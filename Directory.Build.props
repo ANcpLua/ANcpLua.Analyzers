@@ -1,12 +1,15 @@
 <Project>
     <PropertyGroup>
         <Product>ANcpLua.Analyzers</Product>
+        <Authors>Alexander Nachtmann</Authors>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageProjectUrl>https://github.com/ANcpLua/ANcpLua.Analyzers</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/ANcpLua/ANcpLua.Analyzers</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <AssemblyVersion>1</AssemblyVersion>
         <FileVersion>1.0.0</FileVersion>
-        <Version>1.0.2</Version>
+        <Version>1.0.3</Version>
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
