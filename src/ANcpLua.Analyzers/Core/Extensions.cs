@@ -1,7 +1,8 @@
 namespace ANcpLua.Analyzers.Core;
 
 /// <summary>
-/// Extension methods for diagnostic reporting.
+/// Extension methods that simplify diagnostic reporting by combining
+/// Diagnostic.Create and ReportDiagnostic into a single call.
 /// </summary>
 internal static class DiagnosticReportingExtensions
 {
@@ -43,24 +44,4 @@ internal static class DiagnosticReportingExtensions
         DiagnosticDescriptor descriptor,
         Location location)
         => context.ReportDiagnostic(Diagnostic.Create(descriptor, location));
-}
-
-/// <summary>
-/// Extension methods for SemanticModel.
-/// </summary>
-internal static class SemanticModelExtensions
-{
-    public static ISymbol? GetSymbol(
-        this SemanticModel model,
-        SyntaxNode node,
-        CancellationToken cancellationToken = default)
-        => model.GetSymbolInfo(node, cancellationToken).Symbol;
-}
-
-/// <summary>
-/// Symbol equality comparer shorthand.
-/// </summary>
-internal static class Sec
-{
-    public static readonly SymbolEqualityComparer Default = SymbolEqualityComparer.Default;
 }
