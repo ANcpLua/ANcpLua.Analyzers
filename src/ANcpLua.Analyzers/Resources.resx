@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <!-- AL0001: Prohibit primary constructor parameter reassignment -->
+  <data name="AL0001AnalyzerTitle" xml:space="preserve">
+    <value>Prohibit reassignment of primary constructor parameters</value>
+  </data>
+  <data name="AL0001AnalyzerMessageFormat" xml:space="preserve">
+    <value>Primary constructor parameter '{0}' should not be reassigned</value>
+  </data>
+  <data name="AL0001AnalyzerDescription" xml:space="preserve">
+    <value>Primary constructor parameters should not be reassigned as this can lead to confusion and bugs.</value>
+  </data>
+  <!-- AL0002: Don't repeat negated patterns -->
+  <data name="AL0002AnalyzerTitle" xml:space="preserve">
+    <value>Don't repeat negated patterns</value>
+  </data>
+  <data name="AL0002AnalyzerMessageFormat" xml:space="preserve">
+    <value>Use 'not' only once or not at all</value>
+  </data>
+  <data name="AL0002AnalyzerDescription" xml:space="preserve">
+    <value>The negated pattern should not be repeated multiple times.</value>
+  </data>
+  <!-- AL0003: Don't divide by constant zero -->
+  <data name="AL0003AnalyzerTitle" xml:space="preserve">
+    <value>Don't divide by constant zero</value>
+  </data>
+  <data name="AL0003AnalyzerMessageFormat" xml:space="preserve">
+    <value>Division by constant zero will throw DivideByZeroException</value>
+  </data>
+  <data name="AL0003AnalyzerDescription" xml:space="preserve">
+    <value>Integers and Decimal should never be divided by the constant 0 as this causes a DivideByZeroException at runtime.</value>
+  </data>
+  <!-- AL0004: Use pattern matching for Span constant comparison -->
+  <data name="AL0004AnalyzerTitle" xml:space="preserve">
+    <value>Use pattern matching when comparing Span with constants</value>
+  </data>
+  <data name="AL0004AnalyzerMessageFormat" xml:space="preserve">
+    <value>Use pattern matching instead of equality operators for Span comparison</value>
+  </data>
+  <data name="AL0004AnalyzerDescription" xml:space="preserve">
+    <value>When comparing Span and a constant, use pattern matching instead of equality operators, unless you want to compare addresses.</value>
+  </data>
+  <!-- AL0005: Use SequenceEqual for Span non-constant comparison -->
+  <data name="AL0005AnalyzerTitle" xml:space="preserve">
+    <value>Use SequenceEqual when comparing Span with non-constants</value>
+  </data>
+  <data name="AL0005AnalyzerMessageFormat" xml:space="preserve">
+    <value>Use SequenceEqual instead of equality operators for Span comparison</value>
+  </data>
+  <data name="AL0005AnalyzerDescription" xml:space="preserve">
+    <value>When comparing Span and a non-constant, use SequenceEqual instead of equality operators, unless you want to compare addresses.</value>
+  </data>
+  <!-- AL0006: Field name conflicts with primary constructor parameter -->
+  <data name="AL0006AnalyzerTitle" xml:space="preserve">
+    <value>Field name conflicts with primary constructor parameter</value>
+  </data>
+  <data name="AL0006AnalyzerMessageFormat" xml:space="preserve">
+    <value>Field '{0}' conflicts with a primary constructor parameter</value>
+  </data>
+  <data name="AL0006AnalyzerDescription" xml:space="preserve">
+    <value>Field names should not conflict with primary constructor parameters to avoid shadowing and confusion.</value>
+  </data>
+  <!-- AL0007: GetSchema should be explicitly implemented -->
+  <data name="AL0007AnalyzerTitle" xml:space="preserve">
+    <value>GetSchema should be explicitly implemented</value>
+  </data>
+  <data name="AL0007AnalyzerMessageFormat" xml:space="preserve">
+    <value>IXmlSerializable.GetSchema should be explicitly implemented</value>
+  </data>
+  <data name="AL0007AnalyzerDescription" xml:space="preserve">
+    <value>Implement IXmlSerializable.GetSchema explicitly to avoid exposing it as part of the public API.</value>
+  </data>
+  <!-- AL0008: GetSchema must return null -->
+  <data name="AL0008AnalyzerTitle" xml:space="preserve">
+    <value>GetSchema must return null and not be abstract</value>
+  </data>
+  <data name="AL0008AnalyzerMessageFormat" xml:space="preserve">
+    <value>IXmlSerializable.GetSchema should return null and not be abstract</value>
+  </data>
+  <data name="AL0008AnalyzerDescription" xml:space="preserve">
+    <value>GetSchema should return null according to IXmlSerializable guidance and should not be abstract.</value>
+  </data>
+  <!-- AL0009: Don't call GetSchema -->
+  <data name="AL0009AnalyzerTitle" xml:space="preserve">
+    <value>Don't call IXmlSerializable.GetSchema</value>
+  </data>
+  <data name="AL0009AnalyzerMessageFormat" xml:space="preserve">
+    <value>Don't call IXmlSerializable.GetSchema</value>
+  </data>
+  <data name="AL0009AnalyzerDescription" xml:space="preserve">
+    <value>Calling GetSchema is not supported; it should always return null and isn't intended to be invoked.</value>
+  </data>
+  <!-- AL0010: Type should be partial -->
+  <data name="AL0010AnalyzerTitle" xml:space="preserve">
+    <value>Type should be partial</value>
+  </data>
+  <data name="AL0010AnalyzerMessageFormat" xml:space="preserve">
+    <value>The type '{0}' should be partial for source generator support</value>
+  </data>
+  <data name="AL0010AnalyzerDescription" xml:space="preserve">
+    <value>Types that are targets for source generators should be marked as partial.</value>
+  </data>
+  <!-- AL0011: Avoid lock keyword on non-Lock types -->
+  <data name="AL0011AnalyzerTitle" xml:space="preserve">
+    <value>Avoid lock keyword on non-Lock types</value>
+  </data>
+  <data name="AL0011AnalyzerMessageFormat" xml:space="preserve">
+    <value>Use 'Lock _lock = new()' with 'lock(_lock)' instead of 'lock(object)'. The Lock class provides better performance in .NET 9+.</value>
+  </data>
+  <data name="AL0011AnalyzerDescription" xml:space="preserve">
+    <value>The lock keyword on object/non-Lock types should be replaced with the Lock class from System.Threading.</value>
+  </data>
+  <!-- AL0012: Deprecated semantic convention attribute -->
+  <data name="AL0012AnalyzerTitle" xml:space="preserve">
+    <value>Deprecated semantic convention attribute</value>
+  </data>
+  <data name="AL0012AnalyzerMessageFormat" xml:space="preserve">
+    <value>'{0}' is deprecated since schema v{1}. Use '{2}' instead.</value>
+  </data>
+  <data name="AL0012AnalyzerDescription" xml:space="preserve">
+    <value>This attribute name has been deprecated in the OpenTelemetry semantic conventions.</value>
+  </data>
+  <!-- AL0013: Missing telemetry schema URL -->
+  <data name="AL0013AnalyzerTitle" xml:space="preserve">
+    <value>Missing telemetry schema URL</value>
+  </data>
+  <data name="AL0013AnalyzerMessageFormat" xml:space="preserve">
+    <value>OpenTelemetry resource configuration should include 'telemetry.schema_url' attribute</value>
+  </data>
+  <data name="AL0013AnalyzerDescription" xml:space="preserve">
+    <value>Setting the schema URL allows collectors and backends to understand which version of semantic conventions your telemetry uses.</value>
+  </data>
+</root>

@@ -1,0 +1,11 @@
+<Project>
+    <PropertyGroup>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Description)' == ''">
+        <Description>$(AssemblyTitle)</Description>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(GeneratePackageOnBuild)' != 'true'">
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+</Project>

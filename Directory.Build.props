@@ -1,0 +1,18 @@
+<Project>
+    <PropertyGroup>
+        <Product>ANcpLua.Analyzers</Product>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <RepositoryType>git</RepositoryType>
+        <AssemblyVersion>1</AssemblyVersion>
+        <FileVersion>1.0.0</FileVersion>
+        <Version>1.0.2</Version>
+        <LangVersion>latest</LangVersion>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <NoWarn>$(NoWarn);RS2008</NoWarn>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    </PropertyGroup>
+</Project>
