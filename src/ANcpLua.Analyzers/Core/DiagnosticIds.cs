@@ -1,7 +1,7 @@
 namespace ANcpLua.Analyzers.Core;
 
 /// <summary>
-/// Central registry of all diagnostic IDs following Roslyn naming conventions.
+///     Central registry of all diagnostic IDs following Roslyn naming conventions.
 /// </summary>
 public static class DiagnosticIds
 {

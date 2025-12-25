@@ -3,15 +3,17 @@ using ANcpLua.Analyzers.Core;
 namespace ANcpLua.Analyzers.Analyzers;
 
 /// <summary>
-/// AL0010: Type should be partial for source generator support.
+///     AL0010: Type should be partial for source generator support.
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class AL0010PartialTypeAnalyzer : ALAnalyzer
 {
     private static readonly LocalizableResourceString Title = new(
         nameof(Resources.AL0010AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
+
     private static readonly LocalizableResourceString MessageFormat = new(
         nameof(Resources.AL0010AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
+
     private static readonly LocalizableResourceString Description = new(
         nameof(Resources.AL0010AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
 

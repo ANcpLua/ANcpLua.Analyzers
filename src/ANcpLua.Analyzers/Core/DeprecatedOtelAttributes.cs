@@ -1,14 +1,14 @@
 namespace ANcpLua.Analyzers.Core;
 
 /// <summary>
-/// Contains mappings of deprecated OpenTelemetry semantic convention attributes
-/// to their modern replacements.
+///     Contains mappings of deprecated OpenTelemetry semantic convention attributes
+///     to their modern replacements.
 /// </summary>
 public static class DeprecatedOtelAttributes
 {
     /// <summary>
-    /// Deprecated attribute names mapped to replacements.
-    /// Based on OTel schema 1.38.0
+    ///     Deprecated attribute names mapped to replacements.
+    ///     Based on OTel schema 1.38.0
     /// </summary>
     public static readonly IReadOnlyDictionary<string, (string Replacement, string Version)> Renames =
         new Dictionary<string, (string, string)>
@@ -57,7 +57,7 @@ public static class DeprecatedOtelAttributes
         };
 
     /// <summary>
-    /// Known attribute key patterns used in OpenTelemetry APIs.
+    ///     Known attribute key patterns used in OpenTelemetry APIs.
     /// </summary>
     public static readonly HashSet<string> AttributeKeyPatterns = new(StringComparer.OrdinalIgnoreCase)
     {

@@ -3,7 +3,7 @@ using ANcpLua.Analyzers.Core;
 namespace ANcpLua.Analyzers.Analyzers;
 
 /// <summary>
-/// AL0001: Prohibit reassignment of primary constructor parameters.
+///     AL0001: Prohibit reassignment of primary constructor parameters.
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class AL0001ProhibitPrimaryConstructorParameterReassignmentAnalyzer : ALAnalyzer
@@ -51,14 +51,10 @@ public sealed class AL0001ProhibitPrimaryConstructorParameterReassignmentAnalyze
     private static void CheckTuple(IOperation target, OperationAnalysisContext context)
     {
         if (target is ITupleOperation tuple)
-        {
             foreach (var element in tuple.Elements)
                 CheckTuple(element, context);
-        }
         else
-        {
             CheckTargetAndReport(target, context);
-        }
     }
 
     private static void AnalyzeIncrementOrDecrement(OperationAnalysisContext context)
@@ -76,7 +72,8 @@ public sealed class AL0001ProhibitPrimaryConstructorParameterReassignmentAnalyze
             return;
 
         if (!ctor.DeclaringSyntaxReferences.Any(sr =>
-            sr.GetSyntax(context.CancellationToken) is ClassDeclarationSyntax or StructDeclarationSyntax or RecordDeclarationSyntax))
+                sr.GetSyntax(context.CancellationToken) is ClassDeclarationSyntax or StructDeclarationSyntax
+                    or RecordDeclarationSyntax))
             return;
 
         context.ReportDiagnostic(Diagnostic.Create(Rule, target.Syntax.GetLocation(), parameterRef.Parameter.Name));

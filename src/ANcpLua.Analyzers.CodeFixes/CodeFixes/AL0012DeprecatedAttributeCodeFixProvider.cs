@@ -1,9 +1,19 @@
 using ANcpLua.Analyzers.Core;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CodeActions;
+using Microsoft.CodeAnalysis.CodeFixes;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Collections.Immutable;
+using System.Composition;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
 /// <summary>
-/// Code fix provider for AL0012 - replaces deprecated attributes with modern equivalents.
+///     Code fix provider for AL0012 - replaces deprecated attributes with modern equivalents.
 /// </summary>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AL0012DeprecatedAttributeCodeFixProvider))]
 [Shared]
@@ -12,7 +22,10 @@ public sealed class AL0012DeprecatedAttributeCodeFixProvider : CodeFixProvider
     public override ImmutableArray<string> FixableDiagnosticIds =>
         [DiagnosticIds.DeprecatedSemanticConventionAttribute];
 
-    public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
+    public override FixAllProvider GetFixAllProvider()
+    {
+        return WellKnownFixAllProviders.BatchFixer;
+    }
 
     public override async Task RegisterCodeFixesAsync(CodeFixContext context)
     {

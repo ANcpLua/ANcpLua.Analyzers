@@ -3,15 +3,17 @@ using ANcpLua.Analyzers.Core;
 namespace ANcpLua.Analyzers.Analyzers;
 
 /// <summary>
-/// AL0013: Detects OpenTelemetry configurations that don't set the schema URL.
+///     AL0013: Detects OpenTelemetry configurations that don't set the schema URL.
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class AL0013MissingSchemaUrlAnalyzer : ALAnalyzer
 {
     private static readonly LocalizableResourceString Title = new(
         nameof(Resources.AL0013AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
+
     private static readonly LocalizableResourceString MessageFormat = new(
         nameof(Resources.AL0013AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
+
     private static readonly LocalizableResourceString Description = new(
         nameof(Resources.AL0013AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
 
@@ -32,8 +34,10 @@ public sealed class AL0013MissingSchemaUrlAnalyzer : ALAnalyzer
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
-    protected override void RegisterActions(AnalysisContext context) =>
+    protected override void RegisterActions(AnalysisContext context)
+    {
         context.RegisterSyntaxNodeAction(AnalyzeInvocation, SyntaxKind.InvocationExpression);
+    }
 
     private static void AnalyzeInvocation(SyntaxNodeAnalysisContext context)
     {
@@ -91,19 +95,23 @@ public sealed class AL0013MissingSchemaUrlAnalyzer : ALAnalyzer
         return false;
     }
 
-    private static Location GetMethodLocation(InvocationExpressionSyntax invocation) =>
-        invocation.Expression switch
+    private static Location GetMethodLocation(InvocationExpressionSyntax invocation)
+    {
+        return invocation.Expression switch
         {
             MemberAccessExpressionSyntax memberAccess => memberAccess.Name.GetLocation(),
             IdentifierNameSyntax identifier => identifier.GetLocation(),
             _ => invocation.GetLocation()
         };
+    }
 
-    private static string? GetMethodName(InvocationExpressionSyntax invocation) =>
-        invocation.Expression switch
+    private static string? GetMethodName(InvocationExpressionSyntax invocation)
+    {
+        return invocation.Expression switch
         {
             MemberAccessExpressionSyntax memberAccess => memberAccess.Name.Identifier.Text,
             IdentifierNameSyntax identifier => identifier.Identifier.Text,
             _ => null
         };
+    }
 }

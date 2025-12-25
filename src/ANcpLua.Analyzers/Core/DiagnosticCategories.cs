@@ -1,7 +1,7 @@
 namespace ANcpLua.Analyzers.Core;
 
 /// <summary>
-/// Diagnostic categories for grouping related analyzers.
+///     Diagnostic categories for grouping related analyzers.
 /// </summary>
 public static class DiagnosticCategories
 {

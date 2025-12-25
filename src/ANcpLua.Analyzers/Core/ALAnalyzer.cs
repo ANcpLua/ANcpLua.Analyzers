@@ -1,7 +1,7 @@
 namespace ANcpLua.Analyzers.Core;
 
 /// <summary>
-/// Base class for all ANcpLua analyzers.
+///     Base class for all ANcpLua analyzers.
 /// </summary>
 public abstract class ALAnalyzer : DiagnosticAnalyzer
 {

@@ -3,15 +3,17 @@ using ANcpLua.Analyzers.Core;
 namespace ANcpLua.Analyzers.Analyzers;
 
 /// <summary>
-/// AL0012: Detects usage of deprecated OpenTelemetry semantic convention attributes.
+///     AL0012: Detects usage of deprecated OpenTelemetry semantic convention attributes.
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class AL0012DeprecatedAttributeAnalyzer : ALAnalyzer
 {
     private static readonly LocalizableResourceString Title = new(
         nameof(Resources.AL0012AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
+
     private static readonly LocalizableResourceString MessageFormat = new(
         nameof(Resources.AL0012AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
+
     private static readonly LocalizableResourceString Description = new(
         nameof(Resources.AL0012AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
 
@@ -23,8 +25,10 @@ public sealed class AL0012DeprecatedAttributeAnalyzer : ALAnalyzer
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
-    protected override void RegisterActions(AnalysisContext context) =>
+    protected override void RegisterActions(AnalysisContext context)
+    {
         context.RegisterSyntaxNodeAction(AnalyzeStringLiteral, SyntaxKind.StringLiteralExpression);
+    }
 
     private static void AnalyzeStringLiteral(SyntaxNodeAnalysisContext context)
     {
@@ -71,6 +75,7 @@ public sealed class AL0012DeprecatedAttributeAnalyzer : ALAnalyzer
                             typeName.Contains("KeyValuePair"))
                             return true;
                     }
+
                     break;
 
                 case AssignmentExpressionSyntax { Parent: InitializerExpressionSyntax }:
@@ -92,19 +97,23 @@ public sealed class AL0012DeprecatedAttributeAnalyzer : ALAnalyzer
                lowerIdentifier == "attrs";
     }
 
-    private static string? GetMethodName(InvocationExpressionSyntax invocation) =>
-        invocation.Expression switch
+    private static string? GetMethodName(InvocationExpressionSyntax invocation)
+    {
+        return invocation.Expression switch
         {
             MemberAccessExpressionSyntax memberAccess => memberAccess.Name.Identifier.Text,
             IdentifierNameSyntax identifier => identifier.Identifier.Text,
             _ => null
         };
+    }
 
-    private static string? GetIdentifierName(ExpressionSyntax expression) =>
-        expression switch
+    private static string? GetIdentifierName(ExpressionSyntax expression)
+    {
+        return expression switch
         {
             IdentifierNameSyntax identifier => identifier.Identifier.Text,
             MemberAccessExpressionSyntax memberAccess => memberAccess.Name.Identifier.Text,
             _ => null
         };
+    }
 }

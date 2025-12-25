@@ -3,32 +3,38 @@ using ANcpLua.Analyzers.Core;
 namespace ANcpLua.Analyzers.Analyzers;
 
 /// <summary>
-/// Analyzer for IXmlSerializable.GetSchema usage patterns.
-/// AL0007: GetSchema should be explicitly implemented
-/// AL0008: GetSchema must return null and not be abstract
-/// AL0009: Don't call GetSchema
+///     Analyzer for IXmlSerializable.GetSchema usage patterns.
+///     AL0007: GetSchema should be explicitly implemented
+///     AL0008: GetSchema must return null and not be abstract
+///     AL0009: Don't call GetSchema
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class AL0007ToAL0009IXmlSerializableAnalyzer : ALAnalyzer
 {
     private static readonly LocalizableResourceString TitleAL0007 = new(
         nameof(Resources.AL0007AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
+
     private static readonly LocalizableResourceString MessageFormatAL0007 = new(
         nameof(Resources.AL0007AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
+
     private static readonly LocalizableResourceString DescriptionAL0007 = new(
         nameof(Resources.AL0007AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
 
     private static readonly LocalizableResourceString TitleAL0008 = new(
         nameof(Resources.AL0008AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
+
     private static readonly LocalizableResourceString MessageFormatAL0008 = new(
         nameof(Resources.AL0008AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
+
     private static readonly LocalizableResourceString DescriptionAL0008 = new(
         nameof(Resources.AL0008AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
 
     private static readonly LocalizableResourceString TitleAL0009 = new(
         nameof(Resources.AL0009AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
+
     private static readonly LocalizableResourceString MessageFormatAL0009 = new(
         nameof(Resources.AL0009AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
+
     private static readonly LocalizableResourceString DescriptionAL0009 = new(
         nameof(Resources.AL0009AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
 
@@ -54,7 +60,9 @@ public sealed class AL0007ToAL0009IXmlSerializableAnalyzer : ALAnalyzer
         [RuleAL0007, RuleAL0008, RuleAL0009];
 
     protected override void RegisterActions(AnalysisContext context)
-        => context.RegisterCompilationStartAction(OnCompilationStart);
+    {
+        context.RegisterCompilationStartAction(OnCompilationStart);
+    }
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context)
     {
@@ -91,17 +99,16 @@ public sealed class AL0007ToAL0009IXmlSerializableAnalyzer : ALAnalyzer
             return;
 
         // AL0007: Check if explicitly implemented
-        if (!methodSymbol.ExplicitInterfaceImplementations.Any(i => SymbolEqualityComparer.Default.Equals(i, interfaceGetSchema)))
-        {
+        if (!methodSymbol.ExplicitInterfaceImplementations.Any(i =>
+                SymbolEqualityComparer.Default.Equals(i, interfaceGetSchema)))
             context.ReportDiagnostic(RuleAL0007, methodSymbol.Locations[0]);
-        }
 
         // AL0008: Check if abstract or returns non-null
         if (methodSymbol.IsAbstract || ReturnsNonNullValue(methodDeclaration, context.SemanticModel))
         {
             var location = methodDeclaration.DescendantNodes()
-                .FirstOrDefault(n => n is BlockSyntax or ArrowExpressionClauseSyntax)?.GetLocation()
-                ?? methodDeclaration.GetLocation();
+                               .FirstOrDefault(n => n is BlockSyntax or ArrowExpressionClauseSyntax)?.GetLocation()
+                           ?? methodDeclaration.GetLocation();
 
             context.ReportDiagnostic(RuleAL0008, location);
         }
@@ -118,16 +125,15 @@ public sealed class AL0007ToAL0009IXmlSerializableAnalyzer : ALAnalyzer
         // AL0009: Don't call GetSchema
         if (SymbolEqualityComparer.Default.Equals(targetMethod, interfaceGetSchema) ||
             IsGetSchemaImplementation(targetMethod, ixmlSerializable))
-        {
             context.ReportDiagnostic(Diagnostic.Create(
                 RuleAL0009,
                 invocation.Syntax.GetLocation()));
-        }
     }
 
     private static bool IsGetSchemaImplementation(IMethodSymbol method, INamedTypeSymbol ixmlSerializable)
     {
-        var implementsInterface = method.ContainingType.AllInterfaces.Contains(ixmlSerializable, SymbolEqualityComparer.Default);
+        var implementsInterface =
+            method.ContainingType.AllInterfaces.Contains(ixmlSerializable, SymbolEqualityComparer.Default);
         if (!implementsInterface)
             return false;
 

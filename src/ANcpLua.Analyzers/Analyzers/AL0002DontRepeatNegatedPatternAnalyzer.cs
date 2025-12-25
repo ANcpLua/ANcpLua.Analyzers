@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis.Text;
 namespace ANcpLua.Analyzers.Analyzers;
 
 /// <summary>
-/// AL0002: Don't repeat negated patterns (not not not...).
+///     AL0002: Don't repeat negated patterns (not not not...).
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class AL0002DontRepeatNegatedPatternAnalyzer : ALAnalyzer
@@ -28,8 +28,10 @@ public sealed class AL0002DontRepeatNegatedPatternAnalyzer : ALAnalyzer
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
-    protected override void RegisterActions(AnalysisContext context) =>
+    protected override void RegisterActions(AnalysisContext context)
+    {
         context.RegisterSyntaxNodeAction(AnalyzeNotPattern, SyntaxKind.NotPattern);
+    }
 
     private static void AnalyzeNotPattern(SyntaxNodeAnalysisContext context)
     {

@@ -1,9 +1,18 @@
 using ANcpLua.Analyzers.Core;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CodeActions;
+using Microsoft.CodeAnalysis.CodeFixes;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Collections.Immutable;
+using System.Composition;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
 /// <summary>
-/// Code fix provider for AL0008 - makes GetSchema return null with expression body.
+///     Code fix provider for AL0008 - makes GetSchema return null with expression body.
 /// </summary>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AL0008IXmlSerializableCodeFixProvider))]
 [Shared]
@@ -12,7 +21,10 @@ public sealed class AL0008IXmlSerializableCodeFixProvider : CodeFixProvider
     public override ImmutableArray<string> FixableDiagnosticIds =>
         [DiagnosticIds.GetSchemaMustReturnNull];
 
-    public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
+    public override FixAllProvider GetFixAllProvider()
+    {
+        return WellKnownFixAllProviders.BatchFixer;
+    }
 
     public override async Task RegisterCodeFixesAsync(CodeFixContext context)
     {
@@ -89,9 +101,13 @@ public sealed class AL0008IXmlSerializableCodeFixProvider : CodeFixProvider
     }
 
     private static SyntaxNode ReplaceArrowWithNull(ArrowExpressionClauseSyntax arrow, SyntaxNode root)
-        => root.ReplaceNode(arrow, CreateNullArrowExpression());
+    {
+        return root.ReplaceNode(arrow, CreateNullArrowExpression());
+    }
 
     private static ArrowExpressionClauseSyntax CreateNullArrowExpression()
-        => SyntaxFactory.ArrowExpressionClause(
+    {
+        return SyntaxFactory.ArrowExpressionClause(
             SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression));
+    }
 }

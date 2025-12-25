@@ -4,8 +4,8 @@ using Microsoft.CodeAnalysis.Text;
 namespace ANcpLua.Analyzers.Analyzers;
 
 /// <summary>
-/// AL0004: Use pattern matching when comparing Span and a constant.
-/// AL0005: Use SequenceEqual when comparing Span and a non-constant.
+///     AL0004: Use pattern matching when comparing Span and a constant.
+///     AL0005: Use SequenceEqual when comparing Span and a non-constant.
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class AL0004ToAL0005SpanComparisonAnalyzer : ALAnalyzer
@@ -16,15 +16,19 @@ public sealed class AL0004ToAL0005SpanComparisonAnalyzer : ALAnalyzer
 
     private static readonly LocalizableResourceString TitleAL0004 = new(
         nameof(Resources.AL0004AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
+
     private static readonly LocalizableResourceString MessageFormatAL0004 = new(
         nameof(Resources.AL0004AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
+
     private static readonly LocalizableResourceString DescriptionAL0004 = new(
         nameof(Resources.AL0004AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
 
     private static readonly LocalizableResourceString TitleAL0005 = new(
         nameof(Resources.AL0005AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
+
     private static readonly LocalizableResourceString MessageFormatAL0005 = new(
         nameof(Resources.AL0005AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
+
     private static readonly LocalizableResourceString DescriptionAL0005 = new(
         nameof(Resources.AL0005AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
 
@@ -40,8 +44,10 @@ public sealed class AL0004ToAL0005SpanComparisonAnalyzer : ALAnalyzer
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [RuleAL0004, RuleAL0005];
 
-    protected override void RegisterActions(AnalysisContext context) =>
+    protected override void RegisterActions(AnalysisContext context)
+    {
         context.RegisterCompilationStartAction(CompilationStartAction);
+    }
 
     private static void CompilationStartAction(CompilationStartAnalysisContext context)
     {
@@ -84,16 +90,19 @@ public sealed class AL0004ToAL0005SpanComparisonAnalyzer : ALAnalyzer
             Location.Create(node.SyntaxTree, TextSpan.FromBounds(start, end)));
     }
 
-    private static bool IsConstantCollection(SyntaxNode syntax, SemanticModel model, CancellationToken token) =>
-        syntax.Kind() switch
+    private static bool IsConstantCollection(SyntaxNode syntax, SemanticModel model, CancellationToken token)
+    {
+        return syntax.Kind() switch
         {
             SyntaxKind.StringLiteralExpression => true,
             SyntaxKind.CollectionExpression => ((CollectionExpressionSyntax)syntax).Elements
                 .All(e => model.GetConstantValue(e.DescendantNodes().Single(), token).HasValue),
             SyntaxKind.ArrayCreationExpression => ((ArrayCreationExpressionSyntax)syntax).Initializer?.Expressions
                 .All(e => model.GetConstantValue(e, token).HasValue) ?? true,
-            SyntaxKind.ImplicitArrayCreationExpression => ((ImplicitArrayCreationExpressionSyntax)syntax).Initializer.Expressions
+            SyntaxKind.ImplicitArrayCreationExpression => ((ImplicitArrayCreationExpressionSyntax)syntax).Initializer
+                .Expressions
                 .All(e => model.GetConstantValue(e, token).HasValue),
             _ => false
         };
+    }
 }

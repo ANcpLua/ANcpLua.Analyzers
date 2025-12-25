@@ -1,9 +1,19 @@
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CodeActions;
+using Microsoft.CodeAnalysis.CodeRefactorings;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
+using System.Composition;
+using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ANcpLua.Analyzers.CodeFixes.Refactorings;
 
 /// <summary>
-/// AR0001: Refactoring to convert SCREAMING_SNAKE_CASE identifiers to PascalCase.
+///     AR0001: Refactoring to convert SCREAMING_SNAKE_CASE identifiers to PascalCase.
 /// </summary>
 [ExportCodeRefactoringProvider(LanguageNames.CSharp, Name = nameof(AR0001SnakeCaseToPascalCaseRefactoring))]
 [Shared]
@@ -24,8 +34,12 @@ public sealed class AR0001SnakeCaseToPascalCaseRefactoring : CodeRefactoringProv
                     (doc, name, ct) => ConvertTypeAsync(doc, type, name, ct));
                 break;
 
-            case VariableDeclaratorSyntax { Parent: VariableDeclarationSyntax { Parent: FieldDeclarationSyntax field } } variable
-                when field.Modifiers.Any(m => m.IsKind(SyntaxKind.ConstKeyword)) && IsScreamingSnakeCase(variable.Identifier.Text):
+            case VariableDeclaratorSyntax
+                {
+                    Parent: VariableDeclarationSyntax { Parent: FieldDeclarationSyntax field }
+                } variable
+                when field.Modifiers.Any(m => m.IsKind(SyntaxKind.ConstKeyword)) &&
+                     IsScreamingSnakeCase(variable.Identifier.Text):
                 RegisterRefactoring(context, document, variable.Identifier.Text,
                     (doc, name, ct) => ConvertVariableAsync(doc, variable, name, ct));
                 break;
@@ -99,11 +113,15 @@ public sealed class AR0001SnakeCaseToPascalCaseRefactoring : CodeRefactoringProv
         return document.WithSyntaxRoot(root.ReplaceNode(@delegate, newDelegate));
     }
 
-    private static bool IsScreamingSnakeCase(string identifier) =>
-        ScreamingSnakeCasePattern.IsMatch(identifier) && identifier.Contains('_');
+    private static bool IsScreamingSnakeCase(string identifier)
+    {
+        return ScreamingSnakeCasePattern.IsMatch(identifier) && identifier.Contains('_');
+    }
 
-    private static string ToPascalCase(string screamingSnake) =>
-        string.Concat(screamingSnake
+    private static string ToPascalCase(string screamingSnake)
+    {
+        return string.Concat(screamingSnake
             .Split(new[] { '_' }, StringSplitOptions.RemoveEmptyEntries)
             .Select(word => char.ToUpperInvariant(word[0]) + word.Substring(1).ToLowerInvariant()));
+    }
 }

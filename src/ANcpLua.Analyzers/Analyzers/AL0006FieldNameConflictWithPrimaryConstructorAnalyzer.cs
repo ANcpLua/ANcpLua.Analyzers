@@ -3,7 +3,7 @@ using ANcpLua.Analyzers.Core;
 namespace ANcpLua.Analyzers.Analyzers;
 
 /// <summary>
-/// AL0006: Field names should not conflict with primary constructor parameters.
+///     AL0006: Field names should not conflict with primary constructor parameters.
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class AL0006FieldNameConflictWithPrimaryConstructorAnalyzer : ALAnalyzer
@@ -27,8 +27,10 @@ public sealed class AL0006FieldNameConflictWithPrimaryConstructorAnalyzer : ALAn
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
-    protected override void RegisterActions(AnalysisContext context) =>
+    protected override void RegisterActions(AnalysisContext context)
+    {
         context.RegisterSyntaxNodeAction(SyntaxNodeAction, SyntaxKind.FieldDeclaration);
+    }
 
     private static void SyntaxNodeAction(SyntaxNodeAnalysisContext context)
     {
@@ -45,9 +47,7 @@ public sealed class AL0006FieldNameConflictWithPrimaryConstructorAnalyzer : ALAn
         {
             var identifier = variable.Identifier;
             if (parameterList.Parameters.Any(p => p.Identifier.ValueText == identifier.ValueText))
-            {
                 context.ReportDiagnostic(Rule, identifier.GetLocation(), identifier);
-            }
         }
     }
 }

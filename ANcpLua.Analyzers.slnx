@@ -1,10 +1,10 @@
 <Solution>
-  <Folder Name="/src/">
-    <Project Path="src/ANcpLua.Analyzers.CodeFixes/ANcpLua.Analyzers.CodeFixes.csproj" />
-    <Project Path="src/ANcpLua.Analyzers.Package/ANcpLua.Analyzers.Package.csproj" />
-    <Project Path="src/ANcpLua.Analyzers/ANcpLua.Analyzers.csproj" />
-  </Folder>
-  <Folder Name="/tests/">
-    <Project Path="tests/ANcpLua.Analyzers.Tests/ANcpLua.Analyzers.Tests.csproj" />
-  </Folder>
+    <Folder Name="/src/">
+        <Project Path="src/ANcpLua.Analyzers.CodeFixes/ANcpLua.Analyzers.CodeFixes.csproj"/>
+        <Project Path="src/ANcpLua.Analyzers.Package/ANcpLua.Analyzers.Package.csproj"/>
+        <Project Path="src/ANcpLua.Analyzers/ANcpLua.Analyzers.csproj"/>
+    </Folder>
+    <Folder Name="/tests/">
+        <Project Path="tests/ANcpLua.Analyzers.Tests/ANcpLua.Analyzers.Tests.csproj"/>
+    </Folder>
 </Solution>

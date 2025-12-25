@@ -1,9 +1,19 @@
 using ANcpLua.Analyzers.Analyzers;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CodeActions;
+using Microsoft.CodeAnalysis.CodeFixes;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
+using System.Collections.Immutable;
+using System.Composition;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
 /// <summary>
-/// Code fix for AL0004: Converts Span equality to pattern matching.
+///     Code fix for AL0004: Converts Span equality to pattern matching.
 /// </summary>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AL0004CodeFixProvider))]
 [Shared]
@@ -12,11 +22,13 @@ public sealed class AL0004CodeFixProvider : ALCodeFixProvider<BinaryExpressionSy
     public override ImmutableArray<string> FixableDiagnosticIds =>
         [AL0004ToAL0005SpanComparisonAnalyzer.DiagnosticIdAL0004];
 
-    protected override CodeAction CreateCodeAction(Document document, BinaryExpressionSyntax syntax, SyntaxNode root) =>
-        CodeAction.Create(
+    protected override CodeAction CreateCodeAction(Document document, BinaryExpressionSyntax syntax, SyntaxNode root)
+    {
+        return CodeAction.Create(
             CodeFixResources.AL0004CodeFixTitle,
             _ => UsePatternMatching(document, syntax, root),
             nameof(CodeFixResources.AL0004CodeFixTitle));
+    }
 
     private static Task<Document> UsePatternMatching(
         Document document,
@@ -35,8 +47,10 @@ public sealed class AL0004CodeFixProvider : ALCodeFixProvider<BinaryExpressionSy
         return Task.FromResult(document.WithSyntaxRoot(root.ReplaceNode(binary, isPatternExpression)));
     }
 
-    private static IsPatternExpressionSyntax ProcessStringLiteral(BinaryExpressionSyntax binary) =>
-        SyntaxFactory.IsPatternExpression(binary.Left, SyntaxFactory.ConstantPattern(binary.Right));
+    private static IsPatternExpressionSyntax ProcessStringLiteral(BinaryExpressionSyntax binary)
+    {
+        return SyntaxFactory.IsPatternExpression(binary.Left, SyntaxFactory.ConstantPattern(binary.Right));
+    }
 
     private static IsPatternExpressionSyntax ProcessCollection(BinaryExpressionSyntax binary)
     {
@@ -54,8 +68,8 @@ public sealed class AL0004CodeFixProvider : ALCodeFixProvider<BinaryExpressionSy
     {
         var arrayCreation = (ArrayCreationExpressionSyntax)binary.Right;
         var patterns = arrayCreation.Initializer?.Expressions
-            .Select(e => (PatternSyntax)SyntaxFactory.ConstantPattern(e))
-            ?? [];
+                           .Select(e => (PatternSyntax)SyntaxFactory.ConstantPattern(e))
+                       ?? [];
 
         return SyntaxFactory.IsPatternExpression(
             binary.Left,

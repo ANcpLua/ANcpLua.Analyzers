@@ -1,9 +1,17 @@
 using ANcpLua.Analyzers.Analyzers;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CodeActions;
+using Microsoft.CodeAnalysis.CodeFixes;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Collections.Immutable;
+using System.Composition;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
 /// <summary>
-/// Code fix for AL0002: Simplifies repeated negated patterns.
+///     Code fix for AL0002: Simplifies repeated negated patterns.
 /// </summary>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AL0002CodeFixProvider))]
 [Shared]
@@ -12,11 +20,13 @@ public sealed class AL0002CodeFixProvider : ALCodeFixProvider<UnaryPatternSyntax
     public override ImmutableArray<string> FixableDiagnosticIds =>
         [AL0002DontRepeatNegatedPatternAnalyzer.DiagnosticId];
 
-    protected override CodeAction CreateCodeAction(Document document, UnaryPatternSyntax syntax, SyntaxNode root) =>
-        CodeAction.Create(
+    protected override CodeAction CreateCodeAction(Document document, UnaryPatternSyntax syntax, SyntaxNode root)
+    {
+        return CodeAction.Create(
             CodeFixResources.AL0002CodeFixTitle,
             _ => RemoveRepeatedNegatedPatterns(document, syntax, root),
             nameof(CodeFixResources.AL0002CodeFixTitle));
+    }
 
     private static Task<Document> RemoveRepeatedNegatedPatterns(
         Document document,

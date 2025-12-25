@@ -3,7 +3,7 @@ using ANcpLua.Analyzers.Core;
 namespace ANcpLua.Analyzers.Analyzers;
 
 /// <summary>
-/// AL0003: Integers and Decimal should never be divided by the constant 0.
+///     AL0003: Integers and Decimal should never be divided by the constant 0.
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class AL0003DontDivideByConstantZeroAnalyzer : ALAnalyzer
@@ -27,8 +27,10 @@ public sealed class AL0003DontDivideByConstantZeroAnalyzer : ALAnalyzer
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
-    protected override void RegisterActions(AnalysisContext context) =>
+    protected override void RegisterActions(AnalysisContext context)
+    {
         context.RegisterOperationAction(BinaryOperationAction, OperationKind.Binary);
+    }
 
     private static void BinaryOperationAction(OperationAnalysisContext context)
     {
@@ -48,14 +50,18 @@ public sealed class AL0003DontDivideByConstantZeroAnalyzer : ALAnalyzer
         context.ReportDiagnostic(Diagnostic.Create(Rule, operation.Syntax.GetLocation()));
     }
 
-    private static bool IsIntegerOrDecimalType(ITypeSymbol typeSymbol) =>
-        typeSymbol.SpecialType is
+    private static bool IsIntegerOrDecimalType(ITypeSymbol typeSymbol)
+    {
+        return typeSymbol.SpecialType is
             SpecialType.System_Byte or SpecialType.System_SByte or
             SpecialType.System_Int16 or SpecialType.System_UInt16 or
             SpecialType.System_Int32 or SpecialType.System_UInt32 or
             SpecialType.System_Int64 or SpecialType.System_UInt64 or
             SpecialType.System_Decimal;
+    }
 
-    private static bool IsZero(object? value) =>
-        value is 0 or 0u or 0L or 0ul or (byte)0 or (sbyte)0 or (short)0 or (ushort)0 or 0.0m;
+    private static bool IsZero(object? value)
+    {
+        return value is 0 or 0u or 0L or 0ul or (byte)0 or (sbyte)0 or (short)0 or (ushort)0 or 0.0m;
+    }
 }
