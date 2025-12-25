@@ -40,9 +40,15 @@ jobs:
       - name: Build and Pack
         run: dotnet pack src/ANcpLua.Analyzers.Package/ -c Release -o artifacts -p:Version=${{ steps.version.outputs.version }}
 
-      - name: Push to NuGet
+      - name: NuGet login (OIDC → temp API key)
+        id: login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
+      - name: Push to NuGet (Trusted Publishing)
         run: |
           dotnet nuget push artifacts/*.nupkg \
             --source https://api.nuget.org/v3/index.json \
-            --api-key ${{ secrets.NUGET_API_KEY }} \
+            --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" \
             --skip-duplicate
