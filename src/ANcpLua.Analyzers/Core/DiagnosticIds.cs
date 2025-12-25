@@ -66,4 +66,17 @@ public static class DiagnosticIds
 
     /// <summary>AR0001: Convert SCREAMING_SNAKE_CASE to PascalCase.</summary>
     public const string SnakeCaseToPascalCase = "AR0001";
+
+    // ==========================================================================
+    // Style Analyzers (AL0014+)
+    // ==========================================================================
+
+    /// <summary>AL0014: Prefer pattern matching for null and zero comparisons.</summary>
+    public const string PreferPatternMatchingForNullAndZero = "AL0014";
+
+    /// <summary>AL0015: Normalize null-guard style.</summary>
+    public const string NormalizeNullGuardStyle = "AL0015";
+
+    /// <summary>AL0016: Combine declaration with subsequent null-check.</summary>
+    public const string CombineDeclarationWithNullCheck = "AL0016";
 }

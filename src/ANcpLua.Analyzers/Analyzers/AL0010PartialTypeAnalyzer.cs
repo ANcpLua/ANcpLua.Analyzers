@@ -5,6 +5,11 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// <summary>
 ///     AL0010: Type should be partial for source generator support.
 /// </summary>
+/// <remarks>
+///     Disabled by default because flagging all non-partial types is aggressive.
+///     Users can enable via .editorconfig: dotnet_diagnostic.AL0010.severity = suggestion
+///     Useful for codebases that heavily rely on source generators.
+/// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class AL0010PartialTypeAnalyzer : ALAnalyzer
 {

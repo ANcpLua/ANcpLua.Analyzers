@@ -10,9 +10,8 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class AL0004ToAL0005SpanComparisonAnalyzer : ALAnalyzer
 {
-    public const string DiagnosticIdAL0004 = "AL0004";
-    public const string DiagnosticIdAL0005 = "AL0005";
-    private const string Category = "Usage";
+    public const string DiagnosticIdAL0004 = DiagnosticIds.UsePatternMatchingForSpanConstantComparison;
+    public const string DiagnosticIdAL0005 = DiagnosticIds.UseSequenceEqualForSpanNonConstantComparison;
 
     private static readonly LocalizableResourceString TitleAL0004 = new(
         nameof(Resources.AL0004AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
@@ -33,12 +32,12 @@ public sealed class AL0004ToAL0005SpanComparisonAnalyzer : ALAnalyzer
         nameof(Resources.AL0005AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
 
     private static readonly DiagnosticDescriptor RuleAL0004 = new(
-        DiagnosticIdAL0004, TitleAL0004, MessageFormatAL0004, Category,
+        DiagnosticIdAL0004, TitleAL0004, MessageFormatAL0004, DiagnosticCategories.Usage,
         DiagnosticSeverity.Warning, isEnabledByDefault: true, DescriptionAL0004,
         HelpLinkBase + "AL0004.md");
 
     private static readonly DiagnosticDescriptor RuleAL0005 = new(
-        DiagnosticIdAL0005, TitleAL0005, MessageFormatAL0005, Category,
+        DiagnosticIdAL0005, TitleAL0005, MessageFormatAL0005, DiagnosticCategories.Usage,
         DiagnosticSeverity.Warning, isEnabledByDefault: true, DescriptionAL0005,
         HelpLinkBase + "AL0005.md");
 

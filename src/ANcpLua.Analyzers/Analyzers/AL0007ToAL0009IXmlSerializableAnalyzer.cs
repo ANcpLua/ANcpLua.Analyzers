@@ -66,13 +66,12 @@ public sealed class AL0007ToAL0009IXmlSerializableAnalyzer : ALAnalyzer
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context)
     {
-        var ixmlSerializable = context.Compilation.GetTypeByMetadataName("System.Xml.Serialization.IXmlSerializable");
-
-        if (ixmlSerializable is null)
+        if (context.Compilation.GetTypeByMetadataName("System.Xml.Serialization.IXmlSerializable")
+            is not { } ixmlSerializable)
             return;
 
-        var getSchemaMethod = ixmlSerializable.GetMembers("GetSchema").OfType<IMethodSymbol>().SingleOrDefault();
-        if (getSchemaMethod is null)
+        if (ixmlSerializable.GetMembers("GetSchema").OfType<IMethodSymbol>().SingleOrDefault()
+            is not { } getSchemaMethod)
             return;
 
         context.RegisterSyntaxNodeAction(
@@ -125,19 +124,19 @@ public sealed class AL0007ToAL0009IXmlSerializableAnalyzer : ALAnalyzer
         // AL0009: Don't call GetSchema
         if (SymbolEqualityComparer.Default.Equals(targetMethod, interfaceGetSchema) ||
             IsGetSchemaImplementation(targetMethod, ixmlSerializable))
-            context.ReportDiagnostic(Diagnostic.Create(
-                RuleAL0009,
-                invocation.Syntax.GetLocation()));
+            context.ReportDiagnostic(RuleAL0009, invocation.Syntax.GetLocation());
     }
 
     private static bool IsGetSchemaImplementation(IMethodSymbol method, INamedTypeSymbol ixmlSerializable)
     {
         var implementsInterface =
             method.ContainingType.AllInterfaces.Contains(ixmlSerializable, SymbolEqualityComparer.Default);
+
         if (!implementsInterface)
             return false;
 
-        return method.Name.Contains("GetSchema");
+        return method.Name == "GetSchema" ||
+               method.ExplicitInterfaceImplementations.Any(i => i.Name == "GetSchema");
     }
 
     private static bool ReturnsNonNullValue(MethodDeclarationSyntax methodDeclaration, SemanticModel model)

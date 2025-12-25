@@ -5,6 +5,11 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 /// <summary>
 ///     Code fix provider for AL0012 - replaces deprecated attributes with modern equivalents.
 /// </summary>
+/// <remarks>
+///     Does not extend <see cref="ALCodeFixProvider{TNode}" /> because the diagnostic location
+///     may not directly contain the <see cref="LiteralExpressionSyntax" /> - the literal can be
+///     nested within attribute arguments, requiring <c>DescendantNodesAndSelf</c> traversal.
+/// </remarks>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AL0012DeprecatedAttributeCodeFixProvider))]
 [Shared]
 public sealed class AL0012DeprecatedAttributeCodeFixProvider : CodeFixProvider

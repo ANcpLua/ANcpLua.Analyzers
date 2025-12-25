@@ -6,8 +6,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     AL0013: Detects OpenTelemetry configurations that don't set the schema URL.
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class AL0013MissingSchemaUrlAnalyzer : ALAnalyzer
-{
+public sealed class AL0013MissingSchemaUrlAnalyzer : ALAnalyzer {
     private static readonly LocalizableResourceString Title = new(
         nameof(Resources.AL0013AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
 
@@ -23,23 +22,47 @@ public sealed class AL0013MissingSchemaUrlAnalyzer : ALAnalyzer
         DiagnosticSeverity.Info, isEnabledByDefault: true, Description,
         HelpLinkBase + "AL0013.md");
 
-    private static readonly HashSet<string> ResourceConfigMethods = new(StringComparer.OrdinalIgnoreCase)
-    {
+    private static readonly HashSet<string> ResourceConfigMethods = [
         "ConfigureResource",
         "SetResourceBuilder",
         "AddResource",
         "WithResource",
         "ConfigureOpenTelemetry"
-    };
+    ];
+
+    private static readonly string[] OtelBuilderTypeNames = [
+        "OpenTelemetry.Trace.TracerProviderBuilder",
+        "OpenTelemetry.Metrics.MeterProviderBuilder",
+        "OpenTelemetry.Logs.LoggerProviderBuilder",
+        "OpenTelemetry.OpenTelemetryBuilder",
+        "OpenTelemetry.IOpenTelemetryBuilder"
+    ];
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
-    protected override void RegisterActions(AnalysisContext context)
-    {
-        context.RegisterSyntaxNodeAction(AnalyzeInvocation, SyntaxKind.InvocationExpression);
+    protected override void RegisterActions(AnalysisContext context) {
+        context.RegisterCompilationStartAction(OnCompilationStart);
     }
 
-    private static void AnalyzeInvocation(SyntaxNodeAnalysisContext context)
+    private static void OnCompilationStart(CompilationStartAnalysisContext context)
+    {
+        var otelBuilderTypes = OtelBuilderTypeNames
+            .Select(name => context.Compilation.GetTypeByMetadataName(name))
+            .Where(type => type is not null)
+            .Cast<INamedTypeSymbol>()
+            .ToImmutableArray();
+
+        if (otelBuilderTypes.IsEmpty)
+            return;
+
+        context.RegisterSyntaxNodeAction(
+            ctx => AnalyzeInvocation(ctx, otelBuilderTypes),
+            SyntaxKind.InvocationExpression);
+    }
+
+    private static void AnalyzeInvocation(
+        SyntaxNodeAnalysisContext context,
+        ImmutableArray<INamedTypeSymbol> otelBuilderTypes)
     {
         var invocation = (InvocationExpressionSyntax)context.Node;
 
@@ -47,39 +70,56 @@ public sealed class AL0013MissingSchemaUrlAnalyzer : ALAnalyzer
         if (methodName is null || !ResourceConfigMethods.Contains(methodName))
             return;
 
-        if (!IsLikelyOtelBuilderCall(invocation))
+        if (!IsOtelBuilderCall(invocation, context.SemanticModel, otelBuilderTypes, context.CancellationToken))
             return;
 
-        var hasSchemaUrl = CheckForSchemaUrl(invocation);
-
-        if (hasSchemaUrl) return;
+        if (CheckForSchemaUrl(invocation))
+            return;
 
         var location = GetMethodLocation(invocation);
         context.ReportDiagnostic(Rule, location);
     }
 
-    private static bool IsLikelyOtelBuilderCall(InvocationExpressionSyntax invocation)
+    private static bool IsOtelBuilderCall(
+        InvocationExpressionSyntax invocation,
+        SemanticModel semanticModel,
+        ImmutableArray<INamedTypeSymbol> otelBuilderTypes,
+        CancellationToken cancellationToken)
     {
         if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess)
             return false;
 
-        var receiverText = memberAccess.Expression.ToString().ToLowerInvariant();
-        return receiverText.Contains("builder") ||
-               receiverText.Contains("tracer") ||
-               receiverText.Contains("meter") ||
-               receiverText.Contains("logger") ||
-               receiverText.Contains("otel") ||
-               receiverText.Contains("opentelemetry");
+        var receiverType = semanticModel.GetTypeInfo(memberAccess.Expression, cancellationToken).Type;
+        if (receiverType is null)
+            return false;
+
+        // Walk the type hierarchy (self and base types)
+        var currentType = receiverType;
+        while (currentType is not null)
+        {
+            if (currentType is INamedTypeSymbol namedCurrent &&
+                otelBuilderTypes.Any(t => SymbolEqualityComparer.Default.Equals(t, namedCurrent)))
+                return true;
+
+            currentType = currentType.BaseType;
+        }
+
+        // Check interfaces (handles IOpenTelemetryBuilder and DI patterns)
+        if (receiverType is INamedTypeSymbol namedType)
+        {
+            foreach (var iface in namedType.AllInterfaces)
+            {
+                if (otelBuilderTypes.Any(t => SymbolEqualityComparer.Default.Equals(t, iface)))
+                    return true;
+            }
+        }
+
+        return false;
     }
 
-    private static bool CheckForSchemaUrl(InvocationExpressionSyntax invocation)
-    {
-        var descendants = invocation.DescendantNodes();
-
-        foreach (var node in descendants)
-        {
-            if (node is LiteralExpressionSyntax literal)
-            {
+    private static bool CheckForSchemaUrl(InvocationExpressionSyntax invocation) {
+        foreach (var node in invocation.DescendantNodes()) {
+            if (node is LiteralExpressionSyntax literal) {
                 var value = literal.Token.ValueText;
                 if (value.Contains("schema", StringComparison.OrdinalIgnoreCase) ||
                     value.Contains("telemetry.schema_url", StringComparison.OrdinalIgnoreCase) ||
@@ -87,28 +127,26 @@ public sealed class AL0013MissingSchemaUrlAnalyzer : ALAnalyzer
                     return true;
             }
 
-            if (node is not InvocationExpressionSyntax nestedInvocation) continue;
-            var nestedMethod = GetMethodName(nestedInvocation);
-            if (nestedMethod?.Contains("Schema", StringComparison.OrdinalIgnoreCase) == true) return true;
+            if (node is InvocationExpressionSyntax nestedInvocation) {
+                var nestedMethod = GetMethodName(nestedInvocation);
+                if (nestedMethod?.Contains("Schema", StringComparison.OrdinalIgnoreCase) == true)
+                    return true;
+            }
         }
 
         return false;
     }
 
-    private static Location GetMethodLocation(InvocationExpressionSyntax invocation)
-    {
-        return invocation.Expression switch
-        {
+    private static Location GetMethodLocation(InvocationExpressionSyntax invocation) {
+        return invocation.Expression switch {
             MemberAccessExpressionSyntax memberAccess => memberAccess.Name.GetLocation(),
             IdentifierNameSyntax identifier => identifier.GetLocation(),
             _ => invocation.GetLocation()
         };
     }
 
-    private static string? GetMethodName(InvocationExpressionSyntax invocation)
-    {
-        return invocation.Expression switch
-        {
+    private static string? GetMethodName(InvocationExpressionSyntax invocation) {
+        return invocation.Expression switch {
             MemberAccessExpressionSyntax memberAccess => memberAccess.Name.Identifier.Text,
             IdentifierNameSyntax identifier => identifier.Identifier.Text,
             _ => null

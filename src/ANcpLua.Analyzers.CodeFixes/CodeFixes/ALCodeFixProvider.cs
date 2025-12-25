@@ -12,19 +12,15 @@ public abstract class ALCodeFixProvider<TNode> : CodeFixProvider where TNode : C
 
     public sealed override async Task RegisterCodeFixesAsync(CodeFixContext context)
     {
-        var diagnostic = context.Diagnostics.Single(d => d.Id == FixableDiagnosticIds.Single());
+        var diagnostic = context.Diagnostics.First(d => FixableDiagnosticIds.Contains(d.Id));
         var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
 
-        if (root is null)
+        if (root?.FindNode(diagnostic.Location.SourceSpan) is not TNode declaration)
             return;
 
-        var declaration = root.FindNode(diagnostic.Location.SourceSpan) as TNode;
-        if (declaration is null)
-            return;
-
-        var action = CreateCodeAction(context.Document, declaration, root);
+        var action = CreateCodeAction(context.Document, declaration, root, diagnostic);
         context.RegisterCodeFix(action, diagnostic);
     }
 
-    protected abstract CodeAction CreateCodeAction(Document document, TNode syntax, SyntaxNode root);
+    protected abstract CodeAction CreateCodeAction(Document document, TNode syntax, SyntaxNode root, Diagnostic diagnostic);
 }

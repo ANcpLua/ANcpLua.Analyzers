@@ -8,9 +8,6 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class AL0006FieldNameConflictWithPrimaryConstructorAnalyzer : ALAnalyzer
 {
-    public const string DiagnosticId = "AL0006";
-    private const string Category = "Design";
-
     private static readonly LocalizableResourceString Title = new(
         nameof(Resources.AL0006AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
 
@@ -21,7 +18,8 @@ public sealed class AL0006FieldNameConflictWithPrimaryConstructorAnalyzer : ALAn
         nameof(Resources.AL0006AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
 
     private static readonly DiagnosticDescriptor Rule = new(
-        DiagnosticId, Title, MessageFormat, Category,
+        DiagnosticIds.FieldNameConflictsWithPrimaryConstructorParameter,
+        Title, MessageFormat, DiagnosticCategories.Design,
         DiagnosticSeverity.Warning, isEnabledByDefault: true, Description,
         HelpLinkBase + "AL0006.md");
 
@@ -36,17 +34,17 @@ public sealed class AL0006FieldNameConflictWithPrimaryConstructorAnalyzer : ALAn
     {
         var member = (FieldDeclarationSyntax)context.Node;
 
-        if (member.Parent is not TypeDeclarationSyntax type)
+        if (member.Parent is not TypeDeclarationSyntax { ParameterList: { } parameterList })
             return;
 
-        var parameterList = type.ParameterList;
-        if (parameterList is null)
-            return;
+        var parameterNames = new HashSet<string>(
+            parameterList.Parameters.Select(p => p.Identifier.ValueText),
+            StringComparer.Ordinal);
 
         foreach (var variable in member.Declaration.Variables)
         {
             var identifier = variable.Identifier;
-            if (parameterList.Parameters.Any(p => p.Identifier.ValueText == identifier.ValueText))
+            if (parameterNames.Contains(identifier.ValueText))
                 context.ReportDiagnostic(Rule, identifier.GetLocation(), identifier);
         }
     }

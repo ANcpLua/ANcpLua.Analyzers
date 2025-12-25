@@ -84,4 +84,10 @@
     <data name="AL0012CodeFixTitle" xml:space="preserve">
     <value>Use '{0}' instead</value>
   </data>
+    <data name="AL0015CodeFixTitle" xml:space="preserve">
+    <value>Normalize null-guard style</value>
+  </data>
+    <data name="AL0016CodeFixTitle" xml:space="preserve">
+    <value>Combine declaration with null-check</value>
+  </data>
 </root>

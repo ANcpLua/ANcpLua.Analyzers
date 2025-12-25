@@ -4,11 +4,27 @@ namespace ANcpLua.Analyzers.Core;
 ///     Contains mappings of deprecated OpenTelemetry semantic convention attributes
 ///     to their modern replacements.
 /// </summary>
+/// <remarks>
+///     <para>
+///         <b>Source of Truth:</b> OpenTelemetry Semantic Conventions specification
+///         <see href="https://opentelemetry.io/docs/specs/semconv/" />
+///     </para>
+///     <para>
+///         <b>Last Synchronized:</b> December 2024 (Schema v1.38.0)
+///     </para>
+///     <para>
+///         <b>How to Update:</b>
+///         <list type="number">
+///             <item>Check the semantic conventions changelog for renamed/deprecated attributes</item>
+///             <item>Add new entries with (Replacement, VersionDeprecated) tuple</item>
+///             <item>Update the "Last Synchronized" date and schema version above</item>
+///         </list>
+///     </para>
+/// </remarks>
 public static class DeprecatedOtelAttributes
 {
     /// <summary>
     ///     Deprecated attribute names mapped to replacements.
-    ///     Based on OTel schema 1.38.0
     /// </summary>
     public static readonly IReadOnlyDictionary<string, (string Replacement, string Version)> Renames =
         new Dictionary<string, (string, string)>
@@ -31,8 +47,8 @@ public static class DeprecatedOtelAttributes
             // Network
             ["net.host.name"] = ("server.address", "1.21.0"),
             ["net.host.port"] = ("server.port", "1.21.0"),
-            ["net.sock.host.addr"] = ("server.socket.address", "1.21.0"),
-            ["net.sock.host.port"] = ("server.socket.port", "1.21.0"),
+            ["net.sock.host.addr"] = ("network.local.address", "1.21.0"),
+            ["net.sock.host.port"] = ("network.local.port", "1.21.0"),
             ["net.protocol.name"] = ("network.protocol.name", "1.21.0"),
             ["net.protocol.version"] = ("network.protocol.version", "1.21.0"),
 
@@ -52,8 +68,8 @@ public static class DeprecatedOtelAttributes
             ["faas.id"] = ("cloud.resource_id", "1.19.0"),
 
             // Messaging
-            ["messaging.kafka.client_id"] = ("messaging.client_id", "1.21.0"),
-            ["messaging.rocketmq.client_id"] = ("messaging.client_id", "1.21.0")
+            ["messaging.kafka.client_id"] = ("messaging.client.id", "1.21.0"),
+            ["messaging.rocketmq.client_id"] = ("messaging.client.id", "1.21.0")
         };
 
     /// <summary>

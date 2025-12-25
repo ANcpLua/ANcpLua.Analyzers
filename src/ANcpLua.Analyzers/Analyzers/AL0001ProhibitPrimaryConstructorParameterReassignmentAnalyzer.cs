@@ -8,8 +8,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class AL0001ProhibitPrimaryConstructorParameterReassignmentAnalyzer : ALAnalyzer
 {
-    public const string DiagnosticId = "AL0001";
-    private const string Category = "Design";
+    public const string DiagnosticId = DiagnosticIds.ProhibitPrimaryConstructorParameterReassignment;
 
     private static readonly LocalizableResourceString Title = new(
         nameof(Resources.AL0001AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
@@ -21,7 +20,7 @@ public sealed class AL0001ProhibitPrimaryConstructorParameterReassignmentAnalyze
         nameof(Resources.AL0001AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
 
     private static readonly DiagnosticDescriptor Rule = new(
-        DiagnosticId, Title, MessageFormat, Category,
+        DiagnosticId, Title, MessageFormat, DiagnosticCategories.Design,
         DiagnosticSeverity.Error, isEnabledByDefault: true, Description,
         HelpLinkBase + "AL0001.md");
 
@@ -76,6 +75,6 @@ public sealed class AL0001ProhibitPrimaryConstructorParameterReassignmentAnalyze
                     or RecordDeclarationSyntax))
             return;
 
-        context.ReportDiagnostic(Diagnostic.Create(Rule, target.Syntax.GetLocation(), parameterRef.Parameter.Name));
+        context.ReportDiagnostic(Rule, target.Syntax.GetLocation(), parameterRef.Parameter.Name);
     }
 }

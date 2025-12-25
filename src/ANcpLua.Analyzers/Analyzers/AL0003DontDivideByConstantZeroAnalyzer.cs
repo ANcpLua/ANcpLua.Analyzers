@@ -8,8 +8,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class AL0003DontDivideByConstantZeroAnalyzer : ALAnalyzer
 {
-    public const string DiagnosticId = "AL0003";
-    private const string Category = "Reliability";
+    public const string DiagnosticId = DiagnosticIds.DontDivideByConstantZero;
 
     private static readonly LocalizableResourceString Title = new(
         nameof(Resources.AL0003AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
@@ -21,7 +20,7 @@ public sealed class AL0003DontDivideByConstantZeroAnalyzer : ALAnalyzer
         nameof(Resources.AL0003AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
 
     private static readonly DiagnosticDescriptor Rule = new(
-        DiagnosticId, Title, MessageFormat, Category,
+        DiagnosticId, Title, MessageFormat, DiagnosticCategories.Reliability,
         DiagnosticSeverity.Error, isEnabledByDefault: true, Description,
         HelpLinkBase + "AL0003.md");
 
@@ -47,7 +46,7 @@ public sealed class AL0003DontDivideByConstantZeroAnalyzer : ALAnalyzer
         if (!rightConstant.HasValue || !IsZero(rightConstant.Value))
             return;
 
-        context.ReportDiagnostic(Diagnostic.Create(Rule, operation.Syntax.GetLocation()));
+        context.ReportDiagnostic(Rule, operation.Syntax.GetLocation());
     }
 
     private static bool IsIntegerOrDecimalType(ITypeSymbol typeSymbol)

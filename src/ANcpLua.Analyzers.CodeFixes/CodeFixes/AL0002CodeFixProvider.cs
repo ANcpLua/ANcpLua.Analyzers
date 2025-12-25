@@ -12,7 +12,7 @@ public sealed class AL0002CodeFixProvider : ALCodeFixProvider<UnaryPatternSyntax
     public override ImmutableArray<string> FixableDiagnosticIds =>
         [AL0002DontRepeatNegatedPatternAnalyzer.DiagnosticId];
 
-    protected override CodeAction CreateCodeAction(Document document, UnaryPatternSyntax syntax, SyntaxNode root)
+    protected override CodeAction CreateCodeAction(Document document, UnaryPatternSyntax syntax, SyntaxNode root, Diagnostic diagnostic)
     {
         return CodeAction.Create(
             CodeFixResources.AL0002CodeFixTitle,
@@ -31,7 +31,7 @@ public sealed class AL0002CodeFixProvider : ALCodeFixProvider<UnaryPatternSyntax
         // Even count of 'not' patterns: Remove all 'not'
         // Odd count of 'not' patterns: Leave only one 'not'
         var lastPattern = notPatterns[notPatterns.Length - 1];
-        PatternSyntax realPattern = notPatterns.Length % 2 == 0
+        PatternSyntax realPattern = notPatterns.Length % 2 is 0
             ? lastPattern.Pattern
             : lastPattern;
 

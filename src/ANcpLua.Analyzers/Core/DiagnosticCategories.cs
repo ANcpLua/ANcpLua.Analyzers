@@ -10,4 +10,5 @@ public static class DiagnosticCategories
     public const string Reliability = "Reliability";
     public const string Threading = "Threading";
     public const string OpenTelemetry = "OpenTelemetry";
+    public const string Style = "Style";
 }

@@ -1,4 +1,11 @@
 <Project>
+    <!-- Centralize all build output to artifacts/ -->
+    <PropertyGroup>
+        <ArtifactsPath>$(MSBuildThisFileDirectory)artifacts/</ArtifactsPath>
+        <BaseOutputPath>$(ArtifactsPath)bin/$(MSBuildProjectName)/</BaseOutputPath>
+        <BaseIntermediateOutputPath>$(ArtifactsPath)obj/$(MSBuildProjectName)/</BaseIntermediateOutputPath>
+    </PropertyGroup>
+
     <PropertyGroup>
         <Product>ANcpLua.Analyzers</Product>
         <Authors>Alexander Nachtmann</Authors>
@@ -13,6 +20,10 @@
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <!--
+            RS2008: Enable analyzer release tracking - Suppressed as this is a small project
+                    without formal shipped/unshipped analyzer tracking requirements
+        -->
         <NoWarn>$(NoWarn);RS2008</NoWarn>
     </PropertyGroup>
     <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">

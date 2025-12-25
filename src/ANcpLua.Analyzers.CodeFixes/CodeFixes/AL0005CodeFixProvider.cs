@@ -12,7 +12,7 @@ public sealed class AL0005CodeFixProvider : ALCodeFixProvider<BinaryExpressionSy
     public override ImmutableArray<string> FixableDiagnosticIds =>
         [AL0004ToAL0005SpanComparisonAnalyzer.DiagnosticIdAL0005];
 
-    protected override CodeAction CreateCodeAction(Document document, BinaryExpressionSyntax syntax, SyntaxNode root)
+    protected override CodeAction CreateCodeAction(Document document, BinaryExpressionSyntax syntax, SyntaxNode root, Diagnostic diagnostic)
     {
         return CodeAction.Create(
             CodeFixResources.AL0005CodeFixTitle,
