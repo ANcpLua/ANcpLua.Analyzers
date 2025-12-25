@@ -1,7 +1,6 @@
 using ANcpLua.Analyzers.Core;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing;
-using System.Threading.Tasks;
 
 namespace ANcpLua.Analyzers.Tests;
 

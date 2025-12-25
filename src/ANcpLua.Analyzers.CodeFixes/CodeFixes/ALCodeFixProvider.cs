@@ -1,10 +1,3 @@
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CodeActions;
-using Microsoft.CodeAnalysis.CodeFixes;
-using Microsoft.CodeAnalysis.CSharp;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
 /// <summary>

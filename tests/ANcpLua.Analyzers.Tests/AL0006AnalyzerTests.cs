@@ -1,6 +1,4 @@
 using ANcpLua.Analyzers.Analyzers;
-using System.Threading.Tasks;
-using Xunit;
 
 namespace ANcpLua.Analyzers.Tests;
 

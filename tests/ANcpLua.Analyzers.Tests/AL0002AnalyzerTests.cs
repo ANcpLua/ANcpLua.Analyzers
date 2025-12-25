@@ -1,7 +1,5 @@
 using ANcpLua.Analyzers.Analyzers;
 using ANcpLua.Analyzers.CodeFixes.CodeFixes;
-using System.Threading.Tasks;
-using Xunit;
 
 namespace ANcpLua.Analyzers.Tests;
 
