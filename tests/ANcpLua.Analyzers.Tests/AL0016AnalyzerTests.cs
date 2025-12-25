@@ -75,7 +75,7 @@ public sealed class AL0016AnalyzerTests : ALAnalyzerTest<AL0016CombineDeclaratio
                 {
                     public void TestMethod()
                     {
-                        var x = M(), y = N();
+                        object? x = M(), y = N();
                         if (x is null) return;
                     }
 
@@ -89,7 +89,7 @@ public sealed class AL0016AnalyzerTests : ALAnalyzerTest<AL0016CombineDeclaratio
                     public void TestMethod()
                     {
                         var x = M();
-                        y = ProcessX(x);
+                        var _ = ProcessX(x);
                         if (x is null) return;
                     }
 
@@ -118,15 +118,17 @@ public sealed class AL0016AnalyzerTests : ALAnalyzerTest<AL0016CombineDeclaratio
                     public void TestMethod()
                     {
                         var x = M();
-                        var y = N();
-                        if (y is null) return;
+                        DoSomething();
+                        if (x is null) return;
                     }
 
                     private object? M() => null;
-                    private object? N() => null;
+                    private void DoSomething() { }
                 }
                 """)]
     [InlineData("""
+                public class Wrapper { public object? Value { get; set; } }
+
                 public class TestClass
                 {
                     public void TestMethod()
@@ -135,7 +137,7 @@ public sealed class AL0016AnalyzerTests : ALAnalyzerTest<AL0016CombineDeclaratio
                         if (x?.Value is null) return;
                     }
 
-                    private object? M() => null;
+                    private Wrapper? M() => null;
                 }
                 """)]
     [InlineData("""
@@ -306,7 +308,7 @@ public sealed class AL0016EarlyExitTests : ALCodeFixTest<AL0016CombineDeclaratio
                      {
                          public void ProcessItem(Item? item)
                          {
-                             [|var|] context = item?.Context;
+                             [|var context = item?.Context;|]
                              if (context is null) throw new System.InvalidOperationException("No context");
                              Process(context);
                          }
@@ -353,7 +355,7 @@ public sealed class AL0016EarlyExitTests : ALCodeFixTest<AL0016CombineDeclaratio
                          {
                              foreach (var item in items)
                              {
-                                 [|var|] processed = Process(item);
+                                 [|var processed = Process(item);|]
                                  if (processed is null) continue;
                                  Add(processed);
                              }
@@ -401,7 +403,7 @@ public sealed class AL0016EarlyExitTests : ALCodeFixTest<AL0016CombineDeclaratio
                          {
                              for (int i = 0; i < array.Length; i++)
                              {
-                                 [|var|] value = GetValue(array[i]);
+                                 [|var value = GetValue(array[i]);|]
                                  if (value is null) break;
                                  ProcessValue(value);
                              }
@@ -443,7 +445,7 @@ public sealed class AL0016EarlyExitTests : ALCodeFixTest<AL0016CombineDeclaratio
                      {
                          public void ProcessData(object? data)
                          {
-                             [|var|] config = LoadConfig(data);
+                             [|var config = LoadConfig(data);|]
                              if (config is null)
                              {
                                  throw new System.IO.FileNotFoundException("config.json not found");
@@ -487,7 +489,7 @@ public sealed class AL0016EarlyExitTests : ALCodeFixTest<AL0016CombineDeclaratio
                      {
                          public string FormatData(object? data)
                          {
-                             [|var|] value = Extract(data);
+                             [|var value = Extract(data);|]
                              if (value is null)
                              {
                                  return "N/A";
@@ -531,11 +533,16 @@ public sealed class AL0016ComplexExpressionTests : ALCodeFixTest<AL0016CombineDe
     public Task ShouldCombineComplexNullConditionalExpression()
     {
         var source = """
+                     public interface IData
+                     {
+                         System.Func<object?>? GetValue { get; }
+                     }
+
                      public class TestClass
                      {
                          public void ProcessData(IData? data)
                          {
-                             [|var|] value = data?.GetValue?.Invoke();
+                             [|var value = data?.GetValue?.Invoke();|]
                              if (value is null) return;
                              Use(value);
                          }
@@ -545,6 +552,11 @@ public sealed class AL0016ComplexExpressionTests : ALCodeFixTest<AL0016CombineDe
                      """;
 
         var expected = """
+                       public interface IData
+                       {
+                           System.Func<object?>? GetValue { get; }
+                       }
+
                        public class TestClass
                        {
                            public void ProcessData(IData? data)
@@ -571,7 +583,7 @@ public sealed class AL0016ComplexExpressionTests : ALCodeFixTest<AL0016CombineDe
                      {
                          public void ProcessData(object? input)
                          {
-                             [|var|] data = input as string;
+                             [|var data = input as string;|]
                              if (data is null) return;
                              Use(data);
                          }
@@ -613,13 +625,13 @@ public sealed class AL0016FixAllTests : ALCodeFixTest<AL0016CombineDeclarationWi
                      {
                          public void ProcessData(object? data1, object? data2, object? data3)
                          {
-                             [|var|] value1 = Extract(data1);
+                             [|var value1 = Extract(data1);|]
                              if (value1 is null) return;
 
-                             [|var|] value2 = Extract(data2);
+                             [|var value2 = Extract(data2);|]
                              if (value2 is null) return;
 
-                             [|var|] value3 = Extract(data3);
+                             [|var value3 = Extract(data3);|]
                              if (value3 is null) return;
 
                              UseAll(value1, value2, value3);
@@ -671,10 +683,10 @@ public sealed class AL0016FixAllTests : ALCodeFixTest<AL0016CombineDeclarationWi
                          {
                              foreach (var item in items)
                              {
-                                 [|var|] name = item?.Name;
+                                 [|var name = item?.Name;|]
                                  if (name is null) continue;
 
-                                 [|var|] value = item?.Value;
+                                 [|var value = item?.Value;|]
                                  if (value is null) break;
 
                                  Use(name, value);

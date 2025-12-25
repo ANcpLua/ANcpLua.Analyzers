@@ -47,19 +47,47 @@ public sealed class AL0015NormalizeNullGuardStyleAnalyzer : ALAnalyzer
     private static void OnCompilationStart(CompilationStartAnalysisContext context)
     {
         var throwIfNullExists = ThrowIfNullExists(context.Compilation);
-
-        // Read EditorConfig and build properties
         var provider = context.Options.AnalyzerConfigOptionsProvider;
-        var targetFrameworks = provider.GlobalOptions.GetValueOrNull("build_property.TargetFrameworks") ?? "";
-        var targetFramework = provider.GlobalOptions.GetValueOrNull("build_property.TargetFramework") ?? "";
-        var nullGuardStyle = provider.GlobalOptions.GetValueOrNull("ancplua_nullguard_style") ?? "auto";
-
-        // Compute the null-guard mode based on config and capabilities
-        var mode = ComputeNullGuardMode(nullGuardStyle, targetFrameworks, targetFramework, throwIfNullExists);
 
         context.RegisterSyntaxNodeAction(
-            ctx => AnalyzeIfStatement(ctx, throwIfNullExists, mode),
+            ctx => AnalyzeIfStatement(ctx, throwIfNullExists, provider),
             SyntaxKind.IfStatement);
+    }
+
+    /// <summary>
+    /// Gets an analyzer option, checking both global options and per-file options.
+    /// This ensures compatibility with both MSBuild (which uses GlobalOptions) and
+    /// testing frameworks (which may use per-file editorconfig).
+    /// </summary>
+    private static string GetOption(
+        AnalyzerConfigOptionsProvider provider,
+        SyntaxTree syntaxTree,
+        string optionName,
+        string defaultValue = "")
+    {
+        // First try global options (MSBuild scenario)
+        var globalValue = provider.GlobalOptions.GetValueOrNull(optionName);
+        if (!string.IsNullOrEmpty(globalValue))
+            return StripQuotes(globalValue!);
+
+        // Then try per-file options (test scenario or explicit editorconfig)
+        var fileOptions = provider.GetOptions(syntaxTree);
+        var fileValue = fileOptions.GetValueOrNull(optionName);
+        if (!string.IsNullOrEmpty(fileValue))
+            return StripQuotes(fileValue!);
+
+        return defaultValue;
+    }
+
+    /// <summary>
+    /// Strips surrounding quotes from a value if present.
+    /// EditorConfig values may be quoted to preserve special characters like semicolons.
+    /// </summary>
+    private static string StripQuotes(string value)
+    {
+        if (value.Length >= 2 && value.StartsWith("\"") && value.EndsWith("\""))
+            return value.Substring(1, value.Length - 2);
+        return value;
     }
 
     private static bool ThrowIfNullExists(Compilation compilation)
@@ -87,7 +115,7 @@ public sealed class AL0015NormalizeNullGuardStyleAnalyzer : ALAnalyzer
     /// Computes the null-guard mode based on EditorConfig settings, target frameworks, and capability detection.
     ///
     /// Logic:
-    /// 1. If multi-target (TargetFrameworks contains ';') => portable (stability)
+    /// 1. If multi-target (TargetFrameworks contains ';' or explicit override) => portable (stability)
     /// 2. Else if single target:
     ///    a. If mode == "bcl" AND ThrowIfNull is supported => bcl
     ///    b. Else => portable
@@ -98,10 +126,12 @@ public sealed class AL0015NormalizeNullGuardStyleAnalyzer : ALAnalyzer
         string? editorConfigMode,
         string? targetFrameworks,
         string? targetFramework,
+        string? isMultiTargetOverride,
         bool throwIfNullExists)
     {
-        // Multi-target detection: TargetFrameworks contains semicolon separator
-        bool isMultiTarget = targetFrameworks?.Contains(';') == true;
+        // Multi-target detection: explicit override, or TargetFrameworks contains semicolon separator
+        bool isMultiTarget = string.Equals(isMultiTargetOverride, "true", StringComparison.OrdinalIgnoreCase)
+                             || targetFrameworks?.Contains(';') == true;
 
         // If multi-target, always use portable for stability
         if (isMultiTarget)
@@ -140,9 +170,31 @@ public sealed class AL0015NormalizeNullGuardStyleAnalyzer : ALAnalyzer
         return true;
     }
 
-    private static void AnalyzeIfStatement(SyntaxNodeAnalysisContext context, bool throwIfNullExists, string mode)
+    private static void AnalyzeIfStatement(
+        SyntaxNodeAnalysisContext context,
+        bool throwIfNullExists,
+        AnalyzerConfigOptionsProvider provider)
     {
         var ifStatement = (IfStatementSyntax)context.Node;
+        var syntaxTree = ifStatement.SyntaxTree;
+
+        // Read EditorConfig and build properties (checking both global and per-file options)
+        // Try MSBuild property first (production), then custom option (testing/explicit config)
+        var targetFrameworks = GetOption(provider, syntaxTree, "build_property.TargetFrameworks");
+        if (string.IsNullOrEmpty(targetFrameworks))
+            targetFrameworks = GetOption(provider, syntaxTree, "ancplua_target_frameworks");
+
+        var targetFramework = GetOption(provider, syntaxTree, "build_property.TargetFramework");
+        if (string.IsNullOrEmpty(targetFramework))
+            targetFramework = GetOption(provider, syntaxTree, "ancplua_target_framework");
+
+        // Check explicit multi-target flag (for testing or explicit configuration)
+        var isMultiTargetOverride = GetOption(provider, syntaxTree, "ancplua_is_multi_target");
+
+        var nullGuardStyle = GetOption(provider, syntaxTree, "ancplua_nullguard_style", "auto");
+
+        // Compute the null-guard mode based on config and capabilities
+        var mode = ComputeNullGuardMode(nullGuardStyle, targetFrameworks, targetFramework, isMultiTargetOverride, throwIfNullExists);
 
         // Parse the condition to extract null-check info
         if (!TryParseNullCheckCondition(ifStatement.Condition, context.SemanticModel, out var identifier, out var _))
@@ -277,8 +329,25 @@ public sealed class AL0015NormalizeNullGuardStyleAnalyzer : ALAnalyzer
             return false;
 
         // Verify it's ArgumentNullException
+        // First try semantic check, then fall back to syntax check
         var typeSymbol = semanticModel.GetTypeInfo(objectCreation.Type).Type;
-        if (typeSymbol?.ToDisplayString() != "System.ArgumentNullException")
+        bool isArgumentNullException = false;
+
+        if (typeSymbol is not null)
+        {
+            // Semantic check: type name is ArgumentNullException in System namespace
+            isArgumentNullException = typeSymbol.Name == "ArgumentNullException" &&
+                                      typeSymbol.ContainingNamespace?.ToDisplayString() == "System";
+        }
+        else
+        {
+            // Fallback: check syntax for common patterns
+            var typeName = objectCreation.Type.ToString();
+            isArgumentNullException = typeName == "ArgumentNullException" ||
+                                      typeName == "System.ArgumentNullException";
+        }
+
+        if (!isArgumentNullException)
             return false;
 
         // Must have exactly 1 argument (paramName only, no message or inner exception)

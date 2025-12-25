@@ -1,4 +1,5 @@
 using ANcpLua.Analyzers.Core;
+using Microsoft.CodeAnalysis.Editing;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
@@ -36,7 +37,7 @@ public sealed class AL0016CombineDeclarationWithNullCheckCodeFixProvider : ALCod
             nameof(AL0016CombineDeclarationWithNullCheckCodeFixProvider));
     }
 
-    private static Task<Document> CombineDeclarationWithNullCheck(
+    private static async Task<Document> CombineDeclarationWithNullCheck(
         Document document,
         LocalDeclarationStatementSyntax declaration,
         SyntaxNode root,
@@ -50,49 +51,44 @@ public sealed class AL0016CombineDeclarationWithNullCheckCodeFixProvider : ALCod
         // Find the next statement (the if statement)
         var nextStatement = TryGetNextStatement(declaration);
         if (nextStatement is not IfStatementSyntax ifStatement)
-            return Task.FromResult(document);
+            return document;
 
         // Create the pattern: not { } x
-        // This is: UnaryPattern(not) with RecursivePattern that has PropertyPatternClause { } and VariableDesignation x
-        var propertyPatternClause = SyntaxFactory.PropertyPatternClause(
-            SyntaxFactory.Token(SyntaxKind.OpenBraceToken),
-            default,
-            SyntaxFactory.Token(SyntaxKind.CloseBraceToken));
+        // Build inline pattern: is not { } variableName
+        // Parse the pattern as a string to ensure correct inline formatting
+        var patternText = $"is not {{ }} {variableName}";
+        var isPatternExpr = SyntaxFactory.ParseExpression($"_ {patternText}") as IsPatternExpressionSyntax;
+        var pattern = isPatternExpr!.Pattern;
 
-        var variableDesignation = SyntaxFactory.SingleVariableDesignation(
-            SyntaxFactory.Identifier(variableName));
-
-        var recursivePattern = SyntaxFactory.RecursivePattern(
-            null,
-            null,
-            propertyPatternClause,
-            variableDesignation);
-
-        var notPattern = SyntaxFactory.UnaryPattern(
-            SyntaxFactory.Token(SyntaxKind.NotKeyword).WithTrailingTrivia(SyntaxFactory.Space),
-            recursivePattern);
-
-        // Create the is pattern expression
+        // Create the is pattern expression with the initializer
         var newCondition = SyntaxFactory.IsPatternExpression(
             initializer.WithoutTrivia(),
             SyntaxFactory.Token(SyntaxKind.IsKeyword)
                 .WithLeadingTrivia(SyntaxFactory.Space)
                 .WithTrailingTrivia(SyntaxFactory.Space),
-            notPattern);
+            pattern);
 
         // Create the new if statement using the original statement body
+        // Build the if statement with explicit tokens to control formatting
+        // The statement body needs a space before it, not a newline
+        var statementBody = ifStatement.Statement.WithoutLeadingTrivia();
         var newIfStatement = SyntaxFactory.IfStatement(
-            newCondition,
-            ifStatement.Statement)
+                SyntaxFactory.Token(SyntaxKind.IfKeyword),
+                SyntaxFactory.Token(SyntaxKind.OpenParenToken),
+                newCondition,
+                SyntaxFactory.Token(SyntaxKind.CloseParenToken).WithTrailingTrivia(SyntaxFactory.Space),
+                statementBody,
+                null)
             .WithLeadingTrivia(declaration.GetLeadingTrivia())
             .WithTrailingTrivia(ifStatement.GetTrailingTrivia());
 
-        // Replace both statements: remove declaration and replace if statement
-        var newRoot = root
-            .RemoveNode(declaration, SyntaxRemoveOptions.KeepTrailingTrivia)!
-            .ReplaceNode(ifStatement, newIfStatement);
+        // Use DocumentEditor to handle multiple changes correctly
+        // (RemoveNode followed by ReplaceNode doesn't work because nodes become stale)
+        var editor = await DocumentEditor.CreateAsync(document, cancellationToken);
+        editor.RemoveNode(declaration);
+        editor.ReplaceNode(ifStatement, newIfStatement);
 
-        return Task.FromResult(document.WithSyntaxRoot(newRoot));
+        return editor.GetChangedDocument();
     }
 
     /// <summary>
