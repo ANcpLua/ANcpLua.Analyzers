@@ -227,7 +227,7 @@ public sealed class AL0016CodeFixTests : ALCodeFixTest<AL0016CombineDeclarationW
                      {
                          public void TestMethod()
                          {
-                             [|var|] x = M();
+                             [|var x = M();|]
                              if (x is null) return;
                          }
 
@@ -261,7 +261,7 @@ public sealed class AL0016CodeFixTests : ALCodeFixTest<AL0016CombineDeclarationW
                      {
                          public void TestMethod()
                          {
-                             [|var|] result = GetValue();
+                             [|var result = GetValue();|]
                              if (result == null) return;
                          }
 
