@@ -7,6 +7,7 @@ Guidance for Claude Code when working with ANcpLua.Analyzers.
 **ANcpLua.Analyzers** provides Roslyn analyzers and code fixes for C# best practices:
 - AL0001-AL0016: Various code quality rules
 - Shipped as a NuGet package consumed by ANcpLua.NET.Sdk
+- Self-contained (no external dependencies beyond Roslyn)
 
 **Current Version:** See `Directory.Build.props`
 
@@ -17,50 +18,42 @@ Guidance for Claude Code when working with ANcpLua.Analyzers.
 dotnet build
 
 # Test
-dotnet test
+dotnet run --project tests/ANcpLua.Analyzers.Tests/
 
 # Pack
 dotnet pack src/ANcpLua.Analyzers.Package/
 ```
 
-## Automation (ZERO MANUAL STEPS)
+## Automation
 
-**Dependabot handles all dependency updates automatically.**
-
-### What's Automated
+**Dependabot handles dependency updates automatically.**
 
 | Automation | Trigger | What Happens |
 |------------|---------|--------------|
-| **Dependabot** | Weekly | Creates PRs for NuGet package updates |
-| **Roslyn.Utilities updates** | Dependabot | Auto-PR when new version available |
-
-### Dependencies
-
-- `ANcpLua.Roslyn.Utilities` - Roslyn extension methods (NuGet reference)
-- `Microsoft.CodeAnalysis.CSharp` - Roslyn APIs
-
-**When Roslyn.Utilities updates:** Dependabot creates PR. Merge it. Done.
+| **Dependabot** | Weekly | Creates PRs for NuGet/GitHub Actions updates |
+| **NuGet Publish** | Tag `v*` | Builds, packs, publishes to NuGet.org |
 
 ## Project Structure
 
 ```
 src/
 ├── ANcpLua.Analyzers/           # Analyzer implementations
-│   └── Analyzers/               # AL0001-AL0016
+│   ├── Analyzers/               # AL0001-AL0016
+│   ├── Core/                    # ALAnalyzer base, DiagnosticIds, etc.
+│   └── Internal/                # RoslynExtensions (inlined helpers)
 ├── ANcpLua.Analyzers.CodeFixes/ # Code fix providers
 └── ANcpLua.Analyzers.Package/   # NuGet package (ships both)
 
 tests/
-├── ANcpLua.Analyzers.Tests/     # Unit tests (MTP v2)
-└── ANcpLua.Analyzers.Benchmarks/
+└── ANcpLua.Analyzers.Tests/     # Unit tests (xUnit v3 + MTP v2)
 ```
 
 ## Adding New Rules
 
 1. Create analyzer in `src/ANcpLua.Analyzers/Analyzers/AL00XXAnalyzer.cs`
 2. Create code fix in `src/ANcpLua.Analyzers.CodeFixes/CodeFixes/AL00XXCodeFixProvider.cs`
-3. Add tests in `tests/ANcpLua.Analyzers.Tests/`
-4. Update `DiagnosticIds.cs` and `DiagnosticCategories.cs`
+3. Add diagnostic ID to `DiagnosticIds` in `Core/ALAnalyzer.cs`
+4. Add tests in `tests/ANcpLua.Analyzers.Tests/`
 
 ## Testing Analyzers
 
@@ -71,12 +64,11 @@ await VerifyCS.VerifyAnalyzerAsync(testCode, expectedDiagnostic);
 await VerifyCS.VerifyCodeFixAsync(testCode, expectedDiagnostic, fixedCode);
 ```
 
-## Related Repos
+## Related
 
 | Repo | Relationship |
 |------|--------------|
-| `ANcpLua.Roslyn.Utilities` | Provides Roslyn extension methods |
-| `ANcpLua.NET.Sdk` | Consumes this analyzer package |
+| `ANcpLua.NET.Sdk` | MSBuild SDK that consumes this analyzer |
 
 ## Critical Files
 
@@ -84,4 +76,5 @@ await VerifyCS.VerifyCodeFixAsync(testCode, expectedDiagnostic, fixedCode);
 |------|---------|
 | `Directory.Build.props` | Version, common settings |
 | `Directory.Packages.props` | Central Package Management |
+| `src/ANcpLua.Analyzers/Core/ALAnalyzer.cs` | Base class, DiagnosticIds, DiagnosticCategories |
 | `src/ANcpLua.Analyzers.Package/*.csproj` | NuGet package definition |
