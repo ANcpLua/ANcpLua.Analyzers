@@ -3,8 +3,7 @@ using ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
 namespace ANcpLua.Analyzers.Tests;
 
-public sealed class AL0002AnalyzerTests : ALAnalyzerTest<AL0002DontRepeatNegatedPatternAnalyzer>
-{
+public sealed class AL0002AnalyzerTests : ALAnalyzerTest<AL0002DontRepeatNegatedPatternAnalyzer> {
     [Theory]
     [InlineData("""
                 public class TestClass
@@ -24,14 +23,10 @@ public sealed class AL0002AnalyzerTests : ALAnalyzerTest<AL0002DontRepeatNegated
                     }
                 }
                 """)]
-    public Task ShouldReportDiagnostic(string source)
-    {
-        return VerifyAsync(source);
-    }
+    public Task ShouldReportDiagnostic(string source) => VerifyAsync(source);
 }
 
-public sealed class AL0002CodeFixTests : ALCodeFixTest<AL0002DontRepeatNegatedPatternAnalyzer, AL0002CodeFixProvider>
-{
+public sealed class AL0002CodeFixTests : ALCodeFixTest<AL0002DontRepeatNegatedPatternAnalyzer, AL0002CodeFixProvider> {
     [Theory]
     [InlineData("""
                 public class TestClass
@@ -69,8 +64,5 @@ public sealed class AL0002CodeFixTests : ALCodeFixTest<AL0002DontRepeatNegatedPa
             }
         }
         """)]
-    public Task ShouldFix(string source, string fixedSource)
-    {
-        return VerifyAsync(source, fixedSource);
-    }
+    public Task ShouldFix(string source, string fixedSource) => VerifyAsync(source, fixedSource);
 }

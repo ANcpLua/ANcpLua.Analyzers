@@ -11,12 +11,12 @@ public sealed class AL0004CodeFixProvider : ALCodeFixProvider<BinaryExpressionSy
     public override ImmutableArray<string> FixableDiagnosticIds =>
         [AL0004ToAL0005SpanComparisonAnalyzer.DiagnosticIdAL0004];
 
-    protected override CodeAction CreateCodeAction(Document document, BinaryExpressionSyntax syntax, SyntaxNode root, Diagnostic diagnostic) {
-        return CodeAction.Create(
+    protected override CodeAction CreateCodeAction(Document document, BinaryExpressionSyntax syntax, SyntaxNode root,
+        Diagnostic diagnostic) =>
+        CodeAction.Create(
             CodeFixResources.AL0004CodeFixTitle,
             _ => UsePatternMatching(document, syntax, root),
             nameof(CodeFixResources.AL0004CodeFixTitle));
-    }
 
     private static Task<Document> UsePatternMatching(
         Document document,
@@ -33,9 +33,8 @@ public sealed class AL0004CodeFixProvider : ALCodeFixProvider<BinaryExpressionSy
         return Task.FromResult(document.WithSyntaxRoot(root.ReplaceNode(binary, isPatternExpression)));
     }
 
-    private static IsPatternExpressionSyntax ProcessStringLiteral(BinaryExpressionSyntax binary) {
-        return SyntaxFactory.IsPatternExpression(binary.Left, SyntaxFactory.ConstantPattern(binary.Right));
-    }
+    private static IsPatternExpressionSyntax ProcessStringLiteral(BinaryExpressionSyntax binary) =>
+        SyntaxFactory.IsPatternExpression(binary.Left, SyntaxFactory.ConstantPattern(binary.Right));
 
     private static IsPatternExpressionSyntax ProcessCollection(BinaryExpressionSyntax binary) {
         var collection = (CollectionExpressionSyntax)binary.Right;

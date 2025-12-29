@@ -1,7 +1,5 @@
 using ANcpLua.Analyzers.Analyzers;
 using ANcpLua.Analyzers.CodeFixes.CodeFixes;
-using System;
-using System.Collections.Generic;
 
 namespace ANcpLua.Analyzers.Tests;
 
@@ -10,8 +8,7 @@ namespace ANcpLua.Analyzers.Tests;
 ///     Covers detection of a pattern where a local variable is declared and immediately
 ///     checked for null, flagging them for combination into a single pattern match.
 /// </summary>
-public sealed class AL0016AnalyzerTests : ALAnalyzerTest<AL0016CombineDeclarationWithNullCheckAnalyzer>
-{
+public sealed class AL0016AnalyzerTests : ALAnalyzerTest<AL0016CombineDeclarationWithNullCheckAnalyzer> {
     [Theory]
     [InlineData("""
                 public class TestClass
@@ -64,10 +61,7 @@ public sealed class AL0016AnalyzerTests : ALAnalyzerTest<AL0016CombineDeclaratio
                     private object? Process(object? item) => item;
                 }
                 """)]
-    public Task ShouldReportDiagnostic(string source)
-    {
-        return VerifyAsync(source);
-    }
+    public Task ShouldReportDiagnostic(string source) => VerifyAsync(source);
 
     [Theory]
     [InlineData("""
@@ -164,24 +158,20 @@ public sealed class AL0016AnalyzerTests : ALAnalyzerTest<AL0016CombineDeclaratio
                     private object? M() => null;
                 }
                 """)]
-    public Task ShouldNotReportDiagnostic(string source)
-    {
-        return VerifyAsync(source);
-    }
+    public Task ShouldNotReportDiagnostic(string source) => VerifyAsync(source);
 }
 
 /// <summary>
 ///     Code fix tests for AL0016: Combine declaration with subsequent null-check.
 ///     Tests the transformation of patterns into combined pattern matches.
 /// </summary>
-public sealed class AL0016CodeFixTests : ALCodeFixTest<AL0016CombineDeclarationWithNullCheckAnalyzer, AL0016CombineDeclarationWithNullCheckCodeFixProvider>
-{
+public sealed class AL0016CodeFixTests : ALCodeFixTest<AL0016CombineDeclarationWithNullCheckAnalyzer,
+    AL0016CombineDeclarationWithNullCheckCodeFixProvider> {
     /// <summary>
     ///     Test 5: Basic return statement - the fundamental pattern.
     /// </summary>
     [Fact]
-    public Task ShouldCombineDeclarationWithReturnStatement()
-    {
+    public Task ShouldCombineDeclarationWithReturnStatement() {
         var source = """
                      public interface IData
                      {
@@ -222,8 +212,7 @@ public sealed class AL0016CodeFixTests : ALCodeFixTest<AL0016CombineDeclarationW
     ///     Test 5b: Simple method call return.
     /// </summary>
     [Fact]
-    public Task ShouldCombineSimpleMethodCallWithReturn()
-    {
+    public Task ShouldCombineSimpleMethodCallWithReturn() {
         var source = """
                      public class TestClass
                      {
@@ -256,8 +245,7 @@ public sealed class AL0016CodeFixTests : ALCodeFixTest<AL0016CombineDeclarationW
     ///     Test 5c: Equality check (== null) should also work.
     /// </summary>
     [Fact]
-    public Task ShouldCombineDeclarationWithEqualityCheck()
-    {
+    public Task ShouldCombineDeclarationWithEqualityCheck() {
         var source = """
                      public class TestClass
                      {
@@ -290,14 +278,13 @@ public sealed class AL0016CodeFixTests : ALCodeFixTest<AL0016CombineDeclarationW
 /// <summary>
 ///     Comprehensive tests for different early-exit forms (throw, continue, break).
 /// </summary>
-public sealed class AL0016EarlyExitTests : ALCodeFixTest<AL0016CombineDeclarationWithNullCheckAnalyzer, AL0016CombineDeclarationWithNullCheckCodeFixProvider>
-{
+public sealed class AL0016EarlyExitTests : ALCodeFixTest<AL0016CombineDeclarationWithNullCheckAnalyzer,
+    AL0016CombineDeclarationWithNullCheckCodeFixProvider> {
     /// <summary>
     ///     Test 6: Throw statement as early-exit.
     /// </summary>
     [Fact]
-    public Task ShouldCombineDeclarationWithThrowStatement()
-    {
+    public Task ShouldCombineDeclarationWithThrowStatement() {
         var source = """
                      public class Item
                      {
@@ -342,8 +329,7 @@ public sealed class AL0016EarlyExitTests : ALCodeFixTest<AL0016CombineDeclaratio
     ///     Test 6b: Continue statement in loop.
     /// </summary>
     [Fact]
-    public Task ShouldCombineDeclarationWithContinueStatement()
-    {
+    public Task ShouldCombineDeclarationWithContinueStatement() {
         var source = """
                      public class Item
                      {
@@ -394,8 +380,7 @@ public sealed class AL0016EarlyExitTests : ALCodeFixTest<AL0016CombineDeclaratio
     ///     Test 6c: Break statement in loop.
     /// </summary>
     [Fact]
-    public Task ShouldCombineDeclarationWithBreakStatement()
-    {
+    public Task ShouldCombineDeclarationWithBreakStatement() {
         var source = """
                      public class TestClass
                      {
@@ -438,8 +423,7 @@ public sealed class AL0016EarlyExitTests : ALCodeFixTest<AL0016CombineDeclaratio
     ///     Test 6d: Block containing single throw statement.
     /// </summary>
     [Fact]
-    public Task ShouldCombineDeclarationWithBlockContainingThrow()
-    {
+    public Task ShouldCombineDeclarationWithBlockContainingThrow() {
         var source = """
                      public class TestClass
                      {
@@ -482,8 +466,7 @@ public sealed class AL0016EarlyExitTests : ALCodeFixTest<AL0016CombineDeclaratio
     ///     Test 6e: Block containing single return statement.
     /// </summary>
     [Fact]
-    public Task ShouldCombineDeclarationWithBlockContainingReturn()
-    {
+    public Task ShouldCombineDeclarationWithBlockContainingReturn() {
         var source = """
                      public class TestClass
                      {
@@ -524,14 +507,13 @@ public sealed class AL0016EarlyExitTests : ALCodeFixTest<AL0016CombineDeclaratio
 /// <summary>
 ///     Complex expression and multi-statement tests for AL0016.
 /// </summary>
-public sealed class AL0016ComplexExpressionTests : ALCodeFixTest<AL0016CombineDeclarationWithNullCheckAnalyzer, AL0016CombineDeclarationWithNullCheckCodeFixProvider>
-{
+public sealed class AL0016ComplexExpressionTests : ALCodeFixTest<AL0016CombineDeclarationWithNullCheckAnalyzer,
+    AL0016CombineDeclarationWithNullCheckCodeFixProvider> {
     /// <summary>
     ///     Test: Complex initializer expression (null-conditional call).
     /// </summary>
     [Fact]
-    public Task ShouldCombineComplexNullConditionalExpression()
-    {
+    public Task ShouldCombineComplexNullConditionalExpression() {
         var source = """
                      public interface IData
                      {
@@ -576,8 +558,7 @@ public sealed class AL0016ComplexExpressionTests : ALCodeFixTest<AL0016CombineDe
     ///     Test: Initializer with cast expression.
     /// </summary>
     [Fact]
-    public Task ShouldCombineDeclarationWithCastExpression()
-    {
+    public Task ShouldCombineDeclarationWithCastExpression() {
         var source = """
                      public class TestClass
                      {
@@ -612,14 +593,13 @@ public sealed class AL0016ComplexExpressionTests : ALCodeFixTest<AL0016CombineDe
 /// <summary>
 ///     FixAll (batch fixer) tests for AL0016.
 /// </summary>
-public sealed class AL0016FixAllTests : ALCodeFixTest<AL0016CombineDeclarationWithNullCheckAnalyzer, AL0016CombineDeclarationWithNullCheckCodeFixProvider>
-{
+public sealed class AL0016FixAllTests : ALCodeFixTest<AL0016CombineDeclarationWithNullCheckAnalyzer,
+    AL0016CombineDeclarationWithNullCheckCodeFixProvider> {
     /// <summary>
     ///     Test: Multiple patterns in same method are all fixed.
     /// </summary>
     [Fact]
-    public Task ShouldFixAllDeclarationsInSameMethod()
-    {
+    public Task ShouldFixAllDeclarationsInSameMethod() {
         var source = """
                      public class TestClass
                      {
@@ -668,8 +648,7 @@ public sealed class AL0016FixAllTests : ALCodeFixTest<AL0016CombineDeclarationWi
     ///     Test: Multiple patterns with different exit forms.
     /// </summary>
     [Fact]
-    public Task ShouldFixAllWithDifferentExitForms()
-    {
+    public Task ShouldFixAllWithDifferentExitForms() {
         var source = """
                      public class Item
                      {

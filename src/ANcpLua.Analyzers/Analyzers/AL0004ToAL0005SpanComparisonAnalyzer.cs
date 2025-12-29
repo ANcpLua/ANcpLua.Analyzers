@@ -8,8 +8,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     AL0005: Use SequenceEqual when comparing Span and a non-constant.
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class AL0004ToAL0005SpanComparisonAnalyzer : ALAnalyzer
-{
+public sealed class AL0004ToAL0005SpanComparisonAnalyzer : ALAnalyzer {
     public const string DiagnosticIdAL0004 = DiagnosticIds.UsePatternMatchingForSpanConstantComparison;
     public const string DiagnosticIdAL0005 = DiagnosticIds.UseSequenceEqualForSpanNonConstantComparison;
 
@@ -33,28 +32,26 @@ public sealed class AL0004ToAL0005SpanComparisonAnalyzer : ALAnalyzer
 
     private static readonly DiagnosticDescriptor RuleAL0004 = new(
         DiagnosticIdAL0004, TitleAL0004, MessageFormatAL0004, DiagnosticCategories.Usage,
-        DiagnosticSeverity.Warning, isEnabledByDefault: true, DescriptionAL0004,
+        DiagnosticSeverity.Warning, true, DescriptionAL0004,
         HelpLinkBase + "AL0004.md");
 
     private static readonly DiagnosticDescriptor RuleAL0005 = new(
         DiagnosticIdAL0005, TitleAL0005, MessageFormatAL0005, DiagnosticCategories.Usage,
-        DiagnosticSeverity.Warning, isEnabledByDefault: true, DescriptionAL0005,
+        DiagnosticSeverity.Warning, true, DescriptionAL0005,
         HelpLinkBase + "AL0005.md");
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [RuleAL0004, RuleAL0005];
 
-    protected override void RegisterActions(AnalysisContext context)
-    {
+    protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterCompilationStartAction(CompilationStartAction);
-    }
 
-    private static void CompilationStartAction(CompilationStartAnalysisContext context)
-    {
+    private static void CompilationStartAction(CompilationStartAnalysisContext context) {
         var spanType = context.Compilation.GetTypeByMetadataName("System.Span`1");
         var readOnlySpanType = context.Compilation.GetTypeByMetadataName("System.ReadOnlySpan`1");
 
-        if (spanType is null || readOnlySpanType is null)
+        if (spanType is null || readOnlySpanType is null) {
             return;
+        }
 
         context.RegisterSyntaxNodeAction(
             snac => SyntaxNodeAction(snac, spanType, readOnlySpanType),
@@ -64,20 +61,21 @@ public sealed class AL0004ToAL0005SpanComparisonAnalyzer : ALAnalyzer
     private static void SyntaxNodeAction(
         SyntaxNodeAnalysisContext context,
         INamedTypeSymbol spanType,
-        INamedTypeSymbol readOnlySpanType)
-    {
+        INamedTypeSymbol readOnlySpanType) {
         var model = context.SemanticModel;
         var token = context.CancellationToken;
         var node = (BinaryExpressionSyntax)context.Node;
         var operation = model.GetOperation(node, token) as IBinaryOperation;
 
-        if (operation?.LeftOperand.Type is not INamedTypeSymbol leftType)
+        if (operation?.LeftOperand.Type is not INamedTypeSymbol leftType) {
             return;
+        }
 
         var leftDef = leftType.OriginalDefinition ?? leftType;
         if (!SymbolEqualityComparer.Default.Equals(leftDef, spanType) &&
-            !SymbolEqualityComparer.Default.Equals(leftDef, readOnlySpanType))
+            !SymbolEqualityComparer.Default.Equals(leftDef, readOnlySpanType)) {
             return;
+        }
 
         var rightSyntax = operation.RightOperand.Syntax;
         var hasNonConstant = !IsConstantCollection(rightSyntax, model, token);
@@ -89,10 +87,8 @@ public sealed class AL0004ToAL0005SpanComparisonAnalyzer : ALAnalyzer
             Location.Create(node.SyntaxTree, TextSpan.FromBounds(start, end)));
     }
 
-    private static bool IsConstantCollection(SyntaxNode syntax, SemanticModel model, CancellationToken token)
-    {
-        return syntax.Kind() switch
-        {
+    private static bool IsConstantCollection(SyntaxNode syntax, SemanticModel model, CancellationToken token) =>
+        syntax.Kind() switch {
             SyntaxKind.StringLiteralExpression => true,
             SyntaxKind.CollectionExpression => ((CollectionExpressionSyntax)syntax).Elements
                 .All(e => model.GetConstantValue(e.DescendantNodes().Single(), token).HasValue),
@@ -103,5 +99,4 @@ public sealed class AL0004ToAL0005SpanComparisonAnalyzer : ALAnalyzer
                 .All(e => model.GetConstantValue(e, token).HasValue),
             _ => false
         };
-    }
 }

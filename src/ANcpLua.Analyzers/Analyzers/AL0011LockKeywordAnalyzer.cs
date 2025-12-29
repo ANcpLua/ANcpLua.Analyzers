@@ -7,8 +7,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     In .NET 9+, lock(Lock) is valid and preferred - only warn on lock(object).
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class AL0011LockKeywordAnalyzer : ALAnalyzer
-{
+public sealed class AL0011LockKeywordAnalyzer : ALAnalyzer {
     private const string LockTypeMetadataName = "System.Threading.Lock";
 
     private static readonly LocalizableResourceString Title = new(
@@ -23,37 +22,35 @@ public sealed class AL0011LockKeywordAnalyzer : ALAnalyzer
     private static readonly DiagnosticDescriptor Rule = new(
         DiagnosticIds.AvoidLockKeywordOnNonLockTypes,
         Title, MessageFormat, DiagnosticCategories.Threading,
-        DiagnosticSeverity.Warning, isEnabledByDefault: true, Description,
+        DiagnosticSeverity.Warning, true, Description,
         HelpLinkBase + "AL0011.md");
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
-    protected override void RegisterActions(AnalysisContext context)
-    {
+    protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterCompilationStartAction(OnCompilationStart);
-    }
 
-    private static void OnCompilationStart(CompilationStartAnalysisContext context)
-    {
+    private static void OnCompilationStart(CompilationStartAnalysisContext context) {
         var lockType = context.Compilation.GetTypeByMetadataName(LockTypeMetadataName);
 
-        if (lockType is null)
+        if (lockType is null) {
             return;
+        }
 
         context.RegisterSyntaxNodeAction(
             ctx => AnalyzeLockStatement(ctx, lockType),
             SyntaxKind.LockStatement);
     }
 
-    private static void AnalyzeLockStatement(SyntaxNodeAnalysisContext context, INamedTypeSymbol lockType)
-    {
+    private static void AnalyzeLockStatement(SyntaxNodeAnalysisContext context, INamedTypeSymbol lockType) {
         var lockStatement = (LockStatementSyntax)context.Node;
 
         var lockExpressionType =
             context.SemanticModel.GetTypeInfo(lockStatement.Expression, context.CancellationToken).Type;
 
-        if (SymbolEqualityComparer.Default.Equals(lockExpressionType, lockType))
+        if (SymbolEqualityComparer.Default.Equals(lockExpressionType, lockType)) {
             return;
+        }
 
         context.ReportDiagnostic(Rule, lockStatement.LockKeyword.GetLocation());
     }
