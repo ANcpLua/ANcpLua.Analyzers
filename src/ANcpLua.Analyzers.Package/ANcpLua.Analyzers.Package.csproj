@@ -8,7 +8,6 @@
         <NoPackageAnalysis>true</NoPackageAnalysis>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
         <PackageId>ANcpLua.Analyzers</PackageId>
-        <Authors>ANcpLua</Authors>
         <Description>Modern Roslyn analyzers for C# focusing on code quality and best practices</Description>
         <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
     </PropertyGroup>
