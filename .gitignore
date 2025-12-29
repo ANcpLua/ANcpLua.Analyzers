@@ -64,6 +64,7 @@ BenchmarkDotNet.Artifacts/
 project.lock.json
 project.fragment.lock.json
 artifacts/
+test-artifacts/
 
 # Tye
 .tye/
@@ -482,4 +483,3 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
-repos-created-2025.ndjson
