@@ -94,13 +94,11 @@ public sealed class AR0001SnakeCaseToPascalCaseRefactoring : CodeRefactoringProv
         return document.WithSyntaxRoot(root.ReplaceNode(@delegate, newDelegate));
     }
 
-    private static bool IsScreamingSnakeCase(string identifier) {
-        return ScreamingSnakeCasePattern.IsMatch(identifier) && identifier.Contains('_');
-    }
+    private static bool IsScreamingSnakeCase(string identifier) =>
+        ScreamingSnakeCasePattern.IsMatch(identifier) && identifier.Contains('_');
 
-    private static string ToPascalCase(string screamingSnake) {
-        return string.Concat(screamingSnake
+    private static string ToPascalCase(string screamingSnake) =>
+        string.Concat(screamingSnake
             .Split(['_'], StringSplitOptions.RemoveEmptyEntries)
             .Select(word => char.ToUpperInvariant(word[0]) + word.Substring(1).ToLowerInvariant()));
-    }
 }

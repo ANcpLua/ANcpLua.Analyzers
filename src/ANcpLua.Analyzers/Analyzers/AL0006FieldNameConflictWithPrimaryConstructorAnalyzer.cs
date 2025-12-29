@@ -6,8 +6,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     AL0006: Field names should not conflict with primary constructor parameters.
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class AL0006FieldNameConflictWithPrimaryConstructorAnalyzer : ALAnalyzer
-{
+public sealed class AL0006FieldNameConflictWithPrimaryConstructorAnalyzer : ALAnalyzer {
     private static readonly LocalizableResourceString Title = new(
         nameof(Resources.AL0006AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
 
@@ -20,32 +19,30 @@ public sealed class AL0006FieldNameConflictWithPrimaryConstructorAnalyzer : ALAn
     private static readonly DiagnosticDescriptor Rule = new(
         DiagnosticIds.FieldNameConflictsWithPrimaryConstructorParameter,
         Title, MessageFormat, DiagnosticCategories.Design,
-        DiagnosticSeverity.Warning, isEnabledByDefault: true, Description,
+        DiagnosticSeverity.Warning, true, Description,
         HelpLinkBase + "AL0006.md");
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
-    protected override void RegisterActions(AnalysisContext context)
-    {
+    protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterSyntaxNodeAction(SyntaxNodeAction, SyntaxKind.FieldDeclaration);
-    }
 
-    private static void SyntaxNodeAction(SyntaxNodeAnalysisContext context)
-    {
+    private static void SyntaxNodeAction(SyntaxNodeAnalysisContext context) {
         var member = (FieldDeclarationSyntax)context.Node;
 
-        if (member.Parent is not TypeDeclarationSyntax { ParameterList: { } parameterList })
+        if (member.Parent is not TypeDeclarationSyntax { ParameterList: { } parameterList }) {
             return;
+        }
 
         var parameterNames = new HashSet<string>(
             parameterList.Parameters.Select(p => p.Identifier.ValueText),
             StringComparer.Ordinal);
 
-        foreach (var variable in member.Declaration.Variables)
-        {
+        foreach (var variable in member.Declaration.Variables) {
             var identifier = variable.Identifier;
-            if (parameterNames.Contains(identifier.ValueText))
+            if (parameterNames.Contains(identifier.ValueText)) {
                 context.ReportDiagnostic(Rule, identifier.GetLocation(), identifier);
+            }
         }
     }
 }

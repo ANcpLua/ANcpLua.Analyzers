@@ -7,8 +7,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 /// </summary>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AL0014CodeFixProvider))]
 [Shared]
-public sealed class AL0014CodeFixProvider : ALCodeFixProvider<BinaryExpressionSyntax>
-{
+public sealed class AL0014CodeFixProvider : ALCodeFixProvider<BinaryExpressionSyntax> {
     public override ImmutableArray<string> FixableDiagnosticIds =>
         [AL0014PreferPatternMatchingAnalyzer.DiagnosticId];
 
@@ -16,19 +15,16 @@ public sealed class AL0014CodeFixProvider : ALCodeFixProvider<BinaryExpressionSy
         Document document,
         BinaryExpressionSyntax binary,
         SyntaxNode root,
-        Diagnostic diagnostic)
-    {
-        return CodeAction.Create(
+        Diagnostic diagnostic) =>
+        CodeAction.Create(
             "Use pattern matching",
             _ => ConvertToPatternMatching(document, binary, root),
             nameof(AL0014CodeFixProvider));
-    }
 
     private static Task<Document> ConvertToPatternMatching(
         Document document,
         BinaryExpressionSyntax binary,
-        SyntaxNode root)
-    {
+        SyntaxNode root) {
         var isNegated = binary.IsKind(SyntaxKind.NotEqualsExpression);
         var (expression, literal) = GetExpressionAndLiteral(binary);
 
@@ -46,8 +42,7 @@ public sealed class AL0014CodeFixProvider : ALCodeFixProvider<BinaryExpressionSy
     }
 
     private static (ExpressionSyntax Expression, ExpressionSyntax Literal) GetExpressionAndLiteral(
-        BinaryExpressionSyntax binary)
-    {
+        BinaryExpressionSyntax binary) {
         var leftIsLiteral = IsLiteral(binary.Left);
         return leftIsLiteral
             ? (binary.Right, binary.Left)
@@ -58,8 +53,7 @@ public sealed class AL0014CodeFixProvider : ALCodeFixProvider<BinaryExpressionSy
         expression.IsKind(SyntaxKind.NullLiteralExpression) ||
         expression is LiteralExpressionSyntax { Token.ValueText: "0" };
 
-    private static PatternSyntax CreatePattern(ExpressionSyntax literal, bool isNegated)
-    {
+    private static PatternSyntax CreatePattern(ExpressionSyntax literal, bool isNegated) {
         PatternSyntax constantPattern = SyntaxFactory.ConstantPattern(literal);
 
         return isNegated

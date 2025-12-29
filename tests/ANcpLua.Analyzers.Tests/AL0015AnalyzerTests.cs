@@ -1,8 +1,5 @@
 using ANcpLua.Analyzers.Analyzers;
 using ANcpLua.Analyzers.CodeFixes.CodeFixes;
-using Microsoft.CodeAnalysis.CSharp.Testing;
-using Microsoft.CodeAnalysis.Testing;
-using System;
 
 namespace ANcpLua.Analyzers.Tests;
 
@@ -11,8 +8,7 @@ namespace ANcpLua.Analyzers.Tests;
 ///     Covers detection of simple ArgumentNullException null-guards and code fix generation
 ///     for both BCL and portable forms based on target framework and EditorConfig settings.
 /// </summary>
-public sealed class AL0015AnalyzerTests : ALAnalyzerTest<AL0015NormalizeNullGuardStyleAnalyzer>
-{
+public sealed class AL0015AnalyzerTests : ALAnalyzerTest<AL0015NormalizeNullGuardStyleAnalyzer> {
     [Theory]
     [InlineData("""
                 using System;
@@ -61,10 +57,7 @@ public sealed class AL0015AnalyzerTests : ALAnalyzerTest<AL0015NormalizeNullGuar
                     }
                 }
                 """)]
-    public Task ShouldReportDiagnostic(string source)
-    {
-        return VerifyAsync(source);
-    }
+    public Task ShouldReportDiagnostic(string source) => VerifyAsync(source);
 
     [Theory]
     [InlineData("""
@@ -124,10 +117,7 @@ public sealed class AL0015AnalyzerTests : ALAnalyzerTest<AL0015NormalizeNullGuar
                     }
                 }
                 """)]
-    public Task ShouldNotReportDiagnostic(string source)
-    {
-        return VerifyAsync(source);
-    }
+    public Task ShouldNotReportDiagnostic(string source) => VerifyAsync(source);
 }
 
 /// <summary>
@@ -135,16 +125,15 @@ public sealed class AL0015AnalyzerTests : ALAnalyzerTest<AL0015NormalizeNullGuar
 ///     Tests both BCL form (ArgumentNullException.ThrowIfNull) and portable form
 ///     (coalesce assignment) generation based on configuration.
 /// </summary>
-public sealed class AL0015PortableFormCodeFixTests : ALCodeFixTestWithEditorConfig<AL0015NormalizeNullGuardStyleAnalyzer, AL0015NormalizeNullGuardStyleCodeFixProvider>
-{
+public sealed class AL0015PortableFormCodeFixTests : ALCodeFixTestWithEditorConfig<AL0015NormalizeNullGuardStyleAnalyzer
+    , AL0015NormalizeNullGuardStyleCodeFixProvider> {
     /// <summary>
     ///     Test 1: netstandard2.0 without ThrowIfNull produces portable form.
     ///     Setup: No ThrowIfNull available, auto mode
     ///     Expect: Fix produces PORTABLE form (x = x ?? throw ...)
     /// </summary>
     [Fact]
-    public Task ShouldProducePortableFormWithoutThrowIfNull()
-    {
+    public Task ShouldProducePortableFormWithoutThrowIfNull() {
         var source = """
                      using System;
 
@@ -169,19 +158,17 @@ public sealed class AL0015PortableFormCodeFixTests : ALCodeFixTestWithEditorConf
                        }
                        """;
 
-        return VerifyAsync(source, expected, editorConfig: new Dictionary<string, string>
-        {
-            { "ancplua_target_framework", "netstandard2.0" },
-            { "ancplua_nullguard_style", "auto" }
-        });
+        return VerifyAsync(source, expected,
+            new Dictionary<string, string> {
+                { "ancplua_target_framework", "netstandard2.0" }, { "ancplua_nullguard_style", "auto" }
+            });
     }
 
     /// <summary>
     ///     Test 2: Portable form with block statement.
     /// </summary>
     [Fact]
-    public Task ShouldProducePortableFormWithBlock()
-    {
+    public Task ShouldProducePortableFormWithBlock() {
         var source = """
                      using System;
 
@@ -209,19 +196,17 @@ public sealed class AL0015PortableFormCodeFixTests : ALCodeFixTestWithEditorConf
                        }
                        """;
 
-        return VerifyAsync(source, expected, editorConfig: new Dictionary<string, string>
-        {
-            { "ancplua_target_framework", "netstandard2.0" },
-            { "ancplua_nullguard_style", "auto" }
-        });
+        return VerifyAsync(source, expected,
+            new Dictionary<string, string> {
+                { "ancplua_target_framework", "netstandard2.0" }, { "ancplua_nullguard_style", "auto" }
+            });
     }
 
     /// <summary>
     ///     Test 3: Portable form with == null instead of is null.
     /// </summary>
     [Fact]
-    public Task ShouldProducePortableFormWithEqualityCheck()
-    {
+    public Task ShouldProducePortableFormWithEqualityCheck() {
         var source = """
                      using System;
 
@@ -246,18 +231,15 @@ public sealed class AL0015PortableFormCodeFixTests : ALCodeFixTestWithEditorConf
                        }
                        """;
 
-        return VerifyAsync(source, expected, editorConfig: new Dictionary<string, string>
-        {
-            { "ancplua_target_framework", "netstandard2.0" }
-        });
+        return VerifyAsync(source, expected,
+            new Dictionary<string, string> { { "ancplua_target_framework", "netstandard2.0" } });
     }
 
     /// <summary>
     ///     Test 4: Portable form with string literal parameter name.
     /// </summary>
     [Fact]
-    public Task ShouldProducePortableFormWithStringLiteral()
-    {
+    public Task ShouldProducePortableFormWithStringLiteral() {
         var source = """
                      using System;
 
@@ -282,18 +264,15 @@ public sealed class AL0015PortableFormCodeFixTests : ALCodeFixTestWithEditorConf
                        }
                        """;
 
-        return VerifyAsync(source, expected, editorConfig: new Dictionary<string, string>
-        {
-            { "ancplua_nullguard_style", "portable" }
-        });
+        return VerifyAsync(source, expected,
+            new Dictionary<string, string> { { "ancplua_nullguard_style", "portable" } });
     }
 
     /// <summary>
     ///     Test 5: Explicit portable mode forces portable form.
     /// </summary>
     [Fact]
-    public Task ShouldProducePortableFormWhenExplicitlyConfigured()
-    {
+    public Task ShouldProducePortableFormWhenExplicitlyConfigured() {
         var source = """
                      using System;
 
@@ -318,11 +297,10 @@ public sealed class AL0015PortableFormCodeFixTests : ALCodeFixTestWithEditorConf
                        }
                        """;
 
-        return VerifyAsync(source, expected, editorConfig: new Dictionary<string, string>
-        {
-            { "ancplua_target_framework", "net10.0" },
-            { "ancplua_nullguard_style", "portable" }
-        });
+        return VerifyAsync(source, expected,
+            new Dictionary<string, string> {
+                { "ancplua_target_framework", "net10.0" }, { "ancplua_nullguard_style", "portable" }
+            });
     }
 
     /// <summary>
@@ -330,8 +308,7 @@ public sealed class AL0015PortableFormCodeFixTests : ALCodeFixTestWithEditorConf
     ///     This tests that editorconfig options are actually being read.
     /// </summary>
     [Fact]
-    public Task ShouldProducePortableFormWhenExplicitlyConfiguredWithThrowIfNull()
-    {
+    public Task ShouldProducePortableFormWhenExplicitlyConfiguredWithThrowIfNull() {
         var source = """
                      using System;
 
@@ -356,11 +333,10 @@ public sealed class AL0015PortableFormCodeFixTests : ALCodeFixTestWithEditorConf
                        }
                        """;
 
-        return VerifyAsync(source, expected, editorConfig: new Dictionary<string, string>
-        {
-            { "ancplua_target_framework", "net10.0" },
-            { "ancplua_nullguard_style", "portable" }
-        }, includeThrowIfNullReference: true);
+        return VerifyAsync(source, expected,
+            new Dictionary<string, string> {
+                { "ancplua_target_framework", "net10.0" }, { "ancplua_nullguard_style", "portable" }
+            }, true);
     }
 }
 
@@ -368,8 +344,8 @@ public sealed class AL0015PortableFormCodeFixTests : ALCodeFixTestWithEditorConf
 ///     BCL form code fix tests for AL0015.
 ///     Tests ArgumentNullException.ThrowIfNull generation when available.
 /// </summary>
-public sealed class AL0015BclFormCodeFixTests : ALCodeFixTestWithEditorConfig<AL0015NormalizeNullGuardStyleAnalyzer, AL0015NormalizeNullGuardStyleCodeFixProvider>
-{
+public sealed class AL0015BclFormCodeFixTests : ALCodeFixTestWithEditorConfig<AL0015NormalizeNullGuardStyleAnalyzer,
+    AL0015NormalizeNullGuardStyleCodeFixProvider> {
     /// <summary>
     ///     Test 2: net10.0 with single target produces BCL form.
     ///     Setup: Reference set WITH ThrowIfNull available
@@ -378,8 +354,7 @@ public sealed class AL0015BclFormCodeFixTests : ALCodeFixTestWithEditorConfig<AL
     ///     Expect: Fix produces BCL form (ArgumentNullException.ThrowIfNull(x))
     /// </summary>
     [Fact]
-    public Task ShouldProduceBclFormWithSingleTarget()
-    {
+    public Task ShouldProduceBclFormWithSingleTarget() {
         var source = """
                      using System;
 
@@ -404,19 +379,17 @@ public sealed class AL0015BclFormCodeFixTests : ALCodeFixTestWithEditorConfig<AL
                        }
                        """;
 
-        return VerifyAsync(source, expected, editorConfig: new Dictionary<string, string>
-        {
-            { "ancplua_target_framework", "net10.0" },
-            { "ancplua_nullguard_style", "auto" }
-        }, includeThrowIfNullReference: true);
+        return VerifyAsync(source, expected,
+            new Dictionary<string, string> {
+                { "ancplua_target_framework", "net10.0" }, { "ancplua_nullguard_style", "auto" }
+            }, true);
     }
 
     /// <summary>
     ///     Test 2b: BCL form with block statement.
     /// </summary>
     [Fact]
-    public Task ShouldProduceBclFormWithBlock()
-    {
+    public Task ShouldProduceBclFormWithBlock() {
         var source = """
                      using System;
 
@@ -444,19 +417,17 @@ public sealed class AL0015BclFormCodeFixTests : ALCodeFixTestWithEditorConfig<AL
                        }
                        """;
 
-        return VerifyAsync(source, expected, editorConfig: new Dictionary<string, string>
-        {
-            { "ancplua_target_framework", "net10.0" },
-            { "ancplua_nullguard_style", "auto" }
-        }, includeThrowIfNullReference: true);
+        return VerifyAsync(source, expected,
+            new Dictionary<string, string> {
+                { "ancplua_target_framework", "net10.0" }, { "ancplua_nullguard_style", "auto" }
+            }, true);
     }
 
     /// <summary>
     ///     Test 2c: BCL form with == null.
     /// </summary>
     [Fact]
-    public Task ShouldProduceBclFormWithEqualityCheck()
-    {
+    public Task ShouldProduceBclFormWithEqualityCheck() {
         var source = """
                      using System;
 
@@ -481,18 +452,15 @@ public sealed class AL0015BclFormCodeFixTests : ALCodeFixTestWithEditorConfig<AL
                        }
                        """;
 
-        return VerifyAsync(source, expected, editorConfig: new Dictionary<string, string>
-        {
-            { "ancplua_target_framework", "net10.0" }
-        }, includeThrowIfNullReference: true);
+        return VerifyAsync(source, expected,
+            new Dictionary<string, string> { { "ancplua_target_framework", "net10.0" } }, true);
     }
 
     /// <summary>
     ///     Test 2d: BCL form with string literal parameter name.
     /// </summary>
     [Fact]
-    public Task ShouldProduceBclFormWithStringLiteral()
-    {
+    public Task ShouldProduceBclFormWithStringLiteral() {
         var source = """
                      using System;
 
@@ -517,19 +485,17 @@ public sealed class AL0015BclFormCodeFixTests : ALCodeFixTestWithEditorConfig<AL
                        }
                        """;
 
-        return VerifyAsync(source, expected, editorConfig: new Dictionary<string, string>
-        {
-            { "ancplua_target_framework", "net10.0" },
-            { "ancplua_nullguard_style", "auto" }
-        }, includeThrowIfNullReference: true);
+        return VerifyAsync(source, expected,
+            new Dictionary<string, string> {
+                { "ancplua_target_framework", "net10.0" }, { "ancplua_nullguard_style", "auto" }
+            }, true);
     }
 
     /// <summary>
     ///     Test 2e: Explicit BCL mode forces BCL form when available.
     /// </summary>
     [Fact]
-    public Task ShouldProduceBclFormWhenExplicitlyConfigured()
-    {
+    public Task ShouldProduceBclFormWhenExplicitlyConfigured() {
         var source = """
                      using System;
 
@@ -554,11 +520,10 @@ public sealed class AL0015BclFormCodeFixTests : ALCodeFixTestWithEditorConfig<AL
                        }
                        """;
 
-        return VerifyAsync(source, expected, editorConfig: new Dictionary<string, string>
-        {
-            { "ancplua_target_framework", "netstandard2.0" },
-            { "ancplua_nullguard_style", "bcl" }
-        }, includeThrowIfNullReference: true);
+        return VerifyAsync(source, expected,
+            new Dictionary<string, string> {
+                { "ancplua_target_framework", "netstandard2.0" }, { "ancplua_nullguard_style", "bcl" }
+            }, true);
     }
 }
 
@@ -566,8 +531,8 @@ public sealed class AL0015BclFormCodeFixTests : ALCodeFixTestWithEditorConfig<AL
 ///     Multi-target stability tests for AL0015.
 ///     Verifies that multi-target projects always use portable form for consistency.
 /// </summary>
-public sealed class AL0015MultiTargetTests : ALCodeFixTestWithEditorConfig<AL0015NormalizeNullGuardStyleAnalyzer, AL0015NormalizeNullGuardStyleCodeFixProvider>
-{
+public sealed class AL0015MultiTargetTests : ALCodeFixTestWithEditorConfig<AL0015NormalizeNullGuardStyleAnalyzer,
+    AL0015NormalizeNullGuardStyleCodeFixProvider> {
     /// <summary>
     ///     Test 3: Multi-target with netstandard2.0;net10.0 produces portable form.
     ///     Setup: TargetFrameworks=netstandard2.0;net10.0 (multi-target with semicolon)
@@ -576,8 +541,7 @@ public sealed class AL0015MultiTargetTests : ALCodeFixTestWithEditorConfig<AL001
     ///     Key: Even though net10 would support BCL, we use portable for stability.
     /// </summary>
     [Fact]
-    public Task ShouldProducePortableFormForMultiTargetProject()
-    {
+    public Task ShouldProducePortableFormForMultiTargetProject() {
         var source = """
                      using System;
 
@@ -602,19 +566,17 @@ public sealed class AL0015MultiTargetTests : ALCodeFixTestWithEditorConfig<AL001
                        }
                        """;
 
-        return VerifyAsync(source, expected, editorConfig: new Dictionary<string, string>
-        {
-            { "ancplua_is_multi_target", "true" },
-            { "ancplua_nullguard_style", "auto" }
-        }, includeThrowIfNullReference: true);
+        return VerifyAsync(source, expected,
+            new Dictionary<string, string> {
+                { "ancplua_is_multi_target", "true" }, { "ancplua_nullguard_style", "auto" }
+            }, true);
     }
 
     /// <summary>
     ///     Test 3b: Multi-target with three frameworks produces portable form.
     /// </summary>
     [Fact]
-    public Task ShouldProducePortableFormForMultipleTargets()
-    {
+    public Task ShouldProducePortableFormForMultipleTargets() {
         var source = """
                      using System;
 
@@ -639,19 +601,17 @@ public sealed class AL0015MultiTargetTests : ALCodeFixTestWithEditorConfig<AL001
                        }
                        """;
 
-        return VerifyAsync(source, expected, editorConfig: new Dictionary<string, string>
-        {
-            { "ancplua_is_multi_target", "true" },
-            { "ancplua_nullguard_style", "auto" }
-        }, includeThrowIfNullReference: true);
+        return VerifyAsync(source, expected,
+            new Dictionary<string, string> {
+                { "ancplua_is_multi_target", "true" }, { "ancplua_nullguard_style", "auto" }
+            }, true);
     }
 
     /// <summary>
     ///     Test 3c: FixAll behavior - multiple diagnostics produce consistent portable form.
     /// </summary>
     [Fact]
-    public Task ShouldProduceConsistentPortableFormForMultipleDiagnostics()
-    {
+    public Task ShouldProduceConsistentPortableFormForMultipleDiagnostics() {
         var source = """
                      using System;
 
@@ -696,19 +656,18 @@ public sealed class AL0015MultiTargetTests : ALCodeFixTestWithEditorConfig<AL001
                        }
                        """;
 
-        return VerifyAsync(source, expected, editorConfig: new Dictionary<string, string>
-        {
-            { "ancplua_is_multi_target", "true" },
-            { "ancplua_nullguard_style", "auto" }
-        }, includeThrowIfNullReference: true);
+        return VerifyAsync(source, expected,
+            new Dictionary<string, string> {
+                { "ancplua_is_multi_target", "true" }, { "ancplua_nullguard_style", "auto" }
+            }, true);
     }
 }
 
 /// <summary>
 ///     Edge case and rejection tests for AL0015.
 /// </summary>
-public sealed class AL0015EdgeCasesTests : ALCodeFixTestWithEditorConfig<AL0015NormalizeNullGuardStyleAnalyzer, AL0015NormalizeNullGuardStyleCodeFixProvider>
-{
+public sealed class AL0015EdgeCasesTests : ALCodeFixTestWithEditorConfig<AL0015NormalizeNullGuardStyleAnalyzer,
+    AL0015NormalizeNullGuardStyleCodeFixProvider> {
     /// <summary>
     ///     Test 4: BCL mode forced but ThrowIfNull unavailable - falls back to portable.
     ///     Setup: ancplua_nullguard_style=bcl (explicit BCL mode)
@@ -717,8 +676,7 @@ public sealed class AL0015EdgeCasesTests : ALCodeFixTestWithEditorConfig<AL0015N
     ///     Note: Per spec "do not offer fix" but current impl falls back to portable
     /// </summary>
     [Fact]
-    public Task ShouldFallbackToPortableFormWhenBclUnavailable()
-    {
+    public Task ShouldFallbackToPortableFormWhenBclUnavailable() {
         var source = """
                      using System;
 
@@ -743,10 +701,9 @@ public sealed class AL0015EdgeCasesTests : ALCodeFixTestWithEditorConfig<AL0015N
                        }
                        """;
 
-        return VerifyAsync(source, expected, editorConfig: new Dictionary<string, string>
-        {
-            { "ancplua_target_framework", "netstandard2.0" },
-            { "ancplua_nullguard_style", "bcl" }
-        }, includeThrowIfNullReference: false);
+        return VerifyAsync(source, expected,
+            new Dictionary<string, string> {
+                { "ancplua_target_framework", "netstandard2.0" }, { "ancplua_nullguard_style", "bcl" }
+            }, false);
     }
 }

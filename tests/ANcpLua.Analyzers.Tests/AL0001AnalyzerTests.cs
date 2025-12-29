@@ -2,8 +2,8 @@ using ANcpLua.Analyzers.Analyzers;
 
 namespace ANcpLua.Analyzers.Tests;
 
-public sealed class AL0001AnalyzerTests : ALAnalyzerTest<AL0001ProhibitPrimaryConstructorParameterReassignmentAnalyzer>
-{
+public sealed class
+    AL0001AnalyzerTests : ALAnalyzerTest<AL0001ProhibitPrimaryConstructorParameterReassignmentAnalyzer> {
     [Theory]
     [InlineData("""
                 public class TestClass(int i)
@@ -41,8 +41,5 @@ public sealed class AL0001AnalyzerTests : ALAnalyzerTest<AL0001ProhibitPrimaryCo
                     }
                 }
                 """)]
-    public Task ShouldReportDiagnostic(string source)
-    {
-        return VerifyAsync(source);
-    }
+    public Task ShouldReportDiagnostic(string source) => VerifyAsync(source);
 }

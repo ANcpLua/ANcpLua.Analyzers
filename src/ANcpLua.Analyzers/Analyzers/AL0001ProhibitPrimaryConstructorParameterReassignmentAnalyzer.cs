@@ -6,8 +6,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     AL0001: Prohibit reassignment of primary constructor parameters.
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class AL0001ProhibitPrimaryConstructorParameterReassignmentAnalyzer : ALAnalyzer
-{
+public sealed class AL0001ProhibitPrimaryConstructorParameterReassignmentAnalyzer : ALAnalyzer {
     public const string DiagnosticId = DiagnosticIds.ProhibitPrimaryConstructorParameterReassignment;
 
     private static readonly LocalizableResourceString Title = new(
@@ -21,13 +20,12 @@ public sealed class AL0001ProhibitPrimaryConstructorParameterReassignmentAnalyze
 
     private static readonly DiagnosticDescriptor Rule = new(
         DiagnosticId, Title, MessageFormat, DiagnosticCategories.Design,
-        DiagnosticSeverity.Error, isEnabledByDefault: true, Description,
+        DiagnosticSeverity.Error, true, Description,
         HelpLinkBase + "AL0001.md");
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
-    protected override void RegisterActions(AnalysisContext context)
-    {
+    protected override void RegisterActions(AnalysisContext context) {
         context.RegisterOperationAction(AnalyzeAssignment, OperationKind.SimpleAssignment);
         context.RegisterOperationAction(AnalyzeAssignment, OperationKind.CompoundAssignment);
         context.RegisterOperationAction(AnalyzeAssignment, OperationKind.CoalesceAssignment);
@@ -36,44 +34,46 @@ public sealed class AL0001ProhibitPrimaryConstructorParameterReassignmentAnalyze
         context.RegisterOperationAction(AnalyzeIncrementOrDecrement, OperationKind.Decrement);
     }
 
-    private static void AnalyzeAssignment(OperationAnalysisContext context)
-    {
+    private static void AnalyzeAssignment(OperationAnalysisContext context) {
         var operation = (IAssignmentOperation)context.Operation;
         var target = operation.Target;
 
-        if (target is ITupleOperation)
+        if (target is ITupleOperation) {
             CheckTuple(target, context);
-        else
+        } else {
             CheckTargetAndReport(target, context);
+        }
     }
 
-    private static void CheckTuple(IOperation target, OperationAnalysisContext context)
-    {
-        if (target is ITupleOperation tuple)
-            foreach (var element in tuple.Elements)
+    private static void CheckTuple(IOperation target, OperationAnalysisContext context) {
+        if (target is ITupleOperation tuple) {
+            foreach (var element in tuple.Elements) {
                 CheckTuple(element, context);
-        else
+            }
+        } else {
             CheckTargetAndReport(target, context);
+        }
     }
 
-    private static void AnalyzeIncrementOrDecrement(OperationAnalysisContext context)
-    {
+    private static void AnalyzeIncrementOrDecrement(OperationAnalysisContext context) {
         var operation = (IIncrementOrDecrementOperation)context.Operation;
         CheckTargetAndReport(operation.Target, context);
     }
 
-    private static void CheckTargetAndReport(IOperation target, OperationAnalysisContext context)
-    {
-        if (target is not IParameterReferenceOperation parameterRef)
+    private static void CheckTargetAndReport(IOperation target, OperationAnalysisContext context) {
+        if (target is not IParameterReferenceOperation parameterRef) {
             return;
+        }
 
-        if (parameterRef.Parameter.ContainingSymbol is not IMethodSymbol { MethodKind: MethodKind.Constructor } ctor)
+        if (parameterRef.Parameter.ContainingSymbol is not IMethodSymbol { MethodKind: MethodKind.Constructor } ctor) {
             return;
+        }
 
         if (!ctor.DeclaringSyntaxReferences.Any(sr =>
                 sr.GetSyntax(context.CancellationToken) is ClassDeclarationSyntax or StructDeclarationSyntax
-                    or RecordDeclarationSyntax))
+                    or RecordDeclarationSyntax)) {
             return;
+        }
 
         context.ReportDiagnostic(Rule, target.Syntax.GetLocation(), parameterRef.Parameter.Name);
     }

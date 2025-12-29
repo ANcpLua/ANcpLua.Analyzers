@@ -7,8 +7,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     AL0002: Don't repeat negated patterns (not not not...).
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class AL0002DontRepeatNegatedPatternAnalyzer : ALAnalyzer
-{
+public sealed class AL0002DontRepeatNegatedPatternAnalyzer : ALAnalyzer {
     public const string DiagnosticId = DiagnosticIds.DontRepeatNegatedPattern;
 
     private static readonly LocalizableResourceString Title = new(
@@ -22,33 +21,33 @@ public sealed class AL0002DontRepeatNegatedPatternAnalyzer : ALAnalyzer
 
     private static readonly DiagnosticDescriptor Rule = new(
         DiagnosticId, Title, MessageFormat, DiagnosticCategories.Design,
-        DiagnosticSeverity.Warning, isEnabledByDefault: true, Description,
+        DiagnosticSeverity.Warning, true, Description,
         HelpLinkBase + "AL0002.md");
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
-    protected override void RegisterActions(AnalysisContext context)
-    {
+    protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterSyntaxNodeAction(AnalyzeNotPattern, SyntaxKind.NotPattern);
-    }
 
-    private static void AnalyzeNotPattern(SyntaxNodeAnalysisContext context)
-    {
+    private static void AnalyzeNotPattern(SyntaxNodeAnalysisContext context) {
         var syntax = (UnaryPatternSyntax)context.Node;
 
         // Sub pattern must be another negated pattern
-        if (syntax.Pattern is not UnaryPatternSyntax)
+        if (syntax.Pattern is not UnaryPatternSyntax) {
             return;
+        }
 
         // Skip if parent is already a negated pattern (already handled)
-        if (syntax.Parent is UnaryPatternSyntax)
+        if (syntax.Parent is UnaryPatternSyntax) {
             return;
+        }
 
         var innerNode = syntax.DescendantNodes()
             .FirstOrDefault(n => n is not UnaryPatternSyntax);
 
-        if (innerNode is null)
+        if (innerNode is null) {
             return;
+        }
 
         var firstLocation = syntax.SpanStart;
         var nonFirstLocation = innerNode.SpanStart;

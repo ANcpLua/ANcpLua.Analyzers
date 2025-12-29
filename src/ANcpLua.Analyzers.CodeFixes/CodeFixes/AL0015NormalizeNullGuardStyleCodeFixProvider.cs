@@ -8,13 +8,12 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 /// </summary>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AL0015NormalizeNullGuardStyleCodeFixProvider))]
 [Shared]
-public sealed class AL0015NormalizeNullGuardStyleCodeFixProvider : ALCodeFixProvider<IfStatementSyntax>
-{
+public sealed class AL0015NormalizeNullGuardStyleCodeFixProvider : ALCodeFixProvider<IfStatementSyntax> {
     public override ImmutableArray<string> FixableDiagnosticIds =>
         [DiagnosticIds.NormalizeNullGuardStyle];
 
-    protected override CodeAction CreateCodeAction(Document document, IfStatementSyntax ifStatement, SyntaxNode root, Diagnostic diagnostic)
-    {
+    protected override CodeAction CreateCodeAction(Document document, IfStatementSyntax ifStatement, SyntaxNode root,
+        Diagnostic diagnostic) {
         // Extract properties from the diagnostic
         var properties = diagnostic.Properties;
         var identifierName = properties["identifierName"] ?? "";
@@ -23,12 +22,13 @@ public sealed class AL0015NormalizeNullGuardStyleCodeFixProvider : ALCodeFixProv
         var hasThrowIfNull = bool.TryParse(hasThrowIfNullStr, out var result) && result;
 
         // Only create fix if we have the identifier
-        if (string.IsNullOrEmpty(identifierName))
+        if (string.IsNullOrEmpty(identifierName)) {
             return CodeAction.Create(CodeFixResources.AL0015CodeFixTitle, _ => Task.FromResult(document), "NoOp");
+        }
 
         return CodeAction.Create(
             CodeFixResources.AL0015CodeFixTitle,
-            ct => NormalizeNullGuard(document, ifStatement, root, identifierName, modeStr, hasThrowIfNull, ct),
+            _ => NormalizeNullGuard(document, ifStatement, root, identifierName, modeStr, hasThrowIfNull),
             nameof(AL0015NormalizeNullGuardStyleCodeFixProvider));
     }
 
@@ -38,11 +38,9 @@ public sealed class AL0015NormalizeNullGuardStyleCodeFixProvider : ALCodeFixProv
         SyntaxNode root,
         string identifierName,
         string mode,
-        bool hasThrowIfNull,
-        CancellationToken cancellationToken)
-    {
+        bool hasThrowIfNull) {
         // Create the new statement based on mode
-        StatementSyntax newStatement = mode == "bcl" && hasThrowIfNull
+        var newStatement = mode == "bcl" && hasThrowIfNull
             ? CreateBclForm(identifierName)
             : CreatePortableForm(identifierName);
 
@@ -55,8 +53,7 @@ public sealed class AL0015NormalizeNullGuardStyleCodeFixProvider : ALCodeFixProv
         return Task.FromResult(document.WithSyntaxRoot(newRoot));
     }
 
-    private static StatementSyntax CreateBclForm(string identifierName)
-    {
+    private static StatementSyntax CreateBclForm(string identifierName) {
         // ArgumentNullException.ThrowIfNull(x);
         var invocation = SyntaxFactory.InvocationExpression(
             SyntaxFactory.MemberAccessExpression(
@@ -64,24 +61,21 @@ public sealed class AL0015NormalizeNullGuardStyleCodeFixProvider : ALCodeFixProv
                 SyntaxFactory.IdentifierName("ArgumentNullException"),
                 SyntaxFactory.IdentifierName("ThrowIfNull")),
             SyntaxFactory.ArgumentList(
-                SyntaxFactory.SeparatedList(new[]
-                {
+                SyntaxFactory.SeparatedList(new[] {
                     SyntaxFactory.Argument(SyntaxFactory.IdentifierName(identifierName))
                 })));
 
         return SyntaxFactory.ExpressionStatement(invocation);
     }
 
-    private static StatementSyntax CreatePortableForm(string identifierName)
-    {
+    private static StatementSyntax CreatePortableForm(string identifierName) {
         // x = x ?? throw new ArgumentNullException(nameof(x));
         var identifier = SyntaxFactory.IdentifierName(identifierName);
 
         var newArgEx = SyntaxFactory.ObjectCreationExpression(
             SyntaxFactory.IdentifierName("ArgumentNullException"),
             SyntaxFactory.ArgumentList(
-                SyntaxFactory.SeparatedList(new[]
-                {
+                SyntaxFactory.SeparatedList(new[] {
                     SyntaxFactory.Argument(
                         SyntaxFactory.InvocationExpression(
                             SyntaxFactory.IdentifierName("nameof"),

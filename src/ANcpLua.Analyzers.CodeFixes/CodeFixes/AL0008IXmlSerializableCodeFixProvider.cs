@@ -7,26 +7,22 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 /// </summary>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AL0008IXmlSerializableCodeFixProvider))]
 [Shared]
-public sealed class AL0008IXmlSerializableCodeFixProvider : CodeFixProvider
-{
+public sealed class AL0008IXmlSerializableCodeFixProvider : CodeFixProvider {
     public override ImmutableArray<string> FixableDiagnosticIds =>
         [DiagnosticIds.GetSchemaMustReturnNull];
 
-    public override FixAllProvider GetFixAllProvider()
-    {
-        return WellKnownFixAllProviders.BatchFixer;
-    }
+    public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
-    public override async Task RegisterCodeFixesAsync(CodeFixContext context)
-    {
+    public override async Task RegisterCodeFixesAsync(CodeFixContext context) {
         var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
-        if (root is null)
+        if (root is null) {
             return;
+        }
 
-        foreach (var diagnostic in context.Diagnostics)
-        {
-            if (diagnostic.Id != DiagnosticIds.GetSchemaMustReturnNull)
+        foreach (var diagnostic in context.Diagnostics) {
+            if (diagnostic.Id != DiagnosticIds.GetSchemaMustReturnNull) {
                 continue;
+            }
 
             var node = root.FindNode(diagnostic.Location.SourceSpan);
             var target = node as CSharpSyntaxNode
@@ -34,8 +30,9 @@ public sealed class AL0008IXmlSerializableCodeFixProvider : CodeFixProvider
                          ?? node.FirstAncestorOrSelf<BlockSyntax>() as CSharpSyntaxNode
                          ?? node.FirstAncestorOrSelf<ArrowExpressionClauseSyntax>();
 
-            if (target is null)
+            if (target is null) {
                 continue;
+            }
 
             context.RegisterCodeFix(
                 CodeAction.Create(
@@ -46,10 +43,8 @@ public sealed class AL0008IXmlSerializableCodeFixProvider : CodeFixProvider
         }
     }
 
-    private static Task<Document> FixAsync(Document document, CSharpSyntaxNode node, SyntaxNode root)
-    {
-        var newRoot = node switch
-        {
+    private static Task<Document> FixAsync(Document document, CSharpSyntaxNode node, SyntaxNode root) {
+        var newRoot = node switch {
             MethodDeclarationSyntax method when method.Modifiers.Any(SyntaxKind.AbstractKeyword)
                 => RemoveAbstractAndAddNullBody(method, root),
             BlockSyntax block => ReplaceBlockWithNullArrow(block, root),
@@ -60,8 +55,7 @@ public sealed class AL0008IXmlSerializableCodeFixProvider : CodeFixProvider
         return Task.FromResult(document.WithSyntaxRoot(newRoot));
     }
 
-    private static SyntaxNode RemoveAbstractAndAddNullBody(MethodDeclarationSyntax method, SyntaxNode root)
-    {
+    private static SyntaxNode RemoveAbstractAndAddNullBody(MethodDeclarationSyntax method, SyntaxNode root) {
         var abstractKeyword = method.Modifiers.First(t => t.IsKind(SyntaxKind.AbstractKeyword));
         var newModifiers = method.Modifiers.Remove(abstractKeyword);
 
@@ -76,10 +70,10 @@ public sealed class AL0008IXmlSerializableCodeFixProvider : CodeFixProvider
         return root.ReplaceNode(method, newMethod);
     }
 
-    private static SyntaxNode ReplaceBlockWithNullArrow(BlockSyntax block, SyntaxNode root)
-    {
-        if (block.Parent is not MethodDeclarationSyntax method)
+    private static SyntaxNode ReplaceBlockWithNullArrow(BlockSyntax block, SyntaxNode root) {
+        if (block.Parent is not MethodDeclarationSyntax method) {
             return root;
+        }
 
         var newMethod = method
             .WithBody(null)
@@ -91,14 +85,10 @@ public sealed class AL0008IXmlSerializableCodeFixProvider : CodeFixProvider
         return root.ReplaceNode(method, newMethod);
     }
 
-    private static SyntaxNode ReplaceArrowWithNull(ArrowExpressionClauseSyntax arrow, SyntaxNode root)
-    {
-        return root.ReplaceNode(arrow, CreateNullArrowExpression());
-    }
+    private static SyntaxNode ReplaceArrowWithNull(ArrowExpressionClauseSyntax arrow, SyntaxNode root) =>
+        root.ReplaceNode(arrow, CreateNullArrowExpression());
 
-    private static ArrowExpressionClauseSyntax CreateNullArrowExpression()
-    {
-        return SyntaxFactory.ArrowExpressionClause(
+    private static ArrowExpressionClauseSyntax CreateNullArrowExpression() =>
+        SyntaxFactory.ArrowExpressionClause(
             SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression));
-    }
 }

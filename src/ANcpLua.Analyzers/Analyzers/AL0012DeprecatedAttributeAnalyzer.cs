@@ -19,27 +19,29 @@ public sealed class AL0012DeprecatedAttributeAnalyzer : ALAnalyzer {
     private static readonly DiagnosticDescriptor Rule = new(
         DiagnosticIds.DeprecatedSemanticConventionAttribute,
         Title, MessageFormat, DiagnosticCategories.OpenTelemetry,
-        DiagnosticSeverity.Warning, isEnabledByDefault: true, Description,
+        DiagnosticSeverity.Warning, true, Description,
         HelpLinkBase + "AL0012.md");
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
-    protected override void RegisterActions(AnalysisContext context) {
+    protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterSyntaxNodeAction(AnalyzeStringLiteral, SyntaxKind.StringLiteralExpression);
-    }
 
     private static void AnalyzeStringLiteral(SyntaxNodeAnalysisContext context) {
         var literal = (LiteralExpressionSyntax)context.Node;
         var value = literal.Token.ValueText;
 
-        if (string.IsNullOrEmpty(value))
+        if (string.IsNullOrEmpty(value)) {
             return;
+        }
 
-        if (!DeprecatedOtelAttributes.Renames.TryGetValue(value, out var replacement))
+        if (!DeprecatedOtelAttributes.Renames.TryGetValue(value, out var replacement)) {
             return;
+        }
 
-        if (!IsInTelemetryContext(literal))
+        if (!IsInTelemetryContext(literal)) {
             return;
+        }
 
         context.ReportDiagnostic(Rule, literal.GetLocation(), value, replacement.Version, replacement.Replacement);
     }
@@ -61,29 +63,25 @@ public sealed class AL0012DeprecatedAttributeAnalyzer : ALAnalyzer {
         return false;
     }
 
-    private static bool IsTelemetryElementAccess(SyntaxNode node) {
-        return node is ElementAccessExpressionSyntax elementAccess &&
-               GetIdentifierName(elementAccess.Expression) is { } identifier &&
-               IsLikelyTelemetryContainer(identifier);
-    }
+    private static bool IsTelemetryElementAccess(SyntaxNode node) =>
+        node is ElementAccessExpressionSyntax elementAccess &&
+        GetIdentifierName(elementAccess.Expression) is { } identifier &&
+        IsLikelyTelemetryContainer(identifier);
 
-    private static bool IsTelemetryInvocation(SyntaxNode node) {
-        return node is InvocationExpressionSyntax invocation &&
-               GetMethodName(invocation) is { } methodName &&
-               DeprecatedOtelAttributes.AttributeKeyPatterns.Any(p =>
-                   methodName.Contains(p, StringComparison.OrdinalIgnoreCase));
-    }
+    private static bool IsTelemetryInvocation(SyntaxNode node) =>
+        node is InvocationExpressionSyntax invocation &&
+        GetMethodName(invocation) is { } methodName &&
+        DeprecatedOtelAttributes.AttributeKeyPatterns.Any(p =>
+            methodName.Contains(p, StringComparison.OrdinalIgnoreCase));
 
-    private static bool IsTelemetryInitializer(SyntaxNode node) {
-        return node is InitializerExpressionSyntax { Parent: ObjectCreationExpressionSyntax creation } &&
-               IsTelemetryTypeName(creation.Type.ToString());
-    }
+    private static bool IsTelemetryInitializer(SyntaxNode node) =>
+        node is InitializerExpressionSyntax { Parent: ObjectCreationExpressionSyntax creation } &&
+        IsTelemetryTypeName(creation.Type.ToString());
 
-    private static bool IsTelemetryTypeName(string typeName) {
-        return typeName.Contains("Tag") ||
-               typeName.Contains("Attribute") ||
-               typeName.Contains("KeyValuePair");
-    }
+    private static bool IsTelemetryTypeName(string typeName) =>
+        typeName.Contains("Tag") ||
+        typeName.Contains("Attribute") ||
+        typeName.Contains("KeyValuePair");
 
     private static bool IsLikelyTelemetryContainer(string identifier) {
         var lowerIdentifier = identifier.ToLowerInvariant();
@@ -93,19 +91,17 @@ public sealed class AL0012DeprecatedAttributeAnalyzer : ALAnalyzer {
                lowerIdentifier == "attrs";
     }
 
-    private static string? GetMethodName(InvocationExpressionSyntax invocation) {
-        return invocation.Expression switch {
+    private static string? GetMethodName(InvocationExpressionSyntax invocation) =>
+        invocation.Expression switch {
             MemberAccessExpressionSyntax memberAccess => memberAccess.Name.Identifier.Text,
             IdentifierNameSyntax identifier => identifier.Identifier.Text,
             _ => null
         };
-    }
 
-    private static string? GetIdentifierName(ExpressionSyntax expression) {
-        return expression switch {
+    private static string? GetIdentifierName(ExpressionSyntax expression) =>
+        expression switch {
             IdentifierNameSyntax identifier => identifier.Identifier.Text,
             MemberAccessExpressionSyntax memberAccess => memberAccess.Name.Identifier.Text,
             _ => null
         };
-    }
 }

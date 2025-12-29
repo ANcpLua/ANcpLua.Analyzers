@@ -16,8 +16,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     bypasses any overloaded equality operators ensuring true reference comparison.
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class AL0014PreferPatternMatchingAnalyzer : ALAnalyzer
-{
+public sealed class AL0014PreferPatternMatchingAnalyzer : ALAnalyzer {
     public const string DiagnosticId = DiagnosticIds.PreferPatternMatchingForNullAndZero;
 
     internal const string PropertyIsNullCheck = "IsNullCheck";
@@ -30,30 +29,29 @@ public sealed class AL0014PreferPatternMatchingAnalyzer : ALAnalyzer
         "Use '{0}' instead of '{1}'",
         DiagnosticCategories.Style,
         DiagnosticSeverity.Info,
-        isEnabledByDefault: true,
-        description: "Pattern matching syntax (is/is not) is more expressive and idiomatic. " +
-                     "For null checks, it also bypasses overloaded equality operators.",
-        helpLinkUri: HelpLinkBase + "AL0014.md");
+        true,
+        "Pattern matching syntax (is/is not) is more expressive and idiomatic. " +
+        "For null checks, it also bypasses overloaded equality operators.",
+        HelpLinkBase + "AL0014.md");
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
-    protected override void RegisterActions(AnalysisContext context)
-    {
+    protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterSyntaxNodeAction(
             AnalyzeBinaryExpression,
             SyntaxKind.EqualsExpression,
             SyntaxKind.NotEqualsExpression);
-    }
 
-    private static void AnalyzeBinaryExpression(SyntaxNodeAnalysisContext context)
-    {
+    private static void AnalyzeBinaryExpression(SyntaxNodeAnalysisContext context) {
         var binary = (BinaryExpressionSyntax)context.Node;
 
-        if (IsInsidePatternContext(binary))
+        if (IsInsidePatternContext(binary)) {
             return;
+        }
 
-        if (!TryGetComparisonInfo(binary, out var isNullCheck, out var expressionIsLeft))
+        if (!TryGetComparisonInfo(binary, out var isNullCheck, out var expressionIsLeft)) {
             return;
+        }
 
         var isNegated = binary.IsKind(SyntaxKind.NotEqualsExpression);
         var expression = expressionIsLeft ? binary.Left : binary.Right;
@@ -79,36 +77,31 @@ public sealed class AL0014PreferPatternMatchingAnalyzer : ALAnalyzer
     private static bool TryGetComparisonInfo(
         BinaryExpressionSyntax binary,
         out bool isNullCheck,
-        out bool expressionIsLeft)
-    {
+        out bool expressionIsLeft) {
         isNullCheck = false;
         expressionIsLeft = false;
 
         // Check: expression == null, null == expression
-        if (IsNullLiteral(binary.Right))
-        {
+        if (IsNullLiteral(binary.Right)) {
             isNullCheck = true;
             expressionIsLeft = true;
             return true;
         }
 
-        if (IsNullLiteral(binary.Left))
-        {
+        if (IsNullLiteral(binary.Left)) {
             isNullCheck = true;
             expressionIsLeft = false;
             return true;
         }
 
         // Check: expression == 0, 0 == expression
-        if (IsZeroLiteral(binary.Right))
-        {
+        if (IsZeroLiteral(binary.Right)) {
             isNullCheck = false;
             expressionIsLeft = true;
             return true;
         }
 
-        if (IsZeroLiteral(binary.Left))
-        {
+        if (IsZeroLiteral(binary.Left)) {
             isNullCheck = false;
             expressionIsLeft = false;
             return true;
@@ -117,12 +110,11 @@ public sealed class AL0014PreferPatternMatchingAnalyzer : ALAnalyzer
         return false;
     }
 
-    private static bool IsInsidePatternContext(SyntaxNode node)
-    {
-        for (var current = node.Parent; current is not null; current = current.Parent)
-        {
-            if (current is IsPatternExpressionSyntax or SwitchExpressionSyntax or CasePatternSwitchLabelSyntax)
+    private static bool IsInsidePatternContext(SyntaxNode node) {
+        for (var current = node.Parent; current is not null; current = current.Parent) {
+            if (current is IsPatternExpressionSyntax or SwitchExpressionSyntax or CasePatternSwitchLabelSyntax) {
                 return true;
+            }
         }
 
         return false;

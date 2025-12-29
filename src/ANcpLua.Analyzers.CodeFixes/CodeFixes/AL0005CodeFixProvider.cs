@@ -7,24 +7,21 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 /// </summary>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AL0005CodeFixProvider))]
 [Shared]
-public sealed class AL0005CodeFixProvider : ALCodeFixProvider<BinaryExpressionSyntax>
-{
+public sealed class AL0005CodeFixProvider : ALCodeFixProvider<BinaryExpressionSyntax> {
     public override ImmutableArray<string> FixableDiagnosticIds =>
         [AL0004ToAL0005SpanComparisonAnalyzer.DiagnosticIdAL0005];
 
-    protected override CodeAction CreateCodeAction(Document document, BinaryExpressionSyntax syntax, SyntaxNode root, Diagnostic diagnostic)
-    {
-        return CodeAction.Create(
+    protected override CodeAction CreateCodeAction(Document document, BinaryExpressionSyntax syntax, SyntaxNode root,
+        Diagnostic diagnostic) =>
+        CodeAction.Create(
             CodeFixResources.AL0005CodeFixTitle,
             _ => UseSequenceEqual(document, syntax, root),
             nameof(CodeFixResources.AL0005CodeFixTitle));
-    }
 
     private static Task<Document> UseSequenceEqual(
         Document document,
         BinaryExpressionSyntax binary,
-        SyntaxNode root)
-    {
+        SyntaxNode root) {
         var sequenceEqual = SyntaxFactory.IdentifierName("SequenceEqual");
         var memberAccess = SyntaxFactory.MemberAccessExpression(
             SyntaxKind.SimpleMemberAccessExpression,

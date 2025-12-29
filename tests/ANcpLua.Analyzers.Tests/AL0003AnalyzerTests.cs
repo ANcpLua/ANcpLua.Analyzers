@@ -2,8 +2,7 @@ using ANcpLua.Analyzers.Analyzers;
 
 namespace ANcpLua.Analyzers.Tests;
 
-public sealed class AL0003AnalyzerTests : ALAnalyzerTest<AL0003DontDivideByConstantZeroAnalyzer>
-{
+public sealed class AL0003AnalyzerTests : ALAnalyzerTest<AL0003DontDivideByConstantZeroAnalyzer> {
     [Theory]
     [InlineData("""
                 public class TestClass
@@ -41,8 +40,5 @@ public sealed class AL0003AnalyzerTests : ALAnalyzerTest<AL0003DontDivideByConst
                     }
                 }
                 """)]
-    public Task ShouldReportDiagnostic(string source)
-    {
-        return VerifyAsync(source);
-    }
+    public Task ShouldReportDiagnostic(string source) => VerifyAsync(source);
 }

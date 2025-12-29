@@ -7,31 +7,28 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 /// </summary>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AL0002CodeFixProvider))]
 [Shared]
-public sealed class AL0002CodeFixProvider : ALCodeFixProvider<UnaryPatternSyntax>
-{
+public sealed class AL0002CodeFixProvider : ALCodeFixProvider<UnaryPatternSyntax> {
     public override ImmutableArray<string> FixableDiagnosticIds =>
         [AL0002DontRepeatNegatedPatternAnalyzer.DiagnosticId];
 
-    protected override CodeAction CreateCodeAction(Document document, UnaryPatternSyntax syntax, SyntaxNode root, Diagnostic diagnostic)
-    {
-        return CodeAction.Create(
+    protected override CodeAction CreateCodeAction(Document document, UnaryPatternSyntax syntax, SyntaxNode root,
+        Diagnostic diagnostic) =>
+        CodeAction.Create(
             CodeFixResources.AL0002CodeFixTitle,
             _ => RemoveRepeatedNegatedPatterns(document, syntax, root),
             nameof(CodeFixResources.AL0002CodeFixTitle));
-    }
 
     private static Task<Document> RemoveRepeatedNegatedPatterns(
         Document document,
         UnaryPatternSyntax notPattern,
-        SyntaxNode root)
-    {
+        SyntaxNode root) {
         var parent = (ExpressionOrPatternSyntax)notPattern.Parent!;
         var notPatterns = notPattern.DescendantNodesAndSelf().OfType<UnaryPatternSyntax>().ToArray();
 
         // Even count of 'not' patterns: Remove all 'not'
         // Odd count of 'not' patterns: Leave only one 'not'
         var lastPattern = notPatterns[notPatterns.Length - 1];
-        PatternSyntax realPattern = notPatterns.Length % 2 is 0
+        var realPattern = notPatterns.Length % 2 is 0
             ? lastPattern.Pattern
             : lastPattern;
 

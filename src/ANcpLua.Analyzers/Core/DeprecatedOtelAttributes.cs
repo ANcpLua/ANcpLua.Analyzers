@@ -21,14 +21,12 @@ namespace ANcpLua.Analyzers.Core;
 ///         </list>
 ///     </para>
 /// </remarks>
-public static class DeprecatedOtelAttributes
-{
+public static class DeprecatedOtelAttributes {
     /// <summary>
     ///     Deprecated attribute names mapped to replacements.
     /// </summary>
     public static readonly IReadOnlyDictionary<string, (string Replacement, string Version)> Renames =
-        new Dictionary<string, (string, string)>
-        {
+        new Dictionary<string, (string, string)> {
             // GenAI
             ["gen_ai.system"] = ("gen_ai.provider.name", "1.37.0"),
             ["gen_ai.usage.prompt_tokens"] = ("gen_ai.usage.input_tokens", "1.27.0"),
@@ -75,12 +73,12 @@ public static class DeprecatedOtelAttributes
     /// <summary>
     ///     Known attribute key patterns used in OpenTelemetry APIs.
     /// </summary>
-    public static readonly HashSet<string> AttributeKeyPatterns = new(StringComparer.OrdinalIgnoreCase)
-    {
-        "SetAttribute",
-        "AddTag",
-        "SetTag",
-        "attributes",
-        "Tags"
-    };
+    public static readonly HashSet<string> AttributeKeyPatterns =
+        new(StringComparer.OrdinalIgnoreCase) {
+            "SetAttribute",
+            "AddTag",
+            "SetTag",
+            "attributes",
+            "Tags"
+        };
 }

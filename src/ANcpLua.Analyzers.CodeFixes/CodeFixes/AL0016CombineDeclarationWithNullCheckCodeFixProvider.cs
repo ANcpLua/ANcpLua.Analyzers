@@ -20,8 +20,8 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 /// </remarks>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AL0016CombineDeclarationWithNullCheckCodeFixProvider))]
 [Shared]
-public sealed class AL0016CombineDeclarationWithNullCheckCodeFixProvider : ALCodeFixProvider<LocalDeclarationStatementSyntax>
-{
+public sealed class
+    AL0016CombineDeclarationWithNullCheckCodeFixProvider : ALCodeFixProvider<LocalDeclarationStatementSyntax> {
     public override ImmutableArray<string> FixableDiagnosticIds =>
         [DiagnosticIds.CombineDeclarationWithNullCheck];
 
@@ -29,20 +29,16 @@ public sealed class AL0016CombineDeclarationWithNullCheckCodeFixProvider : ALCod
         Document document,
         LocalDeclarationStatementSyntax declaration,
         SyntaxNode root,
-        Diagnostic diagnostic)
-    {
-        return CodeAction.Create(
+        Diagnostic diagnostic) =>
+        CodeAction.Create(
             CodeFixResources.AL0016CodeFixTitle,
-            ct => CombineDeclarationWithNullCheck(document, declaration, root, ct),
+            ct => CombineDeclarationWithNullCheck(document, declaration, ct),
             nameof(AL0016CombineDeclarationWithNullCheckCodeFixProvider));
-    }
 
     private static async Task<Document> CombineDeclarationWithNullCheck(
         Document document,
         LocalDeclarationStatementSyntax declaration,
-        SyntaxNode root,
-        CancellationToken cancellationToken)
-    {
+        CancellationToken cancellationToken) {
         // Extract the variable name and initializer from the declaration
         var variable = declaration.Declaration.Variables[0];
         var variableName = variable.Identifier.Text;
@@ -50,8 +46,9 @@ public sealed class AL0016CombineDeclarationWithNullCheckCodeFixProvider : ALCod
 
         // Find the next statement (the if statement)
         var nextStatement = TryGetNextStatement(declaration);
-        if (nextStatement is not IfStatementSyntax ifStatement)
+        if (nextStatement is not IfStatementSyntax ifStatement) {
             return document;
+        }
 
         // Create the pattern: not { } x
         // Build inline pattern: is not { } variableName
@@ -92,19 +89,19 @@ public sealed class AL0016CombineDeclarationWithNullCheckCodeFixProvider : ALCod
     }
 
     /// <summary>
-    /// Gets the next sibling statement after the current local declaration.
+    ///     Gets the next sibling statement after the current local declaration.
     /// </summary>
-    private static StatementSyntax? TryGetNextStatement(LocalDeclarationStatementSyntax currentNode)
-    {
+    private static StatementSyntax? TryGetNextStatement(LocalDeclarationStatementSyntax currentNode) {
         // Navigate up to find the containing block
-        var containingBlock = currentNode.Parent as BlockSyntax;
-        if (containingBlock is null)
+        if (currentNode.Parent is not BlockSyntax containingBlock) {
             return null;
+        }
 
         // Find the index of the current statement
         var currentIndex = containingBlock.Statements.IndexOf(currentNode);
-        if (currentIndex < 0 || currentIndex >= containingBlock.Statements.Count - 1)
+        if (currentIndex < 0 || currentIndex >= containingBlock.Statements.Count - 1) {
             return null;
+        }
 
         // Return the next statement
         return containingBlock.Statements[currentIndex + 1];
