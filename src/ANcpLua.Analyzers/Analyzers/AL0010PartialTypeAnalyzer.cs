@@ -39,7 +39,7 @@ public sealed class AL0010PartialTypeAnalyzer : ALAnalyzer {
     private static void AnalyzeTypeDeclaration(SyntaxNodeAnalysisContext context) {
         var typeDeclaration = (TypeDeclarationSyntax)context.Node;
 
-        // Already partial - nothing to report
+        
         if (typeDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword)) {
             return;
         }

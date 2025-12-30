@@ -31,7 +31,7 @@ public sealed class AL0011LockKeywordAnalyzer : ALAnalyzer {
         context.RegisterCompilationStartAction(OnCompilationStart);
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
-        // lockType may be null on pre-.NET 9 - that's fine, we still warn on all lock(object)
+        
         var lockType = context.Compilation.GetTypeByMetadataName(LockTypeMetadataName);
 
         context.RegisterSyntaxNodeAction(
@@ -45,7 +45,7 @@ public sealed class AL0011LockKeywordAnalyzer : ALAnalyzer {
         var lockExpressionType =
             context.SemanticModel.GetTypeInfo(lockStatement.Expression, context.CancellationToken).Type;
 
-        // If Lock type exists and expression is Lock type, don't warn (valid .NET 9+ usage)
+        
         if (lockType is not null && SymbolEqualityComparer.Default.Equals(lockExpressionType, lockType)) {
             return;
         }

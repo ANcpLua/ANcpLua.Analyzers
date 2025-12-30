@@ -27,12 +27,12 @@ public static class DeprecatedOtelAttributes {
     /// </summary>
     public static readonly IReadOnlyDictionary<string, (string Replacement, string Version)> Renames =
         new Dictionary<string, (string, string)> {
-            // GenAI
+            
             ["gen_ai.system"] = ("gen_ai.provider.name", "1.37.0"),
             ["gen_ai.usage.prompt_tokens"] = ("gen_ai.usage.input_tokens", "1.27.0"),
             ["gen_ai.usage.completion_tokens"] = ("gen_ai.usage.output_tokens", "1.27.0"),
 
-            // HTTP
+            
             ["http.method"] = ("http.request.method", "1.21.0"),
             ["http.status_code"] = ("http.response.status_code", "1.21.0"),
             ["http.url"] = ("url.full", "1.21.0"),
@@ -42,7 +42,7 @@ public static class DeprecatedOtelAttributes {
             ["http.client_ip"] = ("client.address", "1.21.0"),
             ["http.user_agent"] = ("user_agent.original", "1.19.0"),
 
-            // Network
+            
             ["net.host.name"] = ("server.address", "1.21.0"),
             ["net.host.port"] = ("server.port", "1.21.0"),
             ["net.sock.host.addr"] = ("network.local.address", "1.21.0"),
@@ -50,22 +50,22 @@ public static class DeprecatedOtelAttributes {
             ["net.protocol.name"] = ("network.protocol.name", "1.21.0"),
             ["net.protocol.version"] = ("network.protocol.version", "1.21.0"),
 
-            // Database
+            
             ["db.statement"] = ("db.query.text", "1.25.0"),
             ["db.operation"] = ("db.operation.name", "1.25.0"),
             ["db.name"] = ("db.namespace", "1.25.0"),
 
-            // Code
+            
             ["code.filepath"] = ("code.file.path", "1.30.0"),
             ["code.function"] = ("code.function.name", "1.30.0"),
             ["code.lineno"] = ("code.line.number", "1.30.0"),
             ["code.column"] = ("code.column.number", "1.30.0"),
 
-            // FaaS
+            
             ["faas.execution"] = ("faas.invocation_id", "1.19.0"),
             ["faas.id"] = ("cloud.resource_id", "1.19.0"),
 
-            // Messaging
+            
             ["messaging.kafka.client_id"] = ("messaging.client.id", "1.21.0"),
             ["messaging.rocketmq.client_id"] = ("messaging.client.id", "1.21.0")
         };

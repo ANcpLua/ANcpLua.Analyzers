@@ -67,7 +67,7 @@ public sealed class AL0007ToAL0009IXmlSerializableAnalyzer : ALAnalyzer {
             return;
         }
 
-        // Use FirstOrDefault instead of SingleOrDefault - interface could have overloads
+        
         if (ixmlSerializable.GetMembers("GetSchema").OfType<IMethodSymbol>().FirstOrDefault()
             is not { } getSchemaMethod) {
             return;
@@ -97,13 +97,13 @@ public sealed class AL0007ToAL0009IXmlSerializableAnalyzer : ALAnalyzer {
             return;
         }
 
-        // AL0007: Check if explicitly implemented
+        
         if (!methodSymbol.ExplicitInterfaceImplementations.Any(i =>
                 SymbolEqualityComparer.Default.Equals(i, interfaceGetSchema))) {
             context.ReportDiagnostic(RuleAL0007, methodSymbol.Locations[0]);
         }
 
-        // AL0008: Check if abstract or returns non-null
+        
         if (methodSymbol.IsAbstract || ReturnsNonNullValue(methodDeclaration, context.SemanticModel)) {
             var location = methodDeclaration.DescendantNodes()
                                .FirstOrDefault(n => n is BlockSyntax or ArrowExpressionClauseSyntax)?.GetLocation()
@@ -120,7 +120,7 @@ public sealed class AL0007ToAL0009IXmlSerializableAnalyzer : ALAnalyzer {
         var invocation = (IInvocationOperation)context.Operation;
         var targetMethod = invocation.TargetMethod;
 
-        // AL0009: Don't call GetSchema
+        
         if (SymbolEqualityComparer.Default.Equals(targetMethod, interfaceGetSchema) ||
             IsGetSchemaImplementation(targetMethod, ixmlSerializable)) {
             context.ReportDiagnostic(RuleAL0009, invocation.Syntax.GetLocation());

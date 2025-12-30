@@ -95,7 +95,7 @@ public sealed class AL0013MissingSchemaUrlAnalyzer : ALAnalyzer {
             return false;
         }
 
-        // Walk the type hierarchy (self and base types)
+        
         var currentType = receiverType;
         while (currentType is not null) {
             if (currentType is INamedTypeSymbol namedCurrent &&
@@ -106,7 +106,7 @@ public sealed class AL0013MissingSchemaUrlAnalyzer : ALAnalyzer {
             currentType = currentType.BaseType;
         }
 
-        // Check interfaces (handles IOpenTelemetryBuilder and DI patterns)
+        
         if (receiverType is INamedTypeSymbol namedType) {
             foreach (var iface in namedType.AllInterfaces) {
                 if (otelBuilderTypes.Any(t => SymbolEqualityComparer.Default.Equals(t, iface))) {
