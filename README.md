@@ -8,35 +8,32 @@ Roslyn analyzers for C# code quality, focusing on modern .NET patterns and best 
 
 ## Installation
 
-```xml
-<PackageReference Include="ANcpLua.Analyzers" Version="1.0.9">
-  <PrivateAssets>all</PrivateAssets>
-  <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-</PackageReference>
+```shell
+dotnet add package ANcpLua.Analyzers
 ```
 
 Or use [ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk) which includes these analyzers automatically.
 
 ## Rules
 
-| ID     | Description                                             |
-|--------|---------------------------------------------------------|
-| AL0001 | Prohibit primary constructor parameter reassignment     |
-| AL0002 | Don't repeat negated pattern                            |
-| AL0003 | Don't divide by constant zero                           |
-| AL0004 | Use pattern matching for span constant comparison       |
-| AL0005 | Use SequenceEqual for span non-constant comparison      |
-| AL0006 | Field name conflicts with primary constructor parameter |
-| AL0007 | IXmlSerializable requires parameterless constructor     |
-| AL0008 | IXmlSerializable requires XmlSchemaProvider attribute   |
-| AL0009 | IXmlSerializable requires GetSchema to return null      |
-| AL0010 | Type should be partial for source generation            |
-| AL0011 | Use lock keyword instead of object monitor              |
-| AL0012 | Use recommended attribute for deprecation               |
-| AL0013 | Missing schema URL in OpenTelemetry instrumentation     |
-| AL0014 | Prefer pattern matching for null and zero checks        |
-| AL0015 | Normalize null guard style                              |
-| AL0016 | Combine declaration with null check                     |
+|Id|Category|Description|Severity|
+|--|--------|-----------|:------:|
+|[AL0001](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0001.md)|Design|Prohibit primary constructor parameter reassignment|Error|
+|[AL0002](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0002.md)|Design|Don't repeat negated patterns|Warning|
+|[AL0003](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0003.md)|Reliability|Don't divide by constant zero|Error|
+|[AL0004](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0004.md)|Usage|Use pattern matching for Span constant comparison|Warning|
+|[AL0005](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0005.md)|Usage|Use SequenceEqual for Span non-constant comparison|Warning|
+|[AL0006](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0006.md)|Design|Field name conflicts with primary constructor parameter|Warning|
+|[AL0007](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0007.md)|Usage|GetSchema should be explicitly implemented|Warning|
+|[AL0008](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0008.md)|Usage|GetSchema must return null and not be abstract|Warning|
+|[AL0009](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0009.md)|Usage|Don't call IXmlSerializable.GetSchema|Warning|
+|[AL0010](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0010.md)|Design|Type should be partial for source generator support|Info|
+|[AL0011](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0011.md)|Threading|Avoid lock keyword on non-Lock types|Warning|
+|[AL0012](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0012.md)|OpenTelemetry|Deprecated semantic convention attribute|Warning|
+|[AL0013](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0013.md)|OpenTelemetry|Missing telemetry schema URL|Info|
+|[AL0014](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0014.md)|Style|Prefer pattern matching for null and zero comparisons|Info|
+|[AL0015](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0015.md)|Style|Normalize null-guard style|Info|
+|[AL0016](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0016.md)|Style|Combine declaration with subsequent null-check|Info|
 
 ## Configuration
 
@@ -44,10 +41,13 @@ Configure rule severity in `.editorconfig`:
 
 ```ini
 [*.cs]
-dotnet_diagnostic.AL0001.severity = warning
+dotnet_diagnostic.AL0001.severity = error
 dotnet_diagnostic.AL0014.severity = suggestion
 ```
+
+See [docs/README.md](docs/README.md) for complete configuration options.
 
 ## Related
 
 - [ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk) — MSBuild SDK that includes this analyzer
+- [ANcpLua.Roslyn.Utilities](https://github.com/ANcpLua/ANcpLua.Roslyn.Utilities) — Roslyn utilities used by these analyzers
