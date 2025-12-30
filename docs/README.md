@@ -1,25 +1,25 @@
 # ANcpLua.Analyzers Rules
 
-|Id|Category|Description|Severity|Enabled|Code fix|
-|--|--------|-----------|:------:|:-----:|:------:|
-|[AL0001](AL0001.md)|Design|Prohibit reassignment of primary constructor parameters|Error|Yes|No|
-|[AL0002](AL0002.md)|Design|Don't repeat negated patterns|Warning|Yes|No|
-|[AL0003](AL0003.md)|Reliability|Don't divide by constant zero|Error|Yes|No|
-|[AL0004](AL0004.md)|Usage|Use pattern matching for Span constant comparison|Warning|Yes|Yes|
-|[AL0005](AL0005.md)|Usage|Use SequenceEqual for Span non-constant comparison|Warning|Yes|Yes|
-|[AL0006](AL0006.md)|Design|Field name conflicts with primary constructor parameter|Warning|Yes|No|
-|[AL0007](AL0007.md)|Usage|GetSchema should be explicitly implemented|Warning|Yes|No|
-|[AL0008](AL0008.md)|Usage|GetSchema must return null and not be abstract|Warning|Yes|No|
-|[AL0009](AL0009.md)|Usage|Don't call IXmlSerializable.GetSchema|Warning|Yes|No|
-|[AL0010](AL0010.md)|Design|Type should be partial for source generator support|Info|No|Yes|
-|[AL0011](AL0011.md)|Threading|Avoid lock keyword on non-Lock types|Warning|Yes|No|
-|[AL0012](AL0012.md)|OpenTelemetry|Deprecated semantic convention attribute|Warning|Yes|No|
-|[AL0013](AL0013.md)|OpenTelemetry|Missing telemetry schema URL|Info|Yes|No|
-|[AL0014](AL0014.md)|Style|Prefer pattern matching for null and zero comparisons|Info|Yes|Yes|
-|[AL0015](AL0015.md)|Style|Normalize null-guard style|Info|Yes|Yes|
-|[AL0016](AL0016.md)|Style|Combine declaration with subsequent null-check|Info|Yes|Yes|
+|Id|Category|Description|Severity|Is enabled|Code fix|
+|--|--------|-----------|:------:|:--------:|:------:|
+|[AL0001](AL0001.md)|Design|Prohibit reassignment of primary constructor parameters|<span title='Error'>❌</span>|✔️|❌|
+|[AL0002](AL0002.md)|Design|Don't repeat negated patterns|<span title='Warning'>⚠️</span>|✔️|❌|
+|[AL0003](AL0003.md)|Reliability|Don't divide by constant zero|<span title='Error'>❌</span>|✔️|❌|
+|[AL0004](AL0004.md)|Usage|Use pattern matching for Span constant comparison|<span title='Warning'>⚠️</span>|✔️|✔️|
+|[AL0005](AL0005.md)|Usage|Use SequenceEqual for Span non-constant comparison|<span title='Warning'>⚠️</span>|✔️|✔️|
+|[AL0006](AL0006.md)|Design|Field name conflicts with primary constructor parameter|<span title='Warning'>⚠️</span>|✔️|❌|
+|[AL0007](AL0007.md)|Usage|GetSchema should be explicitly implemented|<span title='Warning'>⚠️</span>|✔️|❌|
+|[AL0008](AL0008.md)|Usage|GetSchema must return null and not be abstract|<span title='Warning'>⚠️</span>|✔️|❌|
+|[AL0009](AL0009.md)|Usage|Don't call IXmlSerializable.GetSchema|<span title='Warning'>⚠️</span>|✔️|❌|
+|[AL0010](AL0010.md)|Design|Type should be partial for source generator support|<span title='Info'>ℹ️</span>|❌|✔️|
+|[AL0011](AL0011.md)|Threading|Avoid lock keyword on non-Lock types|<span title='Warning'>⚠️</span>|✔️|❌|
+|[AL0012](AL0012.md)|OpenTelemetry|Deprecated semantic convention attribute|<span title='Warning'>⚠️</span>|✔️|❌|
+|[AL0013](AL0013.md)|OpenTelemetry|Missing telemetry schema URL|<span title='Info'>ℹ️</span>|✔️|❌|
+|[AL0014](AL0014.md)|Style|Prefer pattern matching for null and zero comparisons|<span title='Info'>ℹ️</span>|✔️|✔️|
+|[AL0015](AL0015.md)|Style|Normalize null-guard style|<span title='Info'>ℹ️</span>|✔️|✔️|
+|[AL0016](AL0016.md)|Style|Combine declaration with subsequent null-check|<span title='Info'>ℹ️</span>|✔️|✔️|
 
-## .editorconfig - default values
+# .editorconfig - default values
 
 ```editorconfig
 # AL0001: Prohibit reassignment of primary constructor parameters

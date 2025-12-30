@@ -14,6 +14,7 @@
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <NeutralLanguage>en</NeutralLanguage>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
 
     <!-- Enable polyfills for netstandard2.0 TFM -->
     <InjectAllPolyfillsOnLegacy>true</InjectAllPolyfillsOnLegacy>
