@@ -41,7 +41,7 @@ jobs:
         run: dotnet build ANcpLua.Analyzers.sln -c Release -p:Version=${{ steps.version.outputs.version }}
 
       - name: Pack
-        run: dotnet pack src/ANcpLua.Analyzers/ANcpLua.Analyzers.csproj -c Release -o artifacts -p:Version=${{ steps.version.outputs.version }} -p:PackageId=ANcpLua.Analyzers --no-build
+        run: dotnet pack src/ANcpLua.Analyzers/ANcpLua.Analyzers.csproj -c Release -o artifacts -p:Version=${{ steps.version.outputs.version }} -p:PackageId=ANcpLua.Analyzers
 
       - name: NuGet login (OIDC → temp API key)
         id: login
