@@ -67,7 +67,8 @@ public sealed class AL0007ToAL0009IXmlSerializableAnalyzer : ALAnalyzer {
             return;
         }
 
-        if (ixmlSerializable.GetMembers("GetSchema").OfType<IMethodSymbol>().SingleOrDefault()
+        // Use FirstOrDefault instead of SingleOrDefault - interface could have overloads
+        if (ixmlSerializable.GetMembers("GetSchema").OfType<IMethodSymbol>().FirstOrDefault()
             is not { } getSchemaMethod) {
             return;
         }

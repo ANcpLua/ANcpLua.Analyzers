@@ -71,7 +71,7 @@ public sealed class AL0004ToAL0005SpanComparisonAnalyzer : ALAnalyzer {
             return;
         }
 
-        var leftDef = leftType.OriginalDefinition ?? leftType;
+        var leftDef = leftType.OriginalDefinition;
         if (!SymbolEqualityComparer.Default.Equals(leftDef, spanType) &&
             !SymbolEqualityComparer.Default.Equals(leftDef, readOnlySpanType)) {
             return;
@@ -90,8 +90,8 @@ public sealed class AL0004ToAL0005SpanComparisonAnalyzer : ALAnalyzer {
     private static bool IsConstantCollection(SyntaxNode syntax, SemanticModel model, CancellationToken token) =>
         syntax.Kind() switch {
             SyntaxKind.StringLiteralExpression => true,
-            SyntaxKind.CollectionExpression => ((CollectionExpressionSyntax)syntax).Elements
-                .All(e => model.GetConstantValue(e.DescendantNodes().Single(), token).HasValue),
+            SyntaxKind.CollectionExpression => IsConstantCollectionExpression(
+                (CollectionExpressionSyntax)syntax, model, token),
             SyntaxKind.ArrayCreationExpression => ((ArrayCreationExpressionSyntax)syntax).Initializer?.Expressions
                 .All(e => model.GetConstantValue(e, token).HasValue) ?? true,
             SyntaxKind.ImplicitArrayCreationExpression => ((ImplicitArrayCreationExpressionSyntax)syntax).Initializer
@@ -99,4 +99,22 @@ public sealed class AL0004ToAL0005SpanComparisonAnalyzer : ALAnalyzer {
                 .All(e => model.GetConstantValue(e, token).HasValue),
             _ => false
         };
+
+    private static bool IsConstantCollectionExpression(
+        CollectionExpressionSyntax collection,
+        SemanticModel model,
+        CancellationToken token) {
+        foreach (var element in collection.Elements) {
+            // Spread elements are never constant
+            if (element is not ExpressionElementSyntax expr) {
+                return false;
+            }
+
+            if (!model.GetConstantValue(expr.Expression, token).HasValue) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

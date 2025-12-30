@@ -2,7 +2,7 @@
 
 ## MISSION: Migrate to ANcpLua.NET.Sdk
 
-**Current NuGet:** 1.0.9 | **Target SDK:** 1.2.4
+**Current NuGet:** 1.3.0 | **Target SDK:** 1.3.0
 
 ### Rules
 

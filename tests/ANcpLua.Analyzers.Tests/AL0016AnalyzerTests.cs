@@ -172,38 +172,38 @@ public sealed class AL0016CodeFixTests : ALCodeFixTest<AL0016CombineDeclarationW
     /// </summary>
     [Fact]
     public Task ShouldCombineDeclarationWithReturnStatement() {
-        var source = """
-                     public interface IData
-                     {
-                         object? GetValue();
-                     }
+        const string source = """
+                              public interface IData
+                              {
+                                  object? GetValue();
+                              }
 
-                     public class TestClass
-                     {
-                         public string Format(IData? data)
-                         {
-                             [|var value = data?.GetValue();|]
-                             if (value is null) return "";
-                             return $"Value: {value}";
-                         }
-                     }
-                     """;
+                              public class TestClass
+                              {
+                                  public string Format(IData? data)
+                                  {
+                                      [|var value = data?.GetValue();|]
+                                      if (value is null) return "";
+                                      return $"Value: {value}";
+                                  }
+                              }
+                              """;
 
-        var expected = """
-                       public interface IData
-                       {
-                           object? GetValue();
-                       }
+        const string expected = """
+                                public interface IData
+                                {
+                                    object? GetValue();
+                                }
 
-                       public class TestClass
-                       {
-                           public string Format(IData? data)
-                           {
-                               if (data?.GetValue() is not { } value) return "";
-                               return $"Value: {value}";
-                           }
-                       }
-                       """;
+                                public class TestClass
+                                {
+                                    public string Format(IData? data)
+                                    {
+                                        if (data?.GetValue() is not { } value) return "";
+                                        return $"Value: {value}";
+                                    }
+                                }
+                                """;
 
         return VerifyAsync(source, expected);
     }

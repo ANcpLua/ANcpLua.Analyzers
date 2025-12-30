@@ -1,7 +1,6 @@
 <Solution>
     <Folder Name="/src/">
         <Project Path="src/ANcpLua.Analyzers.CodeFixes/ANcpLua.Analyzers.CodeFixes.csproj"/>
-        <Project Path="src/ANcpLua.Analyzers.Package/ANcpLua.Analyzers.Package.csproj"/>
         <Project Path="src/ANcpLua.Analyzers/ANcpLua.Analyzers.csproj"/>
     </Folder>
     <Folder Name="/tests/">

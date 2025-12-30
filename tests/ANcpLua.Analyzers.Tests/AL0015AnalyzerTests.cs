@@ -161,7 +161,7 @@ public sealed class AL0015PortableFormCodeFixTests : ALCodeFixTestWithEditorConf
         return VerifyAsync(source, expected,
             new Dictionary<string, string> {
                 { "ancplua_target_framework", "netstandard2.0" }, { "ancplua_nullguard_style", "auto" }
-            });
+            }, useNet10References: false);
     }
 
     /// <summary>
@@ -199,7 +199,7 @@ public sealed class AL0015PortableFormCodeFixTests : ALCodeFixTestWithEditorConf
         return VerifyAsync(source, expected,
             new Dictionary<string, string> {
                 { "ancplua_target_framework", "netstandard2.0" }, { "ancplua_nullguard_style", "auto" }
-            });
+            }, useNet10References: false);
     }
 
     /// <summary>
@@ -232,7 +232,8 @@ public sealed class AL0015PortableFormCodeFixTests : ALCodeFixTestWithEditorConf
                        """;
 
         return VerifyAsync(source, expected,
-            new Dictionary<string, string> { { "ancplua_target_framework", "netstandard2.0" } });
+            new Dictionary<string, string> { { "ancplua_target_framework", "netstandard2.0" } },
+            useNet10References: false);
     }
 
     /// <summary>
@@ -382,7 +383,7 @@ public sealed class AL0015BclFormCodeFixTests : ALCodeFixTestWithEditorConfig<AL
         return VerifyAsync(source, expected,
             new Dictionary<string, string> {
                 { "ancplua_target_framework", "net10.0" }, { "ancplua_nullguard_style", "auto" }
-            }, true);
+            });
     }
 
     /// <summary>
@@ -420,7 +421,7 @@ public sealed class AL0015BclFormCodeFixTests : ALCodeFixTestWithEditorConfig<AL
         return VerifyAsync(source, expected,
             new Dictionary<string, string> {
                 { "ancplua_target_framework", "net10.0" }, { "ancplua_nullguard_style", "auto" }
-            }, true);
+            });
     }
 
     /// <summary>
@@ -453,7 +454,7 @@ public sealed class AL0015BclFormCodeFixTests : ALCodeFixTestWithEditorConfig<AL
                        """;
 
         return VerifyAsync(source, expected,
-            new Dictionary<string, string> { { "ancplua_target_framework", "net10.0" } }, true);
+            new Dictionary<string, string> { { "ancplua_target_framework", "net10.0" } });
     }
 
     /// <summary>
@@ -488,7 +489,7 @@ public sealed class AL0015BclFormCodeFixTests : ALCodeFixTestWithEditorConfig<AL
         return VerifyAsync(source, expected,
             new Dictionary<string, string> {
                 { "ancplua_target_framework", "net10.0" }, { "ancplua_nullguard_style", "auto" }
-            }, true);
+            });
     }
 
     /// <summary>
@@ -523,7 +524,7 @@ public sealed class AL0015BclFormCodeFixTests : ALCodeFixTestWithEditorConfig<AL
         return VerifyAsync(source, expected,
             new Dictionary<string, string> {
                 { "ancplua_target_framework", "netstandard2.0" }, { "ancplua_nullguard_style", "bcl" }
-            }, true);
+            });
     }
 }
 
@@ -569,7 +570,7 @@ public sealed class AL0015MultiTargetTests : ALCodeFixTestWithEditorConfig<AL001
         return VerifyAsync(source, expected,
             new Dictionary<string, string> {
                 { "ancplua_is_multi_target", "true" }, { "ancplua_nullguard_style", "auto" }
-            }, true);
+            }, false, false);
     }
 
     /// <summary>
@@ -604,7 +605,7 @@ public sealed class AL0015MultiTargetTests : ALCodeFixTestWithEditorConfig<AL001
         return VerifyAsync(source, expected,
             new Dictionary<string, string> {
                 { "ancplua_is_multi_target", "true" }, { "ancplua_nullguard_style", "auto" }
-            }, true);
+            }, false, false);
     }
 
     /// <summary>
@@ -659,7 +660,7 @@ public sealed class AL0015MultiTargetTests : ALCodeFixTestWithEditorConfig<AL001
         return VerifyAsync(source, expected,
             new Dictionary<string, string> {
                 { "ancplua_is_multi_target", "true" }, { "ancplua_nullguard_style", "auto" }
-            }, true);
+            }, false, false);
     }
 }
 
@@ -704,6 +705,6 @@ public sealed class AL0015EdgeCasesTests : ALCodeFixTestWithEditorConfig<AL0015N
         return VerifyAsync(source, expected,
             new Dictionary<string, string> {
                 { "ancplua_target_framework", "netstandard2.0" }, { "ancplua_nullguard_style", "bcl" }
-            }, false);
+            }, false, false);
     }
 }

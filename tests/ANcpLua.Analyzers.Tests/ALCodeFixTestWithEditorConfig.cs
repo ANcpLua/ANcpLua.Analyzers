@@ -1,79 +1,91 @@
-using ANcpLua.Analyzers.Core;
+using Basic.Reference.Assemblies;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp.Testing;
+using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
 
 namespace ANcpLua.Analyzers.Tests;
 
 /// <summary>
 ///     Enhanced code fix test base class that supports EditorConfig configuration.
-///     This class allows tests to configure analyzer behavior through EditorConfig properties
-///     (like build_property.TargetFramework, build_property.TargetFrameworks, etc.)
-///     and custom properties (like ancplua_nullguard_style).
 /// </summary>
 public abstract class ALCodeFixTestWithEditorConfig<TAnalyzer, TCodeFix>
-    where TAnalyzer : ALAnalyzer, new()
+    where TAnalyzer : DiagnosticAnalyzer, new()
     where TCodeFix : CodeFixProvider, new() {
     /// <summary>
-    ///     Source code that provides ArgumentNullException with ThrowIfNull for test compilations.
-    ///     This defines the full type to ensure constructors are available.
+    ///     Source code that provides Microsoft.Shared.Diagnostics.Throw for test compilations.
     /// </summary>
-    private const string ThrowIfNullPolyfill = """
-                                               namespace System
+    private const string ThrowHelperPolyfill = """
+                                               namespace Microsoft.Shared.Diagnostics
                                                {
-                                                   public class ArgumentNullException : ArgumentException
+                                                   internal static class Throw
                                                    {
-                                                       public ArgumentNullException() : base("Value cannot be null.") { }
-                                                       public ArgumentNullException(string? paramName) : base("Value cannot be null.", paramName) { }
-                                                       public ArgumentNullException(string? paramName, string? message) : base(message, paramName) { }
-                                                       public ArgumentNullException(string? message, Exception? innerException) : base(message, innerException) { }
-
-                                                       public static void ThrowIfNull(object? argument, string? paramName = null)
+                                                       public static T IfNull<T>(T argument, string? paramName = null) where T : class
                                                        {
                                                            if (argument is null)
-                                                               throw new ArgumentNullException(paramName);
+                                                               throw new System.ArgumentNullException(paramName);
+                                                           return argument;
                                                        }
                                                    }
                                                }
                                                """;
 
+    // Empty ReferenceAssemblies - won't try to resolve NuGet packages
+    private static readonly ReferenceAssemblies EmptyNet100 = new("net10.0");
+    private static readonly ReferenceAssemblies EmptyNetStandard20 = new("netstandard2.0");
+
     /// <summary>
-    ///     Verifies a code fix with optional EditorConfig configuration.
+    ///     Verifies analyzer and code fix behavior.
     /// </summary>
-    /// <param name="source">The source code before the fix.</param>
-    /// <param name="fixedSource">The expected source code after the fix.</param>
-    /// <param name="editorConfig">Optional EditorConfig properties to configure the analyzer.</param>
-    /// <param name="includeThrowIfNullReference">
-    ///     Whether to include a reference to ArgumentNullException.ThrowIfNull
-    ///     (net6.0+).
+    /// <param name="source">Source code with diagnostic markers.</param>
+    /// <param name="fixedSource">Expected source after fix is applied.</param>
+    /// <param name="editorConfig">Optional EditorConfig settings.</param>
+    /// <param name="includeThrowHelper">Include Microsoft.Shared.Diagnostics.Throw polyfill.</param>
+    /// <param name="useNet10References">
+    ///     If true, uses .NET 10 references (includes ThrowIfNull).
+    ///     If false, uses NetStandard 2.0 references (no ThrowIfNull).
     /// </param>
     protected static Task VerifyAsync(
         string source,
         string fixedSource,
         Dictionary<string, string>? editorConfig = null,
-        bool includeThrowIfNullReference = false) {
-        var test =
-            new CustomCodeFixTest(editorConfig ?? new Dictionary<string, string>(), includeThrowIfNullReference) {
-                TestCode = source.ReplaceLineEndings(), FixedCode = fixedSource.ReplaceLineEndings()
-            };
-
+        bool includeThrowHelper = false,
+        bool useNet10References = true) {
+        var test = new CustomCodeFixTest(
+            editorConfig ?? new Dictionary<string, string>(),
+            includeThrowHelper,
+            useNet10References) {
+            TestCode = source.ReplaceLineEndings(), FixedCode = fixedSource.ReplaceLineEndings()
+        };
         return test.RunAsync();
     }
 
-    /// <summary>
-    ///     Custom test class that configures EditorConfig options and compilation references.
-    /// </summary>
     private sealed class CustomCodeFixTest : CSharpCodeFixTest<TAnalyzer, TCodeFix, DefaultVerifier> {
         private readonly Dictionary<string, string> _editorConfig;
-        private readonly bool _includeThrowIfNullReference;
+        private readonly bool _includeThrowHelper;
+        private readonly bool _useNet10References;
 
-        public CustomCodeFixTest(Dictionary<string, string> editorConfig, bool includeThrowIfNullReference) {
+        public CustomCodeFixTest(
+            Dictionary<string, string> editorConfig,
+            bool includeThrowHelper,
+            bool useNet10References) {
             _editorConfig = editorConfig;
-            _includeThrowIfNullReference = includeThrowIfNullReference;
+            _includeThrowHelper = includeThrowHelper;
+            _useNet10References = useNet10References;
 
-            // Apply configurations
+            ConfigureReferences();
             ApplyEditorConfig();
-            ApplyThrowIfNullReference();
+            ApplyThrowHelper();
+        }
+
+        private void ConfigureReferences() {
+            if (_useNet10References) {
+                ReferenceAssemblies = EmptyNet100;
+                TestState.AdditionalReferences.AddRange(Net100.References.All);
+            } else {
+                ReferenceAssemblies = EmptyNetStandard20;
+                TestState.AdditionalReferences.AddRange(NetStandard20.References.All);
+            }
         }
 
         private void ApplyEditorConfig() {
@@ -81,41 +93,29 @@ public abstract class ALCodeFixTestWithEditorConfig<TAnalyzer, TCodeFix>
                 return;
             }
 
-            // Build global analyzer config content
-            // Global configs use "is_global = true" and flat key=value pairs
-            // Note: Values containing semicolons need no escaping in global configs
             var globalLines = new List<string> { "is_global = true", "" };
             foreach (var kvp in _editorConfig) {
                 globalLines.Add($"{kvp.Key} = {kvp.Value}");
             }
 
-            var globalConfigContent = string.Join("\n", globalLines);
+            TestState.AnalyzerConfigFiles.Add(("/.globalconfig", string.Join("\n", globalLines)));
 
-            // Add as global config at root level
-            TestState.AnalyzerConfigFiles.Add(("/.globalconfig", globalConfigContent));
-
-            // Also add as regular editorconfig with [*.cs] pattern for per-file options
-            // The path /0/.editorconfig places it in the same directory as test files (/0/Test1.cs)
-            // Note: In editorconfig, semicolons start comments, so we need to quote values containing them
             var editorConfigLines = new List<string> { "root = true", "", "[*.cs]" };
             foreach (var kvp in _editorConfig) {
-                // Quote values containing semicolons or other special characters
-                var value = kvp.Value.Contains(';') ? $"\"{kvp.Value}\"" : kvp.Value;
+                var value = kvp.Value.Contains(';') ? "\"" + kvp.Value + "\"" : kvp.Value;
                 editorConfigLines.Add($"{kvp.Key} = {value}");
             }
 
-            var editorConfigContent = string.Join("\n", editorConfigLines);
-            TestState.AnalyzerConfigFiles.Add(("/0/.editorconfig", editorConfigContent));
+            TestState.AnalyzerConfigFiles.Add(("/0/.editorconfig", string.Join("\n", editorConfigLines)));
         }
 
-        private void ApplyThrowIfNullReference() {
-            if (!_includeThrowIfNullReference) {
+        private void ApplyThrowHelper() {
+            if (!_includeThrowHelper) {
                 return;
             }
 
-            // Add source code that provides ThrowIfNull method to both test and fixed states
-            TestState.Sources.Add(("ThrowIfNullPolyfill.cs", ThrowIfNullPolyfill));
-            FixedState.Sources.Add(("ThrowIfNullPolyfill.cs", ThrowIfNullPolyfill));
+            TestState.Sources.Add(("ThrowHelper.cs", ThrowHelperPolyfill));
+            FixedState.Sources.Add(("ThrowHelper.cs", ThrowHelperPolyfill));
         }
     }
 }
