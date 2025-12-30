@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.Testing;
 namespace ANcpLua.Analyzers.Tests;
 
 public abstract class ALAnalyzerTest<TAnalyzer> where TAnalyzer : DiagnosticAnalyzer, new() {
-    // Empty ReferenceAssemblies - won't try to resolve NuGet packages
+    
     private static readonly ReferenceAssemblies EmptyNet100 = new("net10.0");
     private static readonly ReferenceAssemblies EmptyNetStandard20 = new("netstandard2.0");
 

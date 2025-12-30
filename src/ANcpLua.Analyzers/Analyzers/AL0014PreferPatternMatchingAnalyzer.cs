@@ -81,7 +81,7 @@ public sealed class AL0014PreferPatternMatchingAnalyzer : ALAnalyzer {
         isNullCheck = false;
         expressionIsLeft = false;
 
-        // Check: expression == null, null == expression
+        
         if (IsNullLiteral(binary.Right)) {
             isNullCheck = true;
             expressionIsLeft = true;
@@ -94,7 +94,7 @@ public sealed class AL0014PreferPatternMatchingAnalyzer : ALAnalyzer {
             return true;
         }
 
-        // Check: expression == 0, 0 == expression
+        
         if (IsZeroLiteral(binary.Right)) {
             isNullCheck = false;
             expressionIsLeft = true;

@@ -126,9 +126,9 @@ public sealed class AL0005AnalyzerTests : ALAnalyzerTest<AL0004ToAL0005SpanCompa
 public sealed class
     AL0004ToAL0005CollectionExpressionEdgeCasesTests : ALAnalyzerTest<AL0004ToAL0005SpanComparisonAnalyzer> {
     [Theory]
-    [InlineData("[1, 2]", "AL0004")] // Simple literals - constant
-    [InlineData("[1 + 2, 3]", "AL0004")] // Binary expression - constant (would BREAK old .Single())
-    [InlineData("[]", "AL0004")] // Empty - constant
+    [InlineData("[1, 2]", "AL0004")] 
+    [InlineData("[1 + 2, 3]", "AL0004")] 
+    [InlineData("[]", "AL0004")] 
     public Task ShouldReportAL0004ForConstantCollections(string collection, string expectedDiagnostic) =>
         VerifyAsync($$"""
                       using System;

@@ -31,9 +31,9 @@ public static class DiagnosticCategories {
 ///     Central registry of all diagnostic IDs following Roslyn naming conventions.
 /// </summary>
 public static class DiagnosticIds {
-    // ==========================================================================
-    // Primary Constructor Analyzers (AL0001-AL0006)
-    // ==========================================================================
+    
+    
+    
 
     /// <summary>AL0001: Prohibit reassignment of primary constructor parameters.</summary>
     public const string ProhibitPrimaryConstructorParameterReassignment = "AL0001";
@@ -53,9 +53,9 @@ public static class DiagnosticIds {
     /// <summary>AL0006: Field name conflicts with primary constructor parameter.</summary>
     public const string FieldNameConflictsWithPrimaryConstructorParameter = "AL0006";
 
-    // ==========================================================================
-    // IXmlSerializable Analyzers (AL0007-AL0009)
-    // ==========================================================================
+    
+    
+    
 
     /// <summary>AL0007: GetSchema should be explicitly implemented.</summary>
     public const string GetSchemaShouldBeExplicitlyImplemented = "AL0007";
@@ -66,16 +66,16 @@ public static class DiagnosticIds {
     /// <summary>AL0009: Don't call IXmlSerializable.GetSchema.</summary>
     public const string DontCallGetSchema = "AL0009";
 
-    // ==========================================================================
-    // Source Generator Support (AL0010)
-    // ==========================================================================
+    
+    
+    
 
     /// <summary>AL0010: Type should be partial for source generator support.</summary>
     public const string TypeShouldBePartial = "AL0010";
 
-    // ==========================================================================
-    // OpenTelemetry Analyzers (AL0011-AL0013)
-    // ==========================================================================
+    
+    
+    
 
     /// <summary>AL0011: Avoid lock keyword on non-Lock types.</summary>
     public const string AvoidLockKeywordOnNonLockTypes = "AL0011";
@@ -86,16 +86,16 @@ public static class DiagnosticIds {
     /// <summary>AL0013: Missing telemetry schema URL.</summary>
     public const string MissingTelemetrySchemaUrl = "AL0013";
 
-    // ==========================================================================
-    // Refactorings (AR0001+)
-    // ==========================================================================
+    
+    
+    
 
     /// <summary>AR0001: Convert SCREAMING_SNAKE_CASE to PascalCase.</summary>
     public const string SnakeCaseToPascalCase = "AR0001";
 
-    // ==========================================================================
-    // Style Analyzers (AL0014+)
-    // ==========================================================================
+    
+    
+    
 
     /// <summary>AL0014: Prefer pattern matching for null and zero comparisons.</summary>
     public const string PreferPatternMatchingForNullAndZero = "AL0014";

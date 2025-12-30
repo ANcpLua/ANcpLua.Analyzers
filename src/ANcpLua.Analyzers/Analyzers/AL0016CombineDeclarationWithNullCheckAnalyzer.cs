@@ -26,14 +26,14 @@ public sealed class AL0016CombineDeclarationWithNullCheckAnalyzer : ALAnalyzer {
         context.RegisterSyntaxNodeAction(AnalyzeDeclaration, SyntaxKind.LocalDeclarationStatement);
 
     private static void AnalyzeDeclaration(SyntaxNodeAnalysisContext context) {
-        // Requires C# 9.0+ for 'is not { }' pattern
+        
         if (((CSharpCompilation)context.Compilation).LanguageVersion < LanguageVersion.CSharp9) {
             return;
         }
 
         var declaration = (LocalDeclarationStatementSyntax)context.Node;
 
-        // 1. Single variable with initializer
+        
         if (declaration.Declaration.Variables.Count != 1) {
             return;
         }
@@ -45,13 +45,13 @@ public sealed class AL0016CombineDeclarationWithNullCheckAnalyzer : ALAnalyzer {
 
         var variableName = variable.Identifier.Text;
 
-        // 2. Reference type only (is not { } unwraps Nullable<T>)
+        
         if (context.SemanticModel.GetDeclaredSymbol(variable) is not ILocalSymbol symbol ||
             !symbol.Type.IsReferenceType) {
             return;
         }
 
-        // 3. Next statement is if (no else)
+        
         if (declaration.Parent is not BlockSyntax block) {
             return;
         }
@@ -69,17 +69,17 @@ public sealed class AL0016CombineDeclarationWithNullCheckAnalyzer : ALAnalyzer {
             return;
         }
 
-        // 4. Null check on same variable
+        
         if (!IsNullCheck(ifStatement.Condition, variableName)) {
             return;
         }
 
-        // 5. Early exit body
+        
         if (!IsEarlyExit(ifStatement.Statement)) {
             return;
         }
 
-        // 6. Variable not used in if-body (would be unassigned)
+        
         if (ContainsNonNameofUsage(ifStatement.Statement, variableName)) {
             return;
         }
@@ -89,14 +89,14 @@ public sealed class AL0016CombineDeclarationWithNullCheckAnalyzer : ALAnalyzer {
 
     private static bool IsNullCheck(ExpressionSyntax condition, string name) {
         switch (condition) {
-            // x is null
+            
             case IsPatternExpressionSyntax {
                     Pattern: ConstantPatternSyntax { Expression: LiteralExpressionSyntax l }
                 } p
                 when l.IsKind(SyntaxKind.NullLiteralExpression):
                 return p.Expression is IdentifierNameSyntax id && id.Identifier.Text == name;
 
-            // x == null / null == x
+            
             case BinaryExpressionSyntax bin when bin.IsKind(SyntaxKind.EqualsExpression): {
                 if (bin.Right.IsKind(SyntaxKind.NullLiteralExpression) && bin.Left is IdentifierNameSyntax lId) {
                     return lId.Identifier.Text == name;
