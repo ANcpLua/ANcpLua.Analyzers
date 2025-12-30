@@ -1,28 +1,26 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="ANcpLua.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
 
-    <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
-        <OutputType>Exe</OutputType>
-        <IsTestProject>true</IsTestProject>
-        <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
-    </PropertyGroup>
+    <!-- Suppress SDK stricter rules for test project -->
+    <NoWarn>$(NoWarn);RS0030;IDE0028;IDE0055;IDE1006</NoWarn>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <!-- Analyzer Testing -->
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing"/>
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing"/>
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeRefactoring.Testing"/>
+  <ItemGroup>
+    <PackageReference Include="AwesomeAssertions"/>
+    <PackageReference Include="Basic.Reference.Assemblies.Net100"/>
+    <PackageReference Include="Basic.Reference.Assemblies.NetStandard20"/>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing"/>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing"/>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces"/>
+    <PackageReference Include="xunit.v3.mtp-v2"/>
+  </ItemGroup>
 
-        <!-- MTP v2 -->
-        <PackageReference Include="xunit.v3.mtp-v2"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\..\src\ANcpLua.Analyzers.CodeFixes\ANcpLua.Analyzers.CodeFixes.csproj"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Using Include="Xunit"/>
-    </ItemGroup>
-
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\ANcpLua.Analyzers\ANcpLua.Analyzers.csproj"/>
+    <ProjectReference Include="..\..\src\ANcpLua.Analyzers.CodeFixes\ANcpLua.Analyzers.CodeFixes.csproj"/>
+  </ItemGroup>
 </Project>

@@ -48,14 +48,36 @@ public sealed class AL0003DontDivideByConstantZeroAnalyzer : ALAnalyzer {
         context.ReportDiagnostic(Rule, operation.Syntax.GetLocation());
     }
 
-    private static bool IsIntegerOrDecimalType(ITypeSymbol typeSymbol) =>
-        typeSymbol.SpecialType is
+    private static bool IsIntegerOrDecimalType(ITypeSymbol typeSymbol) {
+        // Standard integer/decimal types via SpecialType
+        if (typeSymbol.SpecialType is
             SpecialType.System_Byte or SpecialType.System_SByte or
             SpecialType.System_Int16 or SpecialType.System_UInt16 or
             SpecialType.System_Int32 or SpecialType.System_UInt32 or
             SpecialType.System_Int64 or SpecialType.System_UInt64 or
-            SpecialType.System_Decimal;
+            SpecialType.System_IntPtr or SpecialType.System_UIntPtr or // nint/nuint
+            SpecialType.System_Decimal) {
+            return true;
+        }
+
+        // Int128/UInt128 don't have SpecialType values (.NET 7+)
+        var fullName = typeSymbol.ToDisplayString();
+        return fullName is "System.Int128" or "System.UInt128";
+    }
 
     private static bool IsZero(object? value) =>
-        value is 0 or 0u or 0L or 0ul or (byte)0 or (sbyte)0 or (short)0 or (ushort)0 or 0.0m;
+        value switch {
+            // Standard integer zeros
+            0 or 0u or 0L or 0ul => true,
+            byte b => b == 0,
+            sbyte sb => sb == 0,
+            short s => s == 0,
+            ushort us => us == 0,
+            // Decimal zero
+            decimal d => d == 0m,
+            // nint/nuint (aliases for IntPtr/UIntPtr)
+            nint n => n == 0,
+            nuint nu => nu == 0,
+            _ => false
+        };
 }

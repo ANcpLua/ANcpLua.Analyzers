@@ -19,24 +19,24 @@ Or use [ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk) which inclu
 
 ## Rules
 
-| ID | Description |
-|----|-------------|
-| AL0001 | Prohibit primary constructor parameter reassignment |
-| AL0002 | Don't repeat negated pattern |
-| AL0003 | Don't divide by constant zero |
-| AL0004 | Use pattern matching for span constant comparison |
-| AL0005 | Use SequenceEqual for span non-constant comparison |
+| ID     | Description                                             |
+|--------|---------------------------------------------------------|
+| AL0001 | Prohibit primary constructor parameter reassignment     |
+| AL0002 | Don't repeat negated pattern                            |
+| AL0003 | Don't divide by constant zero                           |
+| AL0004 | Use pattern matching for span constant comparison       |
+| AL0005 | Use SequenceEqual for span non-constant comparison      |
 | AL0006 | Field name conflicts with primary constructor parameter |
-| AL0007 | IXmlSerializable requires parameterless constructor |
-| AL0008 | IXmlSerializable requires XmlSchemaProvider attribute |
-| AL0009 | IXmlSerializable requires GetSchema to return null |
-| AL0010 | Type should be partial for source generation |
-| AL0011 | Use lock keyword instead of object monitor |
-| AL0012 | Use recommended attribute for deprecation |
-| AL0013 | Missing schema URL in OpenTelemetry instrumentation |
-| AL0014 | Prefer pattern matching for null and zero checks |
-| AL0015 | Normalize null guard style |
-| AL0016 | Combine declaration with null check |
+| AL0007 | IXmlSerializable requires parameterless constructor     |
+| AL0008 | IXmlSerializable requires XmlSchemaProvider attribute   |
+| AL0009 | IXmlSerializable requires GetSchema to return null      |
+| AL0010 | Type should be partial for source generation            |
+| AL0011 | Use lock keyword instead of object monitor              |
+| AL0012 | Use recommended attribute for deprecation               |
+| AL0013 | Missing schema URL in OpenTelemetry instrumentation     |
+| AL0014 | Prefer pattern matching for null and zero checks        |
+| AL0015 | Normalize null guard style                              |
+| AL0016 | Combine declaration with null check                     |
 
 ## Configuration
 

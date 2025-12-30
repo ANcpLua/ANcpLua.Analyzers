@@ -52,7 +52,10 @@ public sealed class AL0002DontRepeatNegatedPatternAnalyzer : ALAnalyzer {
         var firstLocation = syntax.SpanStart;
         var nonFirstLocation = innerNode.SpanStart;
 
+        // Ensure valid span (end > start)
+        var spanEnd = Math.Max(firstLocation + 1, nonFirstLocation - 1);
+
         context.ReportDiagnostic(Rule,
-            Location.Create(syntax.SyntaxTree, TextSpan.FromBounds(firstLocation, nonFirstLocation - 1)));
+            Location.Create(syntax.SyntaxTree, TextSpan.FromBounds(firstLocation, spanEnd)));
     }
 }

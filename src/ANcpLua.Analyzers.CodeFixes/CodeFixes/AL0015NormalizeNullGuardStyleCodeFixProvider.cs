@@ -1,103 +1,113 @@
+using ANcpLua.Analyzers.Analyzers;
 using ANcpLua.Analyzers.Core;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
 /// <summary>
-///     Code fix provider for AL0015: Normalizes simple ArgumentNullException null-guards.
-///     Converts to either BCL form (ThrowIfNull) or portable form (coalesce assignment).
+///     Code fix for AL0015: Normalizes null-guards to Throw (Throw.IfNull), BCL (ThrowIfNull),
+///     or portable (coalesce) form.
 /// </summary>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AL0015NormalizeNullGuardStyleCodeFixProvider))]
 [Shared]
 public sealed class AL0015NormalizeNullGuardStyleCodeFixProvider : ALCodeFixProvider<IfStatementSyntax> {
-    public override ImmutableArray<string> FixableDiagnosticIds =>
-        [DiagnosticIds.NormalizeNullGuardStyle];
+    public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.NormalizeNullGuardStyle];
 
-    protected override CodeAction CreateCodeAction(Document document, IfStatementSyntax ifStatement, SyntaxNode root,
-        Diagnostic diagnostic) {
-        // Extract properties from the diagnostic
-        var properties = diagnostic.Properties;
-        var identifierName = properties["identifierName"] ?? "";
-        var modeStr = properties["mode"] ?? "portable";
-        var hasThrowIfNullStr = properties["hasThrowIfNull"] ?? "false";
-        var hasThrowIfNull = bool.TryParse(hasThrowIfNullStr, out var result) && result;
-
-        // Only create fix if we have the identifier
-        if (string.IsNullOrEmpty(identifierName)) {
-            return CodeAction.Create(CodeFixResources.AL0015CodeFixTitle, _ => Task.FromResult(document), "NoOp");
-        }
-
-        return CodeAction.Create(
-            CodeFixResources.AL0015CodeFixTitle,
-            _ => NormalizeNullGuard(document, ifStatement, root, identifierName, modeStr, hasThrowIfNull),
-            nameof(AL0015NormalizeNullGuardStyleCodeFixProvider));
-    }
-
-    private static Task<Document> NormalizeNullGuard(
+    protected override CodeAction CreateCodeAction(
         Document document,
         IfStatementSyntax ifStatement,
         SyntaxNode root,
-        string identifierName,
-        string mode,
-        bool hasThrowIfNull) {
-        // Create the new statement based on mode
-        var newStatement = mode == "bcl" && hasThrowIfNull
-            ? CreateBclForm(identifierName)
-            : CreatePortableForm(identifierName);
+        Diagnostic diagnostic) {
+        var identifier = diagnostic.Properties[AL0015NormalizeNullGuardStyleAnalyzer.PropertyIdentifier]!;
+        var typeName = diagnostic.Properties[AL0015NormalizeNullGuardStyleAnalyzer.PropertyTypeName]!;
+        var style = diagnostic.Properties[AL0015NormalizeNullGuardStyleAnalyzer.PropertyStyle]!;
 
-        // Preserve trivia from original if statement
+        var title = style switch {
+            "throw" => "Use Throw.IfNull",
+            "bcl" => "Use ThrowIfNull",
+            _ => "Use coalesce assignment"
+        };
+
+        return CodeAction.Create(
+            title,
+            ct => ApplyFixAsync(document, ifStatement, identifier, typeName, style, ct),
+            nameof(AL0015NormalizeNullGuardStyleCodeFixProvider));
+    }
+
+    private static Task<Document> ApplyFixAsync(
+        Document document,
+        IfStatementSyntax ifStatement,
+        string identifier,
+        string typeName,
+        string style,
+        CancellationToken ct) {
+        var newStatement = style switch {
+            "throw" => CreateThrowHelperStatement(identifier),
+            "bcl" => CreateBclStatement(identifier, typeName),
+            _ => CreatePortableStatement(identifier, typeName)
+        };
+
         newStatement = newStatement
             .WithLeadingTrivia(ifStatement.GetLeadingTrivia())
             .WithTrailingTrivia(ifStatement.GetTrailingTrivia());
 
-        var newRoot = root.ReplaceNode(ifStatement, newStatement);
+        var newRoot = ifStatement.SyntaxTree.GetRoot(ct).ReplaceNode(ifStatement, newStatement);
         return Task.FromResult(document.WithSyntaxRoot(newRoot));
     }
 
-    private static StatementSyntax CreateBclForm(string identifierName) {
-        // ArgumentNullException.ThrowIfNull(x);
-        var invocation = SyntaxFactory.InvocationExpression(
-            SyntaxFactory.MemberAccessExpression(
-                SyntaxKind.SimpleMemberAccessExpression,
-                SyntaxFactory.IdentifierName("ArgumentNullException"),
-                SyntaxFactory.IdentifierName("ThrowIfNull")),
-            SyntaxFactory.ArgumentList(
-                SyntaxFactory.SeparatedList(new[] {
-                    SyntaxFactory.Argument(SyntaxFactory.IdentifierName(identifierName))
-                })));
+    /// <summary>
+    ///     Creates: Throw.IfNull(identifier);
+    /// </summary>
+    private static StatementSyntax CreateThrowHelperStatement(string identifier) =>
+        SyntaxFactory.ExpressionStatement(
+            SyntaxFactory.InvocationExpression(
+                SyntaxFactory.MemberAccessExpression(
+                    SyntaxKind.SimpleMemberAccessExpression,
+                    SyntaxFactory.IdentifierName("Throw"),
+                    SyntaxFactory.IdentifierName("IfNull")),
+                SyntaxFactory.ArgumentList(
+                    SyntaxFactory.SingletonSeparatedList(
+                        SyntaxFactory.Argument(SyntaxFactory.IdentifierName(identifier))))));
 
-        return SyntaxFactory.ExpressionStatement(invocation);
-    }
+    /// <summary>
+    ///     Creates: ArgumentNullException.ThrowIfNull(identifier);
+    /// </summary>
+    private static StatementSyntax CreateBclStatement(string identifier, string typeName) =>
+        SyntaxFactory.ExpressionStatement(
+            SyntaxFactory.InvocationExpression(
+                SyntaxFactory.MemberAccessExpression(
+                    SyntaxKind.SimpleMemberAccessExpression,
+                    SyntaxFactory.ParseName(typeName),
+                    SyntaxFactory.IdentifierName("ThrowIfNull")),
+                SyntaxFactory.ArgumentList(
+                    SyntaxFactory.SingletonSeparatedList(
+                        SyntaxFactory.Argument(SyntaxFactory.IdentifierName(identifier))))));
 
-    private static StatementSyntax CreatePortableForm(string identifierName) {
-        // x = x ?? throw new ArgumentNullException(nameof(x));
-        var identifier = SyntaxFactory.IdentifierName(identifierName);
+    /// <summary>
+    ///     Creates: identifier = identifier ?? throw new ArgumentNullException(nameof(identifier));
+    /// </summary>
+    private static StatementSyntax CreatePortableStatement(string identifier, string typeName) {
+        var idExpr = SyntaxFactory.IdentifierName(identifier);
 
-        var newArgEx = SyntaxFactory.ObjectCreationExpression(
-            SyntaxFactory.IdentifierName("ArgumentNullException"),
-            SyntaxFactory.ArgumentList(
-                SyntaxFactory.SeparatedList(new[] {
-                    SyntaxFactory.Argument(
-                        SyntaxFactory.InvocationExpression(
-                            SyntaxFactory.IdentifierName("nameof"),
-                            SyntaxFactory.ArgumentList(
-                                SyntaxFactory.SingletonSeparatedList(
-                                    SyntaxFactory.Argument(
-                                        SyntaxFactory.IdentifierName(identifierName))))))
-                })),
-            null);
+        var throwExpr = SyntaxFactory.ThrowExpression(
+            SyntaxFactory.ObjectCreationExpression(
+                SyntaxFactory.ParseTypeName(typeName),
+                SyntaxFactory.ArgumentList(
+                    SyntaxFactory.SingletonSeparatedList(
+                        SyntaxFactory.Argument(
+                            SyntaxFactory.InvocationExpression(
+                                SyntaxFactory.IdentifierName("nameof"),
+                                SyntaxFactory.ArgumentList(
+                                    SyntaxFactory.SingletonSeparatedList(
+                                        SyntaxFactory.Argument(idExpr))))))),
+                null));
 
-        var throwExpr = SyntaxFactory.ThrowExpression(newArgEx);
-
-        var coalesceExpr = SyntaxFactory.BinaryExpression(
-            SyntaxKind.CoalesceExpression,
-            identifier,
-            throwExpr);
-
-        var assignment = SyntaxFactory.AssignmentExpression(
-            SyntaxKind.SimpleAssignmentExpression,
-            identifier,
-            coalesceExpr);
-
-        return SyntaxFactory.ExpressionStatement(assignment);
+        return SyntaxFactory.ExpressionStatement(
+            SyntaxFactory.AssignmentExpression(
+                SyntaxKind.SimpleAssignmentExpression,
+                idExpr,
+                SyntaxFactory.BinaryExpression(
+                    SyntaxKind.CoalesceExpression,
+                    idExpr,
+                    throwExpr)));
     }
 }

@@ -1,29 +1,11 @@
 using ANcpLua.Analyzers.Core;
-using ANcpLua.Analyzers.Internal;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
 /// <summary>
 ///     AL0016: Combine declaration with subsequent null-check.
-///     Detects a pattern where a local variable is declared and then immediately checked for null,
-///     flagging them for potential combination into a single pattern match.
+///     Detects "var x = M(); if (x is null) return;" and suggests "if (M() is not { } x) return;".
 /// </summary>
-/// <remarks>
-///     Detects patterns like:
-///     <list type="bullet">
-///         <item>
-///             <c>var x = M(); if (x is null) return;</c>
-///         </item>
-///         <item>
-///             <c>var x = M(); if (x == null) return;</c>
-///         </item>
-///     </list>
-///     Only triggers if:
-///     - Declaration has exactly one variable and initializer
-///     - Next statement is an if with null check (no else clause)
-///     - If body is an early-exit (return/throw/continue/break or block with single early-exit)
-///     - Compilation is C# 7.0+ (for pattern variables)
-/// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class AL0016CombineDeclarationWithNullCheckAnalyzer : ALAnalyzer {
     public const string DiagnosticId = DiagnosticIds.CombineDeclarationWithNullCheck;
@@ -31,162 +13,126 @@ public sealed class AL0016CombineDeclarationWithNullCheckAnalyzer : ALAnalyzer {
     private static readonly DiagnosticDescriptor Rule = new(
         DiagnosticId,
         "Combine declaration with subsequent null-check",
-        "Combine this declaration with the following null-check",
+        "Combine declaration of '{0}' with subsequent null-check",
         DiagnosticCategories.Style,
         DiagnosticSeverity.Info,
         true,
-        "A local variable declaration can be combined with its immediately following null-check into a single pattern match.",
+        "Combines a variable declaration and an immediate null-check into a single pattern match.",
         HelpLinkBase + "AL0016.md");
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
     protected override void RegisterActions(AnalysisContext context) =>
-        context.RegisterSyntaxNodeAction(
-            AnalyzeLocalDeclaration,
-            SyntaxKind.LocalDeclarationStatement);
+        context.RegisterSyntaxNodeAction(AnalyzeDeclaration, SyntaxKind.LocalDeclarationStatement);
 
-    private static void AnalyzeLocalDeclaration(SyntaxNodeAnalysisContext context) {
-        var declaration = (LocalDeclarationStatementSyntax)context.Node;
-
-        // Gate on language version >= C# 7.0 (for pattern variables)
-        if (!context.Compilation.HasLanguageVersionAtLeastEqualTo(LanguageVersion.CSharp7)) {
+    private static void AnalyzeDeclaration(SyntaxNodeAnalysisContext context) {
+        // Requires C# 9.0+ for 'is not { }' pattern
+        if (((CSharpCompilation)context.Compilation).LanguageVersion < LanguageVersion.CSharp9) {
             return;
         }
 
-        // Verify declaration has exactly one variable
+        var declaration = (LocalDeclarationStatementSyntax)context.Node;
+
+        // 1. Single variable with initializer
         if (declaration.Declaration.Variables.Count != 1) {
             return;
         }
 
         var variable = declaration.Declaration.Variables[0];
-
-        // Verify variable has an initializer
-        if (variable.Initializer is null) {
+        if (variable.Initializer == null) {
             return;
         }
 
         var variableName = variable.Identifier.Text;
 
-        // Get the next sibling statement
-        var nextStatement = TryGetNextStatement(declaration);
-
-        // Verify next statement is an if with null check
-        if (nextStatement is not IfStatementSyntax ifStatement) {
+        // 2. Reference type only (is not { } unwraps Nullable<T>)
+        if (context.SemanticModel.GetDeclaredSymbol(variable) is not ILocalSymbol symbol ||
+            !symbol.Type.IsReferenceType) {
             return;
         }
 
-        // Verify no else clause
-        if (ifStatement.Else is not null) {
+        // 3. Next statement is if (no else)
+        if (declaration.Parent is not BlockSyntax block) {
             return;
         }
 
-        // Verify the if condition is a null check on the same variable
-        if (!IsNullCheckIf(ifStatement, variableName)) {
+        var index = block.Statements.IndexOf(declaration);
+        if (index == -1 || index + 1 >= block.Statements.Count) {
             return;
         }
 
-        // Verify if body is an early-exit
+        if (block.Statements[index + 1] is not IfStatementSyntax ifStatement) {
+            return;
+        }
+
+        if (ifStatement.Else != null) {
+            return;
+        }
+
+        // 4. Null check on same variable
+        if (!IsNullCheck(ifStatement.Condition, variableName)) {
+            return;
+        }
+
+        // 5. Early exit body
         if (!IsEarlyExit(ifStatement.Statement)) {
             return;
         }
 
-        // All checks passed, report diagnostic
-        context.ReportDiagnostic(Diagnostic.Create(
-            Rule,
-            declaration.GetLocation()));
-    }
-
-    /// <summary>
-    ///     Gets the next sibling statement after the current local declaration.
-    /// </summary>
-    private static StatementSyntax? TryGetNextStatement(LocalDeclarationStatementSyntax currentNode) {
-        // Navigate up to find the containing block
-        if (currentNode.Parent is not BlockSyntax containingBlock) {
-            return null;
+        // 6. Variable not used in if-body (would be unassigned)
+        if (ContainsNonNameofUsage(ifStatement.Statement, variableName)) {
+            return;
         }
 
-        // Find the index of the current statement
-        var currentIndex = containingBlock.Statements.IndexOf(currentNode);
-        if (currentIndex < 0 || currentIndex >= containingBlock.Statements.Count - 1) {
-            return null;
-        }
-
-        // Return the next statement
-        return containingBlock.Statements[currentIndex + 1];
+        context.ReportDiagnostic(Diagnostic.Create(Rule, declaration.GetLocation(), variableName));
     }
 
-    /// <summary>
-    ///     Checks if an if statement is checking a variable for null.
-    /// </summary>
-    private static bool IsNullCheckIf(IfStatementSyntax ifStatement, string variableName) =>
-        IsIdentifierNullCheck(ifStatement.Condition, out var identifierName) &&
-        identifierName == variableName;
-
-    /// <summary>
-    ///     Checks if an expression is a null check and extracts the identifier name.
-    ///     Supports both "x is null" and "x == null" patterns.
-    /// </summary>
-    private static bool IsIdentifierNullCheck(ExpressionSyntax condition, out string identifierName) {
-        identifierName = string.Empty;
-
+    private static bool IsNullCheck(ExpressionSyntax condition, string name) {
         switch (condition) {
-            // Pattern: x is null
-            case IsPatternExpressionSyntax isPattern: {
-                if (isPattern.Pattern is not ConstantPatternSyntax constantPattern) {
-                    return false;
+            // x is null
+            case IsPatternExpressionSyntax {
+                    Pattern: ConstantPatternSyntax { Expression: LiteralExpressionSyntax l }
+                } p
+                when l.IsKind(SyntaxKind.NullLiteralExpression):
+                return p.Expression is IdentifierNameSyntax id && id.Identifier.Text == name;
+
+            // x == null / null == x
+            case BinaryExpressionSyntax bin when bin.IsKind(SyntaxKind.EqualsExpression): {
+                if (bin.Right.IsKind(SyntaxKind.NullLiteralExpression) && bin.Left is IdentifierNameSyntax lId) {
+                    return lId.Identifier.Text == name;
                 }
 
-                if (!constantPattern.Expression.IsKind(SyntaxKind.NullLiteralExpression)) {
-                    return false;
+                if (bin.Left.IsKind(SyntaxKind.NullLiteralExpression) && bin.Right is IdentifierNameSyntax rId) {
+                    return rId.Identifier.Text == name;
                 }
 
-                // Get identifier from expression
-                if (isPattern.Expression is not IdentifierNameSyntax identifierNameNode) {
-                    return false;
-                }
-
-                identifierName = identifierNameNode.Identifier.Text;
-                return true;
+                break;
             }
-            // Pattern: x == null
-            // Only match ==, not !=
-            case BinaryExpressionSyntax binary when !binary.IsKind(SyntaxKind.EqualsExpression):
-                return false;
-            case BinaryExpressionSyntax binary: {
-                bool expressionIsLeft;
-                if (binary.Right.IsKind(SyntaxKind.NullLiteralExpression)) {
-                    expressionIsLeft = true;
-                } else if (binary.Left.IsKind(SyntaxKind.NullLiteralExpression)) {
-                    expressionIsLeft = false;
-                } else {
-                    return false;
-                }
+        }
 
-                var expr = expressionIsLeft ? binary.Left : binary.Right;
+        return false;
+    }
 
-                // Must be a simple identifier
-                if (expr is not IdentifierNameSyntax identifierNameNode) {
-                    return false;
-                }
-
-                identifierName = identifierNameNode.Identifier.Text;
-                return true;
+    private static bool IsEarlyExit(StatementSyntax stmt) {
+        while (true) {
+            if (stmt is not BlockSyntax { Statements.Count: 1 } b) {
+                return stmt.Kind() is SyntaxKind.ReturnStatement or SyntaxKind.ThrowStatement
+                    or SyntaxKind.BreakStatement or SyntaxKind.ContinueStatement;
             }
-            default:
-                return false;
+
+            stmt = b.Statements[0];
         }
     }
 
-    /// <summary>
-    ///     Checks if a statement is an early-exit statement.
-    ///     Early-exit: return, throw, continue, break, or a block with exactly one of these.
-    /// </summary>
-    private static bool IsEarlyExit(StatementSyntax statement) =>
-        statement switch {
-            // Direct early-exit: return, throw, continue, break
-            ReturnStatementSyntax or ThrowStatementSyntax or ContinueStatementSyntax or BreakStatementSyntax => true,
-            // Block with single early-exit statement
-            BlockSyntax { Statements.Count: 1 } block => IsEarlyExit(block.Statements[0]),
-            _ => false
-        };
+    private static bool ContainsNonNameofUsage(SyntaxNode node, string name) =>
+        node.DescendantNodes()
+            .OfType<IdentifierNameSyntax>()
+            .Where(id => id.Identifier.Text == name)
+            .Any(id => id.Parent is not ArgumentSyntax {
+                Parent: ArgumentListSyntax {
+                    Parent: InvocationExpressionSyntax {
+                        Expression: IdentifierNameSyntax { Identifier.Text: "nameof" }
+                    }
+                }
+            });
 }

@@ -11,56 +11,56 @@ namespace ANcpLua.Analyzers.Tests;
 public sealed class AL0004AnalyzerTests : ALAnalyzerTest<AL0004ToAL0005SpanComparisonAnalyzer> {
     [Theory]
     [InlineData("""
-        using System;
-        public class C {
-            void M(ReadOnlySpan<char> span) {
-                _ = span {|AL0004:== "test"|};
-            }
-        }
-        """)]
+                using System;
+                public class C {
+                    void M(ReadOnlySpan<char> span) {
+                        _ = span {|AL0004:== "test"|};
+                    }
+                }
+                """)]
     [InlineData("""
-        using System;
-        public class C {
-            void M(ReadOnlySpan<char> span) {
-                _ = span {|AL0004:!= "test"|};
-            }
-        }
-        """)]
+                using System;
+                public class C {
+                    void M(ReadOnlySpan<char> span) {
+                        _ = span {|AL0004:!= "test"|};
+                    }
+                }
+                """)]
     [InlineData("""
-        using System;
-        public class C {
-            void M(ReadOnlySpan<int> span) {
-                _ = span {|AL0004:== new[] { 1, 2, 3 }|};
-            }
-        }
-        """)]
+                using System;
+                public class C {
+                    void M(ReadOnlySpan<int> span) {
+                        _ = span {|AL0004:== new[] { 1, 2, 3 }|};
+                    }
+                }
+                """)]
     [InlineData("""
-        using System;
-        public class C {
-            void M(ReadOnlySpan<int> span) {
-                _ = span {|AL0004:== [1, 2, 3]|};
-            }
-        }
-        """)]
+                using System;
+                public class C {
+                    void M(ReadOnlySpan<int> span) {
+                        _ = span {|AL0004:== [1, 2, 3]|};
+                    }
+                }
+                """)]
     public Task ShouldReportConstantComparison(string source) => VerifyAsync(source);
 
     [Theory]
     [InlineData("""
-        using System;
-        public class C {
-            void M(ReadOnlySpan<char> span) {
-                _ = span is "test";
-            }
-        }
-        """)]
+                using System;
+                public class C {
+                    void M(ReadOnlySpan<char> span) {
+                        _ = span is "test";
+                    }
+                }
+                """)]
     [InlineData("""
-        using System;
-        public class C {
-            void M(ReadOnlySpan<int> span) {
-                _ = span is [1, 2, 3];
-            }
-        }
-        """)]
+                using System;
+                public class C {
+                    void M(ReadOnlySpan<int> span) {
+                        _ = span is [1, 2, 3];
+                    }
+                }
+                """)]
     public Task ShouldNotReportPatternMatching(string source) => VerifyAsync(source);
 }
 
@@ -71,51 +71,51 @@ public sealed class AL0004AnalyzerTests : ALAnalyzerTest<AL0004ToAL0005SpanCompa
 public sealed class AL0005AnalyzerTests : ALAnalyzerTest<AL0004ToAL0005SpanComparisonAnalyzer> {
     [Theory]
     [InlineData("""
-        using System;
-        public class C {
-            void M(ReadOnlySpan<char> span, string other) {
-                _ = span {|AL0005:== other|};
-            }
-        }
-        """)]
+                using System;
+                public class C {
+                    void M(ReadOnlySpan<char> span, string other) {
+                        _ = span {|AL0005:== other|};
+                    }
+                }
+                """)]
     [InlineData("""
-        using System;
-        public class C {
-            void M(ReadOnlySpan<int> span, int[] other) {
-                _ = span {|AL0005:== other|};
-            }
-        }
-        """)]
+                using System;
+                public class C {
+                    void M(ReadOnlySpan<int> span, int[] other) {
+                        _ = span {|AL0005:== other|};
+                    }
+                }
+                """)]
     [InlineData("""
-        using System;
-        public class C {
-            void M(ReadOnlySpan<char> span) {
-                string other = GetValue();
-                _ = span {|AL0005:== other|};
-            }
-            string GetValue() => "test";
-        }
-        """)]
+                using System;
+                public class C {
+                    void M(ReadOnlySpan<char> span) {
+                        string other = GetValue();
+                        _ = span {|AL0005:== other|};
+                    }
+                    string GetValue() => "test";
+                }
+                """)]
     [InlineData("""
-        using System;
-        public class C {
-            int[] _arr = { 1, 2, 3 };
-            void M(ReadOnlySpan<int> span) {
-                _ = span {|AL0005:== _arr|};
-            }
-        }
-        """)]
+                using System;
+                public class C {
+                    int[] _arr = { 1, 2, 3 };
+                    void M(ReadOnlySpan<int> span) {
+                        _ = span {|AL0005:== _arr|};
+                    }
+                }
+                """)]
     public Task ShouldReportNonConstantComparison(string source) => VerifyAsync(source);
 
     [Theory]
     [InlineData("""
-        using System;
-        public class C {
-            void M(ReadOnlySpan<char> span, string other) {
-                _ = span.SequenceEqual(other);
-            }
-        }
-        """)]
+                using System;
+                public class C {
+                    void M(ReadOnlySpan<char> span, string other) {
+                        _ = span.SequenceEqual(other);
+                    }
+                }
+                """)]
     public Task ShouldNotReportSequenceEqual(string source) => VerifyAsync(source);
 }
 
@@ -123,20 +123,21 @@ public sealed class AL0005AnalyzerTests : ALAnalyzerTest<AL0004ToAL0005SpanCompa
 ///     Edge case tests for collection expression handling in AL0004/AL0005.
 ///     Verifies the fix for DescendantNodes().Single() bug.
 /// </summary>
-public sealed class AL0004ToAL0005CollectionExpressionEdgeCasesTests : ALAnalyzerTest<AL0004ToAL0005SpanComparisonAnalyzer> {
+public sealed class
+    AL0004ToAL0005CollectionExpressionEdgeCasesTests : ALAnalyzerTest<AL0004ToAL0005SpanComparisonAnalyzer> {
     [Theory]
     [InlineData("[1, 2]", "AL0004")] // Simple literals - constant
     [InlineData("[1 + 2, 3]", "AL0004")] // Binary expression - constant (would BREAK old .Single())
     [InlineData("[]", "AL0004")] // Empty - constant
     public Task ShouldReportAL0004ForConstantCollections(string collection, string expectedDiagnostic) =>
         VerifyAsync($$"""
-            using System;
-            class C {
-                void M(ReadOnlySpan<int> span) {
-                    _ = span {|{{expectedDiagnostic}}:== {{collection}}|};
-                }
-            }
-            """);
+                      using System;
+                      class C {
+                          void M(ReadOnlySpan<int> span) {
+                              _ = span {|{{expectedDiagnostic}}:== {{collection}}|};
+                          }
+                      }
+                      """);
 
     [Theory]
     [InlineData("[a, b]")] // Identifiers - non-constant
@@ -145,16 +146,16 @@ public sealed class AL0004ToAL0005CollectionExpressionEdgeCasesTests : ALAnalyze
     [InlineData("[1, ..x, 2]")] // Mixed with spread - non-constant
     public Task ShouldReportAL0005ForNonConstantCollections(string collection) =>
         VerifyAsync($$"""
-            using System;
-            class C {
-                int[] other = [1];
-                int[] x = [2];
-                void M(ReadOnlySpan<int> span, int a, int b) {
-                    _ = span {|AL0005:== {{collection}}|};
-                }
-                int GetValue() => 1;
-            }
-            """);
+                      using System;
+                      class C {
+                          int[] other = [1];
+                          int[] x = [2];
+                          void M(ReadOnlySpan<int> span, int a, int b) {
+                              _ = span {|AL0005:== {{collection}}|};
+                          }
+                          int GetValue() => 1;
+                      }
+                      """);
 }
 
 /// <summary>

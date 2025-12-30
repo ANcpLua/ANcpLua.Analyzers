@@ -1,7 +1,12 @@
 {
   "sdk": {
     "version": "10.0.100",
-    "rollForward": "latestMinor",
-    "allowPrerelease": true
+    "rollForward": "latestMinor"
+  },
+  "test": {
+    "runner": "Microsoft.Testing.Platform"
+  },
+  "msbuild-sdks": {
+    "ANcpLua.NET.Sdk": "1.3.0"
   }
 }
