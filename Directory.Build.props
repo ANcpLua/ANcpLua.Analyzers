@@ -12,7 +12,9 @@
     <Authors>Alexander Nachtmann</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/ANcpLua/ANcpLua.Analyzers</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
 
     <!-- Common warnings -->
     <NoWarn>$(NoWarn);NU1701;CA1034;CA1307;CA2208;CA1031;CA1062;RS2008</NoWarn>
