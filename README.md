@@ -8,7 +8,7 @@ Roslyn analyzers for C# code quality, focusing on modern .NET patterns and best 
 
 ## Rules
 
-[See all rules and configuration](docs/README.md)
+[See all rules and configuration](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/README.md)
 
 ## Related
 
