@@ -5,8 +5,9 @@
     <BaseOutputPath>$(ArtifactsPath)bin/$(MSBuildProjectName)/</BaseOutputPath>
     <BaseIntermediateOutputPath>$(ArtifactsPath)obj/$(MSBuildProjectName)/</BaseIntermediateOutputPath>
 
-    <!-- Version - single source for all packages -->
-    <Version>1.3.2</Version>
+    <!-- Deterministic builds -->
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
 
     <!-- Package metadata -->
     <Authors>Alexander Nachtmann</Authors>

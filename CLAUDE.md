@@ -1,8 +1,8 @@
-# CLAUDE.md — ANcpLua.Analyzers
+# CLAUDE.md - ANcpLua.Analyzers
 
 Roslyn analyzers for C# code quality (AL0001-AL0016).
 
-**Current Version:** 1.3.2 | **SDK:** ANcpLua.NET.Sdk 1.3.7
+**SDK:** ANcpLua.NET.Sdk 1.3.7 | **Target:** .NET 10 + netstandard2.0
 
 ## Rules (AL0001-AL0016)
 
@@ -28,20 +28,39 @@ Roslyn analyzers for C# code quality (AL0001-AL0016).
 ## Commands
 
 ```bash
-dotnet build ANcpLua.Analyzers.slnx
+# Build
+dotnet build ANcpLua.Analyzers.slnx -c Release
+
+# Test (MTP - no -- separator needed)
 dotnet test --project tests/ANcpLua.Analyzers.Tests/ANcpLua.Analyzers.Tests.csproj
+
+# Test with filter (xUnit v3 MTP syntax)
+dotnet test --project tests/ANcpLua.Analyzers.Tests/ANcpLua.Analyzers.Tests.csproj --filter-method "*AL0001*"
+
+# Pack
 dotnet pack src/ANcpLua.Analyzers/ANcpLua.Analyzers.csproj -c Release -o artifacts -p:PackageId=ANcpLua.Analyzers
 ```
+
+## Banned Patterns
+
+| Pattern | Reason |
+|---------|--------|
+| `FluentAssertions` | Abandoned - use `AwesomeAssertions` |
+| `Microsoft.NET.Test.Sdk` | VSTest legacy - use `xunit.v3.mtp-v2` |
+| `--filter "FQN~..."` | VSTest syntax - use `--filter-method` |
+| `dotnet-quality: preview` | .NET 10 is LTS |
+| `LangVersion` in csproj | SDK-owned property |
+| `Nullable` in csproj | SDK-owned property |
 
 ## Project Structure
 
 ```
 src/
-├── ANcpLua.Analyzers/           # Analyzers (DiagnosticAnalyzer)
-└── ANcpLua.Analyzers.CodeFixes/ # Code fixes (CodeFixProvider)
-
-tests/ANcpLua.Analyzers.Tests/   # Unit tests
-docs/                            # Per-rule documentation (AL0001.md, etc.)
+  ANcpLua.Analyzers/           # Analyzers (DiagnosticAnalyzer)
+  ANcpLua.Analyzers.CodeFixes/ # Code fixes (CodeFixProvider)
+tests/
+  ANcpLua.Analyzers.Tests/     # Unit tests (xunit.v3.mtp-v2)
+docs/                          # Per-rule documentation
 ```
 
 ## Key Facts
