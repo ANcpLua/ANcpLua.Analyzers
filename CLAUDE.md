@@ -79,3 +79,26 @@ docs/                          # Per-rule documentation
 - uses: actions/setup-dotnet@v5
 - uses: actions/upload-artifact@v6
 ```
+
+## Analyzer Test Patterns
+
+When writing analyzer tests, test code snippets must comply with CA1050:
+
+```csharp
+// ✅ CORRECT - class in namespace
+var test = """
+    namespace TestNamespace;
+
+    public class TestClass { }
+    """;
+
+// ❌ WRONG - CA1050 error
+var test = "public class TestClass { }";
+```
+
+## Related Projects
+
+| Project | Purpose |
+|---------|---------|
+| [ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk) | MSBuild SDK that auto-injects this analyzer |
+| [ANcpLua.Roslyn.Utilities](https://github.com/ANcpLua/ANcpLua.Roslyn.Utilities) | Shared Roslyn helpers |
