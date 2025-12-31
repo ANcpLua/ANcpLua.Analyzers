@@ -1,4 +1,17 @@
 <Solution>
+    <Folder Name="/Solution Items/">
+        <File Path=".editorconfig"/>
+        <File Path="Directory.Build.props"/>
+        <File Path="Directory.Build.targets"/>
+        <File Path="Directory.Packages.props"/>
+        <File Path="global.json"/>
+        <File Path="nuget.config"/>
+        <File Path="README.md"/>
+        <File Path="LICENSE"/>
+    </Folder>
+    <Folder Name="/docs/">
+        <File Path="docs/README.md"/>
+    </Folder>
     <Folder Name="/src/">
         <Project Path="src/ANcpLua.Analyzers.CodeFixes/ANcpLua.Analyzers.CodeFixes.csproj"/>
         <Project Path="src/ANcpLua.Analyzers/ANcpLua.Analyzers.csproj"/>
