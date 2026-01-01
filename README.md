@@ -21,23 +21,25 @@ Or add to your project file:
 ## Rules
 
 | Rule | Category | Description | Severity | Enabled | Code Fix |
-|------|----------|-------------|----------|---------|----------|
-| [AL0001](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0001.md) | Design | Prohibit reassignment of primary constructor parameters | Error | Yes | No |
-| [AL0002](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0002.md) | Design | Don't repeat negated patterns | Warning | Yes | No |
-| [AL0003](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0003.md) | Reliability | Don't divide by constant zero | Error | Yes | No |
-| [AL0004](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0004.md) | Usage | Use pattern matching for Span constant comparison | Warning | Yes | Yes |
-| [AL0005](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0005.md) | Usage | Use SequenceEqual for Span non-constant comparison | Warning | Yes | Yes |
-| [AL0006](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0006.md) | Design | Field name conflicts with primary constructor parameter | Warning | Yes | No |
-| [AL0007](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0007.md) | Usage | GetSchema should be explicitly implemented | Warning | Yes | No |
-| [AL0008](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0008.md) | Usage | GetSchema must return null and not be abstract | Warning | Yes | No |
-| [AL0009](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0009.md) | Usage | Don't call IXmlSerializable.GetSchema | Warning | Yes | No |
-| [AL0010](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0010.md) | Design | Type should be partial for source generator support | Info | No | Yes |
-| [AL0011](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0011.md) | Threading | Avoid lock keyword on non-Lock types | Warning | Yes | No |
-| [AL0012](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0012.md) | OpenTelemetry | Deprecated semantic convention attribute | Warning | Yes | No |
-| [AL0013](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0013.md) | OpenTelemetry | Missing telemetry schema URL | Info | Yes | No |
-| [AL0014](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0014.md) | Style | Prefer pattern matching for null and zero comparisons | Info | Yes | Yes |
-| [AL0015](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0015.md) | Style | Normalize null-guard style | Info | Yes | Yes |
-| [AL0016](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0016.md) | Style | Combine declaration with subsequent null-check | Info | Yes | Yes |
+|:-----|:---------|:------------|:--------:|:-------:|:--------:|
+| [AL0001](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0001.md) | Design | Prohibit reassignment of primary constructor parameters | ❌ | ✔️ | |
+| [AL0002](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0002.md) | Design | Don't repeat negated patterns | ⚠️ | ✔️ | |
+| [AL0003](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0003.md) | Reliability | Don't divide by constant zero | ❌ | ✔️ | |
+| [AL0004](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0004.md) | Usage | Use pattern matching for Span constant comparison | ⚠️ | ✔️ | ✔️ |
+| [AL0005](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0005.md) | Usage | Use SequenceEqual for Span non-constant comparison | ⚠️ | ✔️ | ✔️ |
+| [AL0006](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0006.md) | Design | Field name conflicts with primary constructor parameter | ⚠️ | ✔️ | |
+| [AL0007](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0007.md) | Usage | GetSchema should be explicitly implemented | ⚠️ | ✔️ | |
+| [AL0008](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0008.md) | Usage | GetSchema must return null and not be abstract | ⚠️ | ✔️ | |
+| [AL0009](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0009.md) | Usage | Don't call IXmlSerializable.GetSchema | ⚠️ | ✔️ | |
+| [AL0010](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0010.md) | Design | Type should be partial for source generator support | ℹ️ | | ✔️ |
+| [AL0011](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0011.md) | Threading | Avoid lock keyword on non-Lock types | ⚠️ | ✔️ | |
+| [AL0012](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0012.md) | OpenTelemetry | Deprecated semantic convention attribute | ⚠️ | ✔️ | |
+| [AL0013](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0013.md) | OpenTelemetry | Missing telemetry schema URL | ℹ️ | ✔️ | |
+| [AL0014](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0014.md) | Style | Prefer pattern matching for null and zero comparisons | ℹ️ | ✔️ | ✔️ |
+| [AL0015](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0015.md) | Style | Normalize null-guard style | ℹ️ | ✔️ | ✔️ |
+| [AL0016](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0016.md) | Style | Combine declaration with subsequent null-check | ℹ️ | ✔️ | ✔️ |
+
+**Legend:** ❌ Error · ⚠️ Warning · ℹ️ Info
 
 ## Configuration
 
