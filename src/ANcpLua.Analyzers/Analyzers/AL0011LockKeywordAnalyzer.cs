@@ -31,7 +31,6 @@ public sealed class AL0011LockKeywordAnalyzer : ALAnalyzer {
         context.RegisterCompilationStartAction(OnCompilationStart);
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
-        
         var lockType = context.Compilation.GetTypeByMetadataName(LockTypeMetadataName);
 
         context.RegisterSyntaxNodeAction(
@@ -45,7 +44,7 @@ public sealed class AL0011LockKeywordAnalyzer : ALAnalyzer {
         var lockExpressionType =
             context.SemanticModel.GetTypeInfo(lockStatement.Expression, context.CancellationToken).Type;
 
-        
+
         if (lockType is not null && SymbolEqualityComparer.Default.Equals(lockExpressionType, lockType)) {
             return;
         }

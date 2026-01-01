@@ -105,7 +105,6 @@ public sealed class AL0004ToAL0005SpanComparisonAnalyzer : ALAnalyzer {
         SemanticModel model,
         CancellationToken token) {
         foreach (var element in collection.Elements) {
-            
             if (element is not ExpressionElementSyntax expr) {
                 return false;
             }

@@ -67,7 +67,7 @@ public sealed class AL0007ToAL0009IXmlSerializableAnalyzer : ALAnalyzer {
             return;
         }
 
-        
+
         if (ixmlSerializable.GetMembers("GetSchema").OfType<IMethodSymbol>().FirstOrDefault()
             is not { } getSchemaMethod) {
             return;
@@ -97,13 +97,13 @@ public sealed class AL0007ToAL0009IXmlSerializableAnalyzer : ALAnalyzer {
             return;
         }
 
-        
+
         if (!methodSymbol.ExplicitInterfaceImplementations.Any(i =>
                 SymbolEqualityComparer.Default.Equals(i, interfaceGetSchema))) {
             context.ReportDiagnostic(RuleAL0007, methodSymbol.Locations[0]);
         }
 
-        
+
         if (methodSymbol.IsAbstract || ReturnsNonNullValue(methodDeclaration, context.SemanticModel)) {
             var location = methodDeclaration.DescendantNodes()
                                .FirstOrDefault(n => n is BlockSyntax or ArrowExpressionClauseSyntax)?.GetLocation()
@@ -120,7 +120,7 @@ public sealed class AL0007ToAL0009IXmlSerializableAnalyzer : ALAnalyzer {
         var invocation = (IInvocationOperation)context.Operation;
         var targetMethod = invocation.TargetMethod;
 
-        
+
         if (SymbolEqualityComparer.Default.Equals(targetMethod, interfaceGetSchema) ||
             IsGetSchemaImplementation(targetMethod, ixmlSerializable)) {
             context.ReportDiagnostic(RuleAL0009, invocation.Syntax.GetLocation());

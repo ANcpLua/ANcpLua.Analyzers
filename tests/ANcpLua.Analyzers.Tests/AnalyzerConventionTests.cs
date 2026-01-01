@@ -14,21 +14,19 @@ public sealed class AnalyzerConventionTests {
             .Where(t => typeof(DiagnosticAnalyzer).IsAssignableFrom(t) && !t.IsAbstract);
 
         foreach (var type in analyzerTypes) {
-            
             Assert.Matches(@"^AL\d{4}.*Analyzer$", type.Name);
 
             var analyzer = (DiagnosticAnalyzer)Activator.CreateInstance(type)!;
             Assert.NotEmpty(analyzer.SupportedDiagnostics);
 
             foreach (var descriptor in analyzer.SupportedDiagnostics) {
-                
                 Assert.StartsWith("AL", descriptor.Id);
 
-                
+
                 Assert.False(string.IsNullOrEmpty(descriptor.HelpLinkUri),
                     $"{descriptor.Id} missing HelpLinkUri");
 
-                
+
                 Assert.False(string.IsNullOrWhiteSpace(descriptor.Title.ToString()),
                     $"{descriptor.Id} has empty Title");
             }

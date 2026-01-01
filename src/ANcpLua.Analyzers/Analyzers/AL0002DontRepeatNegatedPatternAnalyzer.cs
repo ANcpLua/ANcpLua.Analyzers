@@ -32,12 +32,12 @@ public sealed class AL0002DontRepeatNegatedPatternAnalyzer : ALAnalyzer {
     private static void AnalyzeNotPattern(SyntaxNodeAnalysisContext context) {
         var syntax = (UnaryPatternSyntax)context.Node;
 
-        
+
         if (syntax.Pattern is not UnaryPatternSyntax) {
             return;
         }
 
-        
+
         if (syntax.Parent is UnaryPatternSyntax) {
             return;
         }
@@ -52,7 +52,7 @@ public sealed class AL0002DontRepeatNegatedPatternAnalyzer : ALAnalyzer {
         var firstLocation = syntax.SpanStart;
         var nonFirstLocation = innerNode.SpanStart;
 
-        
+
         var spanEnd = Math.Max(firstLocation + 1, nonFirstLocation - 1);
 
         context.ReportDiagnostic(Rule,

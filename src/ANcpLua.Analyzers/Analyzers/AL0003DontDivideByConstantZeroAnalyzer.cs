@@ -49,33 +49,31 @@ public sealed class AL0003DontDivideByConstantZeroAnalyzer : ALAnalyzer {
     }
 
     private static bool IsIntegerOrDecimalType(ITypeSymbol typeSymbol) {
-        
         if (typeSymbol.SpecialType is
             SpecialType.System_Byte or SpecialType.System_SByte or
             SpecialType.System_Int16 or SpecialType.System_UInt16 or
             SpecialType.System_Int32 or SpecialType.System_UInt32 or
             SpecialType.System_Int64 or SpecialType.System_UInt64 or
-            SpecialType.System_IntPtr or SpecialType.System_UIntPtr or 
+            SpecialType.System_IntPtr or SpecialType.System_UIntPtr or
             SpecialType.System_Decimal) {
             return true;
         }
 
-        
+
         var fullName = typeSymbol.ToDisplayString();
         return fullName is "System.Int128" or "System.UInt128";
     }
 
     private static bool IsZero(object? value) =>
         value switch {
-            
             0 or 0u or 0L or 0ul => true,
             byte b => b == 0,
             sbyte sb => sb == 0,
             short s => s == 0,
             ushort us => us == 0,
-            
+
             decimal d => d == 0m,
-            
+
             nint n => n == 0,
             nuint nu => nu == 0,
             _ => false

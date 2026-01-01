@@ -1,23 +1,26 @@
 <Project>
-  <PropertyGroup>
-    <!-- Centralize all build output to artifacts/ -->
-    <ArtifactsPath>$(MSBuildThisFileDirectory)artifacts/</ArtifactsPath>
-    <BaseOutputPath>$(ArtifactsPath)bin/$(MSBuildProjectName)/</BaseOutputPath>
-    <BaseIntermediateOutputPath>$(ArtifactsPath)obj/$(MSBuildProjectName)/</BaseIntermediateOutputPath>
+    <PropertyGroup>
+        <!-- Centralize all build output to artifacts/ -->
+        <ArtifactsPath>$(MSBuildThisFileDirectory)artifacts/</ArtifactsPath>
+        <BaseOutputPath>$(ArtifactsPath)bin/$(MSBuildProjectName)/</BaseOutputPath>
+        <BaseIntermediateOutputPath>$(ArtifactsPath)obj/$(MSBuildProjectName)/</BaseIntermediateOutputPath>
 
-    <!-- Deterministic builds -->
-    <Deterministic>true</Deterministic>
-    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+        <!-- Version - single source for all packages -->
+        <Version>1.3.2</Version>
 
-    <!-- Package metadata -->
-    <Authors>Alexander Nachtmann</Authors>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/ANcpLua/ANcpLua.Analyzers</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
+        <!-- Package metadata -->
+        <Authors>Alexander Nachtmann</Authors>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <RepositoryUrl>https://github.com/ANcpLua/ANcpLua.Analyzers</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
 
-    <!-- Common warnings -->
-    <NoWarn>$(NoWarn);NU1701;CA1034;CA1307;CA2208;CA1031;CA1062;RS2008</NoWarn>
-  </PropertyGroup>
+        <!-- Common warnings -->
+        <NoWarn>$(NoWarn);NU1701;CA1034;CA1307;CA2208;CA1031;CA1062;RS2008</NoWarn>
+
+        <!-- Reproducible builds -->
+        <Deterministic>true</Deterministic>
+        <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+    </PropertyGroup>
 </Project>

@@ -30,7 +30,7 @@ public abstract class ALCodeFixTestWithEditorConfig<TAnalyzer, TCodeFix>
                                                }
                                                """;
 
-    
+
     private static readonly ReferenceAssemblies EmptyNet100 = new("net10.0");
     private static readonly ReferenceAssemblies EmptyNetStandard20 = new("netstandard2.0");
 

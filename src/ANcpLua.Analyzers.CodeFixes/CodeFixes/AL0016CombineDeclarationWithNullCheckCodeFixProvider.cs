@@ -36,11 +36,11 @@ public sealed class AL0016CombineDeclarationWithNullCheckCodeFixProvider
         var variableName = variable.Identifier.Text;
         var initializer = variable.Initializer!.Value;
 
-        
+
         var patternText = $"{initializer.WithoutTrivia().NormalizeWhitespace()} is not {{ }} {variableName}";
         var condition = SyntaxFactory.ParseExpression(patternText);
 
-        
+
         if (initializer is AssignmentExpressionSyntax or ConditionalExpressionSyntax or LambdaExpressionSyntax) {
             patternText = $"({initializer.WithoutTrivia().NormalizeWhitespace()}) is not {{ }} {variableName}";
             condition = SyntaxFactory.ParseExpression(patternText);

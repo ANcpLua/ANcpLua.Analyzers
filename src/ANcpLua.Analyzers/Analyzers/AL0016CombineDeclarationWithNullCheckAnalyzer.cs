@@ -26,14 +26,13 @@ public sealed class AL0016CombineDeclarationWithNullCheckAnalyzer : ALAnalyzer {
         context.RegisterSyntaxNodeAction(AnalyzeDeclaration, SyntaxKind.LocalDeclarationStatement);
 
     private static void AnalyzeDeclaration(SyntaxNodeAnalysisContext context) {
-        
         if (((CSharpCompilation)context.Compilation).LanguageVersion < LanguageVersion.CSharp9) {
             return;
         }
 
         var declaration = (LocalDeclarationStatementSyntax)context.Node;
 
-        
+
         if (declaration.Declaration.Variables.Count != 1) {
             return;
         }
@@ -45,13 +44,13 @@ public sealed class AL0016CombineDeclarationWithNullCheckAnalyzer : ALAnalyzer {
 
         var variableName = variable.Identifier.Text;
 
-        
+
         if (context.SemanticModel.GetDeclaredSymbol(variable) is not ILocalSymbol symbol ||
             !symbol.Type.IsReferenceType) {
             return;
         }
 
-        
+
         if (declaration.Parent is not BlockSyntax block) {
             return;
         }
@@ -69,17 +68,17 @@ public sealed class AL0016CombineDeclarationWithNullCheckAnalyzer : ALAnalyzer {
             return;
         }
 
-        
+
         if (!IsNullCheck(ifStatement.Condition, variableName)) {
             return;
         }
 
-        
+
         if (!IsEarlyExit(ifStatement.Statement)) {
             return;
         }
 
-        
+
         if (ContainsNonNameofUsage(ifStatement.Statement, variableName)) {
             return;
         }
@@ -89,14 +88,13 @@ public sealed class AL0016CombineDeclarationWithNullCheckAnalyzer : ALAnalyzer {
 
     private static bool IsNullCheck(ExpressionSyntax condition, string name) {
         switch (condition) {
-            
             case IsPatternExpressionSyntax {
                     Pattern: ConstantPatternSyntax { Expression: LiteralExpressionSyntax l }
                 } p
                 when l.IsKind(SyntaxKind.NullLiteralExpression):
                 return p.Expression is IdentifierNameSyntax id && id.Identifier.Text == name;
 
-            
+
             case BinaryExpressionSyntax bin when bin.IsKind(SyntaxKind.EqualsExpression): {
                 if (bin.Right.IsKind(SyntaxKind.NullLiteralExpression) && bin.Left is IdentifierNameSyntax lId) {
                     return lId.Identifier.Text == name;
