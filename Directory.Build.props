@@ -6,7 +6,7 @@
         <BaseIntermediateOutputPath>$(ArtifactsPath)obj/$(MSBuildProjectName)/</BaseIntermediateOutputPath>
 
         <!-- Version - single source for all packages -->
-        <Version>1.3.2</Version>
+        <Version>1.4.0</Version>
 
         <!-- Package metadata -->
         <Authors>Alexander Nachtmann</Authors>
