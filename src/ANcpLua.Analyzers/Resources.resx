@@ -194,4 +194,14 @@
     <data name="AL0013AnalyzerDescription" xml:space="preserve">
     <value>Setting the schema URL allows collectors and backends to understand which version of semantic conventions your telemetry uses.</value>
   </data>
+    <!-- AL0017: Hardcoded package version -->
+    <data name="AL0017AnalyzerTitle" xml:space="preserve">
+    <value>Hardcoded package version detected</value>
+  </data>
+    <data name="AL0017AnalyzerMessageFormat" xml:space="preserve">
+    <value>Package '{0}' uses hardcoded version '{1}'. Use $({2}) from Version.props instead.</value>
+  </data>
+    <data name="AL0017AnalyzerDescription" xml:space="preserve">
+    <value>Package versions should use MSBuild variables from Version.props for centralized version management. This ensures consistency across all projects and simplifies version updates.</value>
+  </data>
 </root>

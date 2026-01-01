@@ -25,6 +25,7 @@ public static class DiagnosticCategories {
     public const string Threading = "Threading";
     public const string OpenTelemetry = "OpenTelemetry";
     public const string Style = "Style";
+    public const string VersionManagement = "VersionManagement";
 }
 
 /// <summary>
@@ -86,6 +87,20 @@ public static class DiagnosticIds {
 
     /// <summary>AL0016: Combine declaration with subsequent null-check.</summary>
     public const string CombineDeclarationWithNullCheck = "AL0016";
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // VERSION MANAGEMENT (AL0017-AL0025)
+    // These analyzers enforce centralized package version management.
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /// <summary>AL0017: Hardcoded version in Directory.Packages.props - use $(VariableName).</summary>
+    public const string HardcodedPackageVersion = "AL0017";
+
+    /// <summary>AL0018: Version.props not imported.</summary>
+    public const string VersionPropsNotImported = "AL0018";
+
+    /// <summary>AL0019: Undefined version variable.</summary>
+    public const string UndefinedVersionVariable = "AL0019";
 }
 
 /// <summary>

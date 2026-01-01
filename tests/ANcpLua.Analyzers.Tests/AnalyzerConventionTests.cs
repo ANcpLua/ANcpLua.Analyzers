@@ -11,7 +11,7 @@ public sealed class AnalyzerConventionTests {
     [Fact]
     public void AllAnalyzersFollowConventions() {
         var analyzerTypes = typeof(ALAnalyzer).Assembly.GetTypes()
-            .Where(t => typeof(DiagnosticAnalyzer).IsAssignableFrom(t) && !t.IsAbstract);
+            .Where(static t => typeof(DiagnosticAnalyzer).IsAssignableFrom(t) && !t.IsAbstract);
 
         foreach (var type in analyzerTypes) {
             Assert.Matches(@"^AL\d{4}.*Analyzer$", type.Name);

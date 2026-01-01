@@ -15,7 +15,7 @@ dotnet add package ANcpLua.Analyzers
 Or add to your project file:
 
 ```xml
-<PackageReference Include="ANcpLua.Analyzers" Version="1.3.2" PrivateAssets="all" />
+<PackageReference Include="ANcpLua.Analyzers" Version="1.4.0" PrivateAssets="all" />
 ```
 
 ## Rules
@@ -38,6 +38,7 @@ Or add to your project file:
 | [AL0014](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0014.md) | Style | Prefer pattern matching for null and zero comparisons | ℹ️ | ✔️ | ✔️ |
 | [AL0015](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0015.md) | Style | Normalize null-guard style | ℹ️ | ✔️ | ✔️ |
 | [AL0016](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0016.md) | Style | Combine declaration with subsequent null-check | ℹ️ | ✔️ | ✔️ |
+| [AL0017](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0017.md) | VersionManagement | Hardcoded package version in Directory.Packages.props | ⚠️ | ✔️ | |
 
 **Legend:** ❌ Error · ⚠️ Warning · ℹ️ Info
 
@@ -94,6 +95,9 @@ dotnet_diagnostic.AL0015.severity = suggestion
 
 # AL0016: Combine declaration with subsequent null-check
 dotnet_diagnostic.AL0016.severity = suggestion
+
+# AL0017: Hardcoded package version
+dotnet_diagnostic.AL0017.severity = warning
 ```
 
 ## Examples
