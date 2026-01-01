@@ -31,14 +31,13 @@ public sealed class AL0015NormalizeNullGuardStyleAnalyzer : ALAnalyzer {
         context.RegisterCompilationStartAction(OnCompilationStart);
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
-        
         var hasThrowHelper = context.Compilation
             .GetTypeByMetadataName("Microsoft.Shared.Diagnostics.Throw")
             ?.GetMembers("IfNull")
             .OfType<IMethodSymbol>()
             .Any(m => m.IsStatic && m.Parameters.Length >= 1) ?? false;
 
-        
+
         var hasThrowIfNullBcl = context.Compilation
             .GetTypeByMetadataName("System.ArgumentNullException")
             ?.GetMembers("ThrowIfNull")
@@ -77,14 +76,14 @@ public sealed class AL0015NormalizeNullGuardStyleAnalyzer : ALAnalyzer {
         var config = context.Options.AnalyzerConfigOptionsProvider.GetOptions(ifStatement.SyntaxTree);
         var global = context.Options.AnalyzerConfigOptionsProvider.GlobalOptions;
 
-        
+
         var isMultiTarget = isMultiTargetGlobal
                             || (config.TryGetValue("ancplua_is_multi_target", out var mt)
                                 && string.Equals(mt, "true", StringComparison.OrdinalIgnoreCase))
                             || (global.TryGetValue("ancplua_is_multi_target", out var gmt)
                                 && string.Equals(gmt, "true", StringComparison.OrdinalIgnoreCase));
 
-        
+
         string configStyle;
         if (config.TryGetValue("ancplua_nullguard_style", out var val)) {
             configStyle = val.ToLowerInvariant();
@@ -94,7 +93,7 @@ public sealed class AL0015NormalizeNullGuardStyleAnalyzer : ALAnalyzer {
             configStyle = "auto";
         }
 
-        
+
         var targetStyle = ComputeTargetStyle(hasThrowHelper, hasThrowIfNullBcl, isMultiTarget, configStyle);
 
         var properties = ImmutableDictionary.CreateBuilder<string, string?>();
@@ -125,7 +124,6 @@ public sealed class AL0015NormalizeNullGuardStyleAnalyzer : ALAnalyzer {
         identifier = "";
 
         switch (condition) {
-            
             case IsPatternExpressionSyntax {
                     Pattern: ConstantPatternSyntax { Expression: LiteralExpressionSyntax l }
                 } p
@@ -134,7 +132,7 @@ public sealed class AL0015NormalizeNullGuardStyleAnalyzer : ALAnalyzer {
                 identifier = id.Identifier.Text;
                 return true;
 
-            
+
             case BinaryExpressionSyntax { Left: var left, Right: var right } bin
                 when bin.IsKind(SyntaxKind.EqualsExpression): {
                 if (right.IsKind(SyntaxKind.NullLiteralExpression) && left is IdentifierNameSyntax lId) {
@@ -177,14 +175,13 @@ public sealed class AL0015NormalizeNullGuardStyleAnalyzer : ALAnalyzer {
             return false;
         }
 
-        
+
         var typeSymbol = model.GetTypeInfo(creation.Type).Type;
         bool isArgumentNullException;
         if (typeSymbol is not null) {
             var fullName = typeSymbol.ToDisplayString();
             isArgumentNullException = fullName == "System.ArgumentNullException";
         } else {
-            
             var syntaxTypeName = creation.Type.ToString();
             isArgumentNullException = syntaxTypeName is "ArgumentNullException" or "System.ArgumentNullException";
         }

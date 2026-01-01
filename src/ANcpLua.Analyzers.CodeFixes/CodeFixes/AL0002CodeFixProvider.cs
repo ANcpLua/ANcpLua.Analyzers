@@ -25,8 +25,7 @@ public sealed class AL0002CodeFixProvider : ALCodeFixProvider<UnaryPatternSyntax
         var parent = (ExpressionOrPatternSyntax)notPattern.Parent!;
         var notPatterns = notPattern.DescendantNodesAndSelf().OfType<UnaryPatternSyntax>().ToArray();
 
-        
-        
+
         var lastPattern = notPatterns[notPatterns.Length - 1];
         var realPattern = notPatterns.Length % 2 is 0
             ? lastPattern.Pattern

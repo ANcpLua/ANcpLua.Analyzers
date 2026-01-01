@@ -54,33 +54,33 @@ Requires `--` separator: `dotnet test -- --filter-method "*MyTest*"`
 
 ## Framework Opt-In Properties
 
-| Framework | Property | Package |
-|-----------|----------|---------|
-| MSTest | `<EnableMSTestRunner>true</EnableMSTestRunner>` | MSTest 3.2.0+ |
-| NUnit | `<EnableNUnitRunner>true</EnableNUnitRunner>` | NUnit3TestAdapter 5.0.0+ |
-| xUnit v3 | `<UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>` | xunit.v3.mtp-v2 |
-| TUnit | Built-in (always MTP) | TUnit |
+| Framework | Property                                                                      | Package                  |
+|-----------|-------------------------------------------------------------------------------|--------------------------|
+| MSTest    | `<EnableMSTestRunner>true</EnableMSTestRunner>`                               | MSTest 3.2.0+            |
+| NUnit     | `<EnableNUnitRunner>true</EnableNUnitRunner>`                                 | NUnit3TestAdapter 5.0.0+ |
+| xUnit v3  | `<UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>` | xunit.v3.mtp-v2          |
+| TUnit     | Built-in (always MTP)                                                         | TUnit                    |
 
 ## xUnit v3 Package Variants (.NET 10 Critical)
 
-| Package | MTP Version | Use Case |
-|---------|-------------|----------|
-| `xunit.v3` | MTP v1 | Default, breaks on .NET 10 SDK |
-| `xunit.v3.mtp-v2` | MTP v2 | **Required for .NET 10+** |
-| `xunit.v3.mtp-v1` | MTP v1 | Explicit v1 lock |
-| `xunit.v3.mtp-off` | None | VSTest only |
+| Package            | MTP Version | Use Case                       |
+|--------------------|-------------|--------------------------------|
+| `xunit.v3`         | MTP v1      | Default, breaks on .NET 10 SDK |
+| `xunit.v3.mtp-v2`  | MTP v2      | **Required for .NET 10+**      |
+| `xunit.v3.mtp-v1`  | MTP v1      | Explicit v1 lock               |
+| `xunit.v3.mtp-off` | None        | VSTest only                    |
 
 ## CLI Argument Mapping (VSTest → MTP)
 
-| VSTest | MTP | Notes |
-|--------|-----|-------|
-| `--filter "FQN~X"` | Framework-specific | See below |
-| `--logger trx` | `--report-trx` | Requires `Microsoft.Testing.Extensions.TrxReport` |
-| `--blame-crash` | `--crashdump` | Requires crash dump extension |
-| `--blame-hang` | `--hangdump` | Requires hang dump extension |
-| `--results-directory` | `--results-directory` | Same |
-| `-t` / `--list-tests` | `--list-tests` | Same |
-| `--settings file.runsettings` | Framework-specific | MSTest/NUnit still support |
+| VSTest                        | MTP                   | Notes                                             |
+|-------------------------------|-----------------------|---------------------------------------------------|
+| `--filter "FQN~X"`            | Framework-specific    | See below                                         |
+| `--logger trx`                | `--report-trx`        | Requires `Microsoft.Testing.Extensions.TrxReport` |
+| `--blame-crash`               | `--crashdump`         | Requires crash dump extension                     |
+| `--blame-hang`                | `--hangdump`          | Requires hang dump extension                      |
+| `--results-directory`         | `--results-directory` | Same                                              |
+| `-t` / `--list-tests`         | `--list-tests`        | Same                                              |
+| `--settings file.runsettings` | Framework-specific    | MSTest/NUnit still support                        |
 
 ## Filtering by Framework
 
@@ -123,39 +123,45 @@ dotnet test -- --filter-method "*Should*"
 
 ## Common Exit Codes
 
-| Code | Meaning |
-|------|---------|
-| 0 | Success |
-| 1 | Unknown error |
-| 2 | Tests failed |
-| 3 | Tests cancelled |
-| 5 | Invalid command line (wrong arguments!) |
-| 6 | No tests found |
-| 8 | Zero tests ran |
+| Code | Meaning                                 |
+|------|-----------------------------------------|
+| 0    | Success                                 |
+| 1    | Unknown error                           |
+| 2    | Tests failed                            |
+| 3    | Tests cancelled                         |
+| 5    | Invalid command line (wrong arguments!) |
+| 6    | No tests found                          |
+| 8    | Zero tests ran                          |
 
 Ignore specific codes: `--ignore-exit-code 8`
 
 ## Troubleshooting
 
 ### "Unknown option '--filter'"
+
 → Using VSTest syntax with MTP. Use `--filter-method` / `--filter-class` for xUnit v3.
 
 ### Exit Code 5 (Invalid Arguments)
+
 → VSTest arguments passed to MTP runner. Check CLI mapping table above.
 
 ### "Zero tests ran" / Exit Code 8
+
 1. Verify filter syntax matches your framework
 2. Check `--` separator for .NET 8/9
 3. Try `--list-tests` to see discovered tests
 4. Run `--filter-query "/**"` to test without filter
 
 ### .NET 10 + xunit.v3 TypeLoadException
+
 ```
 Could not load type 'Microsoft.Testing.Platform.Extensions.TestHost.IDataConsumer'
 ```
+
 → xunit.v3 default is MTP v1, incompatible with .NET 10. Switch to `xunit.v3.mtp-v2`.
 
 ### Force VSTest Mode (Escape Hatch)
+
 ```bash
 dotnet test -p:TestingPlatformDotnetTestSupport=false --filter "..."
 ```

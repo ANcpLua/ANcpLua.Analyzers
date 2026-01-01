@@ -13,4 +13,5 @@ Roslyn analyzers for C# code quality, focusing on modern .NET patterns and best 
 ## Related
 
 - [ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk) - MSBuild SDK that includes this analyzer
-- [ANcpLua.Roslyn.Utilities](https://github.com/ANcpLua/ANcpLua.Roslyn.Utilities) - Roslyn utilities used by these analyzers
+- [ANcpLua.Roslyn.Utilities](https://github.com/ANcpLua/ANcpLua.Roslyn.Utilities) - Roslyn utilities used by these
+  analyzers
