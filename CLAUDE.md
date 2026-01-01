@@ -2,7 +2,7 @@
 
 Roslyn analyzers for C# code quality (AL0001-AL0016).
 
-**SDK:** ANcpLua.NET.Sdk 1.3.7 | **Target:** .NET 10 + netstandard2.0
+**SDK:** ANcpLua.NET.Sdk 1.3.15 | **Target:** .NET 10 + netstandard2.0
 
 ## Rules (AL0001-AL0016)
 
