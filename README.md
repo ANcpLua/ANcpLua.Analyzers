@@ -148,13 +148,13 @@ This analyzer is **auto-injected** when using [ANcpLua.NET.Sdk](https://github.c
 
 ### SDK Features You Get "For Free"
 
-| Feature | Benefit |
-|---------|---------|
-| Auto-injected analyzers | ANcpLua.Analyzers + BannedApiAnalyzers |
-| Guard clauses | `Throw.IfNull()` replaces `ArgumentNullException.ThrowIfNull()` |
-| Banned API enforcement | DateTime.Now, FluentAssertions, and 50+ APIs blocked |
-| Test framework | xUnit v3 + AwesomeAssertions auto-configured |
-| Code quality | Comprehensive .editorconfig with 100s of rules |
+| Feature                 | Benefit                                                         |
+|-------------------------|-----------------------------------------------------------------|
+| Auto-injected analyzers | ANcpLua.Analyzers + BannedApiAnalyzers                          |
+| Guard clauses           | `Throw.IfNull()` replaces `ArgumentNullException.ThrowIfNull()` |
+| Banned API enforcement  | DateTime.Now, FluentAssertions, and 50+ APIs blocked            |
+| Test framework          | xUnit v3 + AwesomeAssertions auto-configured                    |
+| Code quality            | Comprehensive .editorconfig with 100s of rules                  |
 
 ### Guard Clauses (Auto-Injected)
 
@@ -195,7 +195,8 @@ public class ApiTests : IntegrationTestBase<Program>
 ## Related Projects
 
 - [ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk) - MSBuild SDK that auto-injects this analyzer
-- [ANcpLua.Roslyn.Utilities](https://github.com/ANcpLua/ANcpLua.Roslyn.Utilities) - Roslyn utilities for source generators
+- [ANcpLua.Roslyn.Utilities](https://github.com/ANcpLua/ANcpLua.Roslyn.Utilities) - Roslyn utilities for source
+  generators
 
 ## License
 

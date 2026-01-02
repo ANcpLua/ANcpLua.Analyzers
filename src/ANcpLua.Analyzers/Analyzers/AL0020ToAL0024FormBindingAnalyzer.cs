@@ -29,18 +29,19 @@ public sealed class AL0020ToAL0024FormBindingAnalyzer : ALAnalyzer {
     private static readonly DiagnosticDescriptor RuleAL0024 = CreateRule(
         DiagnosticIds.FormAndBodyConflict, "AL0024");
 
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+        [RuleAL0020, RuleAL0021, RuleAL0022, RuleAL0023, RuleAL0024];
+
     private static DiagnosticDescriptor CreateRule(string id, string ruleNumber) => new(
         id,
         new LocalizableResourceString($"{ruleNumber}AnalyzerTitle", Resources.ResourceManager, typeof(Resources)),
-        new LocalizableResourceString($"{ruleNumber}AnalyzerMessageFormat", Resources.ResourceManager, typeof(Resources)),
+        new LocalizableResourceString($"{ruleNumber}AnalyzerMessageFormat", Resources.ResourceManager,
+            typeof(Resources)),
         DiagnosticCategories.AspNetCore,
         DiagnosticSeverity.Error,
         true,
         new LocalizableResourceString($"{ruleNumber}AnalyzerDescription", Resources.ResourceManager, typeof(Resources)),
         HelpLinkBase + $"rules/{ruleNumber}.md");
-
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-        [RuleAL0020, RuleAL0021, RuleAL0022, RuleAL0023, RuleAL0024];
 
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterSymbolAction(AnalyzeMethod, SymbolKind.Method);
@@ -151,19 +152,20 @@ public sealed class AL0020ToAL0024FormBindingAnalyzer : ALAnalyzer {
 
     private static bool IsPrimitive(ITypeSymbol type) {
         // Handle nullable types
-        if (type is INamedTypeSymbol { IsGenericType: true } namedType &&
-            namedType.ConstructedFrom.SpecialType == SpecialType.System_Nullable_T) {
+        if (type is INamedTypeSymbol {
+                IsGenericType: true, ConstructedFrom.SpecialType: SpecialType.System_Nullable_T
+            } namedType) {
             type = namedType.TypeArguments[0];
         }
 
         return type.SpecialType is
-            SpecialType.System_Boolean or SpecialType.System_Byte or SpecialType.System_SByte or
-            SpecialType.System_Int16 or SpecialType.System_UInt16 or SpecialType.System_Int32 or
-            SpecialType.System_UInt32 or SpecialType.System_Int64 or SpecialType.System_UInt64 or
-            SpecialType.System_Single or SpecialType.System_Double or SpecialType.System_Decimal or
-            SpecialType.System_Char or SpecialType.System_String or SpecialType.System_DateTime
-            || GetFullTypeName(type) is "System.Guid" or "System.TimeSpan" or "System.DateTimeOffset"
-                or "System.DateOnly" or "System.TimeOnly" or "System.Uri";
+                   SpecialType.System_Boolean or SpecialType.System_Byte or SpecialType.System_SByte or
+                   SpecialType.System_Int16 or SpecialType.System_UInt16 or SpecialType.System_Int32 or
+                   SpecialType.System_UInt32 or SpecialType.System_Int64 or SpecialType.System_UInt64 or
+                   SpecialType.System_Single or SpecialType.System_Double or SpecialType.System_Decimal or
+                   SpecialType.System_Char or SpecialType.System_String or SpecialType.System_DateTime
+               || GetFullTypeName(type) is "System.Guid" or "System.TimeSpan" or "System.DateTimeOffset"
+                   or "System.DateOnly" or "System.TimeOnly" or "System.Uri";
     }
 
     private static string? GetUnsupportedFormTypeReason(ITypeSymbol type) {

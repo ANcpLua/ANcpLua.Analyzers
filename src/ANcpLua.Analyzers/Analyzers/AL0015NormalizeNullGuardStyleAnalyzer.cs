@@ -35,14 +35,14 @@ public sealed class AL0015NormalizeNullGuardStyleAnalyzer : ALAnalyzer {
             .GetTypeByMetadataName("Microsoft.Shared.Diagnostics.Throw")
             ?.GetMembers("IfNull")
             .OfType<IMethodSymbol>()
-            .Any(m => m.IsStatic && m.Parameters.Length >= 1) ?? false;
+            .Any(static m => m is { IsStatic: true, Parameters.Length: >= 1 }) ?? false;
 
 
         var hasThrowIfNullBcl = context.Compilation
             .GetTypeByMetadataName("System.ArgumentNullException")
             ?.GetMembers("ThrowIfNull")
             .OfType<IMethodSymbol>()
-            .Any(m => m.IsStatic && m.Parameters.Length >= 1) ?? false;
+            .Any(static m => m is { IsStatic: true, Parameters.Length: >= 1 }) ?? false;
 
         var globalOptions = context.Options.AnalyzerConfigOptionsProvider.GlobalOptions;
         var isMultiTarget = globalOptions.TryGetValue("build_property.TargetFrameworks", out var tfms)
@@ -78,20 +78,9 @@ public sealed class AL0015NormalizeNullGuardStyleAnalyzer : ALAnalyzer {
 
 
         var isMultiTarget = isMultiTargetGlobal
-                            || (config.TryGetValue("ancplua_is_multi_target", out var mt)
-                                && string.Equals(mt, "true", StringComparison.OrdinalIgnoreCase))
-                            || (global.TryGetValue("ancplua_is_multi_target", out var gmt)
-                                && string.Equals(gmt, "true", StringComparison.OrdinalIgnoreCase));
+                            || GetConfigBool(config, global, "ancplua_is_multi_target");
 
-
-        string configStyle;
-        if (config.TryGetValue("ancplua_nullguard_style", out var val)) {
-            configStyle = val.ToLowerInvariant();
-        } else if (global.TryGetValue("ancplua_nullguard_style", out var gval)) {
-            configStyle = gval.ToLowerInvariant();
-        } else {
-            configStyle = "auto";
-        }
+        var configStyle = GetConfigValue(config, global, "ancplua_nullguard_style", "auto").ToLowerInvariant();
 
 
         var targetStyle = ComputeTargetStyle(hasThrowHelper, hasThrowIfNullBcl, isMultiTarget, configStyle);
@@ -119,6 +108,13 @@ public sealed class AL0015NormalizeNullGuardStyleAnalyzer : ALAnalyzer {
             "portable" => "portable",
             _ => hasThrowHelper ? "throw" : hasThrowIfNullBcl && !isMultiTarget ? "bcl" : "portable"
         };
+
+    private static bool GetConfigBool(AnalyzerConfigOptions config, AnalyzerConfigOptions global, string key) =>
+        (config.TryGetValue(key, out var v) || global.TryGetValue(key, out v))
+        && string.Equals(v, "true", StringComparison.OrdinalIgnoreCase);
+
+    private static string GetConfigValue(AnalyzerConfigOptions config, AnalyzerConfigOptions global, string key, string defaultValue) =>
+        config.TryGetValue(key, out var v) ? v : global.TryGetValue(key, out v) ? v : defaultValue;
 
     private static bool TryParseNullCheck(ExpressionSyntax condition, out string identifier) {
         identifier = "";
@@ -177,14 +173,9 @@ public sealed class AL0015NormalizeNullGuardStyleAnalyzer : ALAnalyzer {
 
 
         var typeSymbol = model.GetTypeInfo(creation.Type).Type;
-        bool isArgumentNullException;
-        if (typeSymbol is not null) {
-            var fullName = typeSymbol.ToDisplayString();
-            isArgumentNullException = fullName == "System.ArgumentNullException";
-        } else {
-            var syntaxTypeName = creation.Type.ToString();
-            isArgumentNullException = syntaxTypeName is "ArgumentNullException" or "System.ArgumentNullException";
-        }
+        var isArgumentNullException = typeSymbol is not null
+            ? typeSymbol.ToDisplayString() == "System.ArgumentNullException"
+            : creation.Type.ToString() is "ArgumentNullException" or "System.ArgumentNullException";
 
         if (!isArgumentNullException) {
             return false;

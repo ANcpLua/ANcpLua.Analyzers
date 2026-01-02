@@ -14,24 +14,26 @@ public sealed class AL0015AnalyzerTests : ALAnalyzerTest<AL0015NormalizeNullGuar
     [InlineData("object? obj", "obj == null", "nameof(obj)")]
     [InlineData("int? count", "count is null", "\"count\"")]
     public Task ShouldReportDiagnostic(string param, string check, string arg) =>
-        VerifyAsync($"using System; public class C {{ void M({param}) {{ [|if|] ({check}) throw new ArgumentNullException({arg}); }} }}");
+        VerifyAsync(
+            $"using System; public class C {{ void M({param}) {{ [|if|] ({check}) throw new ArgumentNullException({arg}); }} }}");
 
     [Fact]
     public Task ShouldReportDiagnosticWithBlock() => VerifyAsync("""
-        using System;
-        public class C {
-            void M(string? x) {
-                [|if|] (x is null) { throw new ArgumentNullException(nameof(x)); }
-            }
-        }
-        """);
+                                                                 using System;
+                                                                 public class C {
+                                                                     void M(string? x) {
+                                                                         [|if|] (x is null) { throw new ArgumentNullException(nameof(x)); }
+                                                                     }
+                                                                 }
+                                                                 """);
 
     [Theory]
     [InlineData("string? x, string? y", "x is null", "nameof(y)")] // Mismatched param
     [InlineData("string? x", "x is null", "nameof(x), \"msg\"")] // Custom message
     [InlineData("string? x", "x is not null", "nameof(x)")] // Wrong pattern
     public Task ShouldNotReportMismatchedOrCustom(string param, string check, string arg) =>
-        VerifyAsync($"using System; public class C {{ void M({param}) {{ if ({check}) throw new ArgumentNullException({arg}); }} }}");
+        VerifyAsync(
+            $"using System; public class C {{ void M({param}) {{ if ({check}) throw new ArgumentNullException({arg}); }} }}");
 
     [Fact]
     public Task ShouldNotReportWrongExceptionType() => VerifyAsync(
@@ -39,10 +41,10 @@ public sealed class AL0015AnalyzerTests : ALAnalyzerTest<AL0015NormalizeNullGuar
 
     [Fact]
     public Task ShouldNotReportPropertyAccess() => VerifyAsync("""
-        using System;
-        public class W { public object? Value { get; set; } }
-        public class C { void M(W? obj) { if (obj.Value is null) throw new ArgumentNullException(nameof(obj)); } }
-        """);
+                                                               using System;
+                                                               public class W { public object? Value { get; set; } }
+                                                               public class C { void M(W? obj) { if (obj.Value is null) throw new ArgumentNullException(nameof(obj)); } }
+                                                               """);
 }
 
 /// <summary>

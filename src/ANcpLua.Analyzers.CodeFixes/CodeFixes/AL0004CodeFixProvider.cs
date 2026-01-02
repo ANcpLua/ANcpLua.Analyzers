@@ -24,7 +24,8 @@ public sealed class AL0004CodeFixProvider : ALCodeFixProvider<BinaryExpressionSy
         SyntaxNode root) {
         PatternSyntax pattern = binary.Right switch {
             LiteralExpressionSyntax => SyntaxFactory.ConstantPattern(binary.Right),
-            CollectionExpressionSyntax col => ToListPattern(col.Elements.Cast<ExpressionElementSyntax>().Select(e => e.Expression)),
+            CollectionExpressionSyntax col => ToListPattern(col.Elements.Cast<ExpressionElementSyntax>()
+                .Select(e => e.Expression)),
             ArrayCreationExpressionSyntax arr => ToListPattern(arr.Initializer?.Expressions ?? []),
             ImplicitArrayCreationExpressionSyntax imp => ToListPattern(imp.Initializer.Expressions),
             _ => throw new InvalidOperationException("Unexpected syntax kind")
