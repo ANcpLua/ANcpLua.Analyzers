@@ -1,0 +1,36 @@
+- name: Overview
+  href: index.md
+- name: AL0001 - Prohibit primary constructor reassignment
+  href: AL0001.md
+- name: AL0002 - Don't repeat negated patterns
+  href: AL0002.md
+- name: AL0003 - Don't divide by constant zero
+  href: AL0003.md
+- name: AL0004 - Use pattern matching for Span constants
+  href: AL0004.md
+- name: AL0005 - Use SequenceEqual for Span comparison
+  href: AL0005.md
+- name: AL0006 - Field name conflicts with primary constructor
+  href: AL0006.md
+- name: AL0007 - GetSchema should be explicit
+  href: AL0007.md
+- name: AL0008 - GetSchema must return null
+  href: AL0008.md
+- name: AL0009 - Don't call GetSchema
+  href: AL0009.md
+- name: AL0010 - Type should be partial
+  href: AL0010.md
+- name: AL0011 - Avoid lock on non-Lock types
+  href: AL0011.md
+- name: AL0012 - Deprecated OTel attribute
+  href: AL0012.md
+- name: AL0013 - Missing telemetry schema URL
+  href: AL0013.md
+- name: AL0014 - Prefer pattern matching
+  href: AL0014.md
+- name: AL0015 - Normalize null-guard style
+  href: AL0015.md
+- name: AL0016 - Combine declaration with null-check
+  href: AL0016.md
+- name: AL0017 - Hardcoded package version
+  href: AL0017.md
