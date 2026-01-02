@@ -172,7 +172,7 @@ public sealed class AL0016CodeFixTests : ALCodeFixTest<AL0016CombineDeclarationW
     /// </summary>
     [Fact]
     public Task ShouldCombineDeclarationWithReturnStatement() {
-        const string source = """
+        const string Source = """
                               public interface IData
                               {
                                   object? GetValue();
@@ -189,7 +189,7 @@ public sealed class AL0016CodeFixTests : ALCodeFixTest<AL0016CombineDeclarationW
                               }
                               """;
 
-        const string expected = """
+        const string Expected = """
                                 public interface IData
                                 {
                                     object? GetValue();
@@ -205,7 +205,7 @@ public sealed class AL0016CodeFixTests : ALCodeFixTest<AL0016CombineDeclarationW
                                 }
                                 """;
 
-        return VerifyAsync(source, expected);
+        return VerifyAsync(Source, Expected);
     }
 
     /// <summary>
@@ -213,32 +213,32 @@ public sealed class AL0016CodeFixTests : ALCodeFixTest<AL0016CombineDeclarationW
     /// </summary>
     [Fact]
     public Task ShouldCombineSimpleMethodCallWithReturn() {
-        var source = """
-                     public class TestClass
-                     {
-                         public void TestMethod()
-                         {
-                             [|var x = M();|]
-                             if (x is null) return;
-                         }
+        const string Source = """
+                              public class TestClass
+                              {
+                                  public void TestMethod()
+                                  {
+                                      [|var x = M();|]
+                                      if (x is null) return;
+                                  }
 
-                         private object? M() => null;
-                     }
-                     """;
+                                  private object? M() => null;
+                              }
+                              """;
 
-        var expected = """
-                       public class TestClass
-                       {
-                           public void TestMethod()
-                           {
-                               if (M() is not { } x) return;
-                           }
+        const string Expected = """
+                                public class TestClass
+                                {
+                                    public void TestMethod()
+                                    {
+                                        if (M() is not { } x) return;
+                                    }
 
-                           private object? M() => null;
-                       }
-                       """;
+                                    private object? M() => null;
+                                }
+                                """;
 
-        return VerifyAsync(source, expected);
+        return VerifyAsync(Source, Expected);
     }
 
     /// <summary>
@@ -246,32 +246,32 @@ public sealed class AL0016CodeFixTests : ALCodeFixTest<AL0016CombineDeclarationW
     /// </summary>
     [Fact]
     public Task ShouldCombineDeclarationWithEqualityCheck() {
-        var source = """
-                     public class TestClass
-                     {
-                         public void TestMethod()
-                         {
-                             [|var result = GetValue();|]
-                             if (result == null) return;
-                         }
+        const string Source = """
+                              public class TestClass
+                              {
+                                  public void TestMethod()
+                                  {
+                                      [|var result = GetValue();|]
+                                      if (result == null) return;
+                                  }
 
-                         private string? GetValue() => null;
-                     }
-                     """;
+                                  private string? GetValue() => null;
+                              }
+                              """;
 
-        var expected = """
-                       public class TestClass
-                       {
-                           public void TestMethod()
-                           {
-                               if (GetValue() is not { } result) return;
-                           }
+        const string Expected = """
+                                public class TestClass
+                                {
+                                    public void TestMethod()
+                                    {
+                                        if (GetValue() is not { } result) return;
+                                    }
 
-                           private string? GetValue() => null;
-                       }
-                       """;
+                                    private string? GetValue() => null;
+                                }
+                                """;
 
-        return VerifyAsync(source, expected);
+        return VerifyAsync(Source, Expected);
     }
 }
 
@@ -285,44 +285,44 @@ public sealed class AL0016EarlyExitTests : ALCodeFixTest<AL0016CombineDeclaratio
     /// </summary>
     [Fact]
     public Task ShouldCombineDeclarationWithThrowStatement() {
-        var source = """
-                     public class Item
-                     {
-                         public object? Context { get; }
-                     }
+        const string Source = """
+                              public class Item
+                              {
+                                  public object? Context { get; }
+                              }
 
-                     public class TestClass
-                     {
-                         public void ProcessItem(Item? item)
-                         {
-                             [|var context = item?.Context;|]
-                             if (context is null) throw new System.InvalidOperationException("No context");
-                             Process(context);
-                         }
+                              public class TestClass
+                              {
+                                  public void ProcessItem(Item? item)
+                                  {
+                                      [|var context = item?.Context;|]
+                                      if (context is null) throw new System.InvalidOperationException("No context");
+                                      Process(context);
+                                  }
 
-                         private void Process(object context) { }
-                     }
-                     """;
+                                  private void Process(object context) { }
+                              }
+                              """;
 
-        var expected = """
-                       public class Item
-                       {
-                           public object? Context { get; }
-                       }
+        const string Expected = """
+                                public class Item
+                                {
+                                    public object? Context { get; }
+                                }
 
-                       public class TestClass
-                       {
-                           public void ProcessItem(Item? item)
-                           {
-                               if (item?.Context is not { } context) throw new System.InvalidOperationException("No context");
-                               Process(context);
-                           }
+                                public class TestClass
+                                {
+                                    public void ProcessItem(Item? item)
+                                    {
+                                        if (item?.Context is not { } context) throw new System.InvalidOperationException("No context");
+                                        Process(context);
+                                    }
 
-                           private void Process(object context) { }
-                       }
-                       """;
+                                    private void Process(object context) { }
+                                }
+                                """;
 
-        return VerifyAsync(source, expected);
+        return VerifyAsync(Source, Expected);
     }
 
     /// <summary>
@@ -330,50 +330,50 @@ public sealed class AL0016EarlyExitTests : ALCodeFixTest<AL0016CombineDeclaratio
     /// </summary>
     [Fact]
     public Task ShouldCombineDeclarationWithContinueStatement() {
-        var source = """
-                     public class Item
-                     {
-                     }
+        const string Source = """
+                              public class Item
+                              {
+                              }
 
-                     public class TestClass
-                     {
-                         public void ProcessItems(System.Collections.Generic.IEnumerable<Item?> items)
-                         {
-                             foreach (var item in items)
-                             {
-                                 [|var processed = Process(item);|]
-                                 if (processed is null) continue;
-                                 Add(processed);
-                             }
-                         }
+                              public class TestClass
+                              {
+                                  public void ProcessItems(System.Collections.Generic.IEnumerable<Item?> items)
+                                  {
+                                      foreach (var item in items)
+                                      {
+                                          [|var processed = Process(item);|]
+                                          if (processed is null) continue;
+                                          Add(processed);
+                                      }
+                                  }
 
-                         private object? Process(Item? item) => item;
-                         private void Add(object item) { }
-                     }
-                     """;
+                                  private object? Process(Item? item) => item;
+                                  private void Add(object item) { }
+                              }
+                              """;
 
-        var expected = """
-                       public class Item
-                       {
-                       }
+        const string Expected = """
+                                public class Item
+                                {
+                                }
 
-                       public class TestClass
-                       {
-                           public void ProcessItems(System.Collections.Generic.IEnumerable<Item?> items)
-                           {
-                               foreach (var item in items)
-                               {
-                                   if (Process(item) is not { } processed) continue;
-                                   Add(processed);
-                               }
-                           }
+                                public class TestClass
+                                {
+                                    public void ProcessItems(System.Collections.Generic.IEnumerable<Item?> items)
+                                    {
+                                        foreach (var item in items)
+                                        {
+                                            if (Process(item) is not { } processed) continue;
+                                            Add(processed);
+                                        }
+                                    }
 
-                           private object? Process(Item? item) => item;
-                           private void Add(object item) { }
-                       }
-                       """;
+                                    private object? Process(Item? item) => item;
+                                    private void Add(object item) { }
+                                }
+                                """;
 
-        return VerifyAsync(source, expected);
+        return VerifyAsync(Source, Expected);
     }
 
     /// <summary>
@@ -381,42 +381,42 @@ public sealed class AL0016EarlyExitTests : ALCodeFixTest<AL0016CombineDeclaratio
     /// </summary>
     [Fact]
     public Task ShouldCombineDeclarationWithBreakStatement() {
-        var source = """
-                     public class TestClass
-                     {
-                         public void ProcessArray(int[] array)
-                         {
-                             for (int i = 0; i < array.Length; i++)
-                             {
-                                 [|var value = GetValue(array[i]);|]
-                                 if (value is null) break;
-                                 ProcessValue(value);
-                             }
-                         }
+        const string Source = """
+                              public class TestClass
+                              {
+                                  public void ProcessArray(int[] array)
+                                  {
+                                      for (int i = 0; i < array.Length; i++)
+                                      {
+                                          [|var value = GetValue(array[i]);|]
+                                          if (value is null) break;
+                                          ProcessValue(value);
+                                      }
+                                  }
 
-                         private object? GetValue(int index) => null;
-                         private void ProcessValue(object value) { }
-                     }
-                     """;
+                                  private object? GetValue(int index) => null;
+                                  private void ProcessValue(object value) { }
+                              }
+                              """;
 
-        var expected = """
-                       public class TestClass
-                       {
-                           public void ProcessArray(int[] array)
-                           {
-                               for (int i = 0; i < array.Length; i++)
-                               {
-                                   if (GetValue(array[i]) is not { } value) break;
-                                   ProcessValue(value);
-                               }
-                           }
+        const string Expected = """
+                                public class TestClass
+                                {
+                                    public void ProcessArray(int[] array)
+                                    {
+                                        for (int i = 0; i < array.Length; i++)
+                                        {
+                                            if (GetValue(array[i]) is not { } value) break;
+                                            ProcessValue(value);
+                                        }
+                                    }
 
-                           private object? GetValue(int index) => null;
-                           private void ProcessValue(object value) { }
-                       }
-                       """;
+                                    private object? GetValue(int index) => null;
+                                    private void ProcessValue(object value) { }
+                                }
+                                """;
 
-        return VerifyAsync(source, expected);
+        return VerifyAsync(Source, Expected);
     }
 
     /// <summary>
@@ -424,42 +424,42 @@ public sealed class AL0016EarlyExitTests : ALCodeFixTest<AL0016CombineDeclaratio
     /// </summary>
     [Fact]
     public Task ShouldCombineDeclarationWithBlockContainingThrow() {
-        var source = """
-                     public class TestClass
-                     {
-                         public void ProcessData(object? data)
-                         {
-                             [|var config = LoadConfig(data);|]
-                             if (config is null)
-                             {
-                                 throw new System.IO.FileNotFoundException("config.json not found");
-                             }
-                             Apply(config);
-                         }
+        const string Source = """
+                              public class TestClass
+                              {
+                                  public void ProcessData(object? data)
+                                  {
+                                      [|var config = LoadConfig(data);|]
+                                      if (config is null)
+                                      {
+                                          throw new System.IO.FileNotFoundException("config.json not found");
+                                      }
+                                      Apply(config);
+                                  }
 
-                         private object? LoadConfig(object? data) => null;
-                         private void Apply(object config) { }
-                     }
-                     """;
+                                  private object? LoadConfig(object? data) => null;
+                                  private void Apply(object config) { }
+                              }
+                              """;
 
-        var expected = """
-                       public class TestClass
-                       {
-                           public void ProcessData(object? data)
-                           {
-                               if (LoadConfig(data) is not { } config)
-                               {
-                                   throw new System.IO.FileNotFoundException("config.json not found");
-                               }
-                               Apply(config);
-                           }
+        const string Expected = """
+                                public class TestClass
+                                {
+                                    public void ProcessData(object? data)
+                                    {
+                                        if (LoadConfig(data) is not { } config)
+                                        {
+                                            throw new System.IO.FileNotFoundException("config.json not found");
+                                        }
+                                        Apply(config);
+                                    }
 
-                           private object? LoadConfig(object? data) => null;
-                           private void Apply(object config) { }
-                       }
-                       """;
+                                    private object? LoadConfig(object? data) => null;
+                                    private void Apply(object config) { }
+                                }
+                                """;
 
-        return VerifyAsync(source, expected);
+        return VerifyAsync(Source, Expected);
     }
 
     /// <summary>
@@ -467,40 +467,40 @@ public sealed class AL0016EarlyExitTests : ALCodeFixTest<AL0016CombineDeclaratio
     /// </summary>
     [Fact]
     public Task ShouldCombineDeclarationWithBlockContainingReturn() {
-        var source = """
-                     public class TestClass
-                     {
-                         public string FormatData(object? data)
-                         {
-                             [|var value = Extract(data);|]
-                             if (value is null)
-                             {
-                                 return "N/A";
-                             }
-                             return value.ToString();
-                         }
+        const string Source = """
+                              public class TestClass
+                              {
+                                  public string FormatData(object? data)
+                                  {
+                                      [|var value = Extract(data);|]
+                                      if (value is null)
+                                      {
+                                          return "N/A";
+                                      }
+                                      return value.ToString();
+                                  }
 
-                         private object? Extract(object? data) => data;
-                     }
-                     """;
+                                  private object? Extract(object? data) => data;
+                              }
+                              """;
 
-        var expected = """
-                       public class TestClass
-                       {
-                           public string FormatData(object? data)
-                           {
-                               if (Extract(data) is not { } value)
-                               {
-                                   return "N/A";
-                               }
-                               return value.ToString();
-                           }
+        const string Expected = """
+                                public class TestClass
+                                {
+                                    public string FormatData(object? data)
+                                    {
+                                        if (Extract(data) is not { } value)
+                                        {
+                                            return "N/A";
+                                        }
+                                        return value.ToString();
+                                    }
 
-                           private object? Extract(object? data) => data;
-                       }
-                       """;
+                                    private object? Extract(object? data) => data;
+                                }
+                                """;
 
-        return VerifyAsync(source, expected);
+        return VerifyAsync(Source, Expected);
     }
 }
 
@@ -514,44 +514,44 @@ public sealed class AL0016ComplexExpressionTests : ALCodeFixTest<AL0016CombineDe
     /// </summary>
     [Fact]
     public Task ShouldCombineComplexNullConditionalExpression() {
-        var source = """
-                     public interface IData
-                     {
-                         System.Func<object?>? GetValue { get; }
-                     }
+        const string Source = """
+                              public interface IData
+                              {
+                                  System.Func<object?>? GetValue { get; }
+                              }
 
-                     public class TestClass
-                     {
-                         public void ProcessData(IData? data)
-                         {
-                             [|var value = data?.GetValue?.Invoke();|]
-                             if (value is null) return;
-                             Use(value);
-                         }
+                              public class TestClass
+                              {
+                                  public void ProcessData(IData? data)
+                                  {
+                                      [|var value = data?.GetValue?.Invoke();|]
+                                      if (value is null) return;
+                                      Use(value);
+                                  }
 
-                         private void Use(object value) { }
-                     }
-                     """;
+                                  private void Use(object value) { }
+                              }
+                              """;
 
-        var expected = """
-                       public interface IData
-                       {
-                           System.Func<object?>? GetValue { get; }
-                       }
+        const string Expected = """
+                                public interface IData
+                                {
+                                    System.Func<object?>? GetValue { get; }
+                                }
 
-                       public class TestClass
-                       {
-                           public void ProcessData(IData? data)
-                           {
-                               if (data?.GetValue?.Invoke() is not { } value) return;
-                               Use(value);
-                           }
+                                public class TestClass
+                                {
+                                    public void ProcessData(IData? data)
+                                    {
+                                        if (data?.GetValue?.Invoke() is not { } value) return;
+                                        Use(value);
+                                    }
 
-                           private void Use(object value) { }
-                       }
-                       """;
+                                    private void Use(object value) { }
+                                }
+                                """;
 
-        return VerifyAsync(source, expected);
+        return VerifyAsync(Source, Expected);
     }
 
     /// <summary>
@@ -559,34 +559,34 @@ public sealed class AL0016ComplexExpressionTests : ALCodeFixTest<AL0016CombineDe
     /// </summary>
     [Fact]
     public Task ShouldCombineDeclarationWithCastExpression() {
-        var source = """
-                     public class TestClass
-                     {
-                         public void ProcessData(object? input)
-                         {
-                             [|var data = input as string;|]
-                             if (data is null) return;
-                             Use(data);
-                         }
+        const string Source = """
+                              public class TestClass
+                              {
+                                  public void ProcessData(object? input)
+                                  {
+                                      [|var data = input as string;|]
+                                      if (data is null) return;
+                                      Use(data);
+                                  }
 
-                         private void Use(string data) { }
-                     }
-                     """;
+                                  private void Use(string data) { }
+                              }
+                              """;
 
-        var expected = """
-                       public class TestClass
-                       {
-                           public void ProcessData(object? input)
-                           {
-                               if (input as string is not { } data) return;
-                               Use(data);
-                           }
+        const string Expected = """
+                                public class TestClass
+                                {
+                                    public void ProcessData(object? input)
+                                    {
+                                        if (input as string is not { } data) return;
+                                        Use(data);
+                                    }
 
-                           private void Use(string data) { }
-                       }
-                       """;
+                                    private void Use(string data) { }
+                                }
+                                """;
 
-        return VerifyAsync(source, expected);
+        return VerifyAsync(Source, Expected);
     }
 }
 
@@ -600,48 +600,48 @@ public sealed class AL0016FixAllTests : ALCodeFixTest<AL0016CombineDeclarationWi
     /// </summary>
     [Fact]
     public Task ShouldFixAllDeclarationsInSameMethod() {
-        var source = """
-                     public class TestClass
-                     {
-                         public void ProcessData(object? data1, object? data2, object? data3)
-                         {
-                             [|var value1 = Extract(data1);|]
-                             if (value1 is null) return;
+        const string Source = """
+                              public class TestClass
+                              {
+                                  public void ProcessData(object? data1, object? data2, object? data3)
+                                  {
+                                      [|var value1 = Extract(data1);|]
+                                      if (value1 is null) return;
 
-                             [|var value2 = Extract(data2);|]
-                             if (value2 is null) return;
+                                      [|var value2 = Extract(data2);|]
+                                      if (value2 is null) return;
 
-                             [|var value3 = Extract(data3);|]
-                             if (value3 is null) return;
+                                      [|var value3 = Extract(data3);|]
+                                      if (value3 is null) return;
 
-                             UseAll(value1, value2, value3);
-                         }
+                                      UseAll(value1, value2, value3);
+                                  }
 
-                         private object? Extract(object? data) => data;
-                         private void UseAll(object v1, object v2, object v3) { }
-                     }
-                     """;
+                                  private object? Extract(object? data) => data;
+                                  private void UseAll(object v1, object v2, object v3) { }
+                              }
+                              """;
 
-        var expected = """
-                       public class TestClass
-                       {
-                           public void ProcessData(object? data1, object? data2, object? data3)
-                           {
-                               if (Extract(data1) is not { } value1) return;
+        const string Expected = """
+                                public class TestClass
+                                {
+                                    public void ProcessData(object? data1, object? data2, object? data3)
+                                    {
+                                        if (Extract(data1) is not { } value1) return;
 
-                               if (Extract(data2) is not { } value2) return;
+                                        if (Extract(data2) is not { } value2) return;
 
-                               if (Extract(data3) is not { } value3) return;
+                                        if (Extract(data3) is not { } value3) return;
 
-                               UseAll(value1, value2, value3);
-                           }
+                                        UseAll(value1, value2, value3);
+                                    }
 
-                           private object? Extract(object? data) => data;
-                           private void UseAll(object v1, object v2, object v3) { }
-                       }
-                       """;
+                                    private object? Extract(object? data) => data;
+                                    private void UseAll(object v1, object v2, object v3) { }
+                                }
+                                """;
 
-        return VerifyAsync(source, expected);
+        return VerifyAsync(Source, Expected);
     }
 
     /// <summary>
@@ -649,60 +649,60 @@ public sealed class AL0016FixAllTests : ALCodeFixTest<AL0016CombineDeclarationWi
     /// </summary>
     [Fact]
     public Task ShouldFixAllWithDifferentExitForms() {
-        var source = """
-                     public class Item
-                     {
-                         public string? Name { get; }
-                         public object? Value { get; }
-                     }
+        const string Source = """
+                              public class Item
+                              {
+                                  public string? Name { get; }
+                                  public object? Value { get; }
+                              }
 
-                     public class TestClass
-                     {
-                         public string Process(System.Collections.Generic.IEnumerable<Item?> items)
-                         {
-                             foreach (var item in items)
-                             {
-                                 [|var name = item?.Name;|]
-                                 if (name is null) continue;
+                              public class TestClass
+                              {
+                                  public string Process(System.Collections.Generic.IEnumerable<Item?> items)
+                                  {
+                                      foreach (var item in items)
+                                      {
+                                          [|var name = item?.Name;|]
+                                          if (name is null) continue;
 
-                                 [|var value = item?.Value;|]
-                                 if (value is null) break;
+                                          [|var value = item?.Value;|]
+                                          if (value is null) break;
 
-                                 Use(name, value);
-                             }
-                             return "Done";
-                         }
+                                          Use(name, value);
+                                      }
+                                      return "Done";
+                                  }
 
-                         private void Use(string name, object value) { }
-                     }
-                     """;
+                                  private void Use(string name, object value) { }
+                              }
+                              """;
 
-        var expected = """
-                       public class Item
-                       {
-                           public string? Name { get; }
-                           public object? Value { get; }
-                       }
+        const string Expected = """
+                                public class Item
+                                {
+                                    public string? Name { get; }
+                                    public object? Value { get; }
+                                }
 
-                       public class TestClass
-                       {
-                           public string Process(System.Collections.Generic.IEnumerable<Item?> items)
-                           {
-                               foreach (var item in items)
-                               {
-                                   if (item?.Name is not { } name) continue;
+                                public class TestClass
+                                {
+                                    public string Process(System.Collections.Generic.IEnumerable<Item?> items)
+                                    {
+                                        foreach (var item in items)
+                                        {
+                                            if (item?.Name is not { } name) continue;
 
-                                   if (item?.Value is not { } value) break;
+                                            if (item?.Value is not { } value) break;
 
-                                   Use(name, value);
-                               }
-                               return "Done";
-                           }
+                                            Use(name, value);
+                                        }
+                                        return "Done";
+                                    }
 
-                           private void Use(string name, object value) { }
-                       }
-                       """;
+                                    private void Use(string name, object value) { }
+                                }
+                                """;
 
-        return VerifyAsync(source, expected);
+        return VerifyAsync(Source, Expected);
     }
 }

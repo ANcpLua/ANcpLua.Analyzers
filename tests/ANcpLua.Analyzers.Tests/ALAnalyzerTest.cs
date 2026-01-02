@@ -6,19 +6,17 @@ using Microsoft.CodeAnalysis.Testing;
 namespace ANcpLua.Analyzers.Tests;
 
 public abstract class ALAnalyzerTest<TAnalyzer> where TAnalyzer : DiagnosticAnalyzer, new() {
-    private static readonly ReferenceAssemblies EmptyNet100 = new("net10.0");
-    private static readonly ReferenceAssemblies EmptyNetStandard20 = new("netstandard2.0");
+    private static readonly ReferenceAssemblies Net100Tfm = new("net10.0");
+    private static readonly ReferenceAssemblies NetStandard20Tfm = new("netstandard2.0");
 
     protected static Task VerifyAsync(string source, bool useNet10References = true) {
-        var test = new CSharpAnalyzerTest<TAnalyzer, DefaultVerifier> { TestCode = source.ReplaceLineEndings() };
+        var test = new CSharpAnalyzerTest<TAnalyzer, DefaultVerifier> {
+            TestCode = source.ReplaceLineEndings(),
+            ReferenceAssemblies = useNet10References ? Net100Tfm : NetStandard20Tfm
+        };
 
-        if (useNet10References) {
-            test.ReferenceAssemblies = EmptyNet100;
-            test.TestState.AdditionalReferences.AddRange(Net100.References.All);
-        } else {
-            test.ReferenceAssemblies = EmptyNetStandard20;
-            test.TestState.AdditionalReferences.AddRange(NetStandard20.References.All);
-        }
+        test.TestState.AdditionalReferences.AddRange(
+            useNet10References ? Net100.References.All : NetStandard20.References.All);
 
         return test.RunAsync();
     }

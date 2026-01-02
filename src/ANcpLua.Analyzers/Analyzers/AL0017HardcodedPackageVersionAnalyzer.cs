@@ -1,8 +1,8 @@
+using ANcpLua.Analyzers.Core;
+using Microsoft.CodeAnalysis.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
-using ANcpLua.Analyzers.Core;
-using Microsoft.CodeAnalysis.Text;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -114,7 +114,7 @@ public sealed class AL0017HardcodedPackageVersionAnalyzer : DiagnosticAnalyzer {
     private static void AnalyzeCompilation(CompilationAnalysisContext context) {
         // Find Directory.Packages.props in AdditionalFiles
         var propsFiles = context.Options.AdditionalFiles
-            .Where(f => f.Path.EndsWith("Directory.Packages.props", StringComparison.OrdinalIgnoreCase))
+            .Where(static f => f.Path.EndsWith("Directory.Packages.props", StringComparison.OrdinalIgnoreCase))
             .ToList();
 
         foreach (var propsFile in propsFiles) {
@@ -124,39 +124,46 @@ public sealed class AL0017HardcodedPackageVersionAnalyzer : DiagnosticAnalyzer {
 
     private static void AnalyzePropsFile(CompilationAnalysisContext context, AdditionalText propsFile) {
         var sourceText = propsFile.GetText(context.CancellationToken);
-        if (sourceText == null) return;
+        if (sourceText == null) {
+            return;
+        }
 
         var content = sourceText.ToString();
 
         try {
             var doc = XDocument.Parse(content);
             var packageVersions = doc.Descendants()
-                .Where(e => e.Name.LocalName == "PackageVersion");
+                .Where(static e => e.Name.LocalName == "PackageVersion");
 
             foreach (var pkg in packageVersions) {
                 var includeAttr = pkg.Attribute("Include");
                 var versionAttr = pkg.Attribute("Version");
 
-                if (includeAttr == null || versionAttr == null) continue;
+                if (includeAttr == null || versionAttr == null) {
+                    continue;
+                }
 
                 var packageName = includeAttr.Value;
                 var versionValue = versionAttr.Value;
 
                 // Skip if already using $(VariableName) syntax
-                if (MsBuildPropertyPattern.IsMatch(versionValue)) continue;
+                if (MsBuildPropertyPattern.IsMatch(versionValue)) {
+                    continue;
+                }
 
                 // This is a hardcoded version - report diagnostic
                 var suggestedVariable = GetSuggestedVariableName(packageName);
 
                 // Create location from the XML position
-                var lineInfo = (IXmlLineInfo)versionAttr;
+                IXmlLineInfo lineInfo = versionAttr;
                 var location = Location.None;
 
                 if (lineInfo.HasLineInfo()) {
                     // Find the position in source text
                     var linePosition = new LinePosition(lineInfo.LineNumber - 1, lineInfo.LinePosition - 1);
                     var textSpan = sourceText.Lines[lineInfo.LineNumber - 1].Span;
-                    location = Location.Create(propsFile.Path, textSpan, new LinePositionSpan(linePosition, linePosition));
+                    location = Location.Create(propsFile.Path, textSpan,
+                        new LinePositionSpan(linePosition, linePosition));
                 }
 
                 var properties = ImmutableDictionary.CreateBuilder<string, string?>();

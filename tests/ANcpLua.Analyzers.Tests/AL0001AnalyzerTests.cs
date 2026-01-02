@@ -5,41 +5,10 @@ namespace ANcpLua.Analyzers.Tests;
 public sealed class
     AL0001AnalyzerTests : ALAnalyzerTest<AL0001ProhibitPrimaryConstructorParameterReassignmentAnalyzer> {
     [Theory]
-    [InlineData("""
-                public class TestClass(int i)
-                {
-                    public void TestMethod()
-                    {
-                        [|i|] = 10;
-                    }
-                }
-                """)]
-    [InlineData("""
-                public class TestClass(int i)
-                {
-                    public void TestMethod()
-                    {
-                        [|i|] += 10;
-                    }
-                }
-                """)]
-    [InlineData("""
-                public class TestClass(int i)
-                {
-                    public void TestMethod()
-                    {
-                        [|i|]++;
-                    }
-                }
-                """)]
-    [InlineData("""
-                public class TestClass(string? s)
-                {
-                    public void TestMethod()
-                    {
-                        [|s|] ??= string.Empty;
-                    }
-                }
-                """)]
-    public Task ShouldReportDiagnostic(string source) => VerifyAsync(source);
+    [InlineData("int i", "[|i|] = 10")]
+    [InlineData("int i", "[|i|] += 10")]
+    [InlineData("int i", "[|i|]++")]
+    [InlineData("string? s", "[|s|] ??= string.Empty")]
+    public Task ShouldReportDiagnostic(string param, string statement) =>
+        VerifyAsync($"public class C({param}) {{ void M() {{ {statement}; }} }}");
 }

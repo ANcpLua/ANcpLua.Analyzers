@@ -5,25 +5,10 @@ namespace ANcpLua.Analyzers.Tests;
 
 public sealed class AL0002AnalyzerTests : ALAnalyzerTest<AL0002DontRepeatNegatedPatternAnalyzer> {
     [Theory]
-    [InlineData("""
-                public class TestClass
-                {
-                    public void TestMethod(object? obj)
-                    {
-                        _ = obj is [|not not|] null;
-                    }
-                }
-                """)]
-    [InlineData("""
-                public class TestClass
-                {
-                    public void TestMethod(object? obj)
-                    {
-                        _ = obj is [|not not not|] null;
-                    }
-                }
-                """)]
-    public Task ShouldReportDiagnostic(string source) => VerifyAsync(source);
+    [InlineData("[|not not|] null")]
+    [InlineData("[|not not not|] null")]
+    public Task ShouldReportDiagnostic(string pattern) =>
+        VerifyAsync($"public class C {{ void M(object? o) {{ _ = o is {pattern}; }} }}");
 }
 
 public sealed class AL0002CodeFixTests : ALCodeFixTest<AL0002DontRepeatNegatedPatternAnalyzer, AL0002CodeFixProvider> {

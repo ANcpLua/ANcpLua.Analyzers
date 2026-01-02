@@ -8,121 +8,35 @@ namespace ANcpLua.Analyzers.Tests;
 /// </summary>
 public sealed class AL0014AnalyzerTests : ALAnalyzerTest<AL0014PreferPatternMatchingAnalyzer> {
     [Theory]
-    [InlineData("""
-                public class C {
-                    void M(object? o) {
-                        _ = [|o == null|];
-                    }
-                }
-                """)]
-    [InlineData("""
-                public class C {
-                    void M(object? o) {
-                        _ = [|o != null|];
-                    }
-                }
-                """)]
-    [InlineData("""
-                public class C {
-                    void M(object? o) {
-                        _ = [|null == o|];
-                    }
-                }
-                """)]
-    [InlineData("""
-                public class C {
-                    void M(object? o) {
-                        _ = [|null != o|];
-                    }
-                }
-                """)]
-    public Task ShouldReportNullComparisons(string source) => VerifyAsync(source);
+    [InlineData("object? o", "[|o == null|]")]
+    [InlineData("object? o", "[|o != null|]")]
+    [InlineData("object? o", "[|null == o|]")]
+    [InlineData("object? o", "[|null != o|]")]
+    public Task ShouldReportNullComparisons(string param, string expr) =>
+        VerifyAsync($"public class C {{ void M({param}) {{ _ = {expr}; }} }}");
 
     [Theory]
-    [InlineData("""
-                public class C {
-                    void M(int x) {
-                        _ = [|x == 0|];
-                    }
-                }
-                """)]
-    [InlineData("""
-                public class C {
-                    void M(int x) {
-                        _ = [|x != 0|];
-                    }
-                }
-                """)]
-    [InlineData("""
-                public class C {
-                    void M(int x) {
-                        _ = [|0 == x|];
-                    }
-                }
-                """)]
-    [InlineData("""
-                public class C {
-                    void M(int x) {
-                        _ = [|0 != x|];
-                    }
-                }
-                """)]
-    public Task ShouldReportZeroComparisons(string source) => VerifyAsync(source);
+    [InlineData("[|x == 0|]")]
+    [InlineData("[|x != 0|]")]
+    [InlineData("[|0 == x|]")]
+    [InlineData("[|0 != x|]")]
+    public Task ShouldReportZeroComparisons(string expr) =>
+        VerifyAsync($"public class C {{ void M(int x) {{ _ = {expr}; }} }}");
 
     [Theory]
-    [InlineData("""
-                public class C {
-                    void M(object? o) {
-                        _ = o is null;
-                    }
-                }
-                """)]
-    [InlineData("""
-                public class C {
-                    void M(object? o) {
-                        _ = o is not null;
-                    }
-                }
-                """)]
-    [InlineData("""
-                public class C {
-                    void M(int x) {
-                        _ = x is 0;
-                    }
-                }
-                """)]
-    [InlineData("""
-                public class C {
-                    void M(int x) {
-                        _ = x is not 0;
-                    }
-                }
-                """)]
-    public Task ShouldNotReportPatternMatching(string source) => VerifyAsync(source);
+    [InlineData("object? o", "o is null")]
+    [InlineData("object? o", "o is not null")]
+    [InlineData("int x", "x is 0")]
+    [InlineData("int x", "x is not 0")]
+    public Task ShouldNotReportPatternMatching(string param, string expr) =>
+        VerifyAsync($"public class C {{ void M({param}) {{ _ = {expr}; }} }}");
 
     [Theory]
-    [InlineData("""
-                public class C {
-                    void M(int x) {
-                        _ = x == 1;
-                    }
-                }
-                """)]
-    [InlineData("""
-                public class C {
-                    void M(string s) {
-                        _ = s == "test";
-                    }
-                }
-                """)]
-    [InlineData("""
-                public class C {
-                    void M(int x, int y) {
-                        _ = x == y;
-                    }
-                }
-                """)]
-    public Task ShouldNotReportOtherComparisons(string source) => VerifyAsync(source);
+    [InlineData("int x", "x == 1")]
+    [InlineData("string s", "s == \"test\"")]
+    [InlineData("int x, int y", "x == y")]
+    public Task ShouldNotReportOtherComparisons(string param, string expr) =>
+        VerifyAsync($"public class C {{ void M({param}) {{ _ = {expr}; }} }}");
 
     [Theory]
     [InlineData("""
