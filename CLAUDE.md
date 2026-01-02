@@ -1,10 +1,10 @@
 # CLAUDE.md - ANcpLua.Analyzers
 
-Roslyn analyzers for C# code quality (AL0001-AL0016).
+Roslyn analyzers for C# code quality (AL0001-AL0017).
 
-**SDK:** ANcpLua.NET.Sdk 1.3.15 | **Target:** .NET 10 + netstandard2.0
+**SDK:** ANcpLua.NET.Sdk 1.3.18 | **Target:** .NET 10 + netstandard2.0
 
-## Rules (AL0001-AL0016)
+## Rules (AL0001-AL0017)
 
 | Rule | Severity | Description |
 |------|----------|-------------|
@@ -24,6 +24,7 @@ Roslyn analyzers for C# code quality (AL0001-AL0016).
 | AL0014 | Info | Prefer pattern matching for null/zero comparisons |
 | AL0015 | Info | Normalize null-guard style |
 | AL0016 | Info | Combine declaration with subsequent null-check |
+| AL0017 | Warning | Hardcoded package version in Directory.Packages.props |
 
 ## Commands
 
@@ -60,7 +61,9 @@ src/
   ANcpLua.Analyzers.CodeFixes/ # Code fixes (CodeFixProvider)
 tests/
   ANcpLua.Analyzers.Tests/     # Unit tests (xunit.v3.mtp-v2)
-docs/                          # Per-rule documentation
+docs/
+  rules/                       # Per-rule documentation (AL0001-AL0017.md)
+  api/                         # Auto-generated API docs (DocFX)
 ```
 
 ## Key Facts
@@ -82,18 +85,20 @@ docs/                          # Per-rule documentation
 
 ## Analyzer Test Patterns
 
-When writing analyzer tests, test code snippets must comply with CA1050:
+Use condensed single-line `InlineData` with interpolated boilerplate:
 
 ```csharp
-// ✅ CORRECT - class in namespace
-var test = """
-    namespace TestNamespace;
+// ✅ PREFERRED - Parameterized, condensed
+[Theory]
+[InlineData("int i", "[|i|] = 10")]
+[InlineData("int i", "[|i|]++")]
+public Task ShouldReport(string param, string stmt) =>
+    VerifyAsync($"public class C({param}) {{ void M() {{ {stmt}; }} }}");
 
-    public class TestClass { }
-    """;
-
-// ❌ WRONG - CA1050 error
-var test = "public class TestClass { }";
+// ❌ AVOID - Verbose multi-line raw strings for simple cases
+[InlineData("""
+    public class C(int i) { void M() { [|i|] = 10; } }
+    """)]
 ```
 
 ## Related Projects

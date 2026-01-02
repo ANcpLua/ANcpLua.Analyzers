@@ -11,7 +11,7 @@ dotnet add package ANcpLua.Analyzers
 Or via PackageReference:
 
 ```xml
-<PackageReference Include="ANcpLua.Analyzers" Version="1.3.3" PrivateAssets="all" />
+<PackageReference Include="ANcpLua.Analyzers" Version="1.3.6" PrivateAssets="all" />
 ```
 
 ## Features
