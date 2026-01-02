@@ -35,6 +35,7 @@
       "_appTitle": "ANcpLua.Analyzers",
       "_appName": "ANcpLua.Analyzers",
       "_appFooter": "ANcpLua.Analyzers - Roslyn Analyzers for C# Code Quality",
+      "_appLogoPath": "",
       "_enableSearch": true,
       "_enableNewTab": true
     },
