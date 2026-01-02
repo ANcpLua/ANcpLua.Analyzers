@@ -19,6 +19,9 @@
         <!-- Enable polyfills for netstandard2.0 TFM -->
         <InjectAllPolyfillsOnLegacy>true</InjectAllPolyfillsOnLegacy>
 
+        <!-- Analyzers don't have debug symbols - disable snupkg generation -->
+        <IncludeSymbols>false</IncludeSymbols>
+
         <!-- Suppress analyzer rules already handled by base class -->
         <!-- RS1041: Suppress for net10.0 build (only ns2.0 is packaged) -->
         <!-- RS0030: Banned APIs - SDK introduces stricter rules -->
