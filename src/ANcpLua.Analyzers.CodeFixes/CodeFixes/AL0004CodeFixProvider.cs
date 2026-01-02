@@ -22,49 +22,19 @@ public sealed class AL0004CodeFixProvider : ALCodeFixProvider<BinaryExpressionSy
         Document document,
         BinaryExpressionSyntax binary,
         SyntaxNode root) {
-        var isPatternExpression = binary.Right.Kind() switch {
-            SyntaxKind.StringLiteralExpression => ProcessStringLiteral(binary),
-            SyntaxKind.CollectionExpression => ProcessCollection(binary),
-            SyntaxKind.ArrayCreationExpression => ProcessArrayCreation(binary),
-            SyntaxKind.ImplicitArrayCreationExpression => ProcessImplicitArrayCreation(binary),
+        PatternSyntax pattern = binary.Right switch {
+            LiteralExpressionSyntax => SyntaxFactory.ConstantPattern(binary.Right),
+            CollectionExpressionSyntax col => ToListPattern(col.Elements.Cast<ExpressionElementSyntax>().Select(e => e.Expression)),
+            ArrayCreationExpressionSyntax arr => ToListPattern(arr.Initializer?.Expressions ?? []),
+            ImplicitArrayCreationExpressionSyntax imp => ToListPattern(imp.Initializer.Expressions),
             _ => throw new InvalidOperationException("Unexpected syntax kind")
         };
 
-        return Task.FromResult(document.WithSyntaxRoot(root.ReplaceNode(binary, isPatternExpression)));
+        var isPattern = SyntaxFactory.IsPatternExpression(binary.Left, pattern);
+        return Task.FromResult(document.WithSyntaxRoot(root.ReplaceNode(binary, isPattern)));
     }
 
-    private static IsPatternExpressionSyntax ProcessStringLiteral(BinaryExpressionSyntax binary) =>
-        SyntaxFactory.IsPatternExpression(binary.Left, SyntaxFactory.ConstantPattern(binary.Right));
-
-    private static IsPatternExpressionSyntax ProcessCollection(BinaryExpressionSyntax binary) {
-        var collection = (CollectionExpressionSyntax)binary.Right;
-        var patterns = collection.Elements
-            .Cast<ExpressionElementSyntax>()
-            .Select(PatternSyntax (e) => SyntaxFactory.ConstantPattern(e.Expression));
-
-        return SyntaxFactory.IsPatternExpression(
-            binary.Left,
-            SyntaxFactory.ListPattern(SyntaxFactory.SeparatedList(patterns)));
-    }
-
-    private static IsPatternExpressionSyntax ProcessArrayCreation(BinaryExpressionSyntax binary) {
-        var arrayCreation = (ArrayCreationExpressionSyntax)binary.Right;
-        var patterns = arrayCreation.Initializer?.Expressions
-                           .Select(PatternSyntax (e) => SyntaxFactory.ConstantPattern(e))
-                       ?? [];
-
-        return SyntaxFactory.IsPatternExpression(
-            binary.Left,
-            SyntaxFactory.ListPattern(SyntaxFactory.SeparatedList(patterns)));
-    }
-
-    private static IsPatternExpressionSyntax ProcessImplicitArrayCreation(BinaryExpressionSyntax binary) {
-        var implicitArray = (ImplicitArrayCreationExpressionSyntax)binary.Right;
-        var patterns = implicitArray.Initializer.Expressions
-            .Select(PatternSyntax (e) => SyntaxFactory.ConstantPattern(e));
-
-        return SyntaxFactory.IsPatternExpression(
-            binary.Left,
-            SyntaxFactory.ListPattern(SyntaxFactory.SeparatedList(patterns)));
-    }
+    private static ListPatternSyntax ToListPattern(IEnumerable<ExpressionSyntax> expressions) =>
+        SyntaxFactory.ListPattern(SyntaxFactory.SeparatedList(
+            expressions.Select(PatternSyntax (e) => SyntaxFactory.ConstantPattern(e))));
 }

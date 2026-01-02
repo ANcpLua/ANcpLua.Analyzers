@@ -54,7 +54,7 @@ public sealed class AL0012DeprecatedAttributeCodeFixProvider : CodeFixProvider {
 
     private static async Task<Document> ReplaceAttributeAsync(
         Document document,
-        LiteralExpressionSyntax oldLiteral,
+        SyntaxNode oldLiteral,
         string newAttributeName,
         CancellationToken cancellationToken) {
         var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);

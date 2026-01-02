@@ -20,7 +20,7 @@ public sealed class AL0002CodeFixProvider : ALCodeFixProvider<UnaryPatternSyntax
 
     private static Task<Document> RemoveRepeatedNegatedPatterns(
         Document document,
-        UnaryPatternSyntax notPattern,
+        SyntaxNode notPattern,
         SyntaxNode root) {
         var parent = (ExpressionOrPatternSyntax)notPattern.Parent!;
         var notPatterns = notPattern.DescendantNodesAndSelf().OfType<UnaryPatternSyntax>().ToArray();

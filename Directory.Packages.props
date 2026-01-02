@@ -4,11 +4,12 @@
       ANcpLua.Analyzers - Directory.Packages.props
       ═══════════════════════════════════════════════════════════════════════════
 
-      TODO: Once ANcpLua.NET.Sdk 1.4.0+ is published with Version.props,
-      switch to $(VariableName) syntax for centralized version management.
-
-      For now, using hardcoded versions to avoid CI failures.
+      All version variables are defined in Version.props (symlinked from SDK).
+      This file only declares WHICH packages are used, not their versions.
     -->
+
+    <!-- Import centralized versions from symlinked Version.props -->
+    <Import Project="$(MSBuildThisFileDirectory)Version.props" Condition="'$(RoslynVersion)' == ''"/>
 
     <PropertyGroup>
         <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
@@ -17,30 +18,30 @@
 
     <!-- Roslyn -->
     <ItemGroup Label="Roslyn">
-        <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0"/>
-        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0"/>
-        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.0.0"/>
+        <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="$(RoslynAnalyzersVersion)"/>
+        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="$(RoslynVersion)"/>
+        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="$(RoslynVersion)"/>
     </ItemGroup>
 
     <!-- Reference Assemblies -->
     <ItemGroup Label="Reference Assemblies">
-        <PackageVersion Include="Basic.Reference.Assemblies.Net100" Version="1.8.4"/>
-        <PackageVersion Include="Basic.Reference.Assemblies.NetStandard20" Version="1.8.4"/>
+        <PackageVersion Include="Basic.Reference.Assemblies.Net100" Version="$(BasicReferenceAssembliesVersion)"/>
+        <PackageVersion Include="Basic.Reference.Assemblies.NetStandard20" Version="$(BasicReferenceAssembliesVersion)"/>
     </ItemGroup>
 
     <!-- Analyzer Testing (beta from dotnet-tools feed) -->
     <ItemGroup Label="Analyzer Testing">
-        <PackageVersion Include="Microsoft.CodeAnalysis.Analyzer.Testing" Version="1.1.3-beta1.24423.1"/>
-        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing" Version="1.1.3-beta1.24423.1"/>
-        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing" Version="1.1.3-beta1.24423.1"/>
-        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.CodeRefactoring.Testing" Version="1.1.3-beta1.24423.1"/>
-        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing" Version="1.1.3-beta1.24423.1"/>
+        <PackageVersion Include="Microsoft.CodeAnalysis.Analyzer.Testing" Version="$(AnalyzerTestingVersion)"/>
+        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing" Version="$(AnalyzerTestingVersion)"/>
+        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing" Version="$(AnalyzerTestingVersion)"/>
+        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.CodeRefactoring.Testing" Version="$(AnalyzerTestingVersion)"/>
+        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing" Version="$(AnalyzerTestingVersion)"/>
     </ItemGroup>
 
     <!-- Testing (MTP v2) -->
     <ItemGroup Label="Testing">
-        <PackageVersion Include="AwesomeAssertions" Version="9.3.0"/>
-        <PackageVersion Include="xunit.v3" Version="3.2.1"/>
-        <PackageVersion Include="xunit.v3.mtp-v2" Version="3.2.1"/>
+        <PackageVersion Include="AwesomeAssertions" Version="$(AwesomeAssertionsVersion)"/>
+        <PackageVersion Include="xunit.v3" Version="$(XunitV3Version)"/>
+        <PackageVersion Include="xunit.v3.mtp-v2" Version="$(XunitV3Version)"/>
     </ItemGroup>
 </Project>

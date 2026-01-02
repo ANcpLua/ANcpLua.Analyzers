@@ -10,114 +10,39 @@ namespace ANcpLua.Analyzers.Tests;
 /// </summary>
 public sealed class AL0015AnalyzerTests : ALAnalyzerTest<AL0015NormalizeNullGuardStyleAnalyzer> {
     [Theory]
-    [InlineData("""
-                using System;
+    [InlineData("string? x", "x is null", "nameof(x)")]
+    [InlineData("object? obj", "obj == null", "nameof(obj)")]
+    [InlineData("int? count", "count is null", "\"count\"")]
+    public Task ShouldReportDiagnostic(string param, string check, string arg) =>
+        VerifyAsync($"using System; public class C {{ void M({param}) {{ [|if|] ({check}) throw new ArgumentNullException({arg}); }} }}");
 
-                public class TestClass
-                {
-                    public void TestMethod(string? x)
-                    {
-                        [|if|] (x is null) throw new ArgumentNullException(nameof(x));
-                    }
-                }
-                """)]
-    [InlineData("""
-                using System;
-
-                public class TestClass
-                {
-                    public void TestMethod(object? obj)
-                    {
-                        [|if|] (obj == null) throw new ArgumentNullException(nameof(obj));
-                    }
-                }
-                """)]
-    [InlineData("""
-                using System;
-
-                public class TestClass
-                {
-                    public void TestMethod(string? x)
-                    {
-                        [|if|] (x is null)
-                        {
-                            throw new ArgumentNullException(nameof(x));
-                        }
-                    }
-                }
-                """)]
-    [InlineData("""
-                using System;
-
-                public class TestClass
-                {
-                    public void TestMethod(int? count)
-                    {
-                        [|if|] (count is null) throw new ArgumentNullException("count");
-                    }
-                }
-                """)]
-    public Task ShouldReportDiagnostic(string source) => VerifyAsync(source);
+    [Fact]
+    public Task ShouldReportDiagnosticWithBlock() => VerifyAsync("""
+        using System;
+        public class C {
+            void M(string? x) {
+                [|if|] (x is null) { throw new ArgumentNullException(nameof(x)); }
+            }
+        }
+        """);
 
     [Theory]
-    [InlineData("""
-                using System;
+    [InlineData("string? x, string? y", "x is null", "nameof(y)")] // Mismatched param
+    [InlineData("string? x", "x is null", "nameof(x), \"msg\"")] // Custom message
+    [InlineData("string? x", "x is not null", "nameof(x)")] // Wrong pattern
+    public Task ShouldNotReportMismatchedOrCustom(string param, string check, string arg) =>
+        VerifyAsync($"using System; public class C {{ void M({param}) {{ if ({check}) throw new ArgumentNullException({arg}); }} }}");
 
-                public class TestClass
-                {
-                    public void TestMethod(string? x, string? y)
-                    {
-                        if (x is null) throw new ArgumentNullException(nameof(y));
-                    }
-                }
-                """)]
-    [InlineData("""
-                using System;
+    [Fact]
+    public Task ShouldNotReportWrongExceptionType() => VerifyAsync(
+        "using System; public class C { void M(string? x) { if (x is null) throw new InvalidOperationException(nameof(x)); } }");
 
-                public class TestClass
-                {
-                    public void TestMethod(string? x)
-                    {
-                        if (x is null) throw new ArgumentNullException(nameof(x), "custom message");
-                    }
-                }
-                """)]
-    [InlineData("""
-                using System;
-
-                public class TestClass
-                {
-                    public void TestMethod(string? x)
-                    {
-                        if (x is null) throw new InvalidOperationException(nameof(x));
-                    }
-                }
-                """)]
-    [InlineData("""
-                using System;
-
-                public class Wrapper { public object? Value { get; set; } }
-
-                public class TestClass
-                {
-                    public void TestMethod(Wrapper? obj)
-                    {
-                        if (obj.Value is null) throw new ArgumentNullException(nameof(obj));
-                    }
-                }
-                """)]
-    [InlineData("""
-                using System;
-
-                public class TestClass
-                {
-                    public void TestMethod(string? x)
-                    {
-                        if (x is not null) throw new ArgumentNullException(nameof(x));
-                    }
-                }
-                """)]
-    public Task ShouldNotReportDiagnostic(string source) => VerifyAsync(source);
+    [Fact]
+    public Task ShouldNotReportPropertyAccess() => VerifyAsync("""
+        using System;
+        public class W { public object? Value { get; set; } }
+        public class C { void M(W? obj) { if (obj.Value is null) throw new ArgumentNullException(nameof(obj)); } }
+        """);
 }
 
 /// <summary>

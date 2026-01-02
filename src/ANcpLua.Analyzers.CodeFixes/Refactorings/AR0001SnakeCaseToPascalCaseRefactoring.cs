@@ -5,9 +5,9 @@ namespace ANcpLua.Analyzers.CodeFixes.Refactorings;
 /// <summary>
 ///     AR0001: Refactoring to convert SCREAMING_SNAKE_CASE identifiers to PascalCase.
 /// </summary>
-[ExportCodeRefactoringProvider(LanguageNames.CSharp, Name = nameof(AR0001SnakeCaseToPascalCaseRefactoring))]
+[ExportCodeRefactoringProvider(LanguageNames.CSharp, Name = nameof(Ar0001SnakeCaseToPascalCaseRefactoring))]
 [Shared]
-public sealed class AR0001SnakeCaseToPascalCaseRefactoring : CodeRefactoringProvider {
+public sealed class Ar0001SnakeCaseToPascalCaseRefactoring : CodeRefactoringProvider {
     private static readonly Regex ScreamingSnakeCasePattern = new("^[A-Z0-9_]+$", RegexOptions.Compiled);
 
     public override async Task ComputeRefactoringsAsync(CodeRefactoringContext context) {
@@ -18,7 +18,7 @@ public sealed class AR0001SnakeCaseToPascalCaseRefactoring : CodeRefactoringProv
         switch (node) {
             case BaseTypeDeclarationSyntax type when IsScreamingSnakeCase(type.Identifier.Text):
                 RegisterRefactoring(context, document, type.Identifier.Text,
-                    (doc, name, ct) => ConvertTypeAsync(doc, type, name, ct));
+                    (doc, name, ct) => RenameNodeAsync(doc, type, name, (n, id) => n.WithIdentifier(id), ct));
                 break;
 
             case VariableDeclaratorSyntax {
@@ -27,17 +27,17 @@ public sealed class AR0001SnakeCaseToPascalCaseRefactoring : CodeRefactoringProv
                 when field.Modifiers.Any(m => m.IsKind(SyntaxKind.ConstKeyword)) &&
                      IsScreamingSnakeCase(variable.Identifier.Text):
                 RegisterRefactoring(context, document, variable.Identifier.Text,
-                    (doc, name, ct) => ConvertVariableAsync(doc, variable, name, ct));
+                    (doc, name, ct) => RenameNodeAsync(doc, variable, name, (n, id) => n.WithIdentifier(id), ct));
                 break;
 
             case EnumMemberDeclarationSyntax enumMember when IsScreamingSnakeCase(enumMember.Identifier.Text):
                 RegisterRefactoring(context, document, enumMember.Identifier.Text,
-                    (doc, name, ct) => ConvertEnumMemberAsync(doc, enumMember, name, ct));
+                    (doc, name, ct) => RenameNodeAsync(doc, enumMember, name, (n, id) => n.WithIdentifier(id), ct));
                 break;
 
             case DelegateDeclarationSyntax @delegate when IsScreamingSnakeCase(@delegate.Identifier.Text):
                 RegisterRefactoring(context, document, @delegate.Identifier.Text,
-                    (doc, name, ct) => ConvertDelegateAsync(doc, @delegate, name, ct));
+                    (doc, name, ct) => RenameNodeAsync(doc, @delegate, name, (n, id) => n.WithIdentifier(id), ct));
                 break;
         }
     }
@@ -54,44 +54,15 @@ public sealed class AR0001SnakeCaseToPascalCaseRefactoring : CodeRefactoringProv
             "ConvertToPascalCase"));
     }
 
-    private static async Task<Document> ConvertTypeAsync(
+    private static async Task<Document> RenameNodeAsync<T>(
         Document document,
-        BaseTypeDeclarationSyntax type,
+        T node,
         string newName,
-        CancellationToken ct) {
+        Func<T, SyntaxToken, T> withIdentifier,
+        CancellationToken ct) where T : SyntaxNode {
         var root = await document.GetSyntaxRootAsync(ct) ?? throw new InvalidOperationException();
-        var newType = type.WithIdentifier(SyntaxFactory.Identifier(newName));
-        return document.WithSyntaxRoot(root.ReplaceNode(type, newType));
-    }
-
-    private static async Task<Document> ConvertVariableAsync(
-        Document document,
-        VariableDeclaratorSyntax variable,
-        string newName,
-        CancellationToken ct) {
-        var root = await document.GetSyntaxRootAsync(ct) ?? throw new InvalidOperationException();
-        var newVariable = variable.WithIdentifier(SyntaxFactory.Identifier(newName));
-        return document.WithSyntaxRoot(root.ReplaceNode(variable, newVariable));
-    }
-
-    private static async Task<Document> ConvertEnumMemberAsync(
-        Document document,
-        EnumMemberDeclarationSyntax enumMember,
-        string newName,
-        CancellationToken ct) {
-        var root = await document.GetSyntaxRootAsync(ct) ?? throw new InvalidOperationException();
-        var newMember = enumMember.WithIdentifier(SyntaxFactory.Identifier(newName));
-        return document.WithSyntaxRoot(root.ReplaceNode(enumMember, newMember));
-    }
-
-    private static async Task<Document> ConvertDelegateAsync(
-        Document document,
-        DelegateDeclarationSyntax @delegate,
-        string newName,
-        CancellationToken ct) {
-        var root = await document.GetSyntaxRootAsync(ct) ?? throw new InvalidOperationException();
-        var newDelegate = @delegate.WithIdentifier(SyntaxFactory.Identifier(newName));
-        return document.WithSyntaxRoot(root.ReplaceNode(@delegate, newDelegate));
+        var newNode = withIdentifier(node, SyntaxFactory.Identifier(newName));
+        return document.WithSyntaxRoot(root.ReplaceNode(node, newNode));
     }
 
     private static bool IsScreamingSnakeCase(string identifier) =>

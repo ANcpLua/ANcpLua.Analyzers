@@ -4,41 +4,10 @@ namespace ANcpLua.Analyzers.Tests;
 
 public sealed class AL0003AnalyzerTests : ALAnalyzerTest<AL0003DontDivideByConstantZeroAnalyzer> {
     [Theory]
-    [InlineData("""
-                public class TestClass
-                {
-                    public void TestMethod(int i)
-                    {
-                        _ = [|i / 0|];
-                    }
-                }
-                """)]
-    [InlineData("""
-                public class TestClass
-                {
-                    public void TestMethod(int i)
-                    {
-                        _ = [|i % 0|];
-                    }
-                }
-                """)]
-    [InlineData("""
-                public class TestClass
-                {
-                    public void TestMethod(long i)
-                    {
-                        _ = [|i / 0L|];
-                    }
-                }
-                """)]
-    [InlineData("""
-                public class TestClass
-                {
-                    public void TestMethod(decimal d)
-                    {
-                        _ = [|d / 0.0m|];
-                    }
-                }
-                """)]
-    public Task ShouldReportDiagnostic(string source) => VerifyAsync(source);
+    [InlineData("int i", "i / 0")]
+    [InlineData("int i", "i % 0")]
+    [InlineData("long i", "i / 0L")]
+    [InlineData("decimal d", "d / 0.0m")]
+    public Task ShouldReportDiagnostic(string param, string expr) =>
+        VerifyAsync($"public class C {{ void M({param}) {{ _ = [|{expr}|]; }} }}");
 }
