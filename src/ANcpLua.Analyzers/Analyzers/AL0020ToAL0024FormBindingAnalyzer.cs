@@ -140,14 +140,14 @@ public sealed class AL0020ToAL0024FormBindingAnalyzer : ALAnalyzer {
         }
     }
 
-    private static bool HasAttribute(IParameterSymbol param, string attributeFullName) =>
-        param.GetAttributes().Any(attr =>
+    private static bool HasAttribute(ISymbol symbol, string attributeFullName) =>
+        symbol.GetAttributes().Any(attr =>
             attr.AttributeClass is not null && GetFullTypeName(attr.AttributeClass) == attributeFullName);
 
-    private static string GetFullTypeName(ITypeSymbol type) =>
-        type.ContainingNamespace is null || type.ContainingNamespace.IsGlobalNamespace
-            ? type.Name
-            : $"{type.ContainingNamespace.ToDisplayString()}.{type.Name}";
+    private static string GetFullTypeName(ISymbol symbol) =>
+        symbol.ContainingNamespace is null || symbol.ContainingNamespace.IsGlobalNamespace
+            ? symbol.Name
+            : $"{symbol.ContainingNamespace.ToDisplayString()}.{symbol.Name}";
 
     private static bool IsPrimitive(ITypeSymbol type) {
         // Handle nullable types
@@ -180,15 +180,15 @@ public sealed class AL0020ToAL0024FormBindingAnalyzer : ALAnalyzer {
         }
 
         var publicConstructors = namedType.InstanceConstructors
-            .Where(c => c.DeclaredAccessibility == Accessibility.Public)
+            .Where(static c => c.DeclaredAccessibility == Accessibility.Public)
             .ToList();
 
         if (publicConstructors.Count == 0) {
             return "no public constructor available";
         }
 
-        var hasValidConstructor = publicConstructors.Exists(ctor =>
-            ctor.Parameters.IsEmpty || ctor.Parameters.All(p => IsPrimitive(p.Type)));
+        var hasValidConstructor = publicConstructors.Exists(static ctor =>
+            ctor.Parameters.IsEmpty || ctor.Parameters.All(static p => IsPrimitive(p.Type)));
 
         return hasValidConstructor ? null : "no suitable constructor (needs parameterless or all-primitive parameters)";
     }
