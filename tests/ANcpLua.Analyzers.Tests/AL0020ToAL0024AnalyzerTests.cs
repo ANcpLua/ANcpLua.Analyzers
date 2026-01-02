@@ -10,18 +10,18 @@ namespace ANcpLua.Analyzers.Tests;
 /// </summary>
 public sealed class AL0020ToAL0024AnalyzerTests {
     private const string Stubs = """
-        namespace Microsoft.AspNetCore.Mvc {
-            [System.AttributeUsage(System.AttributeTargets.Parameter)]
-            public class FromFormAttribute : System.Attribute { }
-            [System.AttributeUsage(System.AttributeTargets.Parameter)]
-            public class FromBodyAttribute : System.Attribute { }
-        }
-        namespace Microsoft.AspNetCore.Http {
-            public interface IFormCollection { }
-            public interface IFormFile { }
-            public interface IFormFileCollection { }
-        }
-        """;
+                                 namespace Microsoft.AspNetCore.Mvc {
+                                     [System.AttributeUsage(System.AttributeTargets.Parameter)]
+                                     public class FromFormAttribute : System.Attribute { }
+                                     [System.AttributeUsage(System.AttributeTargets.Parameter)]
+                                     public class FromBodyAttribute : System.Attribute { }
+                                 }
+                                 namespace Microsoft.AspNetCore.Http {
+                                     public interface IFormCollection { }
+                                     public interface IFormFile { }
+                                     public interface IFormFileCollection { }
+                                 }
+                                 """;
 
     private const string FF = "[Microsoft.AspNetCore.Mvc.FromForm]";
     private const string FB = "[Microsoft.AspNetCore.Mvc.FromBody]";
@@ -37,6 +37,17 @@ public sealed class AL0020ToAL0024AnalyzerTests {
         test.TestState.AdditionalReferences.AddRange(Net100.References.All);
         return test.RunAsync();
     }
+
+    #region AL0022: Mixed IFormCollection with DTO
+
+    [Fact]
+    public Task AL0022_ShouldReportMixedFormCollectionAndDto() =>
+        VerifyAsync($$"""
+                      public class Dto { public string Name { get; set; } }
+                      public class C { void M({{FF}} {{IFC}} {|AL0021:{|AL0022:form|}|}, {{FF}} Dto dto) { } }
+                      """);
+
+    #endregion
 
     #region AL0020: IFormCollection requires explicit [FromForm]
 
@@ -58,28 +69,17 @@ public sealed class AL0020ToAL0024AnalyzerTests {
     [Fact]
     public Task AL0021_ShouldReportMultipleFromFormDtos() =>
         VerifyAsync($$"""
-            public class Dto1 { public string Name { get; set; } }
-            public class Dto2 { public string Value { get; set; } }
-            public class C { void M({{FF}} Dto1 {|AL0021:dto1|}, {{FF}} Dto2 dto2) { } }
-            """);
+                      public class Dto1 { public string Name { get; set; } }
+                      public class Dto2 { public string Value { get; set; } }
+                      public class C { void M({{FF}} Dto1 {|AL0021:dto1|}, {{FF}} Dto2 dto2) { } }
+                      """);
 
     [Fact]
     public Task AL0021_ShouldNotReportSingleFromFormDto() =>
         VerifyAsync($$"""
-            public class Dto { public string Name { get; set; } }
-            public class C { void M({{FF}} Dto dto) { } }
-            """);
-
-    #endregion
-
-    #region AL0022: Mixed IFormCollection with DTO
-
-    [Fact]
-    public Task AL0022_ShouldReportMixedFormCollectionAndDto() =>
-        VerifyAsync($$"""
-            public class Dto { public string Name { get; set; } }
-            public class C { void M({{FF}} {{IFC}} {|AL0021:{|AL0022:form|}|}, {{FF}} Dto dto) { } }
-            """);
+                      public class Dto { public string Name { get; set; } }
+                      public class C { void M({{FF}} Dto dto) { } }
+                      """);
 
     #endregion
 
@@ -90,9 +90,9 @@ public sealed class AL0020ToAL0024AnalyzerTests {
     [InlineData("public abstract class AbstractData { public abstract string Name { get; } }", "AbstractData")]
     public Task AL0023_ShouldReport(string typeDecl, string typeName) =>
         VerifyAsync($$"""
-            {{typeDecl}}
-            public class C { void M({{FF}} {{typeName}} {|AL0023:data|}) { } }
-            """);
+                      {{typeDecl}}
+                      public class C { void M({{FF}} {{typeName}} {|AL0023:data|}) { } }
+                      """);
 
     [Theory]
     [InlineData($"{FF} string name, {FF} int count", "primitives")]
@@ -102,9 +102,9 @@ public sealed class AL0020ToAL0024AnalyzerTests {
     [Fact]
     public Task AL0023_ShouldNotReportDtoWithParameterlessConstructor() =>
         VerifyAsync($$"""
-            public class Dto { public Dto() { } public string Name { get; set; } }
-            public class C { void M({{FF}} Dto dto) { } }
-            """);
+                      public class Dto { public Dto() { } public string Name { get; set; } }
+                      public class C { void M({{FF}} Dto dto) { } }
+                      """);
 
     #endregion
 
@@ -113,20 +113,20 @@ public sealed class AL0020ToAL0024AnalyzerTests {
     [Fact]
     public Task AL0024_ShouldReportFormAndBodyConflict() =>
         VerifyAsync($$"""
-            public class FormDto { public string Name { get; set; } }
-            public class BodyDto { public string Data { get; set; } }
-            public class C { void M({{FF}} FormDto form, {{FB}} BodyDto {|AL0024:body|}) { } }
-            """);
+                      public class FormDto { public string Name { get; set; } }
+                      public class BodyDto { public string Data { get; set; } }
+                      public class C { void M({{FF}} FormDto form, {{FB}} BodyDto {|AL0024:body|}) { } }
+                      """);
 
     [Theory]
     [InlineData($"{FF} FormDto form", "only FromForm")]
     [InlineData($"{FB} BodyDto body", "only FromBody")]
     public Task AL0024_ShouldNotReport(string param, string _) =>
         VerifyAsync($$"""
-            public class FormDto { public string Name { get; set; } }
-            public class BodyDto { public string Data { get; set; } }
-            public class C { void M({{param}}) { } }
-            """);
+                      public class FormDto { public string Name { get; set; } }
+                      public class BodyDto { public string Data { get; set; } }
+                      public class C { void M({{param}}) { } }
+                      """);
 
     #endregion
 }
