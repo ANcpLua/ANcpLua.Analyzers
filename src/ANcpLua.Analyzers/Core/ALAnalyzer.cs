@@ -26,6 +26,7 @@ public static class DiagnosticCategories {
     public const string OpenTelemetry = "OpenTelemetry";
     public const string Style = "Style";
     public const string VersionManagement = "VersionManagement";
+    public const string AspNetCore = "ASP.NET Core";
 }
 
 /// <summary>
@@ -101,6 +102,26 @@ public static class DiagnosticIds {
 
     /// <summary>AL0019: Undefined version variable.</summary>
     public const string UndefinedVersionVariable = "AL0019";
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // FORM BINDING (AL0020-AL0024)
+    // These analyzers enforce correct form binding patterns in ASP.NET Core.
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /// <summary>AL0020: IFormCollection requires explicit [FromForm] attribute.</summary>
+    public const string FormCollectionRequiresExplicitAttribute = "AL0020";
+
+    /// <summary>AL0021: Multiple structured form sources not allowed.</summary>
+    public const string MultipleStructuredFormSources = "AL0021";
+
+    /// <summary>AL0022: Cannot mix IFormCollection with [FromForm] DTO.</summary>
+    public const string MixedFormCollectionAndDto = "AL0022";
+
+    /// <summary>AL0023: Unsupported [FromForm] type.</summary>
+    public const string UnsupportedFormType = "AL0023";
+
+    /// <summary>AL0024: [FromForm] and [FromBody] conflict.</summary>
+    public const string FormAndBodyConflict = "AL0024";
 }
 
 /// <summary>
