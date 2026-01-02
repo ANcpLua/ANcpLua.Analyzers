@@ -1,0 +1,14 @@
+<Project>
+  <!-- Centralized package versions for CI compatibility -->
+  <PropertyGroup Label="Roslyn">
+    <RoslynVersion>5.0.0</RoslynVersion>
+    <RoslynAnalyzersVersion>3.11.0</RoslynAnalyzersVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Testing">
+    <XunitV3Version>3.2.1</XunitV3Version>
+    <AwesomeAssertionsVersion>9.3.0</AwesomeAssertionsVersion>
+    <AnalyzerTestingVersion>1.1.2</AnalyzerTestingVersion>
+    <BasicReferenceAssembliesVersion>1.8.4</BasicReferenceAssembliesVersion>
+  </PropertyGroup>
+</Project>
