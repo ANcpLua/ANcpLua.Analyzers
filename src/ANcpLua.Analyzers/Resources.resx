@@ -204,4 +204,54 @@
     <data name="AL0017AnalyzerDescription" xml:space="preserve">
     <value>Package versions should use MSBuild variables from Version.props for centralized version management. This ensures consistency across all projects and simplifies version updates.</value>
   </data>
+    <!-- AL0020: IFormCollection requires explicit [FromForm] -->
+    <data name="AL0020AnalyzerTitle" xml:space="preserve">
+    <value>IFormCollection requires explicit attribute</value>
+  </data>
+    <data name="AL0020AnalyzerMessageFormat" xml:space="preserve">
+    <value>Parameter '{0}' on '{1}' uses IFormCollection but lacks [FromForm]. IFormCollection does not auto-bind; add [FromForm] explicitly.</value>
+  </data>
+    <data name="AL0020AnalyzerDescription" xml:space="preserve">
+    <value>IFormCollection parameters must have an explicit [FromForm] attribute. Unlike IFormFile which auto-binds, IFormCollection requires explicit attribution for clarity and safety.</value>
+  </data>
+    <!-- AL0021: Multiple structured form sources -->
+    <data name="AL0021AnalyzerTitle" xml:space="preserve">
+    <value>Multiple structured form sources</value>
+  </data>
+    <data name="AL0021AnalyzerMessageFormat" xml:space="preserve">
+    <value>Endpoint '{0}' has multiple [FromForm] parameters. Only one structured form body ([FromForm] DTO or [FromForm] IFormCollection) is allowed.</value>
+  </data>
+    <data name="AL0021AnalyzerDescription" xml:space="preserve">
+    <value>An endpoint can only have one structured form source. Multiple [FromForm] DTOs or IFormCollections create ambiguity about which parameter receives the form data.</value>
+  </data>
+    <!-- AL0022: Mixed form collection and DTO -->
+    <data name="AL0022AnalyzerTitle" xml:space="preserve">
+    <value>Mixed form collection and DTO</value>
+  </data>
+    <data name="AL0022AnalyzerMessageFormat" xml:space="preserve">
+    <value>Endpoint '{0}' mixes [FromForm] IFormCollection with [FromForm] DTO. Use either raw IFormCollection or structured DTO binding, not both.</value>
+  </data>
+    <data name="AL0022AnalyzerDescription" xml:space="preserve">
+    <value>Mixing IFormCollection with a [FromForm] DTO is not supported. Choose one approach: use IFormCollection for dynamic form access or a typed DTO for structured binding.</value>
+  </data>
+    <!-- AL0023: Unsupported form type -->
+    <data name="AL0023AnalyzerTitle" xml:space="preserve">
+    <value>Unsupported form type</value>
+  </data>
+    <data name="AL0023AnalyzerMessageFormat" xml:space="preserve">
+    <value>Parameter '{0}' on '{1}' cannot be form-bound: {2}</value>
+  </data>
+    <data name="AL0023AnalyzerDescription" xml:space="preserve">
+    <value>[FromForm] can only bind primitives, primitive collections, or DTOs with a parameterless constructor or primary constructor with all-primitive parameters.</value>
+  </data>
+    <!-- AL0024: Form and body conflict -->
+    <data name="AL0024AnalyzerTitle" xml:space="preserve">
+    <value>Form and body conflict</value>
+  </data>
+    <data name="AL0024AnalyzerMessageFormat" xml:space="preserve">
+    <value>Endpoint '{0}' has both [FromForm] and [FromBody] parameters. An endpoint can read from form data OR JSON body, not both.</value>
+  </data>
+    <data name="AL0024AnalyzerDescription" xml:space="preserve">
+    <value>An HTTP request body can only be consumed once. Mixing [FromForm] and [FromBody] parameters in the same endpoint is not supported.</value>
+  </data>
 </root>

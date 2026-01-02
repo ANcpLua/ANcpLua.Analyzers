@@ -296,5 +296,95 @@ namespace ANcpLua.Analyzers {
                 return ResourceManager.GetString("AL0017AnalyzerDescription", resourceCulture);
             }
         }
+
+        internal static string AL0020AnalyzerTitle {
+            get {
+                return ResourceManager.GetString("AL0020AnalyzerTitle", resourceCulture);
+            }
+        }
+
+        internal static string AL0020AnalyzerMessageFormat {
+            get {
+                return ResourceManager.GetString("AL0020AnalyzerMessageFormat", resourceCulture);
+            }
+        }
+
+        internal static string AL0020AnalyzerDescription {
+            get {
+                return ResourceManager.GetString("AL0020AnalyzerDescription", resourceCulture);
+            }
+        }
+
+        internal static string AL0021AnalyzerTitle {
+            get {
+                return ResourceManager.GetString("AL0021AnalyzerTitle", resourceCulture);
+            }
+        }
+
+        internal static string AL0021AnalyzerMessageFormat {
+            get {
+                return ResourceManager.GetString("AL0021AnalyzerMessageFormat", resourceCulture);
+            }
+        }
+
+        internal static string AL0021AnalyzerDescription {
+            get {
+                return ResourceManager.GetString("AL0021AnalyzerDescription", resourceCulture);
+            }
+        }
+
+        internal static string AL0022AnalyzerTitle {
+            get {
+                return ResourceManager.GetString("AL0022AnalyzerTitle", resourceCulture);
+            }
+        }
+
+        internal static string AL0022AnalyzerMessageFormat {
+            get {
+                return ResourceManager.GetString("AL0022AnalyzerMessageFormat", resourceCulture);
+            }
+        }
+
+        internal static string AL0022AnalyzerDescription {
+            get {
+                return ResourceManager.GetString("AL0022AnalyzerDescription", resourceCulture);
+            }
+        }
+
+        internal static string AL0023AnalyzerTitle {
+            get {
+                return ResourceManager.GetString("AL0023AnalyzerTitle", resourceCulture);
+            }
+        }
+
+        internal static string AL0023AnalyzerMessageFormat {
+            get {
+                return ResourceManager.GetString("AL0023AnalyzerMessageFormat", resourceCulture);
+            }
+        }
+
+        internal static string AL0023AnalyzerDescription {
+            get {
+                return ResourceManager.GetString("AL0023AnalyzerDescription", resourceCulture);
+            }
+        }
+
+        internal static string AL0024AnalyzerTitle {
+            get {
+                return ResourceManager.GetString("AL0024AnalyzerTitle", resourceCulture);
+            }
+        }
+
+        internal static string AL0024AnalyzerMessageFormat {
+            get {
+                return ResourceManager.GetString("AL0024AnalyzerMessageFormat", resourceCulture);
+            }
+        }
+
+        internal static string AL0024AnalyzerDescription {
+            get {
+                return ResourceManager.GetString("AL0024AnalyzerDescription", resourceCulture);
+            }
+        }
     }
 }

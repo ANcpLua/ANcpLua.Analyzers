@@ -34,3 +34,13 @@
   href: AL0016.md
 - name: AL0017 - Hardcoded package version
   href: AL0017.md
+- name: AL0020 - IFormCollection requires explicit [FromForm]
+  href: AL0020.md
+- name: AL0021 - Multiple structured form sources
+  href: AL0021.md
+- name: AL0022 - Mixed form collection and DTO
+  href: AL0022.md
+- name: AL0023 - Unsupported form type
+  href: AL0023.md
+- name: AL0024 - Form and body conflict
+  href: AL0024.md
