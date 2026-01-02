@@ -8,12 +8,6 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class AL0020ToAL0024FormBindingAnalyzer : ALAnalyzer {
-    private const string FromFormAttribute = "Microsoft.AspNetCore.Mvc.FromFormAttribute";
-    private const string FromBodyAttribute = "Microsoft.AspNetCore.Mvc.FromBodyAttribute";
-    private const string IFormCollection = "Microsoft.AspNetCore.Http.IFormCollection";
-    private const string IFormFile = "Microsoft.AspNetCore.Http.IFormFile";
-    private const string IFormFileCollection = "Microsoft.AspNetCore.Http.IFormFileCollection";
-
     private static readonly DiagnosticDescriptor RuleAL0020 = CreateRule(
         DiagnosticIds.FormCollectionRequiresExplicitAttribute, "AL0020");
 
@@ -44,19 +38,18 @@ public sealed class AL0020ToAL0024FormBindingAnalyzer : ALAnalyzer {
         HelpLinkBase + $"rules/{ruleNumber}.md");
 
     protected override void RegisterActions(AnalysisContext context) =>
-        context.RegisterSymbolAction(AnalyzeMethod, SymbolKind.Method);
+        context.RegisterCompilationStartAction(OnCompilationStart);
 
-    private static void AnalyzeMethod(SymbolAnalysisContext context) {
-        if (context.Symbol is not IMethodSymbol method) {
+    private static void OnCompilationStart(CompilationStartAnalysisContext context) {
+        var cache = WellKnownTypeCache.Create(context.Compilation);
+        context.RegisterSymbolAction(ctx => AnalyzeMethod(ctx, cache), SymbolKind.Method);
+    }
+
+    private static void AnalyzeMethod(SymbolAnalysisContext context, WellKnownTypeCache cache) {
+        if (context.Symbol is not IMethodSymbol { Parameters.IsEmpty: false } method) {
             return;
         }
 
-        // Skip methods without parameters
-        if (method.Parameters.IsEmpty) {
-            return;
-        }
-
-        // Collect parameter classifications
         var hasFromBody = false;
         var hasFromForm = false;
         var fromFormDtoCount = 0;
@@ -67,20 +60,17 @@ public sealed class AL0020ToAL0024FormBindingAnalyzer : ALAnalyzer {
         IParameterSymbol? firstFromFormParam = null;
 
         foreach (var param in method.Parameters) {
-            var typeFqn = GetFullTypeName(param.Type);
-            var hasFromFormAttr = HasAttribute(param, FromFormAttribute);
-            var hasFromBodyAttr = HasAttribute(param, FromBodyAttribute);
-            var isFormCollection = typeFqn == IFormCollection;
-            var isFormFile = typeFqn == IFormFile;
-            var isFormFileCollection = typeFqn == IFormFileCollection;
+            var hasFromFormAttr = cache.HasAttribute(param, WellKnownType.FromFormAttribute);
+            var hasFromBodyAttr = cache.HasAttribute(param, WellKnownType.FromBodyAttribute);
+            var isFormCollection = cache.IsType(param.Type, WellKnownType.IFormCollection);
+            var isFormFile = cache.IsType(param.Type, WellKnownType.IFormFile);
+            var isFormFileCollection = cache.IsType(param.Type, WellKnownType.IFormFileCollection);
 
-            // AL0024: Check for [FromBody]
             if (hasFromBodyAttr) {
                 hasFromBody = true;
                 fromBodyParam = param;
             }
 
-            // AL0020: IFormCollection without [FromForm]
             if (isFormCollection && !hasFromFormAttr) {
                 context.ReportDiagnostic(Diagnostic.Create(
                     RuleAL0020,
@@ -89,7 +79,6 @@ public sealed class AL0020ToAL0024FormBindingAnalyzer : ALAnalyzer {
                     method.Name));
             }
 
-            // Track [FromForm] parameters
             if (hasFromFormAttr) {
                 hasFromForm = true;
                 firstFromFormParam ??= param;
@@ -98,11 +87,9 @@ public sealed class AL0020ToAL0024FormBindingAnalyzer : ALAnalyzer {
                     hasFromFormCollection = true;
                     fromFormDtoCount++;
                 } else if (!IsPrimitive(param.Type) && !isFormFile && !isFormFileCollection) {
-                    // It's a DTO (non-primitive, non-file)
                     hasFromFormDto = true;
                     fromFormDtoCount++;
 
-                    // AL0023: Check if DTO is form-bindable
                     var reason = GetUnsupportedFormTypeReason(param.Type);
                     if (reason is not null) {
                         context.ReportDiagnostic(Diagnostic.Create(
@@ -116,7 +103,6 @@ public sealed class AL0020ToAL0024FormBindingAnalyzer : ALAnalyzer {
             }
         }
 
-        // AL0024: Form and Body conflict
         if (hasFromBody && hasFromForm) {
             context.ReportDiagnostic(Diagnostic.Create(
                 RuleAL0024,
@@ -124,7 +110,6 @@ public sealed class AL0020ToAL0024FormBindingAnalyzer : ALAnalyzer {
                 method.Name));
         }
 
-        // AL0021: Multiple structured form sources
         if (fromFormDtoCount > 1) {
             context.ReportDiagnostic(Diagnostic.Create(
                 RuleAL0021,
@@ -132,7 +117,6 @@ public sealed class AL0020ToAL0024FormBindingAnalyzer : ALAnalyzer {
                 method.Name));
         }
 
-        // AL0022: Mixed IFormCollection with DTO
         if (hasFromFormCollection && hasFromFormDto) {
             context.ReportDiagnostic(Diagnostic.Create(
                 RuleAL0022,
@@ -141,17 +125,7 @@ public sealed class AL0020ToAL0024FormBindingAnalyzer : ALAnalyzer {
         }
     }
 
-    private static bool HasAttribute(ISymbol symbol, string attributeFullName) =>
-        symbol.GetAttributes().Any(attr =>
-            attr.AttributeClass is not null && GetFullTypeName(attr.AttributeClass) == attributeFullName);
-
-    private static string GetFullTypeName(ISymbol symbol) =>
-        symbol.ContainingNamespace is null || symbol.ContainingNamespace.IsGlobalNamespace
-            ? symbol.Name
-            : $"{symbol.ContainingNamespace.ToDisplayString()}.{symbol.Name}";
-
     private static bool IsPrimitive(ITypeSymbol type) {
-        // Handle nullable types
         if (type is INamedTypeSymbol {
                 IsGenericType: true, ConstructedFrom.SpecialType: SpecialType.System_Nullable_T
             } namedType) {
@@ -164,7 +138,7 @@ public sealed class AL0020ToAL0024FormBindingAnalyzer : ALAnalyzer {
                    SpecialType.System_UInt32 or SpecialType.System_Int64 or SpecialType.System_UInt64 or
                    SpecialType.System_Single or SpecialType.System_Double or SpecialType.System_Decimal or
                    SpecialType.System_Char or SpecialType.System_String or SpecialType.System_DateTime
-               || GetFullTypeName(type) is "System.Guid" or "System.TimeSpan" or "System.DateTimeOffset"
+               || type.ToDisplayString() is "System.Guid" or "System.TimeSpan" or "System.DateTimeOffset"
                    or "System.DateOnly" or "System.TimeOnly" or "System.Uri";
     }
 
