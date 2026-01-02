@@ -483,7 +483,6 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
-Version.props
 
 # DocFX output
 docs/_site/

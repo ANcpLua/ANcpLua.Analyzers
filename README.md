@@ -21,25 +21,25 @@ Or add to your project file:
 
 ## Rules
 
-| Rule                                                                            | Category          | Description                                             | Severity | Enabled | Code Fix |
-|:--------------------------------------------------------------------------------|:------------------|:--------------------------------------------------------|:--------:|:-------:|:--------:|
-| [AL0001](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0001.md) | Design            | Prohibit reassignment of primary constructor parameters |    ❌     |   ✔️    |          |
-| [AL0002](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0002.md) | Design            | Don't repeat negated patterns                           |    ⚠️    |   ✔️    |          |
-| [AL0003](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0003.md) | Reliability       | Don't divide by constant zero                           |    ❌     |   ✔️    |          |
-| [AL0004](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0004.md) | Usage             | Use pattern matching for Span constant comparison       |    ⚠️    |   ✔️    |    ✔️    |
-| [AL0005](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0005.md) | Usage             | Use SequenceEqual for Span non-constant comparison      |    ⚠️    |   ✔️    |    ✔️    |
-| [AL0006](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0006.md) | Design            | Field name conflicts with primary constructor parameter |    ⚠️    |   ✔️    |          |
-| [AL0007](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0007.md) | Usage             | GetSchema should be explicitly implemented              |    ⚠️    |   ✔️    |          |
-| [AL0008](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0008.md) | Usage             | GetSchema must return null and not be abstract          |    ⚠️    |   ✔️    |          |
-| [AL0009](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0009.md) | Usage             | Don't call IXmlSerializable.GetSchema                   |    ⚠️    |   ✔️    |          |
-| [AL0010](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0010.md) | Design            | Type should be partial for source generator support     |    ℹ️    |         |    ✔️    |
-| [AL0011](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0011.md) | Threading         | Avoid lock keyword on non-Lock types                    |    ⚠️    |   ✔️    |          |
-| [AL0012](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0012.md) | OpenTelemetry     | Deprecated semantic convention attribute                |    ⚠️    |   ✔️    |          |
-| [AL0013](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0013.md) | OpenTelemetry     | Missing telemetry schema URL                            |    ℹ️    |   ✔️    |          |
-| [AL0014](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0014.md) | Style             | Prefer pattern matching for null and zero comparisons   |    ℹ️    |   ✔️    |    ✔️    |
-| [AL0015](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0015.md) | Style             | Normalize null-guard style                              |    ℹ️    |   ✔️    |    ✔️    |
-| [AL0016](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0016.md) | Style             | Combine declaration with subsequent null-check          |    ℹ️    |   ✔️    |    ✔️    |
-| [AL0017](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/AL0017.md) | VersionManagement | Hardcoded package version in Directory.Packages.props   |    ⚠️    |   ✔️    |          |
+| Rule                                                                                  | Category          | Description                                             | Severity | Enabled | Code Fix |
+|:--------------------------------------------------------------------------------------|:------------------|:--------------------------------------------------------|:--------:|:-------:|:--------:|
+| [AL0001](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL0001.md) | Design            | Prohibit reassignment of primary constructor parameters |    ❌     |   ✔️    |          |
+| [AL0002](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL0002.md) | Design            | Don't repeat negated patterns                           |    ⚠️    |   ✔️    |    ✔️    |
+| [AL0003](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL0003.md) | Reliability       | Don't divide by constant zero                           |    ❌     |   ✔️    |          |
+| [AL0004](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL0004.md) | Usage             | Use pattern matching for Span constant comparison       |    ⚠️    |   ✔️    |    ✔️    |
+| [AL0005](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL0005.md) | Usage             | Use SequenceEqual for Span non-constant comparison      |    ⚠️    |   ✔️    |    ✔️    |
+| [AL0006](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL0006.md) | Design            | Field name conflicts with primary constructor parameter |    ⚠️    |   ✔️    |          |
+| [AL0007](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL0007.md) | Usage             | GetSchema should be explicitly implemented              |    ⚠️    |   ✔️    |          |
+| [AL0008](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL0008.md) | Usage             | GetSchema must return null and not be abstract          |    ⚠️    |   ✔️    |    ✔️    |
+| [AL0009](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL0009.md) | Usage             | Don't call IXmlSerializable.GetSchema                   |    ⚠️    |   ✔️    |          |
+| [AL0010](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL0010.md) | Design            | Type should be partial for source generator support     |    ℹ️    |         |    ✔️    |
+| [AL0011](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL0011.md) | Threading         | Avoid lock keyword on non-Lock types                    |    ⚠️    |   ✔️    |          |
+| [AL0012](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL0012.md) | OpenTelemetry     | Deprecated semantic convention attribute                |    ⚠️    |   ✔️    |    ✔️    |
+| [AL0013](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL0013.md) | OpenTelemetry     | Missing telemetry schema URL                            |    ℹ️    |   ✔️    |          |
+| [AL0014](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL0014.md) | Style             | Prefer pattern matching for null and zero comparisons   |    ℹ️    |   ✔️    |    ✔️    |
+| [AL0015](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL0015.md) | Style             | Normalize null-guard style                              |    ℹ️    |   ✔️    |    ✔️    |
+| [AL0016](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL0016.md) | Style             | Combine declaration with subsequent null-check          |    ℹ️    |   ✔️    |    ✔️    |
+| [AL0017](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL0017.md) | VersionManagement | Hardcoded package version in Directory.Packages.props   |    ⚠️    |   ✔️    |          |
 
 **Legend:** ❌ Error · ⚠️ Warning · ℹ️ Info
 
@@ -134,14 +134,68 @@ if (x is not null) { }
 
 ## Documentation
 
-See the [docs](https://github.com/ANcpLua/ANcpLua.Analyzers/tree/main/docs) folder for detailed documentation on each
-rule, including examples and fix guidance.
+See the [docs](https://github.com/ANcpLua/ANcpLua.Analyzers/tree/main/docs/rules) folder for detailed documentation on
+each rule, including examples and fix guidance.
+
+## ANcpLua.NET.Sdk Integration
+
+This analyzer is **auto-injected** when using [ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk):
+
+```xml
+<!-- Just use the SDK - analyzer is automatically included -->
+<Project Sdk="ANcpLua.NET.Sdk/1.3.18" />
+```
+
+### SDK Features You Get "For Free"
+
+| Feature | Benefit |
+|---------|---------|
+| Auto-injected analyzers | ANcpLua.Analyzers + BannedApiAnalyzers |
+| Guard clauses | `Throw.IfNull()` replaces `ArgumentNullException.ThrowIfNull()` |
+| Banned API enforcement | DateTime.Now, FluentAssertions, and 50+ APIs blocked |
+| Test framework | xUnit v3 + AwesomeAssertions auto-configured |
+| Code quality | Comprehensive .editorconfig with 100s of rules |
+
+### Guard Clauses (Auto-Injected)
+
+```csharp
+// Available in all SDK projects - replaces ArgumentNullException.ThrowIfNull
+public void Process(string name, List<int> items)
+{
+    Throw.IfNull(name);                // Auto-captures param name
+    Throw.IfNullOrEmpty(items);        // Works on collections
+    Throw.IfNullOrWhitespace(name);    // String validation
+    Throw.IfOutOfRange(myEnum);        // Enum validation
+    Throw.IfLessThan(count, 0);        // Range checks
+}
+```
+
+### Test Base Classes (SDK Test Projects)
+
+```csharp
+// Analyzer testing - pre-configured with .NET 10 reference assemblies
+public class MyAnalyzerTests : AnalyzerTest<MyDiagnosticAnalyzer>
+{
+    [Fact]
+    public Task DetectsIssue() => VerifyAsync("class C { void M() { DateTime.Now; } }");
+}
+
+// Integration testing - WebApplicationFactory + FakeLogCollector
+public class ApiTests : IntegrationTestBase<Program>
+{
+    [Fact]
+    public async Task GetUsers_ReturnsOk()
+    {
+        var response = await Client.GetAsync("/api/users");
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+}
+```
 
 ## Related Projects
 
-- [ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk) - MSBuild SDK that includes this analyzer
-- [ANcpLua.Roslyn.Utilities](https://github.com/ANcpLua/ANcpLua.Roslyn.Utilities) - Roslyn utilities used by these
-  analyzers
+- [ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk) - MSBuild SDK that auto-injects this analyzer
+- [ANcpLua.Roslyn.Utilities](https://github.com/ANcpLua/ANcpLua.Roslyn.Utilities) - Roslyn utilities for source generators
 
 ## License
 
