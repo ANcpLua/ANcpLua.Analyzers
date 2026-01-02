@@ -1,0 +1,3 @@
+# Auto-generated API docs (except index.md)
+*.yml
+!toc.yml
