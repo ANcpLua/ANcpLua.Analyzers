@@ -47,7 +47,7 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Test
-        run: dotnet test ANcpLua.Analyzers.slnx -c Release --report-xunit-trx --report-github --results-directory test_results
+        run: dotnet test --solution ANcpLua.Analyzers.slnx -c Release --report-xunit-trx --report-github --results-directory test_results
 
       - name: Upload test results
         uses: actions/upload-artifact@v6
