@@ -4,12 +4,12 @@
       ANcpLua.Analyzers - Directory.Packages.props
       ═══════════════════════════════════════════════════════════════════════════
 
-    <!-- Version.props is a COPY - sync manually with SDK -->
+      Version.props is a COPY - sync manually with SDK.
       This file only declares WHICH packages are used, not their versions.
     -->
 
-    <!-- Import centralized versions from symlinked Version.props -->
-    <Import Project="$(MSBuildThisFileDirectory)Version.props" Condition="'$(RoslynVersion)' == ''"/>
+    <!-- Import centralized versions from Version.props (unconditional - SDK also imports, but CPM needs it here) -->
+    <Import Project="$(MSBuildThisFileDirectory)Version.props"/>
 
     <PropertyGroup>
         <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
