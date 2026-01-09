@@ -7,7 +7,7 @@
 Roslyn analyzers for C# code quality, focusing on modern .NET patterns and best practices. Catches common mistakes at
 compile time with actionable diagnostics and automatic code fixes.
 
-> **Layer 2 Package**: This is a downstream package that uses [ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk) (v1.3.26) for its build infrastructure. If you use ANcpLua.NET.Sdk, this analyzer package is **auto-injected** to all your projects.
+> **Layer 2 Package**: This is a downstream package that uses [ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk) for its build infrastructure. If you use ANcpLua.NET.Sdk, this analyzer package is **auto-injected** to all your projects.
 
 ## Installation
 
@@ -18,7 +18,7 @@ dotnet add package ANcpLua.Analyzers
 Or add to your project file:
 
 ```xml
-<PackageReference Include="ANcpLua.Analyzers" Version="1.3.6" PrivateAssets="all" />
+<PackageReference Include="ANcpLua.Analyzers" PrivateAssets="all" />
 ```
 
 ## Rules
@@ -173,17 +173,13 @@ dotnet build -c Release
 dotnet test --project tests/ANcpLua.Analyzers.Tests/ANcpLua.Analyzers.Tests.csproj
 ```
 
-### SDK Version
-
-This project uses [ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk) v1.3.26 (defined in `global.json`).
-
 ## ANcpLua.NET.Sdk Integration
 
 This analyzer is **auto-injected** when using [ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk):
 
 ```xml
 <!-- Just use the SDK - analyzer is automatically included -->
-<Project Sdk="ANcpLua.NET.Sdk/1.3.26" />
+<Project Sdk="ANcpLua.NET.Sdk" />
 ```
 
 ### SDK Features You Get "For Free"
