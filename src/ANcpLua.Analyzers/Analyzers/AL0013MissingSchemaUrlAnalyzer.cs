@@ -45,7 +45,7 @@ public sealed class AL0013MissingSchemaUrlAnalyzer : ALAnalyzer {
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
         var otelBuilderTypes = OtelBuilderTypeNames
-            .Select(name => context.Compilation.GetTypeByMetadataName(name))
+            .Select(context.Compilation.GetTypeByMetadataName)
             .Where(type => type is not null)
             .Cast<INamedTypeSymbol>()
             .ToImmutableArray();

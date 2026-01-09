@@ -1,4 +1,4 @@
-namespace ANcpLua.Analyzers.Core;
+﻿namespace ANcpLua.Analyzers.Core;
 
 /// <summary>
 ///     Well-known types used by analyzers.

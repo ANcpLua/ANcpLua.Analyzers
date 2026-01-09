@@ -1,4 +1,4 @@
-using ANcpLua.Analyzers.Core;
+﻿using ANcpLua.Analyzers.Core;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -89,8 +89,8 @@ public sealed class AL0016CombineDeclarationWithNullCheckAnalyzer : ALAnalyzer {
     private static bool IsNullCheck(ExpressionSyntax condition, string name) {
         switch (condition) {
             case IsPatternExpressionSyntax {
-                    Pattern: ConstantPatternSyntax { Expression: LiteralExpressionSyntax l }
-                } p
+                Pattern: ConstantPatternSyntax { Expression: LiteralExpressionSyntax l }
+            } p
                 when l.IsKind(SyntaxKind.NullLiteralExpression):
                 return p.Expression is IdentifierNameSyntax id && id.Identifier.Text == name;
 

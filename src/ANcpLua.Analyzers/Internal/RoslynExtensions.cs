@@ -1,4 +1,4 @@
-namespace ANcpLua.Analyzers.Internal;
+﻿namespace ANcpLua.Analyzers.Internal;
 
 internal static class RoslynExtensions {
     /// <summary>

@@ -2,7 +2,30 @@
 
 Roslyn analyzers for C# code quality (AL0001-AL0017).
 
-**SDK:** ANcpLua.NET.Sdk 1.3.18 | **Target:** .NET 10 + netstandard2.0
+**SDK:** ANcpLua.NET.Sdk | **Target:** .NET 10 + netstandard2.0
+
+## 🏗️ Ecosystem Position
+
+```
+LAYER 0: ANcpLua.Roslyn.Utilities  ← UPSTREAM (no SDK dependency!)
+         ↓ publishes .Sources
+LAYER 1: ANcpLua.NET.Sdk           ← SOURCE OF TRUTH (Version.props)
+         ↓ auto-syncs Version.props
+LAYER 2: ANcpLua.Analyzers         ← YOU ARE HERE (DOWNSTREAM)
+         ↓ consumed by
+LAYER 3: qyl, other projects       ← END USERS
+```
+
+### This Repo: LAYER 2 (Downstream)
+
+| Property | Value |
+|----------|-------|
+| **Upstream dependencies** | ANcpLua.NET.Sdk |
+| **Downstream consumers** | qyl, all SDK consumers |
+| **Version.props** | COPY from SDK |
+| **Auto-sync** | YES (receives from SDK) |
+
+---
 
 ## Rules (AL0001-AL0017)
 

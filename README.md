@@ -7,6 +7,8 @@
 Roslyn analyzers for C# code quality, focusing on modern .NET patterns and best practices. Catches common mistakes at
 compile time with actionable diagnostics and automatic code fixes.
 
+> **Layer 2 Package**: This is a downstream package that uses [ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk) (v1.3.26) for its build infrastructure. If you use ANcpLua.NET.Sdk, this analyzer package is **auto-injected** to all your projects.
+
 ## Installation
 
 ```bash
@@ -40,6 +42,11 @@ Or add to your project file:
 | [AL0015](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL0015.md) | Style             | Normalize null-guard style                              |    ℹ️    |   ✔️    |    ✔️    |
 | [AL0016](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL0016.md) | Style             | Combine declaration with subsequent null-check          |    ℹ️    |   ✔️    |    ✔️    |
 | [AL0017](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL0017.md) | VersionManagement | Hardcoded package version in Directory.Packages.props   |    ⚠️    |   ✔️    |          |
+| [AL0020](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL0020.md) | AspNetCore        | IFormCollection requires explicit [FromForm]             |    ❌     |   ✔️    |          |
+| [AL0021](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL0021.md) | AspNetCore        | Multiple structured form sources                         |    ❌     |   ✔️    |          |
+| [AL0022](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL0022.md) | AspNetCore        | Mixed form collection and DTO                            |    ❌     |   ✔️    |          |
+| [AL0023](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL0023.md) | AspNetCore        | Unsupported form type                                    |    ❌     |   ✔️    |          |
+| [AL0024](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL0024.md) | AspNetCore        | Form and body conflict                                   |    ❌     |   ✔️    |          |
 
 **Legend:** ❌ Error · ⚠️ Warning · ℹ️ Info
 
@@ -99,6 +106,21 @@ dotnet_diagnostic.AL0016.severity = suggestion
 
 # AL0017: Hardcoded package version
 dotnet_diagnostic.AL0017.severity = warning
+
+# AL0020: IFormCollection requires explicit [FromForm]
+dotnet_diagnostic.AL0020.severity = error
+
+# AL0021: Multiple structured form sources
+dotnet_diagnostic.AL0021.severity = error
+
+# AL0022: Mixed form collection and DTO
+dotnet_diagnostic.AL0022.severity = error
+
+# AL0023: Unsupported form type
+dotnet_diagnostic.AL0023.severity = error
+
+# AL0024: Form and body conflict
+dotnet_diagnostic.AL0024.severity = error
 ```
 
 ## Examples
@@ -137,13 +159,31 @@ if (x is not null) { }
 See the [docs](https://github.com/ANcpLua/ANcpLua.Analyzers/tree/main/docs/rules) folder for detailed documentation on
 each rule, including examples and fix guidance.
 
+## Development
+
+### Build
+
+```bash
+dotnet build -c Release
+```
+
+### Test
+
+```bash
+dotnet test --project tests/ANcpLua.Analyzers.Tests/ANcpLua.Analyzers.Tests.csproj
+```
+
+### SDK Version
+
+This project uses [ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk) v1.3.26 (defined in `global.json`).
+
 ## ANcpLua.NET.Sdk Integration
 
 This analyzer is **auto-injected** when using [ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk):
 
 ```xml
 <!-- Just use the SDK - analyzer is automatically included -->
-<Project Sdk="ANcpLua.NET.Sdk/1.3.18" />
+<Project Sdk="ANcpLua.NET.Sdk/1.3.26" />
 ```
 
 ### SDK Features You Get "For Free"

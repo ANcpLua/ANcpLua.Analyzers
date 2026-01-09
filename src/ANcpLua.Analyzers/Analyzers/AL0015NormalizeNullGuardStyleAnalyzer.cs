@@ -1,4 +1,4 @@
-using ANcpLua.Analyzers.Core;
+﻿using ANcpLua.Analyzers.Core;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -47,7 +47,7 @@ public sealed class AL0015NormalizeNullGuardStyleAnalyzer : ALAnalyzer {
         var globalOptions = context.Options.AnalyzerConfigOptionsProvider.GlobalOptions;
         var isMultiTarget = globalOptions.TryGetValue("build_property.TargetFrameworks", out var tfms)
                             && !string.IsNullOrWhiteSpace(tfms)
-                            && tfms.Contains(';');
+                            && tfms.Contains(';', StringComparison.Ordinal);
 
         context.RegisterSyntaxNodeAction(
             ctx => AnalyzeIfStatement(ctx, hasThrowHelper, hasThrowIfNullBcl, isMultiTarget),
@@ -80,7 +80,7 @@ public sealed class AL0015NormalizeNullGuardStyleAnalyzer : ALAnalyzer {
         var isMultiTarget = isMultiTargetGlobal
                             || GetConfigBool(config, global, "ancplua_is_multi_target");
 
-        var configStyle = GetConfigValue(config, global, "ancplua_nullguard_style", "auto").ToLowerInvariant();
+        var configStyle = GetConfigValue(config, global, "ancplua_nullguard_style", "auto").ToUpperInvariant();
 
 
         var targetStyle = ComputeTargetStyle(hasThrowHelper, hasThrowIfNullBcl, isMultiTarget, configStyle);
@@ -103,9 +103,9 @@ public sealed class AL0015NormalizeNullGuardStyleAnalyzer : ALAnalyzer {
         bool isMultiTarget,
         string configStyle) =>
         configStyle switch {
-            "throw" => hasThrowHelper ? "throw" : hasThrowIfNullBcl ? "bcl" : "portable",
-            "bcl" => hasThrowIfNullBcl ? "bcl" : "portable",
-            "portable" => "portable",
+            "THROW" => hasThrowHelper ? "throw" : hasThrowIfNullBcl ? "bcl" : "portable",
+            "BCL" => hasThrowIfNullBcl ? "bcl" : "portable",
+            "PORTABLE" => "portable",
             _ => hasThrowHelper ? "throw" : hasThrowIfNullBcl && !isMultiTarget ? "bcl" : "portable"
         };
 
@@ -121,8 +121,8 @@ public sealed class AL0015NormalizeNullGuardStyleAnalyzer : ALAnalyzer {
 
         switch (condition) {
             case IsPatternExpressionSyntax {
-                    Pattern: ConstantPatternSyntax { Expression: LiteralExpressionSyntax l }
-                } p
+                Pattern: ConstantPatternSyntax { Expression: LiteralExpressionSyntax l }
+            } p
                 when l.IsKind(SyntaxKind.NullLiteralExpression)
                      && p.Expression is IdentifierNameSyntax id:
                 identifier = id.Identifier.Text;
@@ -187,9 +187,9 @@ public sealed class AL0015NormalizeNullGuardStyleAnalyzer : ALAnalyzer {
 
         return arg switch {
             InvocationExpressionSyntax {
-                    Expression: IdentifierNameSyntax { Identifier.Text: "nameof" },
-                    ArgumentList.Arguments.Count: 1
-                } inv when inv.ArgumentList.Arguments[0].Expression is IdentifierNameSyntax argId
+                Expression: IdentifierNameSyntax { Identifier.Text: "nameof" },
+                ArgumentList.Arguments.Count: 1
+            } inv when inv.ArgumentList.Arguments[0].Expression is IdentifierNameSyntax argId
                 => argId.Identifier.Text == targetParam,
             LiteralExpressionSyntax lit when lit.IsKind(SyntaxKind.StringLiteralExpression) =>
                 lit.Token.ValueText == targetParam,

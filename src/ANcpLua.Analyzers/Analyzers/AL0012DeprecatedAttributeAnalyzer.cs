@@ -1,4 +1,4 @@
-using ANcpLua.Analyzers.Core;
+﻿using ANcpLua.Analyzers.Core;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -28,6 +28,12 @@ public sealed class AL0012DeprecatedAttributeAnalyzer : ALAnalyzer {
         context.RegisterSyntaxNodeAction(AnalyzeStringLiteral, SyntaxKind.StringLiteralExpression);
 
     private static void AnalyzeStringLiteral(SyntaxNodeAnalysisContext context) {
+        // Skip analysis of the analyzer's own assembly (contains mapping dictionary of deprecated names)
+        var assemblyName = context.SemanticModel.Compilation.AssemblyName;
+        if (assemblyName is not null && assemblyName.StartsWith("ANcpLua.Analyzers", StringComparison.Ordinal)) {
+            return;
+        }
+
         var literal = (LiteralExpressionSyntax)context.Node;
         var value = literal.Token.ValueText;
 
@@ -79,16 +85,16 @@ public sealed class AL0012DeprecatedAttributeAnalyzer : ALAnalyzer {
         IsTelemetryTypeName(creation.Type.ToString());
 
     private static bool IsTelemetryTypeName(string typeName) =>
-        typeName.Contains("Tag") ||
-        typeName.Contains("Attribute") ||
-        typeName.Contains("KeyValuePair");
+        typeName.Contains("Tag", StringComparison.Ordinal) ||
+        typeName.Contains("Attribute", StringComparison.Ordinal) ||
+        typeName.Contains("KeyValuePair", StringComparison.Ordinal);
 
     private static bool IsLikelyTelemetryContainer(string identifier) {
-        var lowerIdentifier = identifier.ToLowerInvariant();
-        return lowerIdentifier.Contains("attribute") ||
-               lowerIdentifier.Contains("tag") ||
-               lowerIdentifier.Contains("attr") ||
-               lowerIdentifier == "attrs";
+        var upperIdentifier = identifier.ToUpperInvariant();
+        return upperIdentifier.Contains("ATTRIBUTE", StringComparison.Ordinal) ||
+               upperIdentifier.Contains("TAG", StringComparison.Ordinal) ||
+               upperIdentifier.Contains("ATTR", StringComparison.Ordinal) ||
+               upperIdentifier == "ATTRS";
     }
 
     private static string? GetMethodName(InvocationExpressionSyntax invocation) =>

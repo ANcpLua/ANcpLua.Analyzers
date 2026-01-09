@@ -4,7 +4,7 @@
       ANcpLua.Analyzers - Directory.Packages.props
       ═══════════════════════════════════════════════════════════════════════════
 
-      All version variables are defined in Version.props (symlinked from SDK).
+    <!-- Version.props is a COPY - sync manually with SDK -->
       This file only declares WHICH packages are used, not their versions.
     -->
 
