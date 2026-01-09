@@ -1,4 +1,4 @@
-using ANcpLua.Analyzers.Core;
+﻿using ANcpLua.Analyzers.Core;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -127,8 +127,8 @@ public sealed class AL0020ToAL0024FormBindingAnalyzer : ALAnalyzer {
 
     private static bool IsPrimitive(ITypeSymbol type) {
         if (type is INamedTypeSymbol {
-                IsGenericType: true, ConstructedFrom.SpecialType: SpecialType.System_Nullable_T
-            } namedType) {
+            IsGenericType: true, ConstructedFrom.SpecialType: SpecialType.System_Nullable_T
+        } namedType) {
             type = namedType.TypeArguments[0];
         }
 

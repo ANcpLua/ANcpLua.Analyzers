@@ -70,7 +70,7 @@ public abstract class ALCodeFixTestWithEditorConfig<TAnalyzer, TCodeFix>
 
             var editorConfigLines = new List<string> { "root = true", "", "[*.cs]" };
             foreach (var kvp in editorConfig) {
-                var value = kvp.Value.Contains(';') ? $"\"{kvp.Value}\"" : kvp.Value;
+                var value = kvp.Value.Contains(';', StringComparison.Ordinal) ? $"\"{kvp.Value}\"" : kvp.Value;
                 editorConfigLines.Add($"{kvp.Key} = {value}");
             }
 

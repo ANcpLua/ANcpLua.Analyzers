@@ -1,4 +1,4 @@
-using ANcpLua.Analyzers.Core;
+﻿using ANcpLua.Analyzers.Core;
 using Microsoft.CodeAnalysis.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -198,9 +198,9 @@ public sealed class AL0017HardcodedPackageVersionAnalyzer : DiagnosticAnalyzer {
         // Generate a variable name from the package name
         // e.g., "Some.Package.Name" -> "SomePackageNameVersion"
         var cleanName = packageName
-            .Replace(".", "")
-            .Replace("-", "")
-            .Replace("_", "");
+            .Replace(".", string.Empty, StringComparison.Ordinal)
+            .Replace("-", string.Empty, StringComparison.Ordinal)
+            .Replace("_", string.Empty, StringComparison.Ordinal);
         return cleanName + "Version";
     }
 }

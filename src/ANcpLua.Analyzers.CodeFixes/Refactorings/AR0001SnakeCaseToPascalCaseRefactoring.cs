@@ -1,5 +1,8 @@
 using System.Text.RegularExpressions;
 
+// CA1308: ToLowerInvariant is intentional here - we need lowercase output for PascalCase conversion
+#pragma warning disable CA1308 // Normalize strings to uppercase
+
 namespace ANcpLua.Analyzers.CodeFixes.Refactorings;
 
 /// <summary>
@@ -66,7 +69,7 @@ public sealed class Ar0001SnakeCaseToPascalCaseRefactoring : CodeRefactoringProv
     }
 
     private static bool IsScreamingSnakeCase(string identifier) =>
-        ScreamingSnakeCasePattern.IsMatch(identifier) && identifier.Contains('_');
+        ScreamingSnakeCasePattern.IsMatch(identifier) && identifier.Contains('_', StringComparison.Ordinal);
 
     private static string ToPascalCase(string screamingSnake) =>
         string.Concat(screamingSnake

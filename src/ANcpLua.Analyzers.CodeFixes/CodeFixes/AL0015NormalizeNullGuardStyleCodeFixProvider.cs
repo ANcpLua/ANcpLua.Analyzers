@@ -57,7 +57,7 @@ public sealed class AL0015NormalizeNullGuardStyleCodeFixProvider : ALCodeFixProv
     /// <summary>
     ///     Creates: Throw.IfNull(identifier);
     /// </summary>
-    private static StatementSyntax CreateThrowHelperStatement(string identifier) =>
+    private static ExpressionStatementSyntax CreateThrowHelperStatement(string identifier) =>
         SyntaxFactory.ExpressionStatement(
             SyntaxFactory.InvocationExpression(
                 SyntaxFactory.MemberAccessExpression(
@@ -71,7 +71,7 @@ public sealed class AL0015NormalizeNullGuardStyleCodeFixProvider : ALCodeFixProv
     /// <summary>
     ///     Creates: ArgumentNullException.ThrowIfNull(identifier);
     /// </summary>
-    private static StatementSyntax CreateBclStatement(string identifier, string typeName) =>
+    private static ExpressionStatementSyntax CreateBclStatement(string identifier, string typeName) =>
         SyntaxFactory.ExpressionStatement(
             SyntaxFactory.InvocationExpression(
                 SyntaxFactory.MemberAccessExpression(
@@ -85,7 +85,7 @@ public sealed class AL0015NormalizeNullGuardStyleCodeFixProvider : ALCodeFixProv
     /// <summary>
     ///     Creates: identifier = identifier ?? throw new ArgumentNullException(nameof(identifier));
     /// </summary>
-    private static StatementSyntax CreatePortableStatement(string identifier, string typeName) {
+    private static ExpressionStatementSyntax CreatePortableStatement(string identifier, string typeName) {
         var idExpr = SyntaxFactory.IdentifierName(identifier);
 
         var throwExpr = SyntaxFactory.ThrowExpression(

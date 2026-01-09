@@ -1,3 +1,7 @@
+﻿// This file contains deprecated attribute names as dictionary keys - they're needed
+// for the analyzer to detect these deprecated attributes in user code.
+#pragma warning disable AL0012 // Deprecated semantic convention attribute (intentional - this IS the lookup table)
+
 namespace ANcpLua.Analyzers.Core;
 
 /// <summary>
@@ -25,8 +29,8 @@ public static class DeprecatedOtelAttributes {
     /// <summary>
     ///     Deprecated attribute names mapped to replacements.
     /// </summary>
-    public static readonly IReadOnlyDictionary<string, (string Replacement, string Version)> Renames =
-        new Dictionary<string, (string, string)> {
+    public static readonly Dictionary<string, (string Replacement, string Version)> Renames =
+        new Dictionary<string, (string Replacement, string Version)> {
             ["gen_ai.system"] = ("gen_ai.provider.name", "1.37.0"),
             ["gen_ai.usage.prompt_tokens"] = ("gen_ai.usage.input_tokens", "1.27.0"),
             ["gen_ai.usage.completion_tokens"] = ("gen_ai.usage.output_tokens", "1.27.0"),

@@ -20,7 +20,7 @@ public sealed class AnalyzerConventionTests {
             Assert.NotEmpty(analyzer.SupportedDiagnostics);
 
             foreach (var descriptor in analyzer.SupportedDiagnostics) {
-                Assert.StartsWith("AL", descriptor.Id);
+                Assert.StartsWith("AL", descriptor.Id, StringComparison.Ordinal);
 
 
                 Assert.False(string.IsNullOrEmpty(descriptor.HelpLinkUri),
