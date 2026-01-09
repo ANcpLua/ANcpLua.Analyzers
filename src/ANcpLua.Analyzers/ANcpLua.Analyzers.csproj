@@ -25,8 +25,11 @@
         <!-- Suppress analyzer rules already handled by base class -->
         <!-- RS1041: Suppress for net10.0 build (only ns2.0 is packaged) -->
         <!-- RS0030: Banned APIs - SDK introduces stricter rules -->
-        <!-- CA1308/CA1859: Code style that doesn't affect functionality -->
-        <NoWarn>$(NoWarn);RS1025;RS1026;RS1041;RS0030;CA1308;CA1859;AL0012;IDE0055</NoWarn>
+        <!-- RS1025/RS1026/RS1041: Analyzer registration patterns - intentional design
+             RS0030: Banned APIs - analyzer needs access to banned patterns to detect them
+             CA2249: Use Contains - ns2.0 lacks Contains(char, StringComparison), must use IndexOf
+             IDE0055: Multi-TFM formatting conflicts (dotnet format creates TFM merge markers) -->
+        <NoWarn>$(NoWarn);RS1025;RS1026;RS1041;RS0030;IDE0055</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
