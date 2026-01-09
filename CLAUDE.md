@@ -130,3 +130,26 @@ public Task ShouldReport(string param, string stmt) =>
 |---------|---------|
 | [ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk) | MSBuild SDK that auto-injects this analyzer |
 | [ANcpLua.Roslyn.Utilities](https://github.com/ANcpLua/ANcpLua.Roslyn.Utilities) | Shared Roslyn helpers |
+
+## ⚠️ Common CI Errors
+
+### SDK Version Not Found
+```
+error: Unable to find package ANcpLua.NET.Sdk with version (= X.X.X)
+```
+
+**Cause:** global.json references SDK version not yet published to NuGet.
+
+**Fix:** Change global.json to latest published version:
+```bash
+# Check latest: https://www.nuget.org/packages/ANcpLua.NET.Sdk
+sed -i '' 's/"ANcpLua.NET.Sdk": "X.X.X"/"ANcpLua.NET.Sdk": "LATEST"/' global.json
+```
+
+### Release Order (CRITICAL!)
+```
+1. Roslyn.Utilities → publish to NuGet
+2. SDK → update Version.props → publish to NuGet
+3. THEN sync Version.props to Analyzers  ← YOU ARE HERE
+4. Analyzers → can now build
+```
