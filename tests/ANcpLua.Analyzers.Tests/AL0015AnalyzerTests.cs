@@ -89,7 +89,7 @@ public sealed class AL0015PortableFormCodeFixTests : CodeFixTestWithEditorConfig
         return VerifyAsync(source, expected,
             new Dictionary<string, string> {
                 { "ancplua_target_framework", "netstandard2.0" }, { "ancplua_nullguard_style", "auto" }
-            }, useNet10References: false);
+            }, additionalSources: null, useNet10References: false);
     }
 
     /// <summary>
@@ -127,7 +127,7 @@ public sealed class AL0015PortableFormCodeFixTests : CodeFixTestWithEditorConfig
         return VerifyAsync(source, expected,
             new Dictionary<string, string> {
                 { "ancplua_target_framework", "netstandard2.0" }, { "ancplua_nullguard_style", "auto" }
-            }, useNet10References: false);
+            }, additionalSources: null, useNet10References: false);
     }
 
     /// <summary>
@@ -161,7 +161,7 @@ public sealed class AL0015PortableFormCodeFixTests : CodeFixTestWithEditorConfig
 
         return VerifyAsync(source, expected,
             new Dictionary<string, string> { { "ancplua_target_framework", "netstandard2.0" } },
-            useNet10References: false);
+            additionalSources: null, useNet10References: false);
     }
 
     /// <summary>
@@ -265,7 +265,7 @@ public sealed class AL0015PortableFormCodeFixTests : CodeFixTestWithEditorConfig
         return VerifyAsync(source, expected,
             new Dictionary<string, string> {
                 { "ancplua_target_framework", "net10.0" }, { "ancplua_nullguard_style", "portable" }
-            }, true);
+            }, additionalSources: null);
     }
 }
 
@@ -498,7 +498,7 @@ public sealed class AL0015MultiTargetTests : CodeFixTestWithEditorConfig<AL0015N
         return VerifyAsync(source, expected,
             new Dictionary<string, string> {
                 { "ancplua_is_multi_target", "true" }, { "ancplua_nullguard_style", "auto" }
-            }, false, false);
+            }, additionalSources: null, useNet10References: false);
     }
 
     /// <summary>
@@ -533,7 +533,7 @@ public sealed class AL0015MultiTargetTests : CodeFixTestWithEditorConfig<AL0015N
         return VerifyAsync(source, expected,
             new Dictionary<string, string> {
                 { "ancplua_is_multi_target", "true" }, { "ancplua_nullguard_style", "auto" }
-            }, false, false);
+            }, additionalSources: null, useNet10References: false);
     }
 
     /// <summary>
@@ -588,7 +588,7 @@ public sealed class AL0015MultiTargetTests : CodeFixTestWithEditorConfig<AL0015N
         return VerifyAsync(source, expected,
             new Dictionary<string, string> {
                 { "ancplua_is_multi_target", "true" }, { "ancplua_nullguard_style", "auto" }
-            }, false, false);
+            }, additionalSources: null, useNet10References: false);
     }
 }
 
@@ -633,6 +633,6 @@ public sealed class AL0015EdgeCasesTests : CodeFixTestWithEditorConfig<AL0015Nor
         return VerifyAsync(source, expected,
             new Dictionary<string, string> {
                 { "ancplua_target_framework", "netstandard2.0" }, { "ancplua_nullguard_style", "bcl" }
-            }, false, false);
+            }, additionalSources: null, useNet10References: false);
     }
 }
