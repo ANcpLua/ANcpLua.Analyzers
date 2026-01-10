@@ -1,3 +1,4 @@
+using ANcpLua.Roslyn.Utilities.Testing;
 using ANcpLua.Analyzers.Analyzers;
 using ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
@@ -6,7 +7,7 @@ namespace ANcpLua.Analyzers.Tests;
 /// <summary>
 ///     Tests for AL0014: Prefer pattern matching over equality operators for null and zero comparisons.
 /// </summary>
-public sealed class AL0014AnalyzerTests : ALAnalyzerTest<AL0014PreferPatternMatchingAnalyzer> {
+public sealed class AL0014AnalyzerTests : AnalyzerTest<AL0014PreferPatternMatchingAnalyzer> {
     [Theory]
     [InlineData("object? o", "[|o == null|]")]
     [InlineData("object? o", "[|o != null|]")]
@@ -62,7 +63,7 @@ public sealed class AL0014AnalyzerTests : ALAnalyzerTest<AL0014PreferPatternMatc
 /// <summary>
 ///     Code fix tests for AL0014: Converts equality comparisons to pattern matching.
 /// </summary>
-public sealed class AL0014CodeFixTests : ALCodeFixTest<AL0014PreferPatternMatchingAnalyzer, AL0014CodeFixProvider> {
+public sealed class AL0014CodeFixTests : CodeFixTest<AL0014PreferPatternMatchingAnalyzer, AL0014CodeFixProvider> {
     [Fact]
     public Task ShouldConvertEqualsNullToIsNull() => VerifyAsync(
         """
