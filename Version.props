@@ -9,8 +9,8 @@
 
     This file defines ALL shared package versions used across:
     - ANcpLua.NET.Sdk (this SDK)
-    - ANcpLua.Roslyn.Utilities (COPY - sync manually)
-    - ANcpLua.Analyzers (COPY - auto-synced via GitHub Actions)
+    - ANcpLua.Roslyn.Utilities (via symlink)
+    - ANcpLua.Analyzers (via symlink)
 
     USAGE IN CONSUMING PROJECTS' Directory.Packages.props:
       <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="$(RoslynVersion)"/>
