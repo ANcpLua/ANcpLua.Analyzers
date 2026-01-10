@@ -9,14 +9,14 @@
 
     This file defines ALL shared package versions used across:
     - ANcpLua.NET.Sdk (this SDK)
-    - ANcpLua.Roslyn.Utilities (COPY - sync manually)
-    - ANcpLua.Analyzers (COPY - auto-synced via GitHub Actions)
+    - ANcpLua.Roslyn.Utilities (via symlink)
+    - ANcpLua.Analyzers (via symlink)
 
     USAGE IN CONSUMING PROJECTS' Directory.Packages.props:
       <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="$(RoslynVersion)"/>
   -->
   <PropertyGroup Label="SDK Version (Auto-generated)">
-    <ANcpSdkPackageVersion>999.9.9</ANcpSdkPackageVersion>
+    <ANcpSdkPackageVersion>1.0.0</ANcpSdkPackageVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
@@ -33,6 +33,13 @@
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Roslyn.Utilities.Sources">
     <ANcpLuaRoslynUtilitiesSourcesVersion>1.5.1</ANcpLuaRoslynUtilitiesSourcesVersion>
+  </PropertyGroup>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       ROSLYN.UTILITIES.TESTING (Analyzer/CodeFix/Generator test infrastructure)
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <PropertyGroup Label="Roslyn.Utilities.Testing">
+    <ANcpLuaRoslynUtilitiesTestingVersion>1.7.0</ANcpLuaRoslynUtilitiesTestingVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
