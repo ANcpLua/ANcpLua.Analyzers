@@ -23,7 +23,7 @@ public sealed class AL0015NormalizeNullGuardStyleAnalyzer : ALAnalyzer {
         DiagnosticSeverity.Info,
         true,
         "Null-guards should be normalized to the preferred project style (Throw, BCL, or Portable).",
-        HelpLinkBase + "AL0015.md");
+        HelpLinkBase);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 

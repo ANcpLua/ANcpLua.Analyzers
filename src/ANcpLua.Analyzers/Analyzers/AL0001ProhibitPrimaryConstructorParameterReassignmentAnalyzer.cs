@@ -5,6 +5,24 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// <summary>
 ///     AL0001: Prohibit reassignment of primary constructor parameters.
 /// </summary>
+/// <remarks>
+///     <para>
+///         Primary constructor parameters should be treated as immutable since they
+///         define the initial state of the object. Reassigning them leads to confusion
+///         about whether the original or modified value is being used elsewhere in
+///         the class.
+///     </para>
+///     <para>
+///         This analyzer detects all forms of reassignment including simple assignment,
+///         compound assignment (+=, -=), coalesce assignment (??=), deconstruction
+///         assignment, and increment/decrement operations (++, --).
+///     </para>
+///     <para>
+///         The rule only applies to parameters declared in primary constructors on
+///         classes, structs, and records. Regular constructor parameters are not
+///         subject to this rule since they have limited scope.
+///     </para>
+/// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class AL0001ProhibitPrimaryConstructorParameterReassignmentAnalyzer : ALAnalyzer {
     public const string DiagnosticId = DiagnosticIds.ProhibitPrimaryConstructorParameterReassignment;
@@ -21,7 +39,7 @@ public sealed class AL0001ProhibitPrimaryConstructorParameterReassignmentAnalyze
     private static readonly DiagnosticDescriptor Rule = new(
         DiagnosticId, Title, MessageFormat, DiagnosticCategories.Design,
         DiagnosticSeverity.Error, true, Description,
-        HelpLinkBase + "AL0001.md");
+        HelpLinkBase);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 

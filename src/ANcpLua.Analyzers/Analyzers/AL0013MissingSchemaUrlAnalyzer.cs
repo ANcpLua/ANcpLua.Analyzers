@@ -5,6 +5,25 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// <summary>
 ///     AL0013: Detects OpenTelemetry configurations that don't set the schema URL.
 /// </summary>
+/// <remarks>
+///     <para>
+///         The OpenTelemetry specification recommends setting a schema URL on resources
+///         to indicate which version of the semantic conventions is being used. Without
+///         a schema URL, telemetry backends cannot automatically transform attributes
+///         between convention versions, potentially causing data inconsistencies.
+///     </para>
+///     <para>
+///         The analyzer flags resource configuration calls like <c>ConfigureResource</c>,
+///         <c>SetResourceBuilder</c>, and <c>AddResource</c> on OpenTelemetry builder
+///         types when they do not include a schema URL reference.
+///     </para>
+///     <para>
+///         Schema URL detection is heuristic: the analyzer looks for string literals
+///         containing "schema", "telemetry.schema_url", or "opentelemetry.io/schemas",
+///         as well as method calls with "Schema" in the name. This may not catch all
+///         indirect configurations but covers common patterns.
+///     </para>
+/// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class AL0013MissingSchemaUrlAnalyzer : ALAnalyzer {
     private static readonly LocalizableResourceString Title = new(
@@ -20,7 +39,7 @@ public sealed class AL0013MissingSchemaUrlAnalyzer : ALAnalyzer {
         DiagnosticIds.MissingTelemetrySchemaUrl,
         Title, MessageFormat, DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverity.Info, true, Description,
-        HelpLinkBase + "AL0013.md");
+        HelpLinkBase);
 
     private static readonly HashSet<string> ResourceConfigMethods = [
         "ConfigureResource",

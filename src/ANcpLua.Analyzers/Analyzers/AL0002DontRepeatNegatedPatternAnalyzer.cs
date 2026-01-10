@@ -6,6 +6,22 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// <summary>
 ///     AL0002: Don't repeat negated patterns (not not not...).
 /// </summary>
+/// <remarks>
+///     <para>
+///         Repeated negation patterns like <c>not not x</c> or <c>not not not y</c>
+///         are confusing and hard to reason about. Each additional negation flips
+///         the boolean logic, making code review and maintenance error-prone.
+///     </para>
+///     <para>
+///         The analyzer reports only the outermost negation sequence and highlights
+///         the chain of <c>not</c> keywords, allowing a code fix to simplify the
+///         expression to either a single <c>not</c> or no negation at all.
+///     </para>
+///     <para>
+///         A single negation (<c>not null</c>) is valid and not flagged. Only
+///         consecutive negations are considered problematic.
+///     </para>
+/// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class AL0002DontRepeatNegatedPatternAnalyzer : ALAnalyzer {
     public const string DiagnosticId = DiagnosticIds.DontRepeatNegatedPattern;
@@ -22,7 +38,7 @@ public sealed class AL0002DontRepeatNegatedPatternAnalyzer : ALAnalyzer {
     private static readonly DiagnosticDescriptor Rule = new(
         DiagnosticId, Title, MessageFormat, DiagnosticCategories.Design,
         DiagnosticSeverity.Warning, true, Description,
-        HelpLinkBase + "AL0002.md");
+        HelpLinkBase);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 

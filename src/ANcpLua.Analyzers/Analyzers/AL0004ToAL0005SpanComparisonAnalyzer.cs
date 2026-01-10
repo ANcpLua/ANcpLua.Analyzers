@@ -7,6 +7,28 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     AL0004: Use pattern matching when comparing Span and a constant.
 ///     AL0005: Use SequenceEqual when comparing Span and a non-constant.
 /// </summary>
+/// <remarks>
+///     <para>
+///         <see cref="System.Span{T}"/> and <see cref="System.ReadOnlySpan{T}"/> do not
+///         override the equality operators, so <c>span == "value"</c> compiles but performs
+///         reference equality rather than content comparison, which is almost never the
+///         intended behavior.
+///     </para>
+///     <para>
+///         AL0004 triggers when comparing against compile-time constants (string literals,
+///         constant collection expressions, constant array initializers). The fix is to use
+///         pattern matching: <c>span is "value"</c>.
+///     </para>
+///     <para>
+///         AL0005 triggers when comparing against runtime values (variables, method results).
+///         The fix is to use <c>SequenceEqual</c>: <c>span.SequenceEqual(other)</c>.
+///     </para>
+///     <para>
+///         The analyzer applies to both <c>==</c> and <c>!=</c> comparisons where a
+///         <see cref="System.Span{T}"/> or <see cref="System.ReadOnlySpan{T}"/> is on
+///         the left side.
+///     </para>
+/// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class AL0004ToAL0005SpanComparisonAnalyzer : ALAnalyzer {
     public const string DiagnosticIdAL0004 = DiagnosticIds.UsePatternMatchingForSpanConstantComparison;
@@ -33,12 +55,12 @@ public sealed class AL0004ToAL0005SpanComparisonAnalyzer : ALAnalyzer {
     private static readonly DiagnosticDescriptor RuleAL0004 = new(
         DiagnosticIdAL0004, TitleAL0004, MessageFormatAL0004, DiagnosticCategories.Usage,
         DiagnosticSeverity.Warning, true, DescriptionAL0004,
-        HelpLinkBase + "AL0004.md");
+        HelpLinkBase);
 
     private static readonly DiagnosticDescriptor RuleAL0005 = new(
         DiagnosticIdAL0005, TitleAL0005, MessageFormatAL0005, DiagnosticCategories.Usage,
         DiagnosticSeverity.Warning, true, DescriptionAL0005,
-        HelpLinkBase + "AL0005.md");
+        HelpLinkBase);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [RuleAL0004, RuleAL0005];
 

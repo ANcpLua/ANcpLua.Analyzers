@@ -6,6 +6,26 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     AL0020-AL0024: Form binding analyzers for ASP.NET Core Minimal APIs.
 ///     Validates [FromForm], [FromBody], IFormCollection, and IFormFile usage patterns.
 /// </summary>
+/// <remarks>
+///     <para>
+///         ASP.NET Core Minimal APIs have specific constraints on form binding that differ
+///         from MVC controllers. Violations of these constraints cause runtime exceptions
+///         that are difficult to debug. This analyzer catches common mistakes at compile time.
+///     </para>
+///     <para>
+///         AL0020: <c>IFormCollection</c> parameters require explicit <c>[FromForm]</c> attribute.
+///         AL0021: Multiple structured form sources (DTOs or form collections with <c>[FromForm]</c>)
+///         conflict with each other. AL0022: Mixing <c>IFormCollection</c> and DTO binding is
+///         unsupported. AL0023: Abstract types, interfaces, and types without suitable constructors
+///         cannot be form-bound. AL0024: <c>[FromForm]</c> and <c>[FromBody]</c> on the same
+///         method conflict.
+///     </para>
+///     <para>
+///         The analyzer does not flag primitive parameters with <c>[FromForm]</c> or
+///         <c>IFormFile</c>/<c>IFormFileCollection</c> parameters, as these have special
+///         handling in the framework.
+///     </para>
+/// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class AL0020ToAL0024FormBindingAnalyzer : ALAnalyzer {
     private static readonly DiagnosticDescriptor RuleAL0020 = CreateRule(
@@ -35,7 +55,7 @@ public sealed class AL0020ToAL0024FormBindingAnalyzer : ALAnalyzer {
         DiagnosticSeverity.Error,
         true,
         new LocalizableResourceString($"{ruleNumber}AnalyzerDescription", Resources.ResourceManager, typeof(Resources)),
-        HelpLinkBase + $"rules/{ruleNumber}.md");
+        HelpLinkBase);
 
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterCompilationStartAction(OnCompilationStart);

@@ -5,6 +5,25 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// <summary>
 ///     AL0003: Integers and Decimal should never be divided by the constant 0.
 /// </summary>
+/// <remarks>
+///     <para>
+///         Division by zero for integer types throws <see cref="System.DivideByZeroException"/>
+///         at runtime, and for <see cref="decimal"/> it also throws an exception. Unlike
+///         floating-point types which produce infinity or NaN, these divisions always fail.
+///     </para>
+///     <para>
+///         This analyzer catches division and remainder (modulo) operations where the
+///         divisor is a compile-time constant zero. It covers all integral types including
+///         <c>byte</c>, <c>sbyte</c>, <c>short</c>, <c>ushort</c>, <c>int</c>, <c>uint</c>,
+///         <c>long</c>, <c>ulong</c>, <c>nint</c>, <c>nuint</c>, <c>Int128</c>, <c>UInt128</c>,
+///         and <c>decimal</c>.
+///     </para>
+///     <para>
+///         Floating-point division by zero (<c>float</c>, <c>double</c>) is not flagged
+///         because it produces valid IEEE 754 values (infinity or NaN) rather than
+///         throwing exceptions.
+///     </para>
+/// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class AL0003DontDivideByConstantZeroAnalyzer : ALAnalyzer {
     public const string DiagnosticId = DiagnosticIds.DontDivideByConstantZero;
@@ -21,7 +40,7 @@ public sealed class AL0003DontDivideByConstantZeroAnalyzer : ALAnalyzer {
     private static readonly DiagnosticDescriptor Rule = new(
         DiagnosticId, Title, MessageFormat, DiagnosticCategories.Reliability,
         DiagnosticSeverity.Error, true, Description,
-        HelpLinkBase + "AL0003.md");
+        HelpLinkBase);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 

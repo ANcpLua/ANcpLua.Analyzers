@@ -6,6 +6,25 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     AL0016: Combine declaration with subsequent null-check.
 ///     Detects "var x = M(); if (x is null) return;" and suggests "if (M() is not { } x) return;".
 /// </summary>
+/// <remarks>
+///     <para>
+///         The pattern of declaring a variable, checking it for null, and returning early
+///         can be expressed more concisely using C# 9's pattern matching with variable
+///         declaration. The combined form <c>if (M() is not { } x) return;</c> declares
+///         the variable and checks for null in a single statement.
+///     </para>
+///     <para>
+///         The analyzer only triggers when: the declaration has exactly one variable with
+///         an initializer, the next statement is an if-statement checking that variable
+///         for null, the if-body is an early exit (return, throw, break, continue), and
+///         the variable is not used within the if-body (except in <c>nameof</c> expressions).
+///     </para>
+///     <para>
+///         This rule requires C# 9 or later. It only applies to reference types since
+///         value types cannot be null. The analyzer does not fire if the if-statement
+///         has an else clause, as the combined pattern does not naturally express that.
+///     </para>
+/// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class AL0016CombineDeclarationWithNullCheckAnalyzer : ALAnalyzer {
     public const string DiagnosticId = DiagnosticIds.CombineDeclarationWithNullCheck;
@@ -18,7 +37,7 @@ public sealed class AL0016CombineDeclarationWithNullCheckAnalyzer : ALAnalyzer {
         DiagnosticSeverity.Info,
         true,
         "Combines a variable declaration and an immediate null-check into a single pattern match.",
-        HelpLinkBase + "AL0016.md");
+        HelpLinkBase);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 

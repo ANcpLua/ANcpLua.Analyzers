@@ -5,6 +5,27 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// <summary>
 ///     AL0012: Detects usage of deprecated OpenTelemetry semantic convention attributes.
 /// </summary>
+/// <remarks>
+///     <para>
+///         OpenTelemetry semantic conventions evolve over time, with attribute names
+///         being renamed or deprecated across specification versions. Using deprecated
+///         attributes reduces interoperability with modern telemetry backends and tools
+///         that expect current conventions.
+///     </para>
+///     <para>
+///         The analyzer identifies string literals containing deprecated attribute names
+///         when used in telemetry contexts such as tag assignments, attribute dictionaries,
+///         or telemetry method calls. It provides the replacement attribute name and the
+///         specification version where the change occurred.
+///     </para>
+///     <para>
+///         Context detection uses heuristics: the analyzer looks for patterns like
+///         dictionary indexers on variables named "tags" or "attributes", invocations
+///         of methods containing "Attribute" or "Tag", and object initializers for
+///         telemetry-related types. This reduces false positives on unrelated string
+///         literals that happen to match deprecated attribute names.
+///     </para>
+/// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class AL0012DeprecatedAttributeAnalyzer : ALAnalyzer {
     private static readonly LocalizableResourceString Title = new(
@@ -20,7 +41,7 @@ public sealed class AL0012DeprecatedAttributeAnalyzer : ALAnalyzer {
         DiagnosticIds.DeprecatedSemanticConventionAttribute,
         Title, MessageFormat, DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverity.Warning, true, Description,
-        HelpLinkBase + "AL0012.md");
+        HelpLinkBase);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 

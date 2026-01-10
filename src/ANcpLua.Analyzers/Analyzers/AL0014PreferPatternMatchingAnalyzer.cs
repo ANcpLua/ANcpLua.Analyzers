@@ -36,7 +36,7 @@ public sealed class AL0014PreferPatternMatchingAnalyzer : ALAnalyzer {
         true,
         "Pattern matching syntax (is/is not) is more expressive and idiomatic. " +
         "For null checks, it also bypasses overloaded equality operators.",
-        HelpLinkBase + "AL0014.md");
+        HelpLinkBase);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 

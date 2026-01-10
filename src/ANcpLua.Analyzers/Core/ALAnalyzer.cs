@@ -4,7 +4,7 @@
 ///     Base class for all ANcpLua analyzers.
 /// </summary>
 public abstract class ALAnalyzer : DiagnosticAnalyzer {
-    protected const string HelpLinkBase = "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/";
+    public const string HelpLinkBase = "https://github.com/ANcpLua/ANcpLua.Analyzers#rules";
 
     public sealed override void Initialize(AnalysisContext context) {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
