@@ -58,6 +58,36 @@ public sealed class AL0014AnalyzerTests : AnalyzerTest<AL0014PreferPatternMatchi
                 }
                 """)]
     public Task ShouldNotReportInsidePatternContext(string source) => VerifyAsync(source);
+
+    [Theory]
+    [InlineData("""
+                using System;
+                using System.Linq.Expressions;
+                public class C {
+                    void M() {
+                        Expression<Func<string?, bool>> expr = s => s != null;
+                    }
+                }
+                """)]
+    [InlineData("""
+                using System;
+                using System.Linq.Expressions;
+                public class C {
+                    void M() {
+                        Expression<Func<int, bool>> expr = x => x == 0;
+                    }
+                }
+                """)]
+    [InlineData("""
+                using System;
+                using System.Linq.Expressions;
+                public class C {
+                    void M() {
+                        Expression<Func<string?, bool>> expr = s => s == null && s.Length == 0;
+                    }
+                }
+                """)]
+    public Task ShouldNotReportInsideExpressionTree(string source) => VerifyAsync(source);
 }
 
 /// <summary>

@@ -49,7 +49,7 @@ public sealed class AL0014CodeFixProvider : ALCodeFixProvider<BinaryExpressionSy
             : (binary.Left, binary.Right);
     }
 
-    private static bool IsLiteral(ExpressionSyntax expression) =>
+    private static bool IsLiteral(SyntaxNode expression) =>
         expression.IsKind(SyntaxKind.NullLiteralExpression) ||
         expression is LiteralExpressionSyntax { Token.ValueText: "0" };
 
