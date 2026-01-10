@@ -12,29 +12,41 @@ public sealed class AL0016CombineDeclarationWithNullCheckCodeFixProvider
     : ALCodeFixProvider<LocalDeclarationStatementSyntax> {
     public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.CombineDeclarationWithNullCheck];
 
-    protected override CodeAction CreateCodeAction(
+    protected override CodeAction? CreateCodeAction(
         Document document,
         LocalDeclarationStatementSyntax declaration,
         SyntaxNode root,
-        Diagnostic diagnostic) =>
-        CodeAction.Create(
+        Diagnostic diagnostic) {
+        if (declaration.Parent is not BlockSyntax block) {
+            return null;
+        }
+
+        var variable = declaration.Declaration.Variables[0];
+        if (variable.Initializer is not { Value: var initializerValue }) {
+            return null;
+        }
+
+        var index = block.Statements.IndexOf(declaration);
+        if (index + 1 >= block.Statements.Count || block.Statements[index + 1] is not IfStatementSyntax ifStatement) {
+            return null;
+        }
+
+        var variableName = variable.Identifier.Text;
+
+        return CodeAction.Create(
             CodeFixResources.AL0016CodeFixTitle,
-            ct => CombineAsync(document, declaration, ct),
+            ct => CombineAsync(document, declaration, ifStatement, variableName, initializerValue, ct),
             nameof(AL0016CombineDeclarationWithNullCheckCodeFixProvider));
+    }
 
     private static async Task<Document> CombineAsync(
         Document document,
         LocalDeclarationStatementSyntax declaration,
+        IfStatementSyntax ifStatement,
+        string variableName,
+        ExpressionSyntax initializer,
         CancellationToken ct) {
         var editor = await DocumentEditor.CreateAsync(document, ct);
-
-        var block = (BlockSyntax)declaration.Parent!;
-        var index = block.Statements.IndexOf(declaration);
-        var ifStatement = (IfStatementSyntax)block.Statements[index + 1];
-
-        var variable = declaration.Declaration.Variables[0];
-        var variableName = variable.Identifier.Text;
-        var initializer = variable.Initializer!.Value;
 
 
         var patternText = $"{initializer.WithoutTrivia().NormalizeWhitespace()} is not {{ }} {variableName}";

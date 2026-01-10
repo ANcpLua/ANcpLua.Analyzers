@@ -15,9 +15,11 @@ public abstract class ALCodeFixProvider<TNode> : CodeFixProvider where TNode : C
         }
 
         var action = CreateCodeAction(context.Document, declaration, root, diagnostic);
-        context.RegisterCodeFix(action, diagnostic);
+        if (action is not null) {
+            context.RegisterCodeFix(action, diagnostic);
+        }
     }
 
-    protected abstract CodeAction CreateCodeAction(Document document, TNode syntax, SyntaxNode root,
+    protected abstract CodeAction? CreateCodeAction(Document document, TNode syntax, SyntaxNode root,
         Diagnostic diagnostic);
 }

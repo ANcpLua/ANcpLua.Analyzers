@@ -11,7 +11,7 @@ public sealed class AL0014CodeFixProvider : ALCodeFixProvider<BinaryExpressionSy
     public override ImmutableArray<string> FixableDiagnosticIds =>
         [AL0014PreferPatternMatchingAnalyzer.DiagnosticId];
 
-    protected override CodeAction CreateCodeAction(
+    protected override CodeAction? CreateCodeAction(
         Document document,
         BinaryExpressionSyntax binary,
         SyntaxNode root,

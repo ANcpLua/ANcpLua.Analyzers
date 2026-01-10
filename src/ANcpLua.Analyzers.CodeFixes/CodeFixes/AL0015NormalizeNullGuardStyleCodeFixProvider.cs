@@ -12,14 +12,17 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 public sealed class AL0015NormalizeNullGuardStyleCodeFixProvider : ALCodeFixProvider<IfStatementSyntax> {
     public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.NormalizeNullGuardStyle];
 
-    protected override CodeAction CreateCodeAction(
+    protected override CodeAction? CreateCodeAction(
         Document document,
         IfStatementSyntax ifStatement,
         SyntaxNode root,
         Diagnostic diagnostic) {
-        var identifier = diagnostic.Properties[AL0015NormalizeNullGuardStyleAnalyzer.PropertyIdentifier]!;
-        var typeName = diagnostic.Properties[AL0015NormalizeNullGuardStyleAnalyzer.PropertyTypeName]!;
-        var style = diagnostic.Properties[AL0015NormalizeNullGuardStyleAnalyzer.PropertyStyle]!;
+        if (!diagnostic.Properties.TryGetValue(AL0015NormalizeNullGuardStyleAnalyzer.PropertyIdentifier, out var identifier) ||
+            !diagnostic.Properties.TryGetValue(AL0015NormalizeNullGuardStyleAnalyzer.PropertyTypeName, out var typeName) ||
+            !diagnostic.Properties.TryGetValue(AL0015NormalizeNullGuardStyleAnalyzer.PropertyStyle, out var style) ||
+            identifier is null || typeName is null || style is null) {
+            return null;
+        }
 
         var title = style switch {
             "throw" => "Use Throw.IfNull",
