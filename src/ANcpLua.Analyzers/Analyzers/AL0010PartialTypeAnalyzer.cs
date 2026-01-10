@@ -25,7 +25,7 @@ public sealed class AL0010PartialTypeAnalyzer : ALAnalyzer {
         DiagnosticIds.TypeShouldBePartial,
         Title, MessageFormat, DiagnosticCategories.Design,
         DiagnosticSeverity.Info, false, Description,
-        HelpLinkBase + "AL0010.md");
+        HelpLinkBase);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 

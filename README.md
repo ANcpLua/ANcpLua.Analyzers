@@ -133,17 +133,23 @@ public class Example(int x)
 }
 ```
 
-### AL0014: Pattern Matching for Null Checks
+### AL0014: Pattern Matching for Null and Zero Comparisons
 
 ```csharp
 // Before: AL0014 triggered
 if (x == null) { }
 if (x != null) { }
+if (count == 0) { }
+if (count != 0) { }
 
 // After: Use pattern matching
 if (x is null) { }
 if (x is not null) { }
+if (count is 0) { }
+if (count is not 0) { }
 ```
+
+> **Note:** This analyzer skips code inside expression trees (`Expression<T>`) where pattern matching is not supported.
 
 ## ANcpLua.NET.Sdk Integration
 

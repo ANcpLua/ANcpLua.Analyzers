@@ -10,6 +10,26 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     AL0017: Detects hardcoded package versions in Directory.Packages.props files.
 ///     Package versions should use $(VariableName) from Version.props for centralized management.
 /// </summary>
+/// <remarks>
+///     <para>
+///         Central Package Management (CPM) works best when versions are defined as MSBuild
+///         properties in a separate file (typically Version.props) and referenced via
+///         <c>$(PropertyName)</c> syntax. Hardcoding versions directly in Directory.Packages.props
+///         defeats the purpose of centralized management and makes coordinated version updates
+///         across related packages more error-prone.
+///     </para>
+///     <para>
+///         The analyzer examines Directory.Packages.props files added as additional files
+///         to the compilation. It flags any <c>&lt;PackageVersion&gt;</c> element where the
+///         <c>Version</c> attribute contains a literal version string rather than an MSBuild
+///         property reference.
+///     </para>
+///     <para>
+///         The analyzer includes a mapping of common packages to their expected variable names
+///         (e.g., Microsoft.CodeAnalysis.CSharp should use <c>$(RoslynVersion)</c>). For
+///         unknown packages, it generates a suggested variable name based on the package name.
+///     </para>
+/// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class AL0017HardcodedPackageVersionAnalyzer : DiagnosticAnalyzer {
     public const string DiagnosticId = DiagnosticIds.HardcodedPackageVersion;
@@ -23,8 +43,6 @@ public sealed class AL0017HardcodedPackageVersionAnalyzer : DiagnosticAnalyzer {
     /// <summary>Property key for the hardcoded version.</summary>
     public const string HardcodedVersionKey = "HardcodedVersion";
 
-    private const string HelpLinkBase = "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/";
-
     private static readonly LocalizableResourceString Title = new(
         nameof(Resources.AL0017AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
 
@@ -37,7 +55,7 @@ public sealed class AL0017HardcodedPackageVersionAnalyzer : DiagnosticAnalyzer {
     private static readonly DiagnosticDescriptor Rule = new(
         DiagnosticId, Title, MessageFormat, DiagnosticCategories.VersionManagement,
         DiagnosticSeverity.Warning, true, Description,
-        HelpLinkBase + "AL0017.md",
+        ALAnalyzer.HelpLinkBase,
         WellKnownDiagnosticTags.CompilationEnd);
 
     /// <summary>

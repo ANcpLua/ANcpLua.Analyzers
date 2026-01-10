@@ -23,7 +23,7 @@ public sealed class AL0011LockKeywordAnalyzer : ALAnalyzer {
         DiagnosticIds.AvoidLockKeywordOnNonLockTypes,
         Title, MessageFormat, DiagnosticCategories.Threading,
         DiagnosticSeverity.Warning, true, Description,
-        HelpLinkBase + "AL0011.md");
+        HelpLinkBase);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 

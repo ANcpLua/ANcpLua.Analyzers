@@ -8,6 +8,29 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     AL0008: GetSchema must return null and not be abstract
 ///     AL0009: Don't call GetSchema
 /// </summary>
+/// <remarks>
+///     <para>
+///         The <see cref="System.Xml.Serialization.IXmlSerializable.GetSchema"/> method
+///         is a historical artifact that should always return <c>null</c>. Microsoft's
+///         documentation explicitly states this, and the <see cref="System.Xml.Serialization.XmlSerializer"/>
+///         ignores its return value entirely.
+///     </para>
+///     <para>
+///         AL0007 enforces explicit interface implementation to prevent <c>GetSchema</c>
+///         from appearing in the public API surface. An implicit implementation exposes
+///         a meaningless method that always returns <c>null</c>.
+///     </para>
+///     <para>
+///         AL0008 ensures the method returns <c>null</c> and is not abstract. Abstract
+///         <c>GetSchema</c> methods force derived classes to implement something that
+///         has no meaningful implementation.
+///     </para>
+///     <para>
+///         AL0009 prevents calling <c>GetSchema</c> since its return value is always
+///         <c>null</c> by contract. Any code that calls it is either dead code or
+///         based on a misunderstanding of the interface.
+///     </para>
+/// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class AL0007ToAL0009IXmlSerializableAnalyzer : ALAnalyzer {
     private static readonly LocalizableResourceString TitleAL0007 = new(
@@ -41,19 +64,19 @@ public sealed class AL0007ToAL0009IXmlSerializableAnalyzer : ALAnalyzer {
         DiagnosticIds.GetSchemaShouldBeExplicitlyImplemented,
         TitleAL0007, MessageFormatAL0007, DiagnosticCategories.Usage,
         DiagnosticSeverity.Error, true, DescriptionAL0007,
-        HelpLinkBase + "AL0007.md");
+        HelpLinkBase);
 
     private static readonly DiagnosticDescriptor RuleAL0008 = new(
         DiagnosticIds.GetSchemaMustReturnNull,
         TitleAL0008, MessageFormatAL0008, DiagnosticCategories.Usage,
         DiagnosticSeverity.Error, true, DescriptionAL0008,
-        HelpLinkBase + "AL0008.md");
+        HelpLinkBase);
 
     private static readonly DiagnosticDescriptor RuleAL0009 = new(
         DiagnosticIds.DontCallGetSchema,
         TitleAL0009, MessageFormatAL0009, DiagnosticCategories.Usage,
         DiagnosticSeverity.Error, true, DescriptionAL0009,
-        HelpLinkBase + "AL0009.md");
+        HelpLinkBase);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
         [RuleAL0007, RuleAL0008, RuleAL0009];
