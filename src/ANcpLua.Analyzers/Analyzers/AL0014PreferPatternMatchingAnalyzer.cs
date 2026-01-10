@@ -14,6 +14,10 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     </list>
 ///     Pattern matching syntax is more expressive and, for null checks,
 ///     bypasses any overloaded equality operators ensuring true reference comparison.
+///     <para>
+///         This analyzer skips code inside expression trees (<c>Expression&lt;T&gt;</c>)
+///         because pattern matching is not supported in expression trees.
+///     </para>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class AL0014PreferPatternMatchingAnalyzer : ALAnalyzer {
@@ -45,7 +49,7 @@ public sealed class AL0014PreferPatternMatchingAnalyzer : ALAnalyzer {
     private static void AnalyzeBinaryExpression(SyntaxNodeAnalysisContext context) {
         var binary = (BinaryExpressionSyntax)context.Node;
 
-        if (IsInsidePatternContext(binary)) {
+        if (IsInsidePatternContext(binary) || IsInsideExpressionTree(binary, context.SemanticModel)) {
             return;
         }
 
@@ -114,6 +118,23 @@ public sealed class AL0014PreferPatternMatchingAnalyzer : ALAnalyzer {
         for (var current = node.Parent; current is not null; current = current.Parent) {
             if (current is IsPatternExpressionSyntax or SwitchExpressionSyntax or CasePatternSwitchLabelSyntax) {
                 return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool IsInsideExpressionTree(SyntaxNode node, SemanticModel semanticModel) {
+        for (var current = node.Parent; current is not null; current = current.Parent) {
+            if (current is LambdaExpressionSyntax lambda) {
+                var typeInfo = semanticModel.GetTypeInfo(lambda);
+                var convertedType = typeInfo.ConvertedType;
+
+                if (convertedType is INamedTypeSymbol namedType &&
+                    namedType.ContainingNamespace?.ToDisplayString() == "System.Linq.Expressions" &&
+                    namedType.Name == "Expression") {
+                    return true;
+                }
             }
         }
 

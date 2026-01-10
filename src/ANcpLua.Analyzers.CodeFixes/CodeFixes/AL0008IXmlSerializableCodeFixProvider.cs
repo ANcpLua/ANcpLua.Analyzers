@@ -56,7 +56,7 @@ public sealed class AL0008IXmlSerializableCodeFixProvider : CodeFixProvider {
     }
 
     private static SyntaxNode RemoveAbstractAndAddNullBody(MethodDeclarationSyntax method, SyntaxNode root) {
-        var abstractKeyword = method.Modifiers.First(t => t.IsKind(SyntaxKind.AbstractKeyword));
+        var abstractKeyword = method.Modifiers.First(static t => t.IsKind(SyntaxKind.AbstractKeyword));
         var newModifiers = method.Modifiers.Remove(abstractKeyword);
 
         var newMethod = method
@@ -70,7 +70,7 @@ public sealed class AL0008IXmlSerializableCodeFixProvider : CodeFixProvider {
         return root.ReplaceNode(method, newMethod);
     }
 
-    private static SyntaxNode ReplaceBlockWithNullArrow(BlockSyntax block, SyntaxNode root) {
+    private static SyntaxNode ReplaceBlockWithNullArrow(SyntaxNode block, SyntaxNode root) {
         if (block.Parent is not MethodDeclarationSyntax method) {
             return root;
         }
@@ -85,7 +85,7 @@ public sealed class AL0008IXmlSerializableCodeFixProvider : CodeFixProvider {
         return root.ReplaceNode(method, newMethod);
     }
 
-    private static SyntaxNode ReplaceArrowWithNull(ArrowExpressionClauseSyntax arrow, SyntaxNode root) =>
+    private static SyntaxNode ReplaceArrowWithNull(SyntaxNode arrow, SyntaxNode root) =>
         root.ReplaceNode(arrow, CreateNullArrowExpression());
 
     private static ArrowExpressionClauseSyntax CreateNullArrowExpression() =>

@@ -35,7 +35,7 @@ public sealed class AL0015NormalizeNullGuardStyleCodeFixProvider : ALCodeFixProv
 
     private static Task<Document> ApplyFixAsync(
         Document document,
-        IfStatementSyntax ifStatement,
+        CSharpSyntaxNode ifStatement,
         string identifier,
         string typeName,
         string style,

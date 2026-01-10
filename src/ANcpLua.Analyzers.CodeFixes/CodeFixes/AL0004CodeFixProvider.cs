@@ -25,7 +25,7 @@ public sealed class AL0004CodeFixProvider : ALCodeFixProvider<BinaryExpressionSy
         PatternSyntax pattern = binary.Right switch {
             LiteralExpressionSyntax => SyntaxFactory.ConstantPattern(binary.Right),
             CollectionExpressionSyntax col => ToListPattern(col.Elements.Cast<ExpressionElementSyntax>()
-                .Select(e => e.Expression)),
+                .Select(static e => e.Expression)),
             ArrayCreationExpressionSyntax arr => ToListPattern(arr.Initializer?.Expressions ?? []),
             ImplicitArrayCreationExpressionSyntax imp => ToListPattern(imp.Initializer.Expressions),
             _ => throw new InvalidOperationException("Unexpected syntax kind")
@@ -37,5 +37,5 @@ public sealed class AL0004CodeFixProvider : ALCodeFixProvider<BinaryExpressionSy
 
     private static ListPatternSyntax ToListPattern(IEnumerable<ExpressionSyntax> expressions) =>
         SyntaxFactory.ListPattern(SyntaxFactory.SeparatedList(
-            expressions.Select(PatternSyntax (e) => SyntaxFactory.ConstantPattern(e))));
+            expressions.Select(static PatternSyntax (e) => SyntaxFactory.ConstantPattern(e))));
 }

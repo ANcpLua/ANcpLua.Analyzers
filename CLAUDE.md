@@ -1,6 +1,6 @@
 # CLAUDE.md - ANcpLua.Analyzers
 
-Roslyn analyzers for C# code quality (AL0001-AL0017).
+Roslyn analyzers for C# code quality (AL0001-AL0017, AL0020-AL0024).
 
 **SDK:** ANcpLua.NET.Sdk | **Target:** .NET 10 + netstandard2.0
 
@@ -27,7 +27,7 @@ LAYER 3: qyl, other projects       ← END USERS
 
 ---
 
-## Rules (AL0001-AL0017)
+## Rules (AL0001-AL0017, AL0020-AL0024)
 
 | Rule | Severity | Description |
 |------|----------|-------------|
@@ -48,6 +48,11 @@ LAYER 3: qyl, other projects       ← END USERS
 | AL0015 | Info | Normalize null-guard style |
 | AL0016 | Info | Combine declaration with subsequent null-check |
 | AL0017 | Warning | Hardcoded package version in Directory.Packages.props |
+| AL0020 | Error | IFormCollection requires explicit [FromForm] |
+| AL0021 | Error | Multiple structured form sources |
+| AL0022 | Error | Mixed form collection and DTO |
+| AL0023 | Error | Unsupported form type |
+| AL0024 | Error | Form and body conflict |
 
 ## Commands
 
@@ -84,10 +89,9 @@ src/
   ANcpLua.Analyzers.CodeFixes/ # Code fixes (CodeFixProvider)
 tests/
   ANcpLua.Analyzers.Tests/     # Unit tests (xunit.v3.mtp-v2)
-docs/
-  rules/                       # Per-rule documentation (AL0001-AL0017.md)
-  api/                         # Auto-generated API docs (DocFX)
 ```
+
+> **Docs**: Centralized at [ANcpLua.io](https://github.com/ANcpLua/ANcpLua.io)
 
 ## Key Facts
 
