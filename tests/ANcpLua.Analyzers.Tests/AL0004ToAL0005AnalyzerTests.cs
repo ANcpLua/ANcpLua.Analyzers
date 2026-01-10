@@ -1,3 +1,4 @@
+using ANcpLua.Roslyn.Utilities.Testing;
 using ANcpLua.Analyzers.Analyzers;
 using ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
@@ -8,7 +9,7 @@ namespace ANcpLua.Analyzers.Tests;
 ///     C# 14 allows span == "string" via implicit conversions, but pattern matching
 ///     (span is "string") expresses intent more clearly.
 /// </summary>
-public sealed class AL0004AnalyzerTests : ALAnalyzerTest<AL0004ToAL0005SpanComparisonAnalyzer> {
+public sealed class AL0004AnalyzerTests : AnalyzerTest<AL0004ToAL0005SpanComparisonAnalyzer> {
     [Theory]
     [InlineData("""
                 using System;
@@ -68,7 +69,7 @@ public sealed class AL0004AnalyzerTests : ALAnalyzerTest<AL0004ToAL0005SpanCompa
 ///     Tests for AL0005: Use SequenceEqual when comparing Span and a non-constant.
 ///     For non-constant comparisons, SequenceEqual expresses content comparison intent clearly.
 /// </summary>
-public sealed class AL0005AnalyzerTests : ALAnalyzerTest<AL0004ToAL0005SpanComparisonAnalyzer> {
+public sealed class AL0005AnalyzerTests : AnalyzerTest<AL0004ToAL0005SpanComparisonAnalyzer> {
     [Theory]
     [InlineData("""
                 using System;
@@ -124,7 +125,7 @@ public sealed class AL0005AnalyzerTests : ALAnalyzerTest<AL0004ToAL0005SpanCompa
 ///     Verifies the fix for DescendantNodes().Single() bug.
 /// </summary>
 public sealed class
-    AL0004ToAL0005CollectionExpressionEdgeCasesTests : ALAnalyzerTest<AL0004ToAL0005SpanComparisonAnalyzer> {
+    AL0004ToAL0005CollectionExpressionEdgeCasesTests : AnalyzerTest<AL0004ToAL0005SpanComparisonAnalyzer> {
     [Theory]
     [InlineData("[1, 2]", "AL0004")]
     [InlineData("[1 + 2, 3]", "AL0004")]
@@ -161,7 +162,7 @@ public sealed class
 /// <summary>
 ///     Code fix tests for AL0004: Converts Span equality to pattern matching.
 /// </summary>
-public sealed class AL0004CodeFixTests : ALCodeFixTest<AL0004ToAL0005SpanComparisonAnalyzer, AL0004CodeFixProvider> {
+public sealed class AL0004CodeFixTests : CodeFixTest<AL0004ToAL0005SpanComparisonAnalyzer, AL0004CodeFixProvider> {
     [Fact]
     public Task ShouldConvertStringLiteralToPatternMatching() => VerifyAsync(
         """
@@ -242,7 +243,7 @@ public sealed class AL0004CodeFixTests : ALCodeFixTest<AL0004ToAL0005SpanCompari
 /// <summary>
 ///     Code fix tests for AL0005: Converts Span equality to SequenceEqual.
 /// </summary>
-public sealed class AL0005CodeFixTests : ALCodeFixTest<AL0004ToAL0005SpanComparisonAnalyzer, AL0005CodeFixProvider> {
+public sealed class AL0005CodeFixTests : CodeFixTest<AL0004ToAL0005SpanComparisonAnalyzer, AL0005CodeFixProvider> {
     [Fact]
     public Task ShouldConvertToSequenceEqual() => VerifyAsync(
         """

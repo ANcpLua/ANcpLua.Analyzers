@@ -1,3 +1,4 @@
+using ANcpLua.Roslyn.Utilities.Testing;
 using ANcpLua.Analyzers.Analyzers;
 
 namespace ANcpLua.Analyzers.Tests;
@@ -11,7 +12,7 @@ namespace ANcpLua.Analyzers.Tests;
 ///     On .NET 9+, it only suppresses the warning when locking on System.Threading.Lock.
 ///     Tests use a polyfill to simulate the Lock type.
 /// </remarks>
-public sealed class AL0011AnalyzerTests : ALAnalyzerTest<AL0011LockKeywordAnalyzer> {
+public sealed class AL0011AnalyzerTests : AnalyzerTest<AL0011LockKeywordAnalyzer> {
     [Theory]
     [InlineData("""
                 namespace System.Threading {

@@ -1,9 +1,10 @@
+using ANcpLua.Roslyn.Utilities.Testing;
 using ANcpLua.Analyzers.Analyzers;
 using ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
 namespace ANcpLua.Analyzers.Tests;
 
-public sealed class AL0002AnalyzerTests : ALAnalyzerTest<AL0002DontRepeatNegatedPatternAnalyzer> {
+public sealed class AL0002AnalyzerTests : AnalyzerTest<AL0002DontRepeatNegatedPatternAnalyzer> {
     [Theory]
     [InlineData("[|not not|] null")]
     [InlineData("[|not not not|] null")]
@@ -11,7 +12,7 @@ public sealed class AL0002AnalyzerTests : ALAnalyzerTest<AL0002DontRepeatNegated
         VerifyAsync($"public class C {{ void M(object? o) {{ _ = o is {pattern}; }} }}");
 }
 
-public sealed class AL0002CodeFixTests : ALCodeFixTest<AL0002DontRepeatNegatedPatternAnalyzer, AL0002CodeFixProvider> {
+public sealed class AL0002CodeFixTests : CodeFixTest<AL0002DontRepeatNegatedPatternAnalyzer, AL0002CodeFixProvider> {
     [Theory]
     [InlineData("""
                 public class TestClass

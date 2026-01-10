@@ -1,3 +1,4 @@
+using ANcpLua.Roslyn.Utilities.Testing;
 using ANcpLua.Analyzers.Analyzers;
 
 namespace ANcpLua.Analyzers.Tests;
@@ -9,7 +10,7 @@ namespace ANcpLua.Analyzers.Tests;
 ///     This analyzer requires OpenTelemetry types to be present.
 ///     Tests use stubs to simulate the OpenTelemetry API.
 /// </remarks>
-public sealed class AL0013AnalyzerTests : ALAnalyzerTest<AL0013MissingSchemaUrlAnalyzer> {
+public sealed class AL0013AnalyzerTests : AnalyzerTest<AL0013MissingSchemaUrlAnalyzer> {
     [Theory]
     [InlineData("""
                 using System;

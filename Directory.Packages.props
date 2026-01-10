@@ -23,6 +23,11 @@
         <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="$(RoslynVersion)"/>
     </ItemGroup>
 
+    <!-- Roslyn.Utilities -->
+    <ItemGroup Label="Roslyn.Utilities">
+        <PackageVersion Include="ANcpLua.Roslyn.Utilities.Testing" Version="$(ANcpLuaRoslynUtilitiesTestingVersion)"/>
+    </ItemGroup>
+
     <!-- Reference Assemblies -->
     <ItemGroup Label="Reference Assemblies">
         <PackageVersion Include="Basic.Reference.Assemblies.Net100" Version="$(BasicReferenceAssembliesVersion)"/>
