@@ -1,4 +1,4 @@
-using ANcpLua.Analyzers.Core;
+﻿using ANcpLua.Analyzers.Core;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
@@ -14,16 +14,13 @@ public sealed class AL0010PartialTypeCodeFixProvider : CodeFixProvider {
     public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
     public override async Task RegisterCodeFixesAsync(CodeFixContext context) {
-        var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
-        if (root is null) {
+        if (await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false) is not { } root) {
             return;
         }
 
         foreach (var diagnostic in context.Diagnostics) {
             var node = root.FindNode(diagnostic.Location.SourceSpan);
-            var typeDeclaration = node.FirstAncestorOrSelf<TypeDeclarationSyntax>();
-
-            if (typeDeclaration is null) {
+            if (node.FirstAncestorOrSelf<TypeDeclarationSyntax>() is not { } typeDeclaration) {
                 continue;
             }
 

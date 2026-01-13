@@ -122,6 +122,14 @@ public static class DiagnosticIds {
 
     /// <summary>AL0024: [FromForm] and [FromBody] conflict.</summary>
     public const string FormAndBodyConflict = "AL0024";
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // PERFORMANCE (AL0025+)
+    // These analyzers suggest performance improvements.
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /// <summary>AL0025: Anonymous function can be made static.</summary>
+    public const string PreferStaticLambda = "AL0025";
 }
 
 /// <summary>

@@ -1,4 +1,4 @@
-using ANcpLua.Analyzers.Core;
+﻿using ANcpLua.Analyzers.Core;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -65,7 +65,7 @@ public sealed class AL0013MissingSchemaUrlAnalyzer : ALAnalyzer {
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
         var otelBuilderTypes = OtelBuilderTypeNames
             .Select(context.Compilation.GetTypeByMetadataName)
-            .Where(type => type is not null)
+            .Where(static type => type is not null)
             .Cast<INamedTypeSymbol>()
             .ToImmutableArray();
 
@@ -109,8 +109,7 @@ public sealed class AL0013MissingSchemaUrlAnalyzer : ALAnalyzer {
             return false;
         }
 
-        var receiverType = semanticModel.GetTypeInfo(memberAccess.Expression, cancellationToken).Type;
-        if (receiverType is null) {
+        if (semanticModel.GetTypeInfo(memberAccess.Expression, cancellationToken).Type is not { } receiverType) {
             return false;
         }
 
@@ -137,21 +136,26 @@ public sealed class AL0013MissingSchemaUrlAnalyzer : ALAnalyzer {
         return false;
     }
 
-    private static bool CheckForSchemaUrl(InvocationExpressionSyntax invocation) {
+    private static bool CheckForSchemaUrl(SyntaxNode invocation) {
         foreach (var node in invocation.DescendantNodes()) {
-            if (node is LiteralExpressionSyntax literal) {
-                var value = literal.Token.ValueText;
-                if (value.Contains("schema", StringComparison.OrdinalIgnoreCase) ||
-                    value.Contains("telemetry.schema_url", StringComparison.OrdinalIgnoreCase) ||
-                    value.Contains("opentelemetry.io/schemas", StringComparison.OrdinalIgnoreCase)) {
-                    return true;
-                }
-            }
+            switch (node) {
+                case LiteralExpressionSyntax literal: {
+                    var value = literal.Token.ValueText;
+                    if (value.Contains("schema", StringComparison.OrdinalIgnoreCase) ||
+                        value.Contains("telemetry.schema_url", StringComparison.OrdinalIgnoreCase) ||
+                        value.Contains("opentelemetry.io/schemas", StringComparison.OrdinalIgnoreCase)) {
+                        return true;
+                    }
 
-            if (node is InvocationExpressionSyntax nestedInvocation) {
-                var nestedMethod = GetMethodName(nestedInvocation);
-                if (nestedMethod?.Contains("Schema", StringComparison.OrdinalIgnoreCase) == true) {
-                    return true;
+                    break;
+                }
+                case InvocationExpressionSyntax nestedInvocation: {
+                    var nestedMethod = GetMethodName(nestedInvocation);
+                    if (nestedMethod?.Contains("Schema", StringComparison.OrdinalIgnoreCase) == true) {
+                        return true;
+                    }
+
+                    break;
                 }
             }
         }

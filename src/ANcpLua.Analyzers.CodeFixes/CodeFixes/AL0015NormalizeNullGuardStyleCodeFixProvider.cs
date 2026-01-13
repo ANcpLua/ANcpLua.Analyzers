@@ -1,4 +1,4 @@
-using ANcpLua.Analyzers.Analyzers;
+﻿using ANcpLua.Analyzers.Analyzers;
 using ANcpLua.Analyzers.Core;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
@@ -12,8 +12,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 public sealed class AL0015NormalizeNullGuardStyleCodeFixProvider : ALCodeFixProvider<IfStatementSyntax> {
     public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.NormalizeNullGuardStyle];
 
-    protected override CodeAction? CreateCodeAction(
-        Document document,
+    protected override CodeAction? CreateCodeAction(Document document,
         IfStatementSyntax ifStatement,
         SyntaxNode root,
         Diagnostic diagnostic) {

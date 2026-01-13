@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 // CA1308: ToLowerInvariant is intentional here - we need lowercase output for PascalCase conversion
 #pragma warning disable CA1308 // Normalize strings to uppercase
@@ -21,26 +21,26 @@ public sealed class Ar0001SnakeCaseToPascalCaseRefactoring : CodeRefactoringProv
         switch (node) {
             case BaseTypeDeclarationSyntax type when IsScreamingSnakeCase(type.Identifier.Text):
                 RegisterRefactoring(context, document, type.Identifier.Text,
-                    (doc, name, ct) => RenameNodeAsync(doc, type, name, (n, id) => n.WithIdentifier(id), ct));
+                    (doc, name, ct) => RenameNodeAsync(doc, type, name, static (n, id) => n.WithIdentifier(id), ct));
                 break;
 
             case VariableDeclaratorSyntax {
-                    Parent: VariableDeclarationSyntax { Parent: FieldDeclarationSyntax field }
-                } variable
-                when field.Modifiers.Any(m => m.IsKind(SyntaxKind.ConstKeyword)) &&
+                Parent: VariableDeclarationSyntax { Parent: FieldDeclarationSyntax field }
+            } variable
+                when field.Modifiers.Any(static m => m.IsKind(SyntaxKind.ConstKeyword)) &&
                      IsScreamingSnakeCase(variable.Identifier.Text):
                 RegisterRefactoring(context, document, variable.Identifier.Text,
-                    (doc, name, ct) => RenameNodeAsync(doc, variable, name, (n, id) => n.WithIdentifier(id), ct));
+                    (doc, name, ct) => RenameNodeAsync(doc, variable, name, static (n, id) => n.WithIdentifier(id), ct));
                 break;
 
             case EnumMemberDeclarationSyntax enumMember when IsScreamingSnakeCase(enumMember.Identifier.Text):
                 RegisterRefactoring(context, document, enumMember.Identifier.Text,
-                    (doc, name, ct) => RenameNodeAsync(doc, enumMember, name, (n, id) => n.WithIdentifier(id), ct));
+                    (doc, name, ct) => RenameNodeAsync(doc, enumMember, name, static (n, id) => n.WithIdentifier(id), ct));
                 break;
 
             case DelegateDeclarationSyntax @delegate when IsScreamingSnakeCase(@delegate.Identifier.Text):
                 RegisterRefactoring(context, document, @delegate.Identifier.Text,
-                    (doc, name, ct) => RenameNodeAsync(doc, @delegate, name, (n, id) => n.WithIdentifier(id), ct));
+                    (doc, name, ct) => RenameNodeAsync(doc, @delegate, name, static (n, id) => n.WithIdentifier(id), ct));
                 break;
         }
     }
@@ -74,5 +74,5 @@ public sealed class Ar0001SnakeCaseToPascalCaseRefactoring : CodeRefactoringProv
     private static string ToPascalCase(string screamingSnake) =>
         string.Concat(screamingSnake
             .Split(['_'], StringSplitOptions.RemoveEmptyEntries)
-            .Select(word => char.ToUpperInvariant(word[0]) + word.Substring(1).ToLowerInvariant()));
+            .Select(static word => char.ToUpperInvariant(word[0]) + word[1..].ToLowerInvariant()));
 }

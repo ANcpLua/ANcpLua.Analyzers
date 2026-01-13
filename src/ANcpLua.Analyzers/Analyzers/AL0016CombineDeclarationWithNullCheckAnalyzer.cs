@@ -57,7 +57,7 @@ public sealed class AL0016CombineDeclarationWithNullCheckAnalyzer : ALAnalyzer {
         }
 
         var variable = declaration.Declaration.Variables[0];
-        if (variable.Initializer == null) {
+        if (variable.Initializer is null) {
             return;
         }
 
@@ -83,7 +83,7 @@ public sealed class AL0016CombineDeclarationWithNullCheckAnalyzer : ALAnalyzer {
             return;
         }
 
-        if (ifStatement.Else != null) {
+        if (ifStatement.Else is not null) {
             return;
         }
 
@@ -145,7 +145,7 @@ public sealed class AL0016CombineDeclarationWithNullCheckAnalyzer : ALAnalyzer {
         node.DescendantNodes()
             .OfType<IdentifierNameSyntax>()
             .Where(id => id.Identifier.Text == name)
-            .Any(id => id.Parent is not ArgumentSyntax {
+            .Any(static id => id.Parent is not ArgumentSyntax {
                 Parent: ArgumentListSyntax {
                     Parent: InvocationExpressionSyntax {
                         Expression: IdentifierNameSyntax { Identifier.Text: "nameof" }

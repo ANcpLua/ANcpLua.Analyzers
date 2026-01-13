@@ -110,9 +110,8 @@ public sealed class AL0007ToAL0009IXmlSerializableAnalyzer : ALAnalyzer {
         INamedTypeSymbol ixmlSerializable,
         IMethodSymbol interfaceGetSchema) {
         var methodDeclaration = (MethodDeclarationSyntax)context.Node;
-        var methodSymbol = context.SemanticModel.GetDeclaredSymbol(methodDeclaration, context.CancellationToken);
-
-        if (methodSymbol is null) {
+        if (context.SemanticModel.GetDeclaredSymbol(methodDeclaration, context.CancellationToken) is not
+            { } methodSymbol) {
             return;
         }
 
@@ -129,7 +128,8 @@ public sealed class AL0007ToAL0009IXmlSerializableAnalyzer : ALAnalyzer {
 
         if (methodSymbol.IsAbstract || ReturnsNonNullValue(methodDeclaration, context.SemanticModel)) {
             var location = methodDeclaration.DescendantNodes()
-                               .FirstOrDefault(n => n is BlockSyntax or ArrowExpressionClauseSyntax)?.GetLocation()
+                               .FirstOrDefault(static n => n is BlockSyntax or ArrowExpressionClauseSyntax)
+                               ?.GetLocation()
                            ?? methodDeclaration.GetLocation();
 
             context.ReportDiagnostic(RuleAL0008, location);
@@ -159,18 +159,16 @@ public sealed class AL0007ToAL0009IXmlSerializableAnalyzer : ALAnalyzer {
         }
 
         return method.Name == "GetSchema" ||
-               method.ExplicitInterfaceImplementations.Any(i => i.Name == "GetSchema");
+               method.ExplicitInterfaceImplementations.Any(static i => i.Name == "GetSchema");
     }
 
-    private static bool ReturnsNonNullValue(MethodDeclarationSyntax methodDeclaration, SemanticModel model) {
+    private static bool ReturnsNonNullValue(SyntaxNode methodDeclaration, SemanticModel model) {
         foreach (var node in methodDeclaration.DescendantNodes()) {
-            var expression = node switch {
-                ReturnStatementSyntax returnStatement => returnStatement.Expression,
-                ArrowExpressionClauseSyntax arrow => arrow.Expression,
-                _ => null
-            };
-
-            if (expression is null) {
+            if (node switch {
+                    ReturnStatementSyntax returnStatement => returnStatement.Expression,
+                    ArrowExpressionClauseSyntax arrow => arrow.Expression,
+                    _ => null
+                } is not { } expression) {
                 continue;
             }
 

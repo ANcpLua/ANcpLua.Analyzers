@@ -58,10 +58,7 @@ public sealed class AL0002DontRepeatNegatedPatternAnalyzer : ALAnalyzer {
             return;
         }
 
-        var innerNode = syntax.DescendantNodes()
-            .FirstOrDefault(n => n is not UnaryPatternSyntax);
-
-        if (innerNode is null) {
+        if (syntax.DescendantNodes().FirstOrDefault(static n => n is not UnaryPatternSyntax) is not { } innerNode) {
             return;
         }
 

@@ -91,4 +91,7 @@
     <data name="AL0016CodeFixTitle" xml:space="preserve">
     <value>Combine declaration with null-check</value>
   </data>
+    <data name="AL0025CodeFixTitle" xml:space="preserve">
+    <value>Make static</value>
+  </data>
 </root>

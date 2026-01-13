@@ -141,8 +141,7 @@ public sealed class AL0017HardcodedPackageVersionAnalyzer : DiagnosticAnalyzer {
     }
 
     private static void AnalyzePropsFile(CompilationAnalysisContext context, AdditionalText propsFile) {
-        var sourceText = propsFile.GetText(context.CancellationToken);
-        if (sourceText == null) {
+        if (propsFile.GetText(context.CancellationToken) is not { } sourceText) {
             return;
         }
 
@@ -157,7 +156,7 @@ public sealed class AL0017HardcodedPackageVersionAnalyzer : DiagnosticAnalyzer {
                 var includeAttr = pkg.Attribute("Include");
                 var versionAttr = pkg.Attribute("Version");
 
-                if (includeAttr == null || versionAttr == null) {
+                if (includeAttr is null || versionAttr is null) {
                     continue;
                 }
 
