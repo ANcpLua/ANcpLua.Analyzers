@@ -1,4 +1,4 @@
-using ANcpLua.Analyzers.Core;
+﻿using ANcpLua.Analyzers.Core;
 using Microsoft.CodeAnalysis.Editing;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
@@ -12,8 +12,7 @@ public sealed class AL0016CombineDeclarationWithNullCheckCodeFixProvider
     : ALCodeFixProvider<LocalDeclarationStatementSyntax> {
     public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.CombineDeclarationWithNullCheck];
 
-    protected override CodeAction? CreateCodeAction(
-        Document document,
+    protected override CodeAction? CreateCodeAction(Document document,
         LocalDeclarationStatementSyntax declaration,
         SyntaxNode root,
         Diagnostic diagnostic) {
@@ -41,7 +40,7 @@ public sealed class AL0016CombineDeclarationWithNullCheckCodeFixProvider
 
     private static async Task<Document> CombineAsync(
         Document document,
-        LocalDeclarationStatementSyntax declaration,
+        CSharpSyntaxNode declaration,
         IfStatementSyntax ifStatement,
         string variableName,
         ExpressionSyntax initializer,

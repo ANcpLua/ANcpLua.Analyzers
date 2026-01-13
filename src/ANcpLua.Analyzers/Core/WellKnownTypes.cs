@@ -57,8 +57,7 @@ internal sealed class WellKnownTypeCache {
     }
 
     public bool HasAttribute(ISymbol symbol, WellKnownType attributeType) {
-        var attrSymbol = Get(attributeType);
-        if (attrSymbol is null) {
+        if (Get(attributeType) is not { } attrSymbol) {
             return false;
         }
 

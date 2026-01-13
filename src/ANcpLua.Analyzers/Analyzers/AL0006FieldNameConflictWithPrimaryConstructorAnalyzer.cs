@@ -54,7 +54,7 @@ public sealed class AL0006FieldNameConflictWithPrimaryConstructorAnalyzer : ALAn
         }
 
         var parameterNames = new HashSet<string>(
-            parameterList.Parameters.Select(p => p.Identifier.ValueText),
+            parameterList.Parameters.Select(static p => p.Identifier.ValueText),
             StringComparer.Ordinal);
 
         foreach (var variable in member.Declaration.Variables) {

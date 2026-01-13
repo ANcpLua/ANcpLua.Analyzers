@@ -141,7 +141,7 @@ public sealed class AL0014PreferPatternMatchingAnalyzer : ALAnalyzer {
         return false;
     }
 
-    private static bool IsNullLiteral(ExpressionSyntax expression) =>
+    private static bool IsNullLiteral(SyntaxNode expression) =>
         expression.IsKind(SyntaxKind.NullLiteralExpression);
 
     private static bool IsZeroLiteral(ExpressionSyntax expression) =>

@@ -151,7 +151,7 @@ public sealed class AL0015NormalizeNullGuardStyleAnalyzer : ALAnalyzer {
     private static ThrowStatementSyntax? TryGetThrowStatement(StatementSyntax statement) =>
         statement switch {
             ThrowStatementSyntax t => t,
-            BlockSyntax { Statements.Count: 1 } b when b.Statements[0] is ThrowStatementSyntax t => t,
+            BlockSyntax { Statements: [ThrowStatementSyntax t] } => t,
             _ => null
         };
 

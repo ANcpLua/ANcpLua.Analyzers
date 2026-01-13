@@ -1,4 +1,4 @@
-using ANcpLua.Analyzers.Analyzers;
+﻿using ANcpLua.Analyzers.Analyzers;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
@@ -11,7 +11,7 @@ public sealed class AL0004CodeFixProvider : ALCodeFixProvider<BinaryExpressionSy
     public override ImmutableArray<string> FixableDiagnosticIds =>
         [AL0004ToAL0005SpanComparisonAnalyzer.DiagnosticIdAL0004];
 
-    protected override CodeAction? CreateCodeAction(Document document, BinaryExpressionSyntax syntax, SyntaxNode root,
+    protected override CodeAction CreateCodeAction(Document document, BinaryExpressionSyntax syntax, SyntaxNode root,
         Diagnostic diagnostic) =>
         CodeAction.Create(
             CodeFixResources.AL0004CodeFixTitle,
@@ -26,7 +26,8 @@ public sealed class AL0004CodeFixProvider : ALCodeFixProvider<BinaryExpressionSy
             LiteralExpressionSyntax => SyntaxFactory.ConstantPattern(binary.Right),
             CollectionExpressionSyntax col => ToListPattern(col.Elements.Cast<ExpressionElementSyntax>()
                 .Select(static e => e.Expression)),
-            ArrayCreationExpressionSyntax arr => ToListPattern(arr.Initializer?.Expressions ?? []),
+            ArrayCreationExpressionSyntax arr => ToListPattern(arr.Initializer?.Expressions ??
+                                                               Enumerable.Empty<ExpressionSyntax>()),
             ImplicitArrayCreationExpressionSyntax imp => ToListPattern(imp.Initializer.Expressions),
             _ => throw new InvalidOperationException("Unexpected syntax kind")
         };

@@ -1,4 +1,4 @@
-namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
+﻿namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
 /// <summary>
 ///     Base class for all ANcpLua code fix providers.

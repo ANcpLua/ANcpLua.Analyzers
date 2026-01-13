@@ -1,4 +1,4 @@
-using ANcpLua.Analyzers.Analyzers;
+﻿using ANcpLua.Analyzers.Analyzers;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
@@ -11,8 +11,7 @@ public sealed class AL0014CodeFixProvider : ALCodeFixProvider<BinaryExpressionSy
     public override ImmutableArray<string> FixableDiagnosticIds =>
         [AL0014PreferPatternMatchingAnalyzer.DiagnosticId];
 
-    protected override CodeAction? CreateCodeAction(
-        Document document,
+    protected override CodeAction CreateCodeAction(Document document,
         BinaryExpressionSyntax binary,
         SyntaxNode root,
         Diagnostic diagnostic) =>

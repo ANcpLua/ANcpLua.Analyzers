@@ -254,4 +254,14 @@
     <data name="AL0024AnalyzerDescription" xml:space="preserve">
     <value>An HTTP request body can only be consumed once. Mixing [FromForm] and [FromBody] parameters in the same endpoint is not supported.</value>
   </data>
+    <!-- AL0025: Prefer static lambda -->
+    <data name="AL0025AnalyzerTitle" xml:space="preserve">
+    <value>Anonymous function can be made static</value>
+  </data>
+    <data name="AL0025AnalyzerMessageFormat" xml:space="preserve">
+    <value>Anonymous function can be made 'static' since it does not capture any variables</value>
+  </data>
+    <data name="AL0025AnalyzerDescription" xml:space="preserve">
+    <value>Lambda expressions and anonymous methods that don't capture variables should be marked 'static' to avoid unnecessary allocations and improve performance.</value>
+  </data>
 </root>

@@ -179,7 +179,7 @@ public sealed class AL0020ToAL0024FormBindingAnalyzer : ALAnalyzer {
             .Where(static c => c.DeclaredAccessibility == Accessibility.Public)
             .ToList();
 
-        if (publicConstructors.Count == 0) {
+        if (publicConstructors.Count is 0) {
             return "no public constructor available";
         }
 
