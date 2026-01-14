@@ -1,6 +1,11 @@
 # CLAUDE.md - ANcpLua.Analyzers
 
-Roslyn analyzers for C# code quality (AL0001-AL0017, AL0020-AL0024).
+Roslyn analyzers for C# code quality (AL0001-AL0017, AL0020-AL0025).
+
+## ⚡ Claude Rules
+
+- **Never ask confirmation for requested actions** - If user asks for X, do X. Don't ask "do you want X?"
+- **Always commit and push with tags** - When releasing, create git tag and push
 
 **SDK:** ANcpLua.NET.Sdk | **Target:** .NET 10 + netstandard2.0
 
@@ -53,6 +58,7 @@ LAYER 3: qyl, other projects       ← END USERS
 | AL0022 | Error | Mixed form collection and DTO |
 | AL0023 | Error | Unsupported form type |
 | AL0024 | Error | Form and body conflict |
+| AL0025 | Info | Prefer static lambda |
 
 ## Commands
 
