@@ -36,34 +36,46 @@ public sealed class AL0025PreferStaticLambdaAnalyzer : ALAnalyzer {
     private static void AnalyzeLambda(SyntaxNodeAnalysisContext context) {
         var lambda = (AnonymousFunctionExpressionSyntax)context.Node;
 
-        // Skip if already static
-        if (HasStaticModifier(lambda)) {
-            return;
-        }
-
-        // Skip if inside another lambda (nested lambdas are complex)
-        if (lambda.Parent?.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>() is not null) {
-            return;
-        }
-
-        // Use data flow analysis to check for captured variables
-        var dataFlow = context.SemanticModel.AnalyzeDataFlow(lambda);
-        if (dataFlow is null || !dataFlow.Succeeded) {
-            return;
-        }
-
-        // If the lambda captures any variables, it cannot be static
-        if (dataFlow.CapturedInside.Length > 0 || dataFlow.Captured.Length > 0) {
-            return;
-        }
-
-        // Check if the lambda references 'this' implicitly
-        if (ReferencesThis(lambda, context.SemanticModel)) {
+        if (!CanBeStatic(lambda, context.SemanticModel)) {
             return;
         }
 
         // Report diagnostic on the entire lambda for proper Fix All support
         context.ReportDiagnostic(Diagnostic.Create(Rule, lambda.GetLocation()));
+    }
+
+    /// <summary>
+    ///     Determines if a lambda can be made static.
+    ///     Exposed for use by the refactoring provider.
+    /// </summary>
+    public static bool CanBeStatic(AnonymousFunctionExpressionSyntax lambda, SemanticModel semanticModel) {
+        // Skip if already static
+        if (HasStaticModifier(lambda)) {
+            return false;
+        }
+
+        // Skip if inside another lambda (nested lambdas are complex)
+        if (lambda.Parent?.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>() is not null) {
+            return false;
+        }
+
+        // Use data flow analysis to check for captured variables
+        var dataFlow = semanticModel.AnalyzeDataFlow(lambda);
+        if (dataFlow is null || !dataFlow.Succeeded) {
+            return false;
+        }
+
+        // If the lambda captures any variables, it cannot be static
+        if (dataFlow.CapturedInside.Length > 0 || dataFlow.Captured.Length > 0) {
+            return false;
+        }
+
+        // Check if the lambda references 'this' implicitly
+        if (ReferencesThis(lambda, semanticModel)) {
+            return false;
+        }
+
+        return true;
     }
 
     private static bool HasStaticModifier(AnonymousFunctionExpressionSyntax lambda) =>
