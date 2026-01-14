@@ -1,4 +1,5 @@
 using ANcpLua.Analyzers.Core;
+using Microsoft.CodeAnalysis.Text;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
@@ -9,74 +10,53 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AL0025StaticLambdaCodeFixProvider))]
 [Shared]
 public sealed class AL0025StaticLambdaCodeFixProvider : CodeFixProvider {
-    private static readonly SyntaxAnnotation Marker = new("AL0025_ToFix");
-
     public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.PreferStaticLambda];
 
     public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
-    public override async Task RegisterCodeFixesAsync(CodeFixContext context) {
-        if (await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false) is not { } root) {
-            return;
-        }
-
+    public override Task RegisterCodeFixesAsync(CodeFixContext context) {
         foreach (var diagnostic in context.Diagnostics) {
-            var node = root.FindNode(diagnostic.Location.SourceSpan, getInnermostNodeForTie: true);
-            var lambda = node as AnonymousFunctionExpressionSyntax
-                         ?? node.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>();
-
-            if (lambda is null) {
-                continue;
-            }
+            var span = diagnostic.Location.SourceSpan;
 
             context.RegisterCodeFix(
                 CodeAction.Create(
                     CodeFixResources.AL0025CodeFixTitle,
-                    ct => MakeStaticAsync(context.Document, lambda, ct),
+                    ct => MakeStaticAsync(context.Document, span, ct),
                     nameof(CodeFixResources.AL0025CodeFixTitle)),
                 diagnostic);
         }
+
+        return Task.CompletedTask;
     }
 
     private static async Task<Document> MakeStaticAsync(
         Document document,
-        AnonymousFunctionExpressionSyntax lambdaToMark,
+        TextSpan span,
         CancellationToken cancellationToken) {
         var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
         if (root is null) {
             return document;
         }
 
-        // Mark the lambda so we can find it after tree modification
-        var annotatedLambda = lambdaToMark.WithAdditionalAnnotations(Marker);
-        var annotatedRoot = root.ReplaceNode(lambdaToMark, annotatedLambda);
-        var annotatedDoc = document.WithSyntaxRoot(annotatedRoot);
+        var node = root.FindNode(span, getInnermostNodeForTie: true);
+        var lambda = node as AnonymousFunctionExpressionSyntax
+                     ?? node.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>();
 
-        // Get fresh root and find the marked node
-        var freshRoot = await annotatedDoc.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
-        if (freshRoot is null) {
-            return document;
-        }
-
-        var markedLambda = freshRoot.GetAnnotatedNodes(Marker).OfType<AnonymousFunctionExpressionSyntax>().FirstOrDefault();
-        if (markedLambda is null) {
+        if (lambda is null) {
             return document;
         }
 
         var staticKeyword = SyntaxFactory.Token(SyntaxKind.StaticKeyword)
             .WithTrailingTrivia(SyntaxFactory.Space);
 
-        AnonymousFunctionExpressionSyntax newLambda = markedLambda switch {
+        AnonymousFunctionExpressionSyntax newLambda = lambda switch {
             SimpleLambdaExpressionSyntax simple => simple.AddModifiers(staticKeyword),
             ParenthesizedLambdaExpressionSyntax paren => paren.AddModifiers(staticKeyword),
             AnonymousMethodExpressionSyntax anon => anon.AddModifiers(staticKeyword),
-            _ => markedLambda
+            _ => lambda
         };
 
-        // Remove the marker annotation from the final result
-        newLambda = newLambda.WithoutAnnotations(Marker);
-
-        var finalRoot = freshRoot.ReplaceNode(markedLambda, newLambda);
-        return annotatedDoc.WithSyntaxRoot(finalRoot);
+        var newRoot = root.ReplaceNode(lambda, newLambda);
+        return document.WithSyntaxRoot(newRoot);
     }
 }
