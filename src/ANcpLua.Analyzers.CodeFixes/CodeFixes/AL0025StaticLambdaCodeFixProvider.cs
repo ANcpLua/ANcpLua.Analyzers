@@ -14,16 +14,15 @@ public sealed class AL0025StaticLambdaCodeFixProvider : CodeFixProvider {
     public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
     public override async Task RegisterCodeFixesAsync(CodeFixContext context) {
-        var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
-        if (root is null) {
+        if (await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false) is not { } root) {
             return;
         }
 
         foreach (var diagnostic in context.Diagnostics) {
-            // The diagnostic is reported on the arrow token, so we need to find the parent lambda
-            var node = root.FindNode(diagnostic.Location.SourceSpan);
-            var lambda = node.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>()
-                         ?? node.Parent as AnonymousFunctionExpressionSyntax;
+            // The diagnostic is reported on the entire lambda
+            var node = root.FindNode(diagnostic.Location.SourceSpan, getInnermostNodeForTie: true);
+            var lambda = node as AnonymousFunctionExpressionSyntax
+                         ?? node.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>();
 
             if (lambda is null) {
                 continue;
