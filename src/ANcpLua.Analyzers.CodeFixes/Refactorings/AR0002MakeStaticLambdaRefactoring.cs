@@ -31,30 +31,32 @@ public sealed class Ar0002MakeStaticLambdaRefactoring : CodeRefactoringProvider 
             return;
         }
 
-        // Create nested actions for scope selection
-        var nestedActions = ImmutableArray.Create(
+        // Register individual actions for Rider compatibility
+        // Note: Rider doesn't support nested CodeActions (RIDER-74933)
+        // Visual Studio would support nested submenus, but we use flat list for compatibility
+        context.RegisterRefactoring(
             CodeAction.Create(
-                "Make static",
+                "Make lambda static",
                 ct => MakeStaticSingleAsync(document, lambda, ct),
-                "MakeStaticSingle"),
-            CodeAction.Create(
-                "Make static in file",
-                ct => MakeStaticInDocumentAsync(document, ct),
-                "MakeStaticInFile"),
-            CodeAction.Create(
-                "Make static in project",
-                ct => MakeStaticInProjectAsync(document.Project, ct),
-                "MakeStaticInProject"),
-            CodeAction.Create(
-                "Make static in solution",
-                ct => MakeStaticInSolutionAsync(document.Project.Solution, ct),
-                "MakeStaticInSolution"));
+                "AR0002_MakeStaticSingle"));
 
         context.RegisterRefactoring(
             CodeAction.Create(
-                CodeFixResources.AL0025CodeFixTitle,
-                nestedActions,
-                isInlinable: false));
+                "Make all lambdas static in file",
+                ct => MakeStaticInDocumentAsync(document, ct),
+                "AR0002_MakeStaticInFile"));
+
+        context.RegisterRefactoring(
+            CodeAction.Create(
+                "Make all lambdas static in project",
+                ct => MakeStaticInProjectAsync(document.Project, ct),
+                "AR0002_MakeStaticInProject"));
+
+        context.RegisterRefactoring(
+            CodeAction.Create(
+                "Make all lambdas static in solution",
+                ct => MakeStaticInSolutionAsync(document.Project.Solution, ct),
+                "AR0002_MakeStaticInSolution"));
     }
 
     private static async Task<Document> MakeStaticSingleAsync(
