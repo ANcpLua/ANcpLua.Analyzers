@@ -5,7 +5,8 @@ namespace ANcpLua.Analyzers.CodeFixes.Refactorings;
 
 /// <summary>
 ///     AR0002: Refactoring to make lambdas static with scope selection.
-///     Provides "Make static in file/project/solution" submenu.
+///     Provides options for single lambda, file, project, or solution scope.
+///     Note: Uses flat actions instead of submenu due to Rider limitation (RIDER-74933).
 /// </summary>
 [ExportCodeRefactoringProvider(LanguageNames.CSharp, Name = nameof(Ar0002MakeStaticLambdaRefactoring))]
 [Shared]
