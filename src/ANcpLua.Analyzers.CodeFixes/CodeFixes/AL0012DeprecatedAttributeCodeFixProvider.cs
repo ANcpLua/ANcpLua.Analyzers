@@ -19,10 +19,7 @@ public sealed class AL0012DeprecatedAttributeCodeFixProvider : CodeFixProvider {
     public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
     public override async Task RegisterCodeFixesAsync(CodeFixContext context) {
-        var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
-            .ConfigureAwait(false);
-
-        if (root is null) {
+        if (await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false) is not { } root) {
             return;
         }
 
@@ -57,9 +54,7 @@ public sealed class AL0012DeprecatedAttributeCodeFixProvider : CodeFixProvider {
         SyntaxNode oldLiteral,
         string newAttributeName,
         CancellationToken cancellationToken) {
-        var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
-
-        if (root is null) {
+        if (await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false) is not { } root) {
             return document;
         }
 

@@ -62,9 +62,8 @@ public sealed class AL0025PreferStaticLambdaAnalyzer : ALAnalyzer {
             return;
         }
 
-        // Report diagnostic on the lambda keyword or arrow
-        var location = GetLambdaKeywordLocation(lambda);
-        context.ReportDiagnostic(Diagnostic.Create(Rule, location));
+        // Report diagnostic on the entire lambda for proper Fix All support
+        context.ReportDiagnostic(Diagnostic.Create(Rule, lambda.GetLocation()));
     }
 
     private static bool HasStaticModifier(AnonymousFunctionExpressionSyntax lambda) =>
@@ -118,11 +117,4 @@ public sealed class AL0025PreferStaticLambdaAnalyzer : ALAnalyzer {
         };
     }
 
-    private static Location GetLambdaKeywordLocation(CSharpSyntaxNode lambda) =>
-        lambda switch {
-            SimpleLambdaExpressionSyntax simple => simple.ArrowToken.GetLocation(),
-            ParenthesizedLambdaExpressionSyntax paren => paren.ArrowToken.GetLocation(),
-            AnonymousMethodExpressionSyntax anon => anon.DelegateKeyword.GetLocation(),
-            _ => lambda.GetLocation()
-        };
 }
