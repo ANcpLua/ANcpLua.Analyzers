@@ -49,4 +49,12 @@
         <PackageVersion Include="xunit.v3" Version="$(XunitV3Version)"/>
         <PackageVersion Include="xunit.v3.mtp-v2" Version="$(XunitV3Version)"/>
     </ItemGroup>
+
+    <!-- SDK-injected analyzers (must be declared for CPM) -->
+    <ItemGroup Label="SDK Analyzers">
+        <PackageVersion Include="ANcpLua.Analyzers" Version="$(ANcpLuaAnalyzersVersion)"/>
+        <PackageVersion Include="Microsoft.Sbom.Targets" Version="$(SbomTargetsVersion)"/>
+        <PackageVersion Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="$(BannedApiAnalyzersVersion)"/>
+        <PackageVersion Include="JonSkeet.RoslynAnalyzers" Version="$(JonSkeetAnalyzersVersion)"/>
+    </ItemGroup>
 </Project>
