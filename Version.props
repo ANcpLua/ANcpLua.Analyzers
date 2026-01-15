@@ -39,7 +39,7 @@
        ROSLYN.UTILITIES.TESTING (Analyzer/CodeFix/Generator test infrastructure)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Roslyn.Utilities.Testing">
-    <ANcpLuaRoslynUtilitiesTestingVersion>1.10.0</ANcpLuaRoslynUtilitiesTestingVersion>
+    <ANcpLuaRoslynUtilitiesTestingVersion>1.12.0</ANcpLuaRoslynUtilitiesTestingVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
@@ -131,7 +131,7 @@
   <PropertyGroup Label="Build Tools">
     <NuGetVersion>7.0.1</NuGetVersion>
     <MSBuildStructuredLoggerVersion>2.3.113</MSBuildStructuredLoggerVersion>
-    <MicrosoftSourceLinkVersion>8.0.0</MicrosoftSourceLinkVersion>
+    <MicrosoftSourceLinkVersion>10.0.102</MicrosoftSourceLinkVersion>
     <MicrosoftDeploymentDotNetReleasesVersion>1.0.1</MicrosoftDeploymentDotNetReleasesVersion>
   </PropertyGroup>
 
