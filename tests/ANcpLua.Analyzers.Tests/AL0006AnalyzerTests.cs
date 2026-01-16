@@ -1,9 +1,9 @@
+﻿using ANcpLua.Analyzers.Analyzers;
 using ANcpLua.Roslyn.Utilities.Testing;
-using ANcpLua.Analyzers.Analyzers;
 
 namespace ANcpLua.Analyzers.Tests;
 
-public sealed class AL0006AnalyzerTests : AnalyzerTest<AL0006FieldNameConflictWithPrimaryConstructorAnalyzer> {
+public sealed partial class Al0006AnalyzerTests : AnalyzerTest<Al0006FieldNameConflictWithPrimaryConstructorAnalyzer> {
     [Fact]
     public Task ShouldReportDiagnostic() =>
         VerifyAsync("""

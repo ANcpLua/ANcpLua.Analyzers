@@ -24,7 +24,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     </para>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class AL0001ProhibitPrimaryConstructorParameterReassignmentAnalyzer : ALAnalyzer {
+public sealed partial class Al0001ProhibitPrimaryConstructorParameterReassignmentAnalyzer : AlAnalyzer {
     public const string DiagnosticId = DiagnosticIds.ProhibitPrimaryConstructorParameterReassignment;
 
     private static readonly LocalizableResourceString Title = new(

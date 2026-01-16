@@ -1,6 +1,6 @@
 ﻿namespace ANcpLua.Analyzers.Internal;
 
-internal static class RoslynExtensions {
+internal static partial class RoslynExtensions {
     /// <summary>
     ///     Gets the value for the specified key, or null if not found.
     /// </summary>

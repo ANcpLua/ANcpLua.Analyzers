@@ -4,9 +4,12 @@
 
 # ANcpLua.Analyzers
 
-Roslyn analyzers for C# code quality, focusing on modern .NET patterns and best practices. Catches common mistakes at compile time with actionable diagnostics and automatic code fixes.
+Roslyn analyzers for C# code quality, focusing on modern .NET patterns and best practices. Catches common mistakes at
+compile time with actionable diagnostics and automatic code fixes.
 
-> **Layer 2 Package**: This is a downstream package that uses [ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk) for its build infrastructure. If you use ANcpLua.NET.Sdk, this analyzer package is **auto-injected** to all your projects.
+> **Layer 2 Package**: This is a downstream package that
+> uses [ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk) for its build infrastructure. If you use
+> ANcpLua.NET.Sdk, this analyzer package is **auto-injected** to all your projects.
 
 ## Installation
 
@@ -213,7 +216,8 @@ See [ANcpLua.io/analyzers](https://ancplua.io/content/analyzers/) for complete d
 ## Related Projects
 
 - [ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk) - MSBuild SDK that auto-injects this analyzer
-- [ANcpLua.Roslyn.Utilities](https://github.com/ANcpLua/ANcpLua.Roslyn.Utilities) - Roslyn utilities for source generators
+- [ANcpLua.Roslyn.Utilities](https://github.com/ANcpLua/ANcpLua.Roslyn.Utilities) - Roslyn utilities for source
+  generators
 
 ## License
 

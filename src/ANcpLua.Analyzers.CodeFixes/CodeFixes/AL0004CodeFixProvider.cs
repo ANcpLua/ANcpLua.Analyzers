@@ -5,11 +5,11 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 /// <summary>
 ///     Code fix for AL0004: Converts Span equality to pattern matching.
 /// </summary>
-[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AL0004CodeFixProvider))]
+[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0004CodeFixProvider))]
 [Shared]
-public sealed class AL0004CodeFixProvider : ALCodeFixProvider<BinaryExpressionSyntax> {
+public sealed partial class Al0004CodeFixProvider : AlCodeFixProvider<BinaryExpressionSyntax> {
     public override ImmutableArray<string> FixableDiagnosticIds =>
-        [AL0004ToAL0005SpanComparisonAnalyzer.DiagnosticIdAL0004];
+        [Al0004ToAl0005SpanComparisonAnalyzer.DiagnosticIdAl0004];
 
     protected override CodeAction CreateCodeAction(Document document, BinaryExpressionSyntax syntax, SyntaxNode root,
         Diagnostic diagnostic) =>

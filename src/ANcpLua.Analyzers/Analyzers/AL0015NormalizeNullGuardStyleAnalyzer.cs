@@ -8,7 +8,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     Priority: throw (Throw.IfNull) > bcl (ThrowIfNull) > portable (coalesce)
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class AL0015NormalizeNullGuardStyleAnalyzer : ALAnalyzer {
+public sealed partial class Al0015NormalizeNullGuardStyleAnalyzer : AlAnalyzer {
     public const string DiagnosticId = DiagnosticIds.NormalizeNullGuardStyle;
 
     public const string PropertyIdentifier = "Id";
@@ -113,7 +113,8 @@ public sealed class AL0015NormalizeNullGuardStyleAnalyzer : ALAnalyzer {
         (config.TryGetValue(key, out var v) || global.TryGetValue(key, out v))
         && string.Equals(v, "true", StringComparison.OrdinalIgnoreCase);
 
-    private static string GetConfigValue(AnalyzerConfigOptions config, AnalyzerConfigOptions global, string key, string defaultValue) =>
+    private static string GetConfigValue(AnalyzerConfigOptions config, AnalyzerConfigOptions global, string key,
+        string defaultValue) =>
         config.TryGetValue(key, out var v) ? v : global.TryGetValue(key, out v) ? v : defaultValue;
 
     private static bool TryParseNullCheck(ExpressionSyntax condition, out string identifier) {

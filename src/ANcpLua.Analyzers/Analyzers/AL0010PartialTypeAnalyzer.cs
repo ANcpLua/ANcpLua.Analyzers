@@ -11,7 +11,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     Useful for codebases that heavily rely on source generators.
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class AL0010PartialTypeAnalyzer : ALAnalyzer {
+public sealed partial class Al0010PartialTypeAnalyzer : AlAnalyzer {
     private static readonly LocalizableResourceString Title = new(
         nameof(Resources.AL0010AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
 

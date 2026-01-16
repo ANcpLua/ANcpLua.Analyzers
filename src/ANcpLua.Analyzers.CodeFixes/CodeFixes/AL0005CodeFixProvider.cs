@@ -5,11 +5,11 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 /// <summary>
 ///     Code fix for AL0005: Converts Span equality to SequenceEqual.
 /// </summary>
-[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AL0005CodeFixProvider))]
+[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0005CodeFixProvider))]
 [Shared]
-public sealed class AL0005CodeFixProvider : ALCodeFixProvider<BinaryExpressionSyntax> {
+public sealed partial class Al0005CodeFixProvider : AlCodeFixProvider<BinaryExpressionSyntax> {
     public override ImmutableArray<string> FixableDiagnosticIds =>
-        [AL0004ToAL0005SpanComparisonAnalyzer.DiagnosticIdAL0005];
+        [Al0004ToAl0005SpanComparisonAnalyzer.DiagnosticIdAl0005];
 
     protected override CodeAction CreateCodeAction(Document document, BinaryExpressionSyntax syntax, SyntaxNode root,
         Diagnostic diagnostic) =>

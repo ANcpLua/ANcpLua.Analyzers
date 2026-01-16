@@ -27,7 +27,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     </para>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class AL0012DeprecatedAttributeAnalyzer : ALAnalyzer {
+public sealed partial class Al0012DeprecatedAttributeAnalyzer : AlAnalyzer {
     private static readonly LocalizableResourceString Title = new(
         nameof(Resources.AL0012AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
 

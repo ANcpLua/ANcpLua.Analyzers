@@ -9,7 +9,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         <see cref="System.Span{T}"/> and <see cref="System.ReadOnlySpan{T}"/> do not
+///         <see cref="Span{T}" /> and <see cref="ReadOnlySpan{T}" /> do not
 ///         override the equality operators, so <c>span == "value"</c> compiles but performs
 ///         reference equality rather than content comparison, which is almost never the
 ///         intended behavior.
@@ -25,44 +25,44 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     </para>
 ///     <para>
 ///         The analyzer applies to both <c>==</c> and <c>!=</c> comparisons where a
-///         <see cref="System.Span{T}"/> or <see cref="System.ReadOnlySpan{T}"/> is on
+///         <see cref="Span{T}" /> or <see cref="ReadOnlySpan{T}" /> is on
 ///         the left side.
 ///     </para>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class AL0004ToAL0005SpanComparisonAnalyzer : ALAnalyzer {
-    public const string DiagnosticIdAL0004 = DiagnosticIds.UsePatternMatchingForSpanConstantComparison;
-    public const string DiagnosticIdAL0005 = DiagnosticIds.UseSequenceEqualForSpanNonConstantComparison;
+public sealed partial class Al0004ToAl0005SpanComparisonAnalyzer : AlAnalyzer {
+    public const string DiagnosticIdAl0004 = DiagnosticIds.UsePatternMatchingForSpanConstantComparison;
+    public const string DiagnosticIdAl0005 = DiagnosticIds.UseSequenceEqualForSpanNonConstantComparison;
 
-    private static readonly LocalizableResourceString TitleAL0004 = new(
+    private static readonly LocalizableResourceString TitleAl0004 = new(
         nameof(Resources.AL0004AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly LocalizableResourceString MessageFormatAL0004 = new(
+    private static readonly LocalizableResourceString MessageFormatAl0004 = new(
         nameof(Resources.AL0004AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly LocalizableResourceString DescriptionAL0004 = new(
+    private static readonly LocalizableResourceString DescriptionAl0004 = new(
         nameof(Resources.AL0004AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly LocalizableResourceString TitleAL0005 = new(
+    private static readonly LocalizableResourceString TitleAl0005 = new(
         nameof(Resources.AL0005AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly LocalizableResourceString MessageFormatAL0005 = new(
+    private static readonly LocalizableResourceString MessageFormatAl0005 = new(
         nameof(Resources.AL0005AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly LocalizableResourceString DescriptionAL0005 = new(
+    private static readonly LocalizableResourceString DescriptionAl0005 = new(
         nameof(Resources.AL0005AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly DiagnosticDescriptor RuleAL0004 = new(
-        DiagnosticIdAL0004, TitleAL0004, MessageFormatAL0004, DiagnosticCategories.Usage,
-        DiagnosticSeverity.Warning, true, DescriptionAL0004,
+    private static readonly DiagnosticDescriptor RuleAl0004 = new(
+        DiagnosticIdAl0004, TitleAl0004, MessageFormatAl0004, DiagnosticCategories.Usage,
+        DiagnosticSeverity.Warning, true, DescriptionAl0004,
         HelpLinkBase);
 
-    private static readonly DiagnosticDescriptor RuleAL0005 = new(
-        DiagnosticIdAL0005, TitleAL0005, MessageFormatAL0005, DiagnosticCategories.Usage,
-        DiagnosticSeverity.Warning, true, DescriptionAL0005,
+    private static readonly DiagnosticDescriptor RuleAl0005 = new(
+        DiagnosticIdAl0005, TitleAl0005, MessageFormatAl0005, DiagnosticCategories.Usage,
+        DiagnosticSeverity.Warning, true, DescriptionAl0005,
         HelpLinkBase);
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [RuleAL0004, RuleAL0005];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [RuleAl0004, RuleAl0005];
 
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterCompilationStartAction(CompilationStartAction);
@@ -105,7 +105,7 @@ public sealed class AL0004ToAL0005SpanComparisonAnalyzer : ALAnalyzer {
         var start = node.OperatorToken.Span.Start;
         var end = node.Right.Span.End;
 
-        context.ReportDiagnostic(hasNonConstant ? RuleAL0005 : RuleAL0004,
+        context.ReportDiagnostic(hasNonConstant ? RuleAl0005 : RuleAl0004,
             Location.Create(node.SyntaxTree, TextSpan.FromBounds(start, end)));
     }
 

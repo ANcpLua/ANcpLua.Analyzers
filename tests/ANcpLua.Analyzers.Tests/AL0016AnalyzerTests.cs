@@ -1,6 +1,6 @@
-using ANcpLua.Roslyn.Utilities.Testing;
-using ANcpLua.Analyzers.Analyzers;
+﻿using ANcpLua.Analyzers.Analyzers;
 using ANcpLua.Analyzers.CodeFixes.CodeFixes;
+using ANcpLua.Roslyn.Utilities.Testing;
 
 namespace ANcpLua.Analyzers.Tests;
 
@@ -9,7 +9,7 @@ namespace ANcpLua.Analyzers.Tests;
 ///     Covers detection of a pattern where a local variable is declared and immediately
 ///     checked for null, flagging them for combination into a single pattern match.
 /// </summary>
-public sealed class AL0016AnalyzerTests : AnalyzerTest<AL0016CombineDeclarationWithNullCheckAnalyzer> {
+public sealed partial class Al0016AnalyzerTests : AnalyzerTest<Al0016CombineDeclarationWithNullCheckAnalyzer> {
     [Theory]
     [InlineData("""
                 public class TestClass
@@ -166,8 +166,8 @@ public sealed class AL0016AnalyzerTests : AnalyzerTest<AL0016CombineDeclarationW
 ///     Code fix tests for AL0016: Combine declaration with subsequent null-check.
 ///     Tests the transformation of patterns into combined pattern matches.
 /// </summary>
-public sealed class AL0016CodeFixTests : CodeFixTest<AL0016CombineDeclarationWithNullCheckAnalyzer,
-    AL0016CombineDeclarationWithNullCheckCodeFixProvider> {
+public sealed partial class Al0016CodeFixTests : CodeFixTest<Al0016CombineDeclarationWithNullCheckAnalyzer,
+    Al0016CombineDeclarationWithNullCheckCodeFixProvider> {
     /// <summary>
     ///     Test 5: Basic return statement - the fundamental pattern.
     /// </summary>
@@ -279,8 +279,8 @@ public sealed class AL0016CodeFixTests : CodeFixTest<AL0016CombineDeclarationWit
 /// <summary>
 ///     Comprehensive tests for different early-exit forms (throw, continue, break).
 /// </summary>
-public sealed class AL0016EarlyExitTests : CodeFixTest<AL0016CombineDeclarationWithNullCheckAnalyzer,
-    AL0016CombineDeclarationWithNullCheckCodeFixProvider> {
+public sealed partial class Al0016EarlyExitTests : CodeFixTest<Al0016CombineDeclarationWithNullCheckAnalyzer,
+    Al0016CombineDeclarationWithNullCheckCodeFixProvider> {
     /// <summary>
     ///     Test 6: Throw statement as early-exit.
     /// </summary>
@@ -508,8 +508,8 @@ public sealed class AL0016EarlyExitTests : CodeFixTest<AL0016CombineDeclarationW
 /// <summary>
 ///     Complex expression and multi-statement tests for AL0016.
 /// </summary>
-public sealed class AL0016ComplexExpressionTests : CodeFixTest<AL0016CombineDeclarationWithNullCheckAnalyzer,
-    AL0016CombineDeclarationWithNullCheckCodeFixProvider> {
+public sealed partial class Al0016ComplexExpressionTests : CodeFixTest<Al0016CombineDeclarationWithNullCheckAnalyzer,
+    Al0016CombineDeclarationWithNullCheckCodeFixProvider> {
     /// <summary>
     ///     Test: Complex initializer expression (null-conditional call).
     /// </summary>
@@ -594,8 +594,8 @@ public sealed class AL0016ComplexExpressionTests : CodeFixTest<AL0016CombineDecl
 /// <summary>
 ///     FixAll (batch fixer) tests for AL0016.
 /// </summary>
-public sealed class AL0016FixAllTests : CodeFixTest<AL0016CombineDeclarationWithNullCheckAnalyzer,
-    AL0016CombineDeclarationWithNullCheckCodeFixProvider> {
+public sealed partial class Al0016FixAllTests : CodeFixTest<Al0016CombineDeclarationWithNullCheckAnalyzer,
+    Al0016CombineDeclarationWithNullCheckCodeFixProvider> {
     /// <summary>
     ///     Test: Multiple patterns in same method are all fixed.
     /// </summary>

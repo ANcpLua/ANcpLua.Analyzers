@@ -23,7 +23,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     </para>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class AL0002DontRepeatNegatedPatternAnalyzer : ALAnalyzer {
+public sealed partial class Al0002DontRepeatNegatedPatternAnalyzer : AlAnalyzer {
     public const string DiagnosticId = DiagnosticIds.DontRepeatNegatedPattern;
 
     private static readonly LocalizableResourceString Title = new(

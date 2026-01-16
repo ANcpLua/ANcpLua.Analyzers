@@ -1,4 +1,4 @@
-using ANcpLua.Analyzers.Core;
+﻿using ANcpLua.Analyzers.Core;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
@@ -6,20 +6,21 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 ///     Code fix provider for AL0012 - replaces deprecated attributes with modern equivalents.
 /// </summary>
 /// <remarks>
-///     Does not extend <see cref="ALCodeFixProvider{TNode}" /> because the diagnostic location
+///     Does not extend <see cref="AlCodeFixProvider{TNode}" /> because the diagnostic location
 ///     may not directly contain the <see cref="LiteralExpressionSyntax" /> - the literal can be
 ///     nested within attribute arguments, requiring <c>DescendantNodesAndSelf</c> traversal.
 /// </remarks>
-[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AL0012DeprecatedAttributeCodeFixProvider))]
+[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0012DeprecatedAttributeCodeFixProvider))]
 [Shared]
-public sealed class AL0012DeprecatedAttributeCodeFixProvider : CodeFixProvider {
+public sealed partial class Al0012DeprecatedAttributeCodeFixProvider : CodeFixProvider {
     public override ImmutableArray<string> FixableDiagnosticIds =>
         [DiagnosticIds.DeprecatedSemanticConventionAttribute];
 
     public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
     public override async Task RegisterCodeFixesAsync(CodeFixContext context) {
-        if (await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false) is not { } root) {
+        if (await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false) is not
+            { } root) {
             return;
         }
 
@@ -28,10 +29,8 @@ public sealed class AL0012DeprecatedAttributeCodeFixProvider : CodeFixProvider {
 
         var node = root.FindNode(diagnosticSpan, getInnermostNodeForTie: true);
 
-        var literal = node as LiteralExpressionSyntax
-                      ?? node.DescendantNodesAndSelf().OfType<LiteralExpressionSyntax>().FirstOrDefault();
-
-        if (literal is null) {
+        if ((node as LiteralExpressionSyntax
+             ?? node.DescendantNodesAndSelf().OfType<LiteralExpressionSyntax>().FirstOrDefault()) is not { } literal) {
             return;
         }
 

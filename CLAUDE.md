@@ -49,7 +49,7 @@ LAYER 3: qyl, other projects       ← END USERS
 | AL0011 | Warning | Avoid lock keyword on non-Lock types (.NET 9+) |
 | AL0012 | Warning | Deprecated OTel semantic convention attribute |
 | AL0013 | Info | Missing telemetry schema URL |
-| AL0014 | Info | Prefer pattern matching for null/zero comparisons |
+| AL0014 | Warning | Prefer pattern matching for null/zero comparisons |
 | AL0015 | Info | Normalize null-guard style |
 | AL0016 | Info | Combine declaration with subsequent null-check |
 | AL0017 | Warning | Hardcoded package version in Directory.Packages.props |
@@ -58,7 +58,7 @@ LAYER 3: qyl, other projects       ← END USERS
 | AL0022 | Error | Mixed form collection and DTO |
 | AL0023 | Error | Unsupported form type |
 | AL0024 | Error | Form and body conflict |
-| AL0025 | Info | Prefer static lambda |
+| AL0025 | Warning | Prefer static lambda |
 
 ## Commands
 

@@ -1,13 +1,13 @@
-using ANcpLua.Roslyn.Utilities.Testing;
-using ANcpLua.Analyzers.Analyzers;
+﻿using ANcpLua.Analyzers.Analyzers;
 using ANcpLua.Analyzers.CodeFixes.CodeFixes;
+using ANcpLua.Roslyn.Utilities.Testing;
 
 namespace ANcpLua.Analyzers.Tests;
 
 /// <summary>
 ///     Tests for AL0007: GetSchema should be explicitly implemented.
 /// </summary>
-public sealed class AL0007AnalyzerTests : AnalyzerTest<AL0007ToAL0009IXmlSerializableAnalyzer> {
+public sealed partial class Al0007AnalyzerTests : AnalyzerTest<Al0007ToAl0009IXmlSerializableAnalyzer> {
     [Theory]
     [InlineData("""
                 using System.Xml;
@@ -51,7 +51,7 @@ public sealed class AL0007AnalyzerTests : AnalyzerTest<AL0007ToAL0009IXmlSeriali
 /// <summary>
 ///     Tests for AL0008: GetSchema must return null and not be abstract.
 /// </summary>
-public sealed class AL0008AnalyzerTests : AnalyzerTest<AL0007ToAL0009IXmlSerializableAnalyzer> {
+public sealed partial class Al0008AnalyzerTests : AnalyzerTest<Al0007ToAl0009IXmlSerializableAnalyzer> {
     [Theory]
     [InlineData("""
                 using System.Xml;
@@ -120,7 +120,7 @@ public sealed class AL0008AnalyzerTests : AnalyzerTest<AL0007ToAL0009IXmlSeriali
 /// <summary>
 ///     Tests for AL0009: Don't call GetSchema.
 /// </summary>
-public sealed class AL0009AnalyzerTests : AnalyzerTest<AL0007ToAL0009IXmlSerializableAnalyzer> {
+public sealed partial class Al0009AnalyzerTests : AnalyzerTest<Al0007ToAl0009IXmlSerializableAnalyzer> {
     [Theory]
     [InlineData("""
                 using System.Xml;
@@ -145,8 +145,8 @@ public sealed class AL0009AnalyzerTests : AnalyzerTest<AL0007ToAL0009IXmlSeriali
 /// <summary>
 ///     Code fix tests for AL0008: Makes GetSchema return null.
 /// </summary>
-public sealed class
-    AL0008CodeFixTests : CodeFixTest<AL0007ToAL0009IXmlSerializableAnalyzer, AL0008IXmlSerializableCodeFixProvider> {
+public sealed partial class
+    Al0008CodeFixTests : CodeFixTest<Al0007ToAl0009IXmlSerializableAnalyzer, Al0008IXmlSerializableCodeFixProvider> {
     [Fact]
     public Task ShouldReplaceNonNullReturnWithNull() => VerifyAsync(
         """

@@ -25,7 +25,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     </para>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class AL0013MissingSchemaUrlAnalyzer : ALAnalyzer {
+public sealed partial class Al0013MissingSchemaUrlAnalyzer : AlAnalyzer {
     private static readonly LocalizableResourceString Title = new(
         nameof(Resources.AL0013AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
 

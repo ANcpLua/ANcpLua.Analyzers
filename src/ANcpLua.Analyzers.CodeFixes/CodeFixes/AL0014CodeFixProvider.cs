@@ -5,11 +5,11 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 /// <summary>
 ///     Code fix for AL0014: Converts equality comparisons to pattern matching.
 /// </summary>
-[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AL0014CodeFixProvider))]
+[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0014CodeFixProvider))]
 [Shared]
-public sealed class AL0014CodeFixProvider : ALCodeFixProvider<BinaryExpressionSyntax> {
+public sealed partial class Al0014CodeFixProvider : AlCodeFixProvider<BinaryExpressionSyntax> {
     public override ImmutableArray<string> FixableDiagnosticIds =>
-        [AL0014PreferPatternMatchingAnalyzer.DiagnosticId];
+        [Al0014PreferPatternMatchingAnalyzer.DiagnosticId];
 
     protected override CodeAction CreateCodeAction(Document document,
         BinaryExpressionSyntax binary,
@@ -18,7 +18,7 @@ public sealed class AL0014CodeFixProvider : ALCodeFixProvider<BinaryExpressionSy
         CodeAction.Create(
             "Use pattern matching",
             _ => ConvertToPatternMatching(document, binary, root),
-            nameof(AL0014CodeFixProvider));
+            nameof(Al0014CodeFixProvider));
 
     private static Task<Document> ConvertToPatternMatching(
         Document document,

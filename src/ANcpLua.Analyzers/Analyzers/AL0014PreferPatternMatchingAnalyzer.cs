@@ -9,7 +9,8 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     <list type="bullet">
 ///         <item><c>x == null</c> → <c>x is null</c></item>
 ///         <item><c>x != null</c> → <c>x is not null</c></item>
-///         <item><c>x == 0</c> → <c>x is 0</c></item>
+///         <item><c>x == 0</c> → <c>x is 0</c> (includes 0L, 0u, 0f, 0d, 0m)</item>
+///         <item><c>x == 0.0</c> → <c>x is 0.0</c> (includes 0.0f, 0.0d, 0.0m)</item>
 ///         <item><c>x != 0</c> → <c>x is not 0</c></item>
 ///     </list>
 ///     Pattern matching syntax is more expressive and, for null checks,
@@ -20,7 +21,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     </para>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class AL0014PreferPatternMatchingAnalyzer : ALAnalyzer {
+public sealed partial class Al0014PreferPatternMatchingAnalyzer : AlAnalyzer {
     public const string DiagnosticId = DiagnosticIds.PreferPatternMatchingForNullAndZero;
 
     internal const string PropertyIsNullCheck = "IsNullCheck";
@@ -32,7 +33,7 @@ public sealed class AL0014PreferPatternMatchingAnalyzer : ALAnalyzer {
         "Prefer pattern matching for null and zero comparisons",
         "Use '{0}' instead of '{1}'",
         DiagnosticCategories.Style,
-        DiagnosticSeverity.Info,
+        DiagnosticSeverity.Warning,
         true,
         "Pattern matching syntax (is/is not) is more expressive and idiomatic. " +
         "For null checks, it also bypasses overloaded equality operators.",
@@ -116,8 +117,15 @@ public sealed class AL0014PreferPatternMatchingAnalyzer : ALAnalyzer {
 
     private static bool IsInsidePatternContext(SyntaxNode node) {
         for (var current = node.Parent; current is not null; current = current.Parent) {
-            if (current is IsPatternExpressionSyntax or SwitchExpressionSyntax or CasePatternSwitchLabelSyntax) {
+            // Skip patterns themselves but NOT arm expressions in switch expressions
+            // SwitchExpressionArmSyntax.Expression should be analyzed
+            if (current is IsPatternExpressionSyntax or CasePatternSwitchLabelSyntax) {
                 return true;
+            }
+
+            // For switch expressions, only skip if we're in the pattern part, not the expression part
+            if (current is SwitchExpressionArmSyntax arm && node.SpanStart >= arm.Expression.SpanStart) {
+                return false; // We're in the arm expression, analyze it
             }
         }
 
@@ -145,5 +153,5 @@ public sealed class AL0014PreferPatternMatchingAnalyzer : ALAnalyzer {
         expression.IsKind(SyntaxKind.NullLiteralExpression);
 
     private static bool IsZeroLiteral(ExpressionSyntax expression) =>
-        expression is LiteralExpressionSyntax { Token.ValueText: "0" };
+        expression is LiteralExpressionSyntax { Token.ValueText: "0" or "0.0" };
 }
