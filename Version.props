@@ -111,8 +111,8 @@
        Used by: SDK (ServiceDefaults), Web projects
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Microsoft.Extensions">
-    <MicrosoftExtensionsVersion>10.1.0</MicrosoftExtensionsVersion>
-    <AspNetCoreVersion>10.0.1</AspNetCoreVersion>
+    <MicrosoftExtensionsVersion>10.2.0</MicrosoftExtensionsVersion>
+    <AspNetCoreVersion>10.0.2</AspNetCoreVersion>
     <MicrosoftBclAsyncInterfacesVersion>10.0.2</MicrosoftBclAsyncInterfacesVersion>
   </PropertyGroup>
 
