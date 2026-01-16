@@ -77,7 +77,7 @@
        Used by: SDK, Roslyn.Utilities.Testing, Analyzers.Tests
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Testing">
-    <XunitV3Version>3.2.1</XunitV3Version>
+    <XunitV3Version>3.2.2</XunitV3Version>
     <AwesomeAssertionsVersion>9.3.0</AwesomeAssertionsVersion>
     <AwesomeAssertionsAnalyzersVersion>9.0.8</AwesomeAssertionsAnalyzersVersion>
     <GitHubActionsTestLoggerVersion>3.0.1</GitHubActionsTestLoggerVersion>
