@@ -1,6 +1,6 @@
-using ANcpLua.Roslyn.Utilities.Testing;
-using ANcpLua.Analyzers.Analyzers;
+﻿using ANcpLua.Analyzers.Analyzers;
 using ANcpLua.Analyzers.CodeFixes.CodeFixes;
+using ANcpLua.Roslyn.Utilities.Testing;
 
 namespace ANcpLua.Analyzers.Tests;
 
@@ -9,7 +9,7 @@ namespace ANcpLua.Analyzers.Tests;
 ///     Covers detection of simple ArgumentNullException null-guards and code fix generation
 ///     for both BCL and portable forms based on target framework and EditorConfig settings.
 /// </summary>
-public sealed class AL0015AnalyzerTests : AnalyzerTest<AL0015NormalizeNullGuardStyleAnalyzer> {
+public sealed partial class Al0015AnalyzerTests : AnalyzerTest<Al0015NormalizeNullGuardStyleAnalyzer> {
     [Theory]
     [InlineData("string? x", "x is null", "nameof(x)")]
     [InlineData("object? obj", "obj == null", "nameof(obj)")]
@@ -53,8 +53,8 @@ public sealed class AL0015AnalyzerTests : AnalyzerTest<AL0015NormalizeNullGuardS
 ///     Tests both BCL form (ArgumentNullException.ThrowIfNull) and portable form
 ///     (coalesce assignment) generation based on configuration.
 /// </summary>
-public sealed class AL0015PortableFormCodeFixTests : CodeFixTestWithEditorConfig<AL0015NormalizeNullGuardStyleAnalyzer
-    , AL0015NormalizeNullGuardStyleCodeFixProvider> {
+public sealed partial class Al0015PortableFormCodeFixTests : CodeFixTestWithEditorConfig<Al0015NormalizeNullGuardStyleAnalyzer
+    , Al0015NormalizeNullGuardStyleCodeFixProvider> {
     /// <summary>
     ///     Test 1: netstandard2.0 without ThrowIfNull produces portable form.
     ///     Setup: No ThrowIfNull available, auto mode
@@ -62,17 +62,17 @@ public sealed class AL0015PortableFormCodeFixTests : CodeFixTestWithEditorConfig
     /// </summary>
     [Fact]
     public Task ShouldProducePortableFormWithoutThrowIfNull() {
-        var source = """
-                     using System;
+        const string Source = """
+                              using System;
 
-                     public class TestClass
-                     {
-                         public void TestMethod(string? x)
-                         {
-                             [|if|] (x is null) throw new ArgumentNullException(nameof(x));
-                         }
-                     }
-                     """;
+                              public class TestClass
+                              {
+                                  public void TestMethod(string? x)
+                                  {
+                                      [|if|] (x is null) throw new ArgumentNullException(nameof(x));
+                                  }
+                              }
+                              """;
 
         var expected = """
                        using System;
@@ -86,10 +86,10 @@ public sealed class AL0015PortableFormCodeFixTests : CodeFixTestWithEditorConfig
                        }
                        """;
 
-        return VerifyAsync(source, expected,
+        return VerifyAsync(Source, expected,
             new Dictionary<string, string> {
                 { "ancplua_target_framework", "netstandard2.0" }, { "ancplua_nullguard_style", "auto" }
-            }, additionalSources: null, useNet10References: false);
+            }, null, false);
     }
 
     /// <summary>
@@ -97,37 +97,37 @@ public sealed class AL0015PortableFormCodeFixTests : CodeFixTestWithEditorConfig
     /// </summary>
     [Fact]
     public Task ShouldProducePortableFormWithBlock() {
-        var source = """
-                     using System;
+        const string Source = """
+                              using System;
 
-                     public class TestClass
-                     {
-                         public void TestMethod(object? obj)
-                         {
-                             [|if|] (obj is null)
-                             {
-                                 throw new ArgumentNullException(nameof(obj));
-                             }
-                         }
-                     }
-                     """;
+                              public class TestClass
+                              {
+                                  public void TestMethod(object? obj)
+                                  {
+                                      [|if|] (obj is null)
+                                      {
+                                          throw new ArgumentNullException(nameof(obj));
+                                      }
+                                  }
+                              }
+                              """;
 
-        var expected = """
-                       using System;
+        const string Expected = """
+                                using System;
 
-                       public class TestClass
-                       {
-                           public void TestMethod(object? obj)
-                           {
-                               obj = obj ?? throw new ArgumentNullException(nameof(obj));
-                           }
-                       }
-                       """;
+                                public class TestClass
+                                {
+                                    public void TestMethod(object? obj)
+                                    {
+                                        obj = obj ?? throw new ArgumentNullException(nameof(obj));
+                                    }
+                                }
+                                """;
 
-        return VerifyAsync(source, expected,
+        return VerifyAsync(Source, Expected,
             new Dictionary<string, string> {
                 { "ancplua_target_framework", "netstandard2.0" }, { "ancplua_nullguard_style", "auto" }
-            }, additionalSources: null, useNet10References: false);
+            }, null, false);
     }
 
     /// <summary>
@@ -135,33 +135,33 @@ public sealed class AL0015PortableFormCodeFixTests : CodeFixTestWithEditorConfig
     /// </summary>
     [Fact]
     public Task ShouldProducePortableFormWithEqualityCheck() {
-        var source = """
-                     using System;
+        const string Source = """
+                              using System;
 
-                     public class TestClass
-                     {
-                         public void TestMethod(string? value)
-                         {
-                             [|if|] (value == null) throw new ArgumentNullException(nameof(value));
-                         }
-                     }
-                     """;
+                              public class TestClass
+                              {
+                                  public void TestMethod(string? value)
+                                  {
+                                      [|if|] (value == null) throw new ArgumentNullException(nameof(value));
+                                  }
+                              }
+                              """;
 
-        var expected = """
-                       using System;
+        const string Expected = """
+                                using System;
 
-                       public class TestClass
-                       {
-                           public void TestMethod(string? value)
-                           {
-                               value = value ?? throw new ArgumentNullException(nameof(value));
-                           }
-                       }
-                       """;
+                                public class TestClass
+                                {
+                                    public void TestMethod(string? value)
+                                    {
+                                        value = value ?? throw new ArgumentNullException(nameof(value));
+                                    }
+                                }
+                                """;
 
-        return VerifyAsync(source, expected,
+        return VerifyAsync(Source, Expected,
             new Dictionary<string, string> { { "ancplua_target_framework", "netstandard2.0" } },
-            additionalSources: null, useNet10References: false);
+            null, false);
     }
 
     /// <summary>
@@ -169,31 +169,31 @@ public sealed class AL0015PortableFormCodeFixTests : CodeFixTestWithEditorConfig
     /// </summary>
     [Fact]
     public Task ShouldProducePortableFormWithStringLiteral() {
-        var source = """
-                     using System;
+        const string Source = """
+                              using System;
 
-                     public class TestClass
-                     {
-                         public void TestMethod(int? count)
-                         {
-                             [|if|] (count is null) throw new ArgumentNullException("count");
-                         }
-                     }
-                     """;
+                              public class TestClass
+                              {
+                                  public void TestMethod(int? count)
+                                  {
+                                      [|if|] (count is null) throw new ArgumentNullException("count");
+                                  }
+                              }
+                              """;
 
-        var expected = """
-                       using System;
+        const string Expected = """
+                                using System;
 
-                       public class TestClass
-                       {
-                           public void TestMethod(int? count)
-                           {
-                               count = count ?? throw new ArgumentNullException(nameof(count));
-                           }
-                       }
-                       """;
+                                public class TestClass
+                                {
+                                    public void TestMethod(int? count)
+                                    {
+                                        count = count ?? throw new ArgumentNullException(nameof(count));
+                                    }
+                                }
+                                """;
 
-        return VerifyAsync(source, expected,
+        return VerifyAsync(Source, Expected,
             new Dictionary<string, string> { { "ancplua_nullguard_style", "portable" } });
     }
 
@@ -202,31 +202,31 @@ public sealed class AL0015PortableFormCodeFixTests : CodeFixTestWithEditorConfig
     /// </summary>
     [Fact]
     public Task ShouldProducePortableFormWhenExplicitlyConfigured() {
-        var source = """
-                     using System;
+        const string Source = """
+                              using System;
 
-                     public class TestClass
-                     {
-                         public void TestMethod(string? x)
-                         {
-                             [|if|] (x is null) throw new ArgumentNullException(nameof(x));
-                         }
-                     }
-                     """;
+                              public class TestClass
+                              {
+                                  public void TestMethod(string? x)
+                                  {
+                                      [|if|] (x is null) throw new ArgumentNullException(nameof(x));
+                                  }
+                              }
+                              """;
 
-        var expected = """
-                       using System;
+        const string Expected = """
+                                using System;
 
-                       public class TestClass
-                       {
-                           public void TestMethod(string? x)
-                           {
-                               x = x ?? throw new ArgumentNullException(nameof(x));
-                           }
-                       }
-                       """;
+                                public class TestClass
+                                {
+                                    public void TestMethod(string? x)
+                                    {
+                                        x = x ?? throw new ArgumentNullException(nameof(x));
+                                    }
+                                }
+                                """;
 
-        return VerifyAsync(source, expected,
+        return VerifyAsync(Source, Expected,
             new Dictionary<string, string> {
                 { "ancplua_target_framework", "net10.0" }, { "ancplua_nullguard_style", "portable" }
             });
@@ -238,34 +238,34 @@ public sealed class AL0015PortableFormCodeFixTests : CodeFixTestWithEditorConfig
     /// </summary>
     [Fact]
     public Task ShouldProducePortableFormWhenExplicitlyConfiguredWithThrowIfNull() {
-        var source = """
-                     using System;
+        const string Source = """
+                              using System;
 
-                     public class TestClass
-                     {
-                         public void TestMethod(string? x)
-                         {
-                             [|if|] (x is null) throw new ArgumentNullException(nameof(x));
-                         }
-                     }
-                     """;
+                              public class TestClass
+                              {
+                                  public void TestMethod(string? x)
+                                  {
+                                      [|if|] (x is null) throw new ArgumentNullException(nameof(x));
+                                  }
+                              }
+                              """;
 
-        var expected = """
-                       using System;
+        const string Expected = """
+                                using System;
 
-                       public class TestClass
-                       {
-                           public void TestMethod(string? x)
-                           {
-                               x = x ?? throw new ArgumentNullException(nameof(x));
-                           }
-                       }
-                       """;
+                                public class TestClass
+                                {
+                                    public void TestMethod(string? x)
+                                    {
+                                        x = x ?? throw new ArgumentNullException(nameof(x));
+                                    }
+                                }
+                                """;
 
-        return VerifyAsync(source, expected,
+        return VerifyAsync(Source, Expected,
             new Dictionary<string, string> {
                 { "ancplua_target_framework", "net10.0" }, { "ancplua_nullguard_style", "portable" }
-            }, additionalSources: null);
+            }, null);
     }
 }
 
@@ -273,8 +273,8 @@ public sealed class AL0015PortableFormCodeFixTests : CodeFixTestWithEditorConfig
 ///     BCL form code fix tests for AL0015.
 ///     Tests ArgumentNullException.ThrowIfNull generation when available.
 /// </summary>
-public sealed class AL0015BclFormCodeFixTests : CodeFixTestWithEditorConfig<AL0015NormalizeNullGuardStyleAnalyzer,
-    AL0015NormalizeNullGuardStyleCodeFixProvider> {
+public sealed partial class Al0015BclFormCodeFixTests : CodeFixTestWithEditorConfig<Al0015NormalizeNullGuardStyleAnalyzer,
+    Al0015NormalizeNullGuardStyleCodeFixProvider> {
     /// <summary>
     ///     Test 2: net10.0 with single target produces BCL form.
     ///     Setup: Reference set WITH ThrowIfNull available
@@ -284,31 +284,31 @@ public sealed class AL0015BclFormCodeFixTests : CodeFixTestWithEditorConfig<AL00
     /// </summary>
     [Fact]
     public Task ShouldProduceBclFormWithSingleTarget() {
-        var source = """
-                     using System;
+        const string Source = """
+                              using System;
 
-                     public class TestClass
-                     {
-                         public void TestMethod(string? x)
-                         {
-                             [|if|] (x is null) throw new ArgumentNullException(nameof(x));
-                         }
-                     }
-                     """;
+                              public class TestClass
+                              {
+                                  public void TestMethod(string? x)
+                                  {
+                                      [|if|] (x is null) throw new ArgumentNullException(nameof(x));
+                                  }
+                              }
+                              """;
 
-        var expected = """
-                       using System;
+        const string Expected = """
+                                using System;
 
-                       public class TestClass
-                       {
-                           public void TestMethod(string? x)
-                           {
-                               ArgumentNullException.ThrowIfNull(x);
-                           }
-                       }
-                       """;
+                                public class TestClass
+                                {
+                                    public void TestMethod(string? x)
+                                    {
+                                        ArgumentNullException.ThrowIfNull(x);
+                                    }
+                                }
+                                """;
 
-        return VerifyAsync(source, expected,
+        return VerifyAsync(Source, Expected,
             new Dictionary<string, string> {
                 { "ancplua_target_framework", "net10.0" }, { "ancplua_nullguard_style", "auto" }
             });
@@ -319,34 +319,34 @@ public sealed class AL0015BclFormCodeFixTests : CodeFixTestWithEditorConfig<AL00
     /// </summary>
     [Fact]
     public Task ShouldProduceBclFormWithBlock() {
-        var source = """
-                     using System;
+        const string Source = """
+                              using System;
 
-                     public class TestClass
-                     {
-                         public void TestMethod(object? obj)
-                         {
-                             [|if|] (obj is null)
-                             {
-                                 throw new ArgumentNullException(nameof(obj));
-                             }
-                         }
-                     }
-                     """;
+                              public class TestClass
+                              {
+                                  public void TestMethod(object? obj)
+                                  {
+                                      [|if|] (obj is null)
+                                      {
+                                          throw new ArgumentNullException(nameof(obj));
+                                      }
+                                  }
+                              }
+                              """;
 
-        var expected = """
-                       using System;
+        const string Expected = """
+                                using System;
 
-                       public class TestClass
-                       {
-                           public void TestMethod(object? obj)
-                           {
-                               ArgumentNullException.ThrowIfNull(obj);
-                           }
-                       }
-                       """;
+                                public class TestClass
+                                {
+                                    public void TestMethod(object? obj)
+                                    {
+                                        ArgumentNullException.ThrowIfNull(obj);
+                                    }
+                                }
+                                """;
 
-        return VerifyAsync(source, expected,
+        return VerifyAsync(Source, Expected,
             new Dictionary<string, string> {
                 { "ancplua_target_framework", "net10.0" }, { "ancplua_nullguard_style", "auto" }
             });
@@ -357,31 +357,31 @@ public sealed class AL0015BclFormCodeFixTests : CodeFixTestWithEditorConfig<AL00
     /// </summary>
     [Fact]
     public Task ShouldProduceBclFormWithEqualityCheck() {
-        var source = """
-                     using System;
+        const string Source = """
+                              using System;
 
-                     public class TestClass
-                     {
-                         public void TestMethod(string? value)
-                         {
-                             [|if|] (value == null) throw new ArgumentNullException(nameof(value));
-                         }
-                     }
-                     """;
+                              public class TestClass
+                              {
+                                  public void TestMethod(string? value)
+                                  {
+                                      [|if|] (value == null) throw new ArgumentNullException(nameof(value));
+                                  }
+                              }
+                              """;
 
-        var expected = """
-                       using System;
+        const string Expected = """
+                                using System;
 
-                       public class TestClass
-                       {
-                           public void TestMethod(string? value)
-                           {
-                               ArgumentNullException.ThrowIfNull(value);
-                           }
-                       }
-                       """;
+                                public class TestClass
+                                {
+                                    public void TestMethod(string? value)
+                                    {
+                                        ArgumentNullException.ThrowIfNull(value);
+                                    }
+                                }
+                                """;
 
-        return VerifyAsync(source, expected,
+        return VerifyAsync(Source, Expected,
             new Dictionary<string, string> { { "ancplua_target_framework", "net10.0" } });
     }
 
@@ -390,31 +390,31 @@ public sealed class AL0015BclFormCodeFixTests : CodeFixTestWithEditorConfig<AL00
     /// </summary>
     [Fact]
     public Task ShouldProduceBclFormWithStringLiteral() {
-        var source = """
-                     using System;
+        const string Source = """
+                              using System;
 
-                     public class TestClass
-                     {
-                         public void TestMethod(int? count)
-                         {
-                             [|if|] (count is null) throw new ArgumentNullException("count");
-                         }
-                     }
-                     """;
+                              public class TestClass
+                              {
+                                  public void TestMethod(int? count)
+                                  {
+                                      [|if|] (count is null) throw new ArgumentNullException("count");
+                                  }
+                              }
+                              """;
 
-        var expected = """
-                       using System;
+        const string Expected = """
+                                using System;
 
-                       public class TestClass
-                       {
-                           public void TestMethod(int? count)
-                           {
-                               ArgumentNullException.ThrowIfNull(count);
-                           }
-                       }
-                       """;
+                                public class TestClass
+                                {
+                                    public void TestMethod(int? count)
+                                    {
+                                        ArgumentNullException.ThrowIfNull(count);
+                                    }
+                                }
+                                """;
 
-        return VerifyAsync(source, expected,
+        return VerifyAsync(Source, Expected,
             new Dictionary<string, string> {
                 { "ancplua_target_framework", "net10.0" }, { "ancplua_nullguard_style", "auto" }
             });
@@ -425,31 +425,31 @@ public sealed class AL0015BclFormCodeFixTests : CodeFixTestWithEditorConfig<AL00
     /// </summary>
     [Fact]
     public Task ShouldProduceBclFormWhenExplicitlyConfigured() {
-        var source = """
-                     using System;
+        const string Source = """
+                              using System;
 
-                     public class TestClass
-                     {
-                         public void TestMethod(string? x)
-                         {
-                             [|if|] (x is null) throw new ArgumentNullException(nameof(x));
-                         }
-                     }
-                     """;
+                              public class TestClass
+                              {
+                                  public void TestMethod(string? x)
+                                  {
+                                      [|if|] (x is null) throw new ArgumentNullException(nameof(x));
+                                  }
+                              }
+                              """;
 
-        var expected = """
-                       using System;
+        const string Expected = """
+                                using System;
 
-                       public class TestClass
-                       {
-                           public void TestMethod(string? x)
-                           {
-                               ArgumentNullException.ThrowIfNull(x);
-                           }
-                       }
-                       """;
+                                public class TestClass
+                                {
+                                    public void TestMethod(string? x)
+                                    {
+                                        ArgumentNullException.ThrowIfNull(x);
+                                    }
+                                }
+                                """;
 
-        return VerifyAsync(source, expected,
+        return VerifyAsync(Source, Expected,
             new Dictionary<string, string> {
                 { "ancplua_target_framework", "netstandard2.0" }, { "ancplua_nullguard_style", "bcl" }
             });
@@ -460,8 +460,8 @@ public sealed class AL0015BclFormCodeFixTests : CodeFixTestWithEditorConfig<AL00
 ///     Multi-target stability tests for AL0015.
 ///     Verifies that multi-target projects always use portable form for consistency.
 /// </summary>
-public sealed class AL0015MultiTargetTests : CodeFixTestWithEditorConfig<AL0015NormalizeNullGuardStyleAnalyzer,
-    AL0015NormalizeNullGuardStyleCodeFixProvider> {
+public sealed partial class Al0015MultiTargetTests : CodeFixTestWithEditorConfig<Al0015NormalizeNullGuardStyleAnalyzer,
+    Al0015NormalizeNullGuardStyleCodeFixProvider> {
     /// <summary>
     ///     Test 3: Multi-target with netstandard2.0;net10.0 produces portable form.
     ///     Setup: TargetFrameworks=netstandard2.0;net10.0 (multi-target with semicolon)
@@ -471,34 +471,34 @@ public sealed class AL0015MultiTargetTests : CodeFixTestWithEditorConfig<AL0015N
     /// </summary>
     [Fact]
     public Task ShouldProducePortableFormForMultiTargetProject() {
-        var source = """
-                     using System;
+        const string Source = """
+                              using System;
 
-                     public class TestClass
-                     {
-                         public void TestMethod(string? x)
-                         {
-                             [|if|] (x is null) throw new ArgumentNullException(nameof(x));
-                         }
-                     }
-                     """;
+                              public class TestClass
+                              {
+                                  public void TestMethod(string? x)
+                                  {
+                                      [|if|] (x is null) throw new ArgumentNullException(nameof(x));
+                                  }
+                              }
+                              """;
 
-        var expected = """
-                       using System;
+        const string Expected = """
+                                using System;
 
-                       public class TestClass
-                       {
-                           public void TestMethod(string? x)
-                           {
-                               x = x ?? throw new ArgumentNullException(nameof(x));
-                           }
-                       }
-                       """;
+                                public class TestClass
+                                {
+                                    public void TestMethod(string? x)
+                                    {
+                                        x = x ?? throw new ArgumentNullException(nameof(x));
+                                    }
+                                }
+                                """;
 
-        return VerifyAsync(source, expected,
+        return VerifyAsync(Source, Expected,
             new Dictionary<string, string> {
                 { "ancplua_is_multi_target", "true" }, { "ancplua_nullguard_style", "auto" }
-            }, additionalSources: null, useNet10References: false);
+            }, null, false);
     }
 
     /// <summary>
@@ -506,34 +506,34 @@ public sealed class AL0015MultiTargetTests : CodeFixTestWithEditorConfig<AL0015N
     /// </summary>
     [Fact]
     public Task ShouldProducePortableFormForMultipleTargets() {
-        var source = """
-                     using System;
+        const string Source = """
+                              using System;
 
-                     public class TestClass
-                     {
-                         public void TestMethod(object? obj)
-                         {
-                             [|if|] (obj is null) throw new ArgumentNullException(nameof(obj));
-                         }
-                     }
-                     """;
+                              public class TestClass
+                              {
+                                  public void TestMethod(object? obj)
+                                  {
+                                      [|if|] (obj is null) throw new ArgumentNullException(nameof(obj));
+                                  }
+                              }
+                              """;
 
-        var expected = """
-                       using System;
+        const string Expected = """
+                                using System;
 
-                       public class TestClass
-                       {
-                           public void TestMethod(object? obj)
-                           {
-                               obj = obj ?? throw new ArgumentNullException(nameof(obj));
-                           }
-                       }
-                       """;
+                                public class TestClass
+                                {
+                                    public void TestMethod(object? obj)
+                                    {
+                                        obj = obj ?? throw new ArgumentNullException(nameof(obj));
+                                    }
+                                }
+                                """;
 
-        return VerifyAsync(source, expected,
+        return VerifyAsync(Source, Expected,
             new Dictionary<string, string> {
                 { "ancplua_is_multi_target", "true" }, { "ancplua_nullguard_style", "auto" }
-            }, additionalSources: null, useNet10References: false);
+            }, null, false);
     }
 
     /// <summary>
@@ -541,62 +541,62 @@ public sealed class AL0015MultiTargetTests : CodeFixTestWithEditorConfig<AL0015N
     /// </summary>
     [Fact]
     public Task ShouldProduceConsistentPortableFormForMultipleDiagnostics() {
-        var source = """
-                     using System;
+        const string Source = """
+                              using System;
 
-                     public class TestClass
-                     {
-                         public void Method1(string? x)
-                         {
-                             [|if|] (x is null) throw new ArgumentNullException(nameof(x));
-                         }
+                              public class TestClass
+                              {
+                                  public void Method1(string? x)
+                                  {
+                                      [|if|] (x is null) throw new ArgumentNullException(nameof(x));
+                                  }
 
-                         public void Method2(object? y)
-                         {
-                             [|if|] (y is null) throw new ArgumentNullException(nameof(y));
-                         }
+                                  public void Method2(object? y)
+                                  {
+                                      [|if|] (y is null) throw new ArgumentNullException(nameof(y));
+                                  }
 
-                         public void Method3(int? z)
-                         {
-                             [|if|] (z is null) throw new ArgumentNullException(nameof(z));
-                         }
-                     }
-                     """;
+                                  public void Method3(int? z)
+                                  {
+                                      [|if|] (z is null) throw new ArgumentNullException(nameof(z));
+                                  }
+                              }
+                              """;
 
-        var expected = """
-                       using System;
+        const string Expected = """
+                                using System;
 
-                       public class TestClass
-                       {
-                           public void Method1(string? x)
-                           {
-                               x = x ?? throw new ArgumentNullException(nameof(x));
-                           }
+                                public class TestClass
+                                {
+                                    public void Method1(string? x)
+                                    {
+                                        x = x ?? throw new ArgumentNullException(nameof(x));
+                                    }
 
-                           public void Method2(object? y)
-                           {
-                               y = y ?? throw new ArgumentNullException(nameof(y));
-                           }
+                                    public void Method2(object? y)
+                                    {
+                                        y = y ?? throw new ArgumentNullException(nameof(y));
+                                    }
 
-                           public void Method3(int? z)
-                           {
-                               z = z ?? throw new ArgumentNullException(nameof(z));
-                           }
-                       }
-                       """;
+                                    public void Method3(int? z)
+                                    {
+                                        z = z ?? throw new ArgumentNullException(nameof(z));
+                                    }
+                                }
+                                """;
 
-        return VerifyAsync(source, expected,
+        return VerifyAsync(Source, Expected,
             new Dictionary<string, string> {
                 { "ancplua_is_multi_target", "true" }, { "ancplua_nullguard_style", "auto" }
-            }, additionalSources: null, useNet10References: false);
+            }, null, false);
     }
 }
 
 /// <summary>
 ///     Edge case and rejection tests for AL0015.
 /// </summary>
-public sealed class AL0015EdgeCasesTests : CodeFixTestWithEditorConfig<AL0015NormalizeNullGuardStyleAnalyzer,
-    AL0015NormalizeNullGuardStyleCodeFixProvider> {
+public sealed partial class Al0015EdgeCasesTests : CodeFixTestWithEditorConfig<Al0015NormalizeNullGuardStyleAnalyzer,
+    Al0015NormalizeNullGuardStyleCodeFixProvider> {
     /// <summary>
     ///     Test 4: BCL mode forced but ThrowIfNull unavailable - falls back to portable.
     ///     Setup: ancplua_nullguard_style=bcl (explicit BCL mode)
@@ -606,33 +606,33 @@ public sealed class AL0015EdgeCasesTests : CodeFixTestWithEditorConfig<AL0015Nor
     /// </summary>
     [Fact]
     public Task ShouldFallbackToPortableFormWhenBclUnavailable() {
-        var source = """
-                     using System;
+        const string Source = """
+                              using System;
 
-                     public class TestClass
-                     {
-                         public void TestMethod(string? x)
-                         {
-                             [|if|] (x is null) throw new ArgumentNullException(nameof(x));
-                         }
-                     }
-                     """;
+                              public class TestClass
+                              {
+                                  public void TestMethod(string? x)
+                                  {
+                                      [|if|] (x is null) throw new ArgumentNullException(nameof(x));
+                                  }
+                              }
+                              """;
 
-        var expected = """
-                       using System;
+        const string Expected = """
+                                using System;
 
-                       public class TestClass
-                       {
-                           public void TestMethod(string? x)
-                           {
-                               x = x ?? throw new ArgumentNullException(nameof(x));
-                           }
-                       }
-                       """;
+                                public class TestClass
+                                {
+                                    public void TestMethod(string? x)
+                                    {
+                                        x = x ?? throw new ArgumentNullException(nameof(x));
+                                    }
+                                }
+                                """;
 
-        return VerifyAsync(source, expected,
+        return VerifyAsync(Source, Expected,
             new Dictionary<string, string> {
                 { "ancplua_target_framework", "netstandard2.0" }, { "ancplua_nullguard_style", "bcl" }
-            }, additionalSources: null, useNet10References: false);
+            }, null, false);
     }
 }

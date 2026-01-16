@@ -1,10 +1,10 @@
+﻿using ANcpLua.Analyzers.Analyzers;
 using ANcpLua.Roslyn.Utilities.Testing;
-using ANcpLua.Analyzers.Analyzers;
 
 namespace ANcpLua.Analyzers.Tests;
 
-public sealed class
-    AL0001AnalyzerTests : AnalyzerTest<AL0001ProhibitPrimaryConstructorParameterReassignmentAnalyzer> {
+public sealed partial class
+    Al0001AnalyzerTests : AnalyzerTest<Al0001ProhibitPrimaryConstructorParameterReassignmentAnalyzer> {
     [Theory]
     [InlineData("int i", "[|i|] = 10")]
     [InlineData("int i", "[|i|] += 10")]

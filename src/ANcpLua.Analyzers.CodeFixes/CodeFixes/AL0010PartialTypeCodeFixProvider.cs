@@ -5,16 +5,17 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 /// <summary>
 ///     Code fix provider for AL0010 - adds partial modifier to types.
 /// </summary>
-[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AL0010PartialTypeCodeFixProvider))]
+[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0010PartialTypeCodeFixProvider))]
 [Shared]
-public sealed class AL0010PartialTypeCodeFixProvider : CodeFixProvider {
+public sealed partial class Al0010PartialTypeCodeFixProvider : CodeFixProvider {
     public override ImmutableArray<string> FixableDiagnosticIds =>
         [DiagnosticIds.TypeShouldBePartial];
 
     public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
     public override async Task RegisterCodeFixesAsync(CodeFixContext context) {
-        if (await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false) is not { } root) {
+        if (await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false) is not
+            { } root) {
             return;
         }
 

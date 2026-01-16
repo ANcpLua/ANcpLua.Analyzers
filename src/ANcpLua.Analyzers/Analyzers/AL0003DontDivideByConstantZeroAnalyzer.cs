@@ -7,8 +7,8 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         Division by zero for integer types throws <see cref="System.DivideByZeroException"/>
-///         at runtime, and for <see cref="decimal"/> it also throws an exception. Unlike
+///         Division by zero for integer types throws <see cref="DivideByZeroException" />
+///         at runtime, and for <see cref="decimal" /> it also throws an exception. Unlike
 ///         floating-point types which produce infinity or NaN, these divisions always fail.
 ///     </para>
 ///     <para>
@@ -25,7 +25,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     </para>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class AL0003DontDivideByConstantZeroAnalyzer : ALAnalyzer {
+public sealed partial class Al0003DontDivideByConstantZeroAnalyzer : AlAnalyzer {
     public const string DiagnosticId = DiagnosticIds.DontDivideByConstantZero;
 
     private static readonly LocalizableResourceString Title = new(

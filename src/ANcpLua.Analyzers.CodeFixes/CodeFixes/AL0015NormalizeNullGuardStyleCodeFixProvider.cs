@@ -7,18 +7,20 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 ///     Code fix for AL0015: Normalizes null-guards to Throw (Throw.IfNull), BCL (ThrowIfNull),
 ///     or portable (coalesce) form.
 /// </summary>
-[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AL0015NormalizeNullGuardStyleCodeFixProvider))]
+[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0015NormalizeNullGuardStyleCodeFixProvider))]
 [Shared]
-public sealed class AL0015NormalizeNullGuardStyleCodeFixProvider : ALCodeFixProvider<IfStatementSyntax> {
+public sealed partial class Al0015NormalizeNullGuardStyleCodeFixProvider : AlCodeFixProvider<IfStatementSyntax> {
     public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.NormalizeNullGuardStyle];
 
     protected override CodeAction? CreateCodeAction(Document document,
         IfStatementSyntax ifStatement,
         SyntaxNode root,
         Diagnostic diagnostic) {
-        if (!diagnostic.Properties.TryGetValue(AL0015NormalizeNullGuardStyleAnalyzer.PropertyIdentifier, out var identifier) ||
-            !diagnostic.Properties.TryGetValue(AL0015NormalizeNullGuardStyleAnalyzer.PropertyTypeName, out var typeName) ||
-            !diagnostic.Properties.TryGetValue(AL0015NormalizeNullGuardStyleAnalyzer.PropertyStyle, out var style) ||
+        if (!diagnostic.Properties.TryGetValue(Al0015NormalizeNullGuardStyleAnalyzer.PropertyIdentifier,
+                out var identifier) ||
+            !diagnostic.Properties.TryGetValue(Al0015NormalizeNullGuardStyleAnalyzer.PropertyTypeName,
+                out var typeName) ||
+            !diagnostic.Properties.TryGetValue(Al0015NormalizeNullGuardStyleAnalyzer.PropertyStyle, out var style) ||
             identifier is null || typeName is null || style is null) {
             return null;
         }
@@ -32,7 +34,7 @@ public sealed class AL0015NormalizeNullGuardStyleCodeFixProvider : ALCodeFixProv
         return CodeAction.Create(
             title,
             ct => ApplyFixAsync(document, ifStatement, identifier, typeName, style, ct),
-            nameof(AL0015NormalizeNullGuardStyleCodeFixProvider));
+            nameof(Al0015NormalizeNullGuardStyleCodeFixProvider));
     }
 
     private static Task<Document> ApplyFixAsync(

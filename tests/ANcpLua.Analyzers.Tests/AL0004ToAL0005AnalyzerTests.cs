@@ -1,6 +1,6 @@
-using ANcpLua.Roslyn.Utilities.Testing;
-using ANcpLua.Analyzers.Analyzers;
+﻿using ANcpLua.Analyzers.Analyzers;
 using ANcpLua.Analyzers.CodeFixes.CodeFixes;
+using ANcpLua.Roslyn.Utilities.Testing;
 
 namespace ANcpLua.Analyzers.Tests;
 
@@ -9,7 +9,7 @@ namespace ANcpLua.Analyzers.Tests;
 ///     C# 14 allows span == "string" via implicit conversions, but pattern matching
 ///     (span is "string") expresses intent more clearly.
 /// </summary>
-public sealed class AL0004AnalyzerTests : AnalyzerTest<AL0004ToAL0005SpanComparisonAnalyzer> {
+public sealed partial class Al0004AnalyzerTests : AnalyzerTest<Al0004ToAl0005SpanComparisonAnalyzer> {
     [Theory]
     [InlineData("""
                 using System;
@@ -69,7 +69,7 @@ public sealed class AL0004AnalyzerTests : AnalyzerTest<AL0004ToAL0005SpanCompari
 ///     Tests for AL0005: Use SequenceEqual when comparing Span and a non-constant.
 ///     For non-constant comparisons, SequenceEqual expresses content comparison intent clearly.
 /// </summary>
-public sealed class AL0005AnalyzerTests : AnalyzerTest<AL0004ToAL0005SpanComparisonAnalyzer> {
+public sealed partial class Al0005AnalyzerTests : AnalyzerTest<Al0004ToAl0005SpanComparisonAnalyzer> {
     [Theory]
     [InlineData("""
                 using System;
@@ -124,13 +124,13 @@ public sealed class AL0005AnalyzerTests : AnalyzerTest<AL0004ToAL0005SpanCompari
 ///     Edge case tests for collection expression handling in AL0004/AL0005.
 ///     Verifies the fix for DescendantNodes().Single() bug.
 /// </summary>
-public sealed class
-    AL0004ToAL0005CollectionExpressionEdgeCasesTests : AnalyzerTest<AL0004ToAL0005SpanComparisonAnalyzer> {
+public sealed partial class
+    Al0004ToAl0005CollectionExpressionEdgeCasesTests : AnalyzerTest<Al0004ToAl0005SpanComparisonAnalyzer> {
     [Theory]
     [InlineData("[1, 2]", "AL0004")]
     [InlineData("[1 + 2, 3]", "AL0004")]
     [InlineData("[]", "AL0004")]
-    public Task ShouldReportAL0004ForConstantCollections(string collection, string expectedDiagnostic) =>
+    public Task ShouldReportAl0004ForConstantCollections(string collection, string expectedDiagnostic) =>
         VerifyAsync($$"""
                       using System;
                       class C {
@@ -145,7 +145,7 @@ public sealed class
     [InlineData("[GetValue()]")] // Method call - non-constant
     [InlineData("[..other]")] // Spread element - not ExpressionElementSyntax
     [InlineData("[1, ..x, 2]")] // Mixed with spread - non-constant
-    public Task ShouldReportAL0005ForNonConstantCollections(string collection) =>
+    public Task ShouldReportAl0005ForNonConstantCollections(string collection) =>
         VerifyAsync($$"""
                       using System;
                       class C {
@@ -162,7 +162,7 @@ public sealed class
 /// <summary>
 ///     Code fix tests for AL0004: Converts Span equality to pattern matching.
 /// </summary>
-public sealed class AL0004CodeFixTests : CodeFixTest<AL0004ToAL0005SpanComparisonAnalyzer, AL0004CodeFixProvider> {
+public sealed partial class Al0004CodeFixTests : CodeFixTest<Al0004ToAl0005SpanComparisonAnalyzer, Al0004CodeFixProvider> {
     [Fact]
     public Task ShouldConvertStringLiteralToPatternMatching() => VerifyAsync(
         """
@@ -243,7 +243,7 @@ public sealed class AL0004CodeFixTests : CodeFixTest<AL0004ToAL0005SpanCompariso
 /// <summary>
 ///     Code fix tests for AL0005: Converts Span equality to SequenceEqual.
 /// </summary>
-public sealed class AL0005CodeFixTests : CodeFixTest<AL0004ToAL0005SpanComparisonAnalyzer, AL0005CodeFixProvider> {
+public sealed partial class Al0005CodeFixTests : CodeFixTest<Al0004ToAl0005SpanComparisonAnalyzer, Al0005CodeFixProvider> {
     [Fact]
     public Task ShouldConvertToSequenceEqual() => VerifyAsync(
         """

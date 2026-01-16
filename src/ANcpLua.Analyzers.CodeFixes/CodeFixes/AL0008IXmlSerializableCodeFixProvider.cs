@@ -1,21 +1,21 @@
-using ANcpLua.Analyzers.Core;
+﻿using ANcpLua.Analyzers.Core;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
 /// <summary>
 ///     Code fix provider for AL0008 - makes GetSchema return null with expression body.
 /// </summary>
-[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AL0008IXmlSerializableCodeFixProvider))]
+[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0008IXmlSerializableCodeFixProvider))]
 [Shared]
-public sealed class AL0008IXmlSerializableCodeFixProvider : CodeFixProvider {
+public sealed partial class Al0008IXmlSerializableCodeFixProvider : CodeFixProvider {
     public override ImmutableArray<string> FixableDiagnosticIds =>
         [DiagnosticIds.GetSchemaMustReturnNull];
 
     public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
     public override async Task RegisterCodeFixesAsync(CodeFixContext context) {
-        var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
-        if (root is null) {
+        if (await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false) is not
+            { } root) {
             return;
         }
 
@@ -25,12 +25,10 @@ public sealed class AL0008IXmlSerializableCodeFixProvider : CodeFixProvider {
             }
 
             var node = root.FindNode(diagnostic.Location.SourceSpan);
-            var target = node as CSharpSyntaxNode
-                         ?? node.FirstAncestorOrSelf<MethodDeclarationSyntax>() as CSharpSyntaxNode
-                         ?? node.FirstAncestorOrSelf<BlockSyntax>() as CSharpSyntaxNode
-                         ?? node.FirstAncestorOrSelf<ArrowExpressionClauseSyntax>();
-
-            if (target is null) {
+            if ((node as CSharpSyntaxNode
+                 ?? node.FirstAncestorOrSelf<MethodDeclarationSyntax>() as CSharpSyntaxNode
+                 ?? node.FirstAncestorOrSelf<BlockSyntax>() as CSharpSyntaxNode
+                 ?? node.FirstAncestorOrSelf<ArrowExpressionClauseSyntax>()) is not { } target) {
                 continue;
             }
 

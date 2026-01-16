@@ -1,4 +1,4 @@
-using ANcpLua.Analyzers.Core;
+﻿using ANcpLua.Analyzers.Core;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -8,7 +8,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     and can therefore be marked with the 'static' modifier for better performance.
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class AL0025PreferStaticLambdaAnalyzer : ALAnalyzer {
+public sealed partial class Al0025PreferStaticLambdaAnalyzer : AlAnalyzer {
     private static readonly LocalizableResourceString Title = new(
         nameof(Resources.AL0025AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
 
@@ -21,7 +21,7 @@ public sealed class AL0025PreferStaticLambdaAnalyzer : ALAnalyzer {
     private static readonly DiagnosticDescriptor Rule = new(
         DiagnosticIds.PreferStaticLambda,
         Title, MessageFormat, DiagnosticCategories.Usage,
-        DiagnosticSeverity.Info, true, Description,
+        DiagnosticSeverity.Warning, true, Description,
         HelpLinkBase);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
@@ -51,11 +51,6 @@ public sealed class AL0025PreferStaticLambdaAnalyzer : ALAnalyzer {
     public static bool CanBeStatic(AnonymousFunctionExpressionSyntax lambda, SemanticModel semanticModel) {
         // Skip if already static
         if (HasStaticModifier(lambda)) {
-            return false;
-        }
-
-        // Skip if inside another lambda (nested lambdas are complex)
-        if (lambda.Parent?.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>() is not null) {
             return false;
         }
 
@@ -93,15 +88,13 @@ public sealed class AL0025PreferStaticLambdaAnalyzer : ALAnalyzer {
         }
 
         // Get the containing type of the lambda
-        var lambdaContainingType = semanticModel.GetEnclosingSymbol(lambda.SpanStart)?.ContainingType;
-        if (lambdaContainingType is null) {
+        if (semanticModel.GetEnclosingSymbol(lambda.SpanStart)?.ContainingType is not { } lambdaContainingType) {
             return false;
         }
 
         // Check for implicit 'this' through instance member access
         foreach (var identifier in lambda.DescendantNodes().OfType<IdentifierNameSyntax>()) {
-            var symbol = semanticModel.GetSymbolInfo(identifier).Symbol;
-            if (symbol is null) {
+            if (semanticModel.GetSymbolInfo(identifier).Symbol is not { } symbol) {
                 continue;
             }
 
@@ -128,5 +121,4 @@ public sealed class AL0025PreferStaticLambdaAnalyzer : ALAnalyzer {
             _ => false
         };
     }
-
 }

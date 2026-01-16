@@ -27,24 +27,24 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     </para>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class AL0020ToAL0024FormBindingAnalyzer : ALAnalyzer {
-    private static readonly DiagnosticDescriptor RuleAL0020 = CreateRule(
+public sealed partial class Al0020ToAl0024FormBindingAnalyzer : AlAnalyzer {
+    private static readonly DiagnosticDescriptor RuleAl0020 = CreateRule(
         DiagnosticIds.FormCollectionRequiresExplicitAttribute, "AL0020");
 
-    private static readonly DiagnosticDescriptor RuleAL0021 = CreateRule(
+    private static readonly DiagnosticDescriptor RuleAl0021 = CreateRule(
         DiagnosticIds.MultipleStructuredFormSources, "AL0021");
 
-    private static readonly DiagnosticDescriptor RuleAL0022 = CreateRule(
+    private static readonly DiagnosticDescriptor RuleAl0022 = CreateRule(
         DiagnosticIds.MixedFormCollectionAndDto, "AL0022");
 
-    private static readonly DiagnosticDescriptor RuleAL0023 = CreateRule(
+    private static readonly DiagnosticDescriptor RuleAl0023 = CreateRule(
         DiagnosticIds.UnsupportedFormType, "AL0023");
 
-    private static readonly DiagnosticDescriptor RuleAL0024 = CreateRule(
+    private static readonly DiagnosticDescriptor RuleAl0024 = CreateRule(
         DiagnosticIds.FormAndBodyConflict, "AL0024");
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-        [RuleAL0020, RuleAL0021, RuleAL0022, RuleAL0023, RuleAL0024];
+        [RuleAl0020, RuleAl0021, RuleAl0022, RuleAl0023, RuleAl0024];
 
     private static DiagnosticDescriptor CreateRule(string id, string ruleNumber) => new(
         id,
@@ -93,7 +93,7 @@ public sealed class AL0020ToAL0024FormBindingAnalyzer : ALAnalyzer {
 
             if (isFormCollection && !hasFromFormAttr) {
                 context.ReportDiagnostic(Diagnostic.Create(
-                    RuleAL0020,
+                    RuleAl0020,
                     param.Locations.FirstOrDefault() ?? Location.None,
                     param.Name,
                     method.Name));
@@ -113,7 +113,7 @@ public sealed class AL0020ToAL0024FormBindingAnalyzer : ALAnalyzer {
                     var reason = GetUnsupportedFormTypeReason(param.Type);
                     if (reason is not null) {
                         context.ReportDiagnostic(Diagnostic.Create(
-                            RuleAL0023,
+                            RuleAl0023,
                             param.Locations.FirstOrDefault() ?? Location.None,
                             param.Name,
                             method.Name,
@@ -125,21 +125,21 @@ public sealed class AL0020ToAL0024FormBindingAnalyzer : ALAnalyzer {
 
         if (hasFromBody && hasFromForm) {
             context.ReportDiagnostic(Diagnostic.Create(
-                RuleAL0024,
+                RuleAl0024,
                 fromBodyParam?.Locations.FirstOrDefault() ?? method.Locations.FirstOrDefault() ?? Location.None,
                 method.Name));
         }
 
         if (fromFormDtoCount > 1) {
             context.ReportDiagnostic(Diagnostic.Create(
-                RuleAL0021,
+                RuleAl0021,
                 firstFromFormParam?.Locations.FirstOrDefault() ?? method.Locations.FirstOrDefault() ?? Location.None,
                 method.Name));
         }
 
         if (hasFromFormCollection && hasFromFormDto) {
             context.ReportDiagnostic(Diagnostic.Create(
-                RuleAL0022,
+                RuleAl0022,
                 firstFromFormParam?.Locations.FirstOrDefault() ?? method.Locations.FirstOrDefault() ?? Location.None,
                 method.Name));
         }

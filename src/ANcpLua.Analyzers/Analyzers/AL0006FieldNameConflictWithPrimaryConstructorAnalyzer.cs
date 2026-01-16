@@ -25,7 +25,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     </para>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class AL0006FieldNameConflictWithPrimaryConstructorAnalyzer : ALAnalyzer {
+public sealed partial class Al0006FieldNameConflictWithPrimaryConstructorAnalyzer : AlAnalyzer {
     private static readonly LocalizableResourceString Title = new(
         nameof(Resources.AL0006AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
 

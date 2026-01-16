@@ -1,13 +1,13 @@
-using ANcpLua.Roslyn.Utilities.Testing;
-using ANcpLua.Analyzers.Analyzers;
+﻿using ANcpLua.Analyzers.Analyzers;
 using ANcpLua.Analyzers.CodeFixes.CodeFixes;
+using ANcpLua.Roslyn.Utilities.Testing;
 
 namespace ANcpLua.Analyzers.Tests;
 
 /// <summary>
 ///     Tests for AL0014: Prefer pattern matching over equality operators for null and zero comparisons.
 /// </summary>
-public sealed class AL0014AnalyzerTests : AnalyzerTest<AL0014PreferPatternMatchingAnalyzer> {
+public sealed partial class Al0014AnalyzerTests : AnalyzerTest<Al0014PreferPatternMatchingAnalyzer> {
     [Theory]
     [InlineData("object? o", "[|o == null|]")]
     [InlineData("object? o", "[|o != null|]")]
@@ -17,12 +17,16 @@ public sealed class AL0014AnalyzerTests : AnalyzerTest<AL0014PreferPatternMatchi
         VerifyAsync($"public class C {{ void M({param}) {{ _ = {expr}; }} }}");
 
     [Theory]
-    [InlineData("[|x == 0|]")]
-    [InlineData("[|x != 0|]")]
-    [InlineData("[|0 == x|]")]
-    [InlineData("[|0 != x|]")]
-    public Task ShouldReportZeroComparisons(string expr) =>
-        VerifyAsync($"public class C {{ void M(int x) {{ _ = {expr}; }} }}");
+    [InlineData("int x", "[|x == 0|]")]
+    [InlineData("int x", "[|x != 0|]")]
+    [InlineData("int x", "[|0 == x|]")]
+    [InlineData("int x", "[|0 != x|]")]
+    [InlineData("double x", "[|x == 0.0|]")]
+    [InlineData("double x", "[|x != 0.0|]")]
+    [InlineData("float x", "[|x == 0.0f|]")]
+    [InlineData("decimal x", "[|x == 0.0m|]")]
+    public Task ShouldReportZeroComparisons(string param, string expr) =>
+        VerifyAsync($"public class C {{ void M({param}) {{ _ = {expr}; }} }}");
 
     [Theory]
     [InlineData("object? o", "o is null")]
@@ -60,6 +64,12 @@ public sealed class AL0014AnalyzerTests : AnalyzerTest<AL0014PreferPatternMatchi
     public Task ShouldNotReportInsidePatternContext(string source) => VerifyAsync(source);
 
     [Theory]
+    [InlineData("int x", "[|x == 0|]")]
+    [InlineData("byte x", "[|x == 0|]")]
+    public Task ShouldReportInsideSwitchArmExpression(string param, string expr) =>
+        VerifyAsync($"public class C {{ bool M({param}) => x switch {{ 1 => true, _ => {expr} }}; }}");
+
+    [Theory]
     [InlineData("""
                 using System;
                 using System.Linq.Expressions;
@@ -93,7 +103,7 @@ public sealed class AL0014AnalyzerTests : AnalyzerTest<AL0014PreferPatternMatchi
 /// <summary>
 ///     Code fix tests for AL0014: Converts equality comparisons to pattern matching.
 /// </summary>
-public sealed class AL0014CodeFixTests : CodeFixTest<AL0014PreferPatternMatchingAnalyzer, AL0014CodeFixProvider> {
+public sealed partial class Al0014CodeFixTests : CodeFixTest<Al0014PreferPatternMatchingAnalyzer, Al0014CodeFixProvider> {
     [Fact]
     public Task ShouldConvertEqualsNullToIsNull() => VerifyAsync(
         """

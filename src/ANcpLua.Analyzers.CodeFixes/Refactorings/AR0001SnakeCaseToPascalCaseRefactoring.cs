@@ -10,7 +10,7 @@ namespace ANcpLua.Analyzers.CodeFixes.Refactorings;
 /// </summary>
 [ExportCodeRefactoringProvider(LanguageNames.CSharp, Name = nameof(Ar0001SnakeCaseToPascalCaseRefactoring))]
 [Shared]
-public sealed class Ar0001SnakeCaseToPascalCaseRefactoring : CodeRefactoringProvider {
+public sealed partial class Ar0001SnakeCaseToPascalCaseRefactoring : CodeRefactoringProvider {
     private static readonly Regex ScreamingSnakeCasePattern = new("^[A-Z0-9_]+$", RegexOptions.Compiled);
 
     public override async Task ComputeRefactoringsAsync(CodeRefactoringContext context) {
@@ -25,22 +25,25 @@ public sealed class Ar0001SnakeCaseToPascalCaseRefactoring : CodeRefactoringProv
                 break;
 
             case VariableDeclaratorSyntax {
-                Parent: VariableDeclarationSyntax { Parent: FieldDeclarationSyntax field }
-            } variable
+                    Parent: VariableDeclarationSyntax { Parent: FieldDeclarationSyntax field }
+                } variable
                 when field.Modifiers.Any(static m => m.IsKind(SyntaxKind.ConstKeyword)) &&
                      IsScreamingSnakeCase(variable.Identifier.Text):
                 RegisterRefactoring(context, document, variable.Identifier.Text,
-                    (doc, name, ct) => RenameNodeAsync(doc, variable, name, static (n, id) => n.WithIdentifier(id), ct));
+                    (doc, name, ct) =>
+                        RenameNodeAsync(doc, variable, name, static (n, id) => n.WithIdentifier(id), ct));
                 break;
 
             case EnumMemberDeclarationSyntax enumMember when IsScreamingSnakeCase(enumMember.Identifier.Text):
                 RegisterRefactoring(context, document, enumMember.Identifier.Text,
-                    (doc, name, ct) => RenameNodeAsync(doc, enumMember, name, static (n, id) => n.WithIdentifier(id), ct));
+                    (doc, name, ct) =>
+                        RenameNodeAsync(doc, enumMember, name, static (n, id) => n.WithIdentifier(id), ct));
                 break;
 
             case DelegateDeclarationSyntax @delegate when IsScreamingSnakeCase(@delegate.Identifier.Text):
                 RegisterRefactoring(context, document, @delegate.Identifier.Text,
-                    (doc, name, ct) => RenameNodeAsync(doc, @delegate, name, static (n, id) => n.WithIdentifier(id), ct));
+                    (doc, name, ct) =>
+                        RenameNodeAsync(doc, @delegate, name, static (n, id) => n.WithIdentifier(id), ct));
                 break;
         }
     }

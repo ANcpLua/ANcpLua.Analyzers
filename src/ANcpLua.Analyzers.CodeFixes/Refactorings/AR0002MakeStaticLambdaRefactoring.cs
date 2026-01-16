@@ -1,4 +1,5 @@
-using ANcpLua.Analyzers.Analyzers;
+﻿using ANcpLua.Analyzers.Analyzers;
+using ANcpLua.Analyzers.Core;
 using Microsoft.CodeAnalysis.Editing;
 
 namespace ANcpLua.Analyzers.CodeFixes.Refactorings;
@@ -10,11 +11,10 @@ namespace ANcpLua.Analyzers.CodeFixes.Refactorings;
 /// </summary>
 [ExportCodeRefactoringProvider(LanguageNames.CSharp, Name = nameof(Ar0002MakeStaticLambdaRefactoring))]
 [Shared]
-public sealed class Ar0002MakeStaticLambdaRefactoring : CodeRefactoringProvider {
+public sealed partial class Ar0002MakeStaticLambdaRefactoring : CodeRefactoringProvider {
     public override async Task ComputeRefactoringsAsync(CodeRefactoringContext context) {
         var document = context.Document;
-        var root = await document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
-        if (root is null) {
+        if (await document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false) is not { } root) {
             return;
         }
 
@@ -28,7 +28,13 @@ public sealed class Ar0002MakeStaticLambdaRefactoring : CodeRefactoringProvider 
 
         // Check if lambda can be made static using the analyzer's logic
         var semanticModel = await document.GetSemanticModelAsync(context.CancellationToken).ConfigureAwait(false);
-        if (semanticModel is null || !AL0025PreferStaticLambdaAnalyzer.CanBeStatic(lambda, semanticModel)) {
+        if (semanticModel is null || !Al0025PreferStaticLambdaAnalyzer.CanBeStatic(lambda, semanticModel)) {
+            return;
+        }
+
+        // Skip if AL0025 diagnostic is active (code fix handles it)
+        var diagnostics = semanticModel.GetDiagnostics(lambda.Span, context.CancellationToken);
+        if (diagnostics.Any(static d => d.Id == DiagnosticIds.PreferStaticLambda)) {
             return;
         }
 
@@ -64,8 +70,7 @@ public sealed class Ar0002MakeStaticLambdaRefactoring : CodeRefactoringProvider 
         Document document,
         AnonymousFunctionExpressionSyntax lambda,
         CancellationToken ct) {
-        var root = await document.GetSyntaxRootAsync(ct).ConfigureAwait(false);
-        if (root is null) {
+        if (await document.GetSyntaxRootAsync(ct).ConfigureAwait(false) is not { } root) {
             return document;
         }
 
@@ -101,8 +106,7 @@ public sealed class Ar0002MakeStaticLambdaRefactoring : CodeRefactoringProvider 
         var solution = project.Solution;
 
         foreach (var documentId in project.DocumentIds) {
-            var document = solution.GetDocument(documentId);
-            if (document is null) {
+            if (solution.GetDocument(documentId) is not { } document) {
                 continue;
             }
 
@@ -118,8 +122,7 @@ public sealed class Ar0002MakeStaticLambdaRefactoring : CodeRefactoringProvider 
         CancellationToken ct) {
         foreach (var project in solution.Projects) {
             foreach (var documentId in project.DocumentIds) {
-                var document = solution.GetDocument(documentId);
-                if (document is null) {
+                if (solution.GetDocument(documentId) is not { } document) {
                     continue;
                 }
 
@@ -133,11 +136,12 @@ public sealed class Ar0002MakeStaticLambdaRefactoring : CodeRefactoringProvider 
 
     private static ImmutableArray<AnonymousFunctionExpressionSyntax> FindStaticCandidates(
         SyntaxNode root,
-        SemanticModel semanticModel) =>
-        [.. root.DescendantNodes()
+        SemanticModel semanticModel) => [
+        .. root.DescendantNodes()
             .OfType<AnonymousFunctionExpressionSyntax>()
             .Where(lambda => !lambda.Modifiers.Any(SyntaxKind.StaticKeyword) &&
-                             AL0025PreferStaticLambdaAnalyzer.CanBeStatic(lambda, semanticModel))];
+                             Al0025PreferStaticLambdaAnalyzer.CanBeStatic(lambda, semanticModel))
+    ];
 
     private static AnonymousFunctionExpressionSyntax AddStaticModifier(AnonymousFunctionExpressionSyntax lambda) {
         var staticKeyword = SyntaxFactory.Token(SyntaxKind.StaticKeyword)

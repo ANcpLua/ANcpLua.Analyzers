@@ -1,5 +1,6 @@
 ﻿// This file contains deprecated attribute names as dictionary keys - they're needed
 // for the analyzer to detect these deprecated attributes in user code.
+
 #pragma warning disable AL0012 // Deprecated semantic convention attribute (intentional - this IS the lookup table)
 
 namespace ANcpLua.Analyzers.Core;
@@ -25,7 +26,7 @@ namespace ANcpLua.Analyzers.Core;
 ///         </list>
 ///     </para>
 /// </remarks>
-public static class DeprecatedOtelAttributes {
+public static partial class DeprecatedOtelAttributes {
     /// <summary>
     ///     Deprecated attribute names mapped to replacements.
     /// </summary>

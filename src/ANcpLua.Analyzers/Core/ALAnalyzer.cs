@@ -3,7 +3,7 @@
 /// <summary>
 ///     Base class for all ANcpLua analyzers.
 /// </summary>
-public abstract class ALAnalyzer : DiagnosticAnalyzer {
+public abstract partial class AlAnalyzer : DiagnosticAnalyzer {
     public const string HelpLinkBase = "https://github.com/ANcpLua/ANcpLua.Analyzers#rules";
 
     public sealed override void Initialize(AnalysisContext context) {
@@ -18,7 +18,7 @@ public abstract class ALAnalyzer : DiagnosticAnalyzer {
 /// <summary>
 ///     Diagnostic categories for grouping related analyzers.
 /// </summary>
-public static class DiagnosticCategories {
+public static partial class DiagnosticCategories {
     public const string Design = "Design";
     public const string Usage = "Usage";
     public const string Reliability = "Reliability";
@@ -32,7 +32,7 @@ public static class DiagnosticCategories {
 /// <summary>
 ///     Central registry of all diagnostic IDs following Roslyn naming conventions.
 /// </summary>
-public static class DiagnosticIds {
+public static partial class DiagnosticIds {
     /// <summary>AL0001: Prohibit reassignment of primary constructor parameters.</summary>
     public const string ProhibitPrimaryConstructorParameterReassignment = "AL0001";
 
@@ -136,7 +136,7 @@ public static class DiagnosticIds {
 ///     Extension methods that simplify diagnostic reporting by combining
 ///     Diagnostic.Create and ReportDiagnostic into a single call.
 /// </summary>
-internal static class DiagnosticReportingExtensions {
+internal static partial class DiagnosticReportingExtensions {
     public static void ReportDiagnostic(
         this SyntaxNodeAnalysisContext context,
         DiagnosticDescriptor descriptor,

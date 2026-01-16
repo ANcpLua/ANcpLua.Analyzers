@@ -6,10 +6,10 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 /// <summary>
 ///     Code fix for AL0016: Combines declaration with null-check into "if (M() is not { } x) return;".
 /// </summary>
-[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AL0016CombineDeclarationWithNullCheckCodeFixProvider))]
+[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0016CombineDeclarationWithNullCheckCodeFixProvider))]
 [Shared]
-public sealed class AL0016CombineDeclarationWithNullCheckCodeFixProvider
-    : ALCodeFixProvider<LocalDeclarationStatementSyntax> {
+public sealed partial class Al0016CombineDeclarationWithNullCheckCodeFixProvider
+    : AlCodeFixProvider<LocalDeclarationStatementSyntax> {
     public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.CombineDeclarationWithNullCheck];
 
     protected override CodeAction? CreateCodeAction(Document document,
@@ -35,7 +35,7 @@ public sealed class AL0016CombineDeclarationWithNullCheckCodeFixProvider
         return CodeAction.Create(
             CodeFixResources.AL0016CodeFixTitle,
             ct => CombineAsync(document, declaration, ifStatement, variableName, initializerValue, ct),
-            nameof(AL0016CombineDeclarationWithNullCheckCodeFixProvider));
+            nameof(Al0016CombineDeclarationWithNullCheckCodeFixProvider));
     }
 
     private static async Task<Document> CombineAsync(

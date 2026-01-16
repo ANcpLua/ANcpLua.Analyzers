@@ -1,13 +1,13 @@
-using ANcpLua.Roslyn.Utilities.Testing;
-using ANcpLua.Analyzers.Analyzers;
+﻿using ANcpLua.Analyzers.Analyzers;
 using ANcpLua.Analyzers.CodeFixes.CodeFixes;
+using ANcpLua.Roslyn.Utilities.Testing;
 
 namespace ANcpLua.Analyzers.Tests;
 
 /// <summary>
 ///     Tests for AL0012: Detects usage of deprecated OpenTelemetry semantic convention attributes.
 /// </summary>
-public sealed class AL0012AnalyzerTests : AnalyzerTest<AL0012DeprecatedAttributeAnalyzer> {
+public sealed partial class Al0012AnalyzerTests : AnalyzerTest<Al0012DeprecatedAttributeAnalyzer> {
     [Theory]
     [InlineData("""
                 using System.Collections.Generic;
@@ -137,8 +137,8 @@ public sealed class AL0012AnalyzerTests : AnalyzerTest<AL0012DeprecatedAttribute
 /// <summary>
 ///     Code fix tests for AL0012: Replaces deprecated attributes with modern equivalents.
 /// </summary>
-public sealed class
-    AL0012CodeFixTests : CodeFixTest<AL0012DeprecatedAttributeAnalyzer, AL0012DeprecatedAttributeCodeFixProvider> {
+public sealed partial class
+    Al0012CodeFixTests : CodeFixTest<Al0012DeprecatedAttributeAnalyzer, Al0012DeprecatedAttributeCodeFixProvider> {
     [Fact]
     public Task ShouldReplaceHttpMethod() => VerifyAsync(
         """

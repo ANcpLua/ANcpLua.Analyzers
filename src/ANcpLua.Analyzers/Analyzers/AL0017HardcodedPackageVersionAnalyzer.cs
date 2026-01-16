@@ -31,7 +31,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     </para>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class AL0017HardcodedPackageVersionAnalyzer : DiagnosticAnalyzer {
+public sealed partial class Al0017HardcodedPackageVersionAnalyzer : DiagnosticAnalyzer {
     public const string DiagnosticId = DiagnosticIds.HardcodedPackageVersion;
 
     /// <summary>Property key for the suggested variable name.</summary>
@@ -55,7 +55,7 @@ public sealed class AL0017HardcodedPackageVersionAnalyzer : DiagnosticAnalyzer {
     private static readonly DiagnosticDescriptor Rule = new(
         DiagnosticId, Title, MessageFormat, DiagnosticCategories.VersionManagement,
         DiagnosticSeverity.Warning, true, Description,
-        ALAnalyzer.HelpLinkBase,
+        AlAnalyzer.HelpLinkBase,
         WellKnownDiagnosticTags.CompilationEnd);
 
     /// <summary>

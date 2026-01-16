@@ -1008,6 +1008,79 @@ dotnet_diagnostic.s2325.severity = none
 # Types should be defined in named namespaces
 dotnet_diagnostic.s3903.severity = none
 
+### ANcpLua.Analyzers (Dogfood Mode) ###
+
+## Errors (all rules enforced during internal development) ##
+
+# AL0001: Prohibit reassignment of primary constructor params
+dotnet_diagnostic.AL0001.severity = error
+
+# AL0002: Don't repeat negated patterns
+dotnet_diagnostic.AL0002.severity = error
+
+# AL0003: Don't divide by constant zero
+dotnet_diagnostic.AL0003.severity = error
+
+# AL0004: Use pattern matching for Span constant comparison
+dotnet_diagnostic.AL0004.severity = error
+
+# AL0005: Use SequenceEqual for Span non-constant comparison
+dotnet_diagnostic.AL0005.severity = error
+
+# AL0006: Field name conflicts with primary constructor parameter
+dotnet_diagnostic.AL0006.severity = error
+
+# AL0007: GetSchema should be explicitly implemented
+dotnet_diagnostic.AL0007.severity = error
+
+# AL0008: GetSchema must return null and not be abstract
+dotnet_diagnostic.AL0008.severity = error
+
+# AL0009: Don't call IXmlSerializable.GetSchema
+dotnet_diagnostic.AL0009.severity = error
+
+# AL0010: Type should be partial for source generator support
+dotnet_diagnostic.AL0010.severity = error
+
+# AL0011: Avoid lock keyword on non-Lock types (.NET 9+)
+dotnet_diagnostic.AL0011.severity = error
+
+# AL0012: Deprecated OTel semantic convention attribute
+dotnet_diagnostic.AL0012.severity = error
+
+# AL0013: Missing telemetry schema URL
+dotnet_diagnostic.AL0013.severity = error
+
+# AL0014: Prefer pattern matching for null/zero comparisons
+dotnet_diagnostic.AL0014.severity = error
+
+# AL0015: Normalize null-guard style
+dotnet_diagnostic.AL0015.severity = error
+
+# AL0016: Combine declaration with subsequent null-check
+dotnet_diagnostic.AL0016.severity = error
+
+# AL0017: Hardcoded package version in Directory.Packages.props
+dotnet_diagnostic.AL0017.severity = error
+
+# AL0020: IFormCollection requires explicit [FromForm]
+dotnet_diagnostic.AL0020.severity = error
+
+# AL0021: Multiple structured form sources
+dotnet_diagnostic.AL0021.severity = error
+
+# AL0022: Mixed form collection and DTO
+dotnet_diagnostic.AL0022.severity = error
+
+# AL0023: Unsupported form type
+dotnet_diagnostic.AL0023.severity = error
+
+# AL0024: Form and body conflict
+dotnet_diagnostic.AL0024.severity = error
+
+# AL0025: Prefer static lambda
+dotnet_diagnostic.AL0025.severity = error
+
 ### StyleCop ###
 
 ## Settings ##
@@ -1606,3 +1679,35 @@ dotnet_naming_symbols.interface.required_modifiers =
 
 dotnet_naming_style.begins_with_i.required_prefix = I
 dotnet_naming_style.begins_with_i.capitalization = pascal_case
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Test Projects - Relaxed ANcpLua.Analyzers rules (warning instead of error)
+# Tests can be more lenient since they often contain intentional violations
+# for testing purposes
+# ═══════════════════════════════════════════════════════════════════════════
+[tests/**/*.cs]
+
+# Relax ANcpLua.Analyzers to warning for test code
+dotnet_diagnostic.AL0001.severity = warning
+dotnet_diagnostic.AL0002.severity = warning
+dotnet_diagnostic.AL0003.severity = warning
+dotnet_diagnostic.AL0004.severity = warning
+dotnet_diagnostic.AL0005.severity = warning
+dotnet_diagnostic.AL0006.severity = warning
+dotnet_diagnostic.AL0007.severity = warning
+dotnet_diagnostic.AL0008.severity = warning
+dotnet_diagnostic.AL0009.severity = warning
+dotnet_diagnostic.AL0010.severity = warning
+dotnet_diagnostic.AL0011.severity = warning
+dotnet_diagnostic.AL0012.severity = warning
+dotnet_diagnostic.AL0013.severity = warning
+dotnet_diagnostic.AL0014.severity = warning
+dotnet_diagnostic.AL0015.severity = warning
+dotnet_diagnostic.AL0016.severity = warning
+dotnet_diagnostic.AL0017.severity = warning
+dotnet_diagnostic.AL0020.severity = warning
+dotnet_diagnostic.AL0021.severity = warning
+dotnet_diagnostic.AL0022.severity = warning
+dotnet_diagnostic.AL0023.severity = warning
+dotnet_diagnostic.AL0024.severity = warning
+dotnet_diagnostic.AL0025.severity = warning

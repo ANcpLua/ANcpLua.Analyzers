@@ -10,9 +10,9 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         The <see cref="System.Xml.Serialization.IXmlSerializable.GetSchema"/> method
+///         The <see cref="System.Xml.Serialization.IXmlSerializable.GetSchema" /> method
 ///         is a historical artifact that should always return <c>null</c>. Microsoft's
-///         documentation explicitly states this, and the <see cref="System.Xml.Serialization.XmlSerializer"/>
+///         documentation explicitly states this, and the <see cref="System.Xml.Serialization.XmlSerializer" />
 ///         ignores its return value entirely.
 ///     </para>
 ///     <para>
@@ -32,54 +32,54 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     </para>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class AL0007ToAL0009IXmlSerializableAnalyzer : ALAnalyzer {
-    private static readonly LocalizableResourceString TitleAL0007 = new(
+public sealed partial class Al0007ToAl0009IXmlSerializableAnalyzer : AlAnalyzer {
+    private static readonly LocalizableResourceString TitleAl0007 = new(
         nameof(Resources.AL0007AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly LocalizableResourceString MessageFormatAL0007 = new(
+    private static readonly LocalizableResourceString MessageFormatAl0007 = new(
         nameof(Resources.AL0007AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly LocalizableResourceString DescriptionAL0007 = new(
+    private static readonly LocalizableResourceString DescriptionAl0007 = new(
         nameof(Resources.AL0007AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly LocalizableResourceString TitleAL0008 = new(
+    private static readonly LocalizableResourceString TitleAl0008 = new(
         nameof(Resources.AL0008AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly LocalizableResourceString MessageFormatAL0008 = new(
+    private static readonly LocalizableResourceString MessageFormatAl0008 = new(
         nameof(Resources.AL0008AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly LocalizableResourceString DescriptionAL0008 = new(
+    private static readonly LocalizableResourceString DescriptionAl0008 = new(
         nameof(Resources.AL0008AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly LocalizableResourceString TitleAL0009 = new(
+    private static readonly LocalizableResourceString TitleAl0009 = new(
         nameof(Resources.AL0009AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly LocalizableResourceString MessageFormatAL0009 = new(
+    private static readonly LocalizableResourceString MessageFormatAl0009 = new(
         nameof(Resources.AL0009AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly LocalizableResourceString DescriptionAL0009 = new(
+    private static readonly LocalizableResourceString DescriptionAl0009 = new(
         nameof(Resources.AL0009AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly DiagnosticDescriptor RuleAL0007 = new(
+    private static readonly DiagnosticDescriptor RuleAl0007 = new(
         DiagnosticIds.GetSchemaShouldBeExplicitlyImplemented,
-        TitleAL0007, MessageFormatAL0007, DiagnosticCategories.Usage,
-        DiagnosticSeverity.Error, true, DescriptionAL0007,
+        TitleAl0007, MessageFormatAl0007, DiagnosticCategories.Usage,
+        DiagnosticSeverity.Error, true, DescriptionAl0007,
         HelpLinkBase);
 
-    private static readonly DiagnosticDescriptor RuleAL0008 = new(
+    private static readonly DiagnosticDescriptor RuleAl0008 = new(
         DiagnosticIds.GetSchemaMustReturnNull,
-        TitleAL0008, MessageFormatAL0008, DiagnosticCategories.Usage,
-        DiagnosticSeverity.Error, true, DescriptionAL0008,
+        TitleAl0008, MessageFormatAl0008, DiagnosticCategories.Usage,
+        DiagnosticSeverity.Error, true, DescriptionAl0008,
         HelpLinkBase);
 
-    private static readonly DiagnosticDescriptor RuleAL0009 = new(
+    private static readonly DiagnosticDescriptor RuleAl0009 = new(
         DiagnosticIds.DontCallGetSchema,
-        TitleAL0009, MessageFormatAL0009, DiagnosticCategories.Usage,
-        DiagnosticSeverity.Error, true, DescriptionAL0009,
+        TitleAl0009, MessageFormatAl0009, DiagnosticCategories.Usage,
+        DiagnosticSeverity.Error, true, DescriptionAl0009,
         HelpLinkBase);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-        [RuleAL0007, RuleAL0008, RuleAL0009];
+        [RuleAl0007, RuleAl0008, RuleAl0009];
 
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterCompilationStartAction(OnCompilationStart);
@@ -122,7 +122,7 @@ public sealed class AL0007ToAL0009IXmlSerializableAnalyzer : ALAnalyzer {
 
         if (!methodSymbol.ExplicitInterfaceImplementations.Any(i =>
                 SymbolEqualityComparer.Default.Equals(i, interfaceGetSchema))) {
-            context.ReportDiagnostic(RuleAL0007, methodSymbol.Locations[0]);
+            context.ReportDiagnostic(RuleAl0007, methodSymbol.Locations[0]);
         }
 
 
@@ -132,7 +132,7 @@ public sealed class AL0007ToAL0009IXmlSerializableAnalyzer : ALAnalyzer {
                                ?.GetLocation()
                            ?? methodDeclaration.GetLocation();
 
-            context.ReportDiagnostic(RuleAL0008, location);
+            context.ReportDiagnostic(RuleAl0008, location);
         }
     }
 
@@ -146,7 +146,7 @@ public sealed class AL0007ToAL0009IXmlSerializableAnalyzer : ALAnalyzer {
 
         if (SymbolEqualityComparer.Default.Equals(targetMethod, interfaceGetSchema) ||
             IsGetSchemaImplementation(targetMethod, ixmlSerializable)) {
-            context.ReportDiagnostic(RuleAL0009, invocation.Syntax.GetLocation());
+            context.ReportDiagnostic(RuleAl0009, invocation.Syntax.GetLocation());
         }
     }
 
@@ -165,10 +165,10 @@ public sealed class AL0007ToAL0009IXmlSerializableAnalyzer : ALAnalyzer {
     private static bool ReturnsNonNullValue(SyntaxNode methodDeclaration, SemanticModel model) {
         foreach (var node in methodDeclaration.DescendantNodes()) {
             if (node switch {
-                    ReturnStatementSyntax returnStatement => returnStatement.Expression,
-                    ArrowExpressionClauseSyntax arrow => arrow.Expression,
-                    _ => null
-                } is not { } expression) {
+                ReturnStatementSyntax returnStatement => returnStatement.Expression,
+                ArrowExpressionClauseSyntax arrow => arrow.Expression,
+                _ => null
+            } is not { } expression) {
                 continue;
             }
 
