@@ -29,7 +29,8 @@ jobs:
         run: dotnet restore ANcpLua.Analyzers.slnx
 
       - name: Build
-        run: dotnet build ANcpLua.Analyzers.slnx -c Release --no-restore --warnaserror
+        # MSB4011: SDK double-import warning (harmless, tracked upstream)
+        run: dotnet build ANcpLua.Analyzers.slnx -c Release --no-restore --warnaserror /warnnotaserror:MSB4011
 
   test:
     needs: build
