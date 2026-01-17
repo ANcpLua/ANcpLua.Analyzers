@@ -486,3 +486,10 @@ $RECYCLE.BIN/
 
 # DocFX output
 docs/_site/
+
+# SDK-managed (synced from ANcpLua.NET.Sdk)
+Version.props
+
+# Local build outputs
+nupkgs/
+pp.txt
