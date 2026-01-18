@@ -42,9 +42,11 @@
         <Using Include="Microsoft.CodeAnalysis.Diagnostics"/>
         <Using Include="Microsoft.CodeAnalysis.Operations"/>
         <Using Include="System.Collections.Immutable"/>
+        <Using Include="ANcpLua.Roslyn.Utilities"/>
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="ANcpLua.Roslyn.Utilities" PrivateAssets="all"/>
         <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" PrivateAssets="all">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>

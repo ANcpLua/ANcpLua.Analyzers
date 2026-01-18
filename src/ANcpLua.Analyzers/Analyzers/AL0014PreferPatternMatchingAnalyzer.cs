@@ -42,29 +42,42 @@ public sealed partial class Al0014PreferPatternMatchingAnalyzer : AlAnalyzer {
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
     protected override void RegisterActions(AnalysisContext context) =>
-        context.RegisterSyntaxNodeAction(
-            AnalyzeBinaryExpression,
-            SyntaxKind.EqualsExpression,
-            SyntaxKind.NotEqualsExpression);
+        context.RegisterCompilationStartAction(compilationContext => {
+            var expressionType = compilationContext.Compilation
+                .GetTypeByMetadataName("System.Linq.Expressions.Expression`1");
 
-    private static void AnalyzeBinaryExpression(SyntaxNodeAnalysisContext context) {
-        var binary = (BinaryExpressionSyntax)context.Node;
+            compilationContext.RegisterOperationAction(
+                ctx => AnalyzeBinaryOperation(ctx, expressionType),
+                OperationKind.Binary);
+        });
 
-        if (IsInsidePatternContext(binary) || IsInsideExpressionTree(binary, context.SemanticModel)) {
+    private static void AnalyzeBinaryOperation(OperationAnalysisContext context, INamedTypeSymbol? expressionType) {
+        var operation = (IBinaryOperation)context.Operation;
+
+        if (operation.OperatorKind is not (BinaryOperatorKind.Equals or BinaryOperatorKind.NotEquals)) {
             return;
         }
 
-        if (!TryGetComparisonInfo(binary, out var isNullCheck, out var expressionIsLeft)) {
+        if (IsInsidePatternContext(operation.Syntax)) {
             return;
         }
 
-        var isNegated = binary.IsKind(SyntaxKind.NotEqualsExpression);
-        var expression = expressionIsLeft ? binary.Left : binary.Right;
-        var literal = expressionIsLeft ? binary.Right : binary.Left;
+        // Skip operations inside expression trees (pattern matching not supported)
+        if (operation.IsInExpressionTree(expressionType)) {
+            return;
+        }
 
-        var originalText = $"{expression} {binary.OperatorToken} {literal}";
+        if (!TryGetComparisonInfo(operation, out var isNullCheck, out var expressionIsLeft)) {
+            return;
+        }
+
+        var isNegated = operation.OperatorKind == BinaryOperatorKind.NotEquals;
+        var expressionOperand = expressionIsLeft ? operation.LeftOperand : operation.RightOperand;
+        var literalOperand = expressionIsLeft ? operation.RightOperand : operation.LeftOperand;
+
+        var originalText = $"{expressionOperand.Syntax} {GetOperatorText(operation)} {literalOperand.Syntax}";
         var patternKeyword = isNegated ? "is not" : "is";
-        var suggestedText = $"{expression} {patternKeyword} {literal}";
+        var suggestedText = $"{expressionOperand.Syntax} {patternKeyword} {literalOperand.Syntax}";
 
         var properties = ImmutableDictionary.CreateBuilder<string, string?>();
         properties.Add(PropertyIsNullCheck, isNullCheck.ToString());
@@ -73,40 +86,40 @@ public sealed partial class Al0014PreferPatternMatchingAnalyzer : AlAnalyzer {
 
         context.ReportDiagnostic(Diagnostic.Create(
             Rule,
-            binary.GetLocation(),
+            operation.Syntax.GetLocation(),
             properties.ToImmutable(),
             suggestedText,
             originalText));
     }
 
     private static bool TryGetComparisonInfo(
-        BinaryExpressionSyntax binary,
+        IBinaryOperation operation,
         out bool isNullCheck,
         out bool expressionIsLeft) {
         isNullCheck = false;
         expressionIsLeft = false;
 
-
-        if (IsNullLiteral(binary.Right)) {
+        // Check right operand for null/zero
+        if (operation.RightOperand.IsConstantNull()) {
             isNullCheck = true;
             expressionIsLeft = true;
             return true;
         }
 
-        if (IsNullLiteral(binary.Left)) {
+        if (operation.LeftOperand.IsConstantNull()) {
             isNullCheck = true;
             expressionIsLeft = false;
             return true;
         }
 
-
-        if (IsZeroLiteral(binary.Right)) {
+        // Check for zero literals
+        if (IsZeroLiteral(operation.RightOperand)) {
             isNullCheck = false;
             expressionIsLeft = true;
             return true;
         }
 
-        if (IsZeroLiteral(binary.Left)) {
+        if (IsZeroLiteral(operation.LeftOperand)) {
             isNullCheck = false;
             expressionIsLeft = false;
             return true;
@@ -115,43 +128,31 @@ public sealed partial class Al0014PreferPatternMatchingAnalyzer : AlAnalyzer {
         return false;
     }
 
+    private static bool IsZeroLiteral(IOperation operation) {
+        // Use IsConstantZero for numeric zero detection
+        if (!operation.IsConstantZero()) {
+            return false;
+        }
+
+        // Ensure it's a literal expression (not just any constant zero expression)
+        return operation.Syntax is LiteralExpressionSyntax { Token.ValueText: "0" or "0.0" };
+    }
+
     private static bool IsInsidePatternContext(SyntaxNode node) {
         for (var current = node.Parent; current is not null; current = current.Parent) {
-            // Skip patterns themselves but NOT arm expressions in switch expressions
-            // SwitchExpressionArmSyntax.Expression should be analyzed
             if (current is IsPatternExpressionSyntax or CasePatternSwitchLabelSyntax) {
                 return true;
             }
 
             // For switch expressions, only skip if we're in the pattern part, not the expression part
             if (current is SwitchExpressionArmSyntax arm && node.SpanStart >= arm.Expression.SpanStart) {
-                return false; // We're in the arm expression, analyze it
+                return false;
             }
         }
 
         return false;
     }
 
-    private static bool IsInsideExpressionTree(SyntaxNode node, SemanticModel semanticModel) {
-        for (var current = node.Parent; current is not null; current = current.Parent) {
-            if (current is LambdaExpressionSyntax lambda) {
-                var typeInfo = semanticModel.GetTypeInfo(lambda);
-                var convertedType = typeInfo.ConvertedType;
-
-                if (convertedType is INamedTypeSymbol namedType &&
-                    namedType.ContainingNamespace?.ToDisplayString() == "System.Linq.Expressions" &&
-                    namedType.Name == "Expression") {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    private static bool IsNullLiteral(SyntaxNode expression) =>
-        expression.IsKind(SyntaxKind.NullLiteralExpression);
-
-    private static bool IsZeroLiteral(ExpressionSyntax expression) =>
-        expression is LiteralExpressionSyntax { Token.ValueText: "0" or "0.0" };
+    private static string GetOperatorText(IBinaryOperation operation) =>
+        operation.OperatorKind == BinaryOperatorKind.Equals ? "==" : "!=";
 }

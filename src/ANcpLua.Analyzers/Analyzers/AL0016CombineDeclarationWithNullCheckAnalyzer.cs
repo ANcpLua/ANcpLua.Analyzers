@@ -51,7 +51,6 @@ public sealed partial class Al0016CombineDeclarationWithNullCheckAnalyzer : AlAn
 
         var declaration = (LocalDeclarationStatementSyntax)context.Node;
 
-
         if (declaration.Declaration.Variables.Count != 1) {
             return;
         }
@@ -63,12 +62,10 @@ public sealed partial class Al0016CombineDeclarationWithNullCheckAnalyzer : AlAn
 
         var variableName = variable.Identifier.Text;
 
-
         if (context.SemanticModel.GetDeclaredSymbol(variable) is not ILocalSymbol symbol ||
             !symbol.Type.IsReferenceType) {
             return;
         }
-
 
         if (declaration.Parent is not BlockSyntax block) {
             return;
@@ -87,43 +84,44 @@ public sealed partial class Al0016CombineDeclarationWithNullCheckAnalyzer : AlAn
             return;
         }
 
-
-        if (!IsNullCheck(ifStatement.Condition, variableName)) {
+        if (!IsNullCheck(ifStatement.Condition, variableName, context.SemanticModel)) {
             return;
         }
-
 
         if (!IsEarlyExit(ifStatement.Statement)) {
             return;
         }
 
-
-        if (ContainsNonNameofUsage(ifStatement.Statement, variableName)) {
+        if (ContainsNonNameofUsage(ifStatement.Statement, variableName, context.SemanticModel)) {
             return;
         }
 
         context.ReportDiagnostic(Diagnostic.Create(Rule, declaration.GetLocation(), variableName));
     }
 
-    private static bool IsNullCheck(ExpressionSyntax condition, string name) {
+    private static bool IsNullCheck(ExpressionSyntax condition, string name, SemanticModel semanticModel) {
         switch (condition) {
-            case IsPatternExpressionSyntax {
-                Pattern: ConstantPatternSyntax { Expression: LiteralExpressionSyntax l }
-            } p
-                when l.IsKind(SyntaxKind.NullLiteralExpression):
-                return p.Expression is IdentifierNameSyntax id && id.Identifier.Text == name;
-
+            case IsPatternExpressionSyntax { Pattern: ConstantPatternSyntax { Expression: var expr } } pattern
+                when expr.IsKind(SyntaxKind.NullLiteralExpression):
+                return pattern.Expression is IdentifierNameSyntax id && id.Identifier.Text == name;
 
             case BinaryExpressionSyntax bin when bin.IsKind(SyntaxKind.EqualsExpression): {
-                if (bin.Right.IsKind(SyntaxKind.NullLiteralExpression) && bin.Left is IdentifierNameSyntax lId) {
-                    return lId.Identifier.Text == name;
+                // Use semantic model to get operations for null check
+                if (semanticModel.GetOperation(bin) is not IBinaryOperation operation) {
+                    return false;
                 }
 
-                if (bin.Left.IsKind(SyntaxKind.NullLiteralExpression) && bin.Right is IdentifierNameSyntax rId) {
-                    return rId.Identifier.Text == name;
+                // Check if this is an equality comparison with null
+                var leftIsNull = operation.LeftOperand.IsConstantNull();
+                var rightIsNull = operation.RightOperand.IsConstantNull();
+
+                if (!leftIsNull && !rightIsNull) {
+                    return false;
                 }
 
-                break;
+                // Verify the non-null side is our variable
+                var variableSide = leftIsNull ? bin.Right : bin.Left;
+                return variableSide is IdentifierNameSyntax identifier && identifier.Identifier.Text == name;
             }
         }
 
@@ -141,15 +139,38 @@ public sealed partial class Al0016CombineDeclarationWithNullCheckAnalyzer : AlAn
         }
     }
 
-    private static bool ContainsNonNameofUsage(SyntaxNode node, string name) =>
-        node.DescendantNodes()
-            .OfType<IdentifierNameSyntax>()
-            .Where(id => id.Identifier.Text == name)
-            .Any(static id => id.Parent is not ArgumentSyntax {
-                Parent: ArgumentListSyntax {
-                    Parent: InvocationExpressionSyntax {
-                        Expression: IdentifierNameSyntax { Identifier.Text: "nameof" }
-                    }
+    private static bool ContainsNonNameofUsage(SyntaxNode node, string name, SemanticModel semanticModel) {
+        foreach (var identifier in node.DescendantNodes().OfType<IdentifierNameSyntax>()) {
+            if (identifier.Identifier.Text != name) {
+                continue;
+            }
+
+            // Get the operation for this identifier to check if it's inside nameof
+            var operation = semanticModel.GetOperation(identifier);
+            if (operation is null) {
+                // Fallback to syntax-based check
+                if (!IsInsideNameofSyntax(identifier)) {
+                    return true;
                 }
-            });
+
+                continue;
+            }
+
+            // Use OperationExtensions.IsInNameofOperation()
+            if (!operation.IsInNameofOperation()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool IsInsideNameofSyntax(SyntaxNode node) =>
+        node.Parent is ArgumentSyntax {
+            Parent: ArgumentListSyntax {
+                Parent: InvocationExpressionSyntax {
+                    Expression: IdentifierNameSyntax { Identifier.Text: "nameof" }
+                }
+            }
+        };
 }
