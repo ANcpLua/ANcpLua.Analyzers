@@ -46,6 +46,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <!-- Runtime package - bundled into analyzer package via _AddAnalyzersToPackage target -->
         <PackageReference Include="ANcpLua.Roslyn.Utilities" PrivateAssets="all"/>
         <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" PrivateAssets="all">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -62,15 +63,20 @@
         <None Include="../../README.md" Pack="true" PackagePath="/"/>
     </ItemGroup>
 
-    <!-- CRITICAL: Pack BOTH analyzer assemblies (netstandard2.0 only) -->
+    <!-- CRITICAL: Pack ALL analyzer assemblies including dependencies (netstandard2.0 only) -->
     <PropertyGroup>
         <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToPackage</TargetsForTfmSpecificContentInPackage>
+        <!-- Ensure dependencies are copied to output for bundling -->
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     </PropertyGroup>
 
     <Target Name="_AddAnalyzersToPackage" Condition="'$(TargetFramework)' == 'netstandard2.0'">
         <ItemGroup>
+            <!-- Analyzer assemblies -->
             <TfmSpecificPackageFile Include="$(OutputPath)ANcpLua.Analyzers.dll" PackagePath="analyzers/dotnet/cs"/>
             <TfmSpecificPackageFile Include="$(ArtifactsPath)bin/ANcpLua.Analyzers.CodeFixes/release_netstandard2.0/ANcpLua.Analyzers.CodeFixes.dll" PackagePath="analyzers/dotnet/cs"/>
+            <!-- Bundle Roslyn.Utilities dependency (required for analyzer runtime) -->
+            <TfmSpecificPackageFile Include="$(OutputPath)ANcpLua.Roslyn.Utilities.dll" PackagePath="analyzers/dotnet/cs"/>
         </ItemGroup>
     </Target>
 </Project>
