@@ -16,7 +16,7 @@
       <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="$(RoslynVersion)"/>
   -->
   <PropertyGroup Label="SDK Version (Auto-generated)">
-    <ANcpSdkPackageVersion>1.6.12</ANcpSdkPackageVersion>
+    <ANcpSdkPackageVersion>1.6.13</ANcpSdkPackageVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
@@ -33,13 +33,6 @@
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Roslyn.Utilities.Sources">
     <ANcpLuaRoslynUtilitiesSourcesVersion>1.13.0</ANcpLuaRoslynUtilitiesSourcesVersion>
-  </PropertyGroup>
-
-  <!-- ═══════════════════════════════════════════════════════════════════════
-       ROSLYN.UTILITIES.TESTING (Analyzer/CodeFix/Generator test infrastructure)
-       ═══════════════════════════════════════════════════════════════════════ -->
-  <PropertyGroup Label="Roslyn.Utilities.Testing">
-    <ANcpLuaRoslynUtilitiesTestingVersion>1.13.0</ANcpLuaRoslynUtilitiesTestingVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
@@ -63,7 +56,7 @@
        Used by: SDK, Roslyn.Utilities
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Meziantou">
-    <MeziantouFrameworkVersion>5.0.10</MeziantouFrameworkVersion>
+    <MeziantouFrameworkVersion>5.0.7</MeziantouFrameworkVersion>
     <MeziantouFullPathVersion>1.1.12</MeziantouFullPathVersion>
     <MeziantouTemporaryDirectoryVersion>1.0.30</MeziantouTemporaryDirectoryVersion>
     <MeziantouThreadingVersion>2.0.3</MeziantouThreadingVersion>
@@ -77,7 +70,7 @@
        Used by: SDK, Roslyn.Utilities.Testing, Analyzers.Tests
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Testing">
-    <XunitV3Version>3.2.2</XunitV3Version>
+    <XunitV3Version>3.2.1</XunitV3Version>
     <AwesomeAssertionsVersion>9.3.0</AwesomeAssertionsVersion>
     <AwesomeAssertionsAnalyzersVersion>9.0.8</AwesomeAssertionsAnalyzersVersion>
     <GitHubActionsTestLoggerVersion>3.0.1</GitHubActionsTestLoggerVersion>
@@ -131,7 +124,7 @@
   <PropertyGroup Label="Build Tools">
     <NuGetVersion>7.0.1</NuGetVersion>
     <MSBuildStructuredLoggerVersion>2.3.113</MSBuildStructuredLoggerVersion>
-    <MicrosoftSourceLinkVersion>10.0.102</MicrosoftSourceLinkVersion>
+    <MicrosoftSourceLinkVersion>8.0.0</MicrosoftSourceLinkVersion>
     <MicrosoftDeploymentDotNetReleasesVersion>1.0.1</MicrosoftDeploymentDotNetReleasesVersion>
   </PropertyGroup>
 
