@@ -1,4 +1,13 @@
 <Project>
+    <!--
+      Temporarily suppress AL0014 for SDK polyfill files until SDK 1.6.12.
+      SDK 1.6.10's StringExtensions.cs uses == 0 instead of is 0.
+      Remove this after updating to SDK 1.6.12 with fixed polyfills.
+    -->
+    <PropertyGroup>
+        <NoWarn>$(NoWarn);AL0014</NoWarn>
+    </PropertyGroup>
+
     <PropertyGroup>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     </PropertyGroup>

@@ -86,15 +86,15 @@ public sealed partial class Al0003DontDivideByConstantZeroAnalyzer : AlAnalyzer 
     private static bool IsZero(object? value) =>
         value switch {
             0 or 0u or 0L or 0ul => true,
-            byte b => b == 0,
-            sbyte sb => sb == 0,
-            short s => s == 0,
-            ushort us => us == 0,
+            byte b => b is 0,
+            sbyte sb => sb is 0,
+            short s => s is 0,
+            ushort us => us is 0,
 
-            decimal d => d == 0m,
+            decimal d => d is 0m,
 
-            nint n => n == 0,
-            nuint nu => nu == 0,
+            nint n => n is 0,
+            nuint nu => nu is 0,
             _ => false
         };
 }
