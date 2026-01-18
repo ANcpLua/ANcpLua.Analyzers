@@ -209,9 +209,9 @@ public class ApiTests : IntegrationTestBase<Program>
 }
 ```
 
-## Full Documentation
+## Documentation
 
-See [ANcpLua.io/analyzers](https://ancplua.io/content/analyzers/) for complete documentation and [API Reference](https://ancplua.io/api/analyzers/).
+Full reference: https://ancplua.mintlify.app/analyzers/overview
 
 ## Related Projects
 
