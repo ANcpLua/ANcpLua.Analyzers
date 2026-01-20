@@ -1,4 +1,5 @@
 using ANcpLua.Analyzers.Core;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Editing;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
@@ -36,7 +37,7 @@ public sealed partial class Al0011LockTypeCodeFixProvider : CodeFixProvider {
             }
 
             // Find the field being used for synchronization
-            if (FindSyncField(lockStatement.Expression, semanticModel, context.CancellationToken) is not { } fieldInfo) {
+            if (FindSyncField(lockStatement.Expression, semanticModel, root.SyntaxTree, context.CancellationToken) is not { } fieldInfo) {
                 continue;
             }
 
@@ -52,6 +53,7 @@ public sealed partial class Al0011LockTypeCodeFixProvider : CodeFixProvider {
     private static (VariableDeclaratorSyntax declaration, IFieldSymbol field)? FindSyncField(
         ExpressionSyntax syncExpression,
         SemanticModel semanticModel,
+        SyntaxTree currentSyntaxTree,
         CancellationToken cancellationToken) {
         if (semanticModel.GetSymbolInfo(syncExpression, cancellationToken).Symbol is not IFieldSymbol field) {
             return null;
@@ -66,6 +68,16 @@ public sealed partial class Al0011LockTypeCodeFixProvider : CodeFixProvider {
         // Find the declaration syntax
         if (field.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax(cancellationToken)
             is not VariableDeclaratorSyntax declarator) {
+            return null;
+        }
+
+        // Skip if field is declared in a different document (e.g., partial class in another file)
+        if (declarator.SyntaxTree != currentSyntaxTree) {
+            return null;
+        }
+
+        // Skip multi-variable declarations (e.g., private readonly object _sync1 = new(), _other = new())
+        if (declarator.Parent is VariableDeclarationSyntax { Variables.Count: > 1 }) {
             return null;
         }
 
@@ -98,10 +110,23 @@ public sealed partial class Al0011LockTypeCodeFixProvider : CodeFixProvider {
         // Create new variable declaration with Lock type
         var newVariableDeclaration = variableDeclaration.WithType(lockTypeSyntax);
 
-        // Update initializer to use new() if present
+        // Update initializer if present
         if (declarator.Initializer?.Value is ObjectCreationExpressionSyntax or ImplicitObjectCreationExpressionSyntax) {
-            var newInitializer = SyntaxFactory.ImplicitObjectCreationExpression()
-                .WithArgumentList(SyntaxFactory.ArgumentList())
+            // Check if C# 9+ is available for target-typed new()
+            var useImplicitNew = editor.SemanticModel.Compilation is CSharpCompilation csharp &&
+                                 csharp.LanguageVersion >= LanguageVersion.CSharp9;
+
+            ExpressionSyntax newInitializer;
+            if (useImplicitNew) {
+                newInitializer = SyntaxFactory.ImplicitObjectCreationExpression()
+                    .WithArgumentList(SyntaxFactory.ArgumentList());
+            } else {
+                // For C# 8 and earlier, use explicit new Lock()
+                newInitializer = SyntaxFactory.ObjectCreationExpression(lockTypeSyntax.WithoutTrailingTrivia())
+                    .WithArgumentList(SyntaxFactory.ArgumentList());
+            }
+
+            newInitializer = newInitializer
                 .WithLeadingTrivia(declarator.Initializer.Value.GetLeadingTrivia())
                 .WithTrailingTrivia(declarator.Initializer.Value.GetTrailingTrivia());
 
