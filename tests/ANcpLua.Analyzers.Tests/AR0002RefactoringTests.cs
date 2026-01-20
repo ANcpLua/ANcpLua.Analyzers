@@ -127,7 +127,7 @@ public sealed partial class Ar0002RefactoringTests : IDisposable {
         actions.Should().Contain(static a => a.Title == "Make all lambdas static in solution");
 
         var makeStaticInSolutionAction = actions.First(static a => a.Title == "Make all lambdas static in solution");
-        var changedSolution = await ApplySolutionCodeActionAsync(solution, makeStaticInSolutionAction);
+        var changedSolution = await ApplySolutionCodeActionAsync(makeStaticInSolutionAction);
 
         var changedDoc1 = changedSolution.Projects.First().Documents.First(static d => d.Name == "File1.cs");
         var changedDoc2 = changedSolution.Projects.First().Documents.First(static d => d.Name == "File2.cs");
@@ -183,7 +183,7 @@ public sealed partial class Ar0002RefactoringTests : IDisposable {
         actions.Should().Contain(static a => a.Title == "Make all lambdas static in project");
 
         var makeStaticInProjectAction = actions.First(static a => a.Title == "Make all lambdas static in project");
-        var changedSolution = await ApplySolutionCodeActionAsync(solution, makeStaticInProjectAction);
+        var changedSolution = await ApplySolutionCodeActionAsync(makeStaticInProjectAction);
 
         var changedDoc1 = changedSolution.Projects.First(static p => p.Name == "Project1").Documents.First();
         var changedDoc2 = changedSolution.Projects.First(static p => p.Name == "Project2").Documents.First();
@@ -254,7 +254,7 @@ public sealed partial class Ar0002RefactoringTests : IDisposable {
         actions.Should().Contain(static a => a.Title == "Make all lambdas static in solution");
 
         var makeStaticInSolutionAction = actions.First(static a => a.Title == "Make all lambdas static in solution");
-        var changedSolution = await ApplySolutionCodeActionAsync(solution, makeStaticInSolutionAction);
+        var changedSolution = await ApplySolutionCodeActionAsync(makeStaticInSolutionAction);
 
         var changedDoc1 = changedSolution.Projects.First(static p => p.Name == "Project1").Documents.First();
         var changedDoc2 = changedSolution.Projects.First(static p => p.Name == "Project2").Documents.First();
@@ -370,7 +370,7 @@ public sealed partial class Ar0002RefactoringTests : IDisposable {
         return applyChanges.ChangedSolution.GetDocument(document.Id)!;
     }
 
-    private static async Task<Solution> ApplySolutionCodeActionAsync(Solution solution, CodeAction action) {
+    private static async Task<Solution> ApplySolutionCodeActionAsync(CodeAction action) {
         var operations = await action.GetOperationsAsync(TestContext.Current.CancellationToken);
         var applyChanges = operations.OfType<ApplyChangesOperation>().First();
         return applyChanges.ChangedSolution;

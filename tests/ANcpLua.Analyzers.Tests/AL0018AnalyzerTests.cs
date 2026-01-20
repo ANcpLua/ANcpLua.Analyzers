@@ -13,20 +13,20 @@ public sealed partial class Al0018AnalyzerTests {
     private const string EmptyCode = "public class C { }";
 
     [Fact]
-    public async Task ShouldReportWhenVersionPropsNotImported() {
-        var directoryBuildProps = """
-            <Project>
-                <PropertyGroup>
-                    <SomeProperty>Value</SomeProperty>
-                </PropertyGroup>
-            </Project>
-            """;
+    public Task ShouldReportWhenVersionPropsNotImported() {
+        const string DirectoryBuildProps = """
+                                           <Project>
+                                               <PropertyGroup>
+                                                   <SomeProperty>Value</SomeProperty>
+                                               </PropertyGroup>
+                                           </Project>
+                                           """;
 
         var test = new CSharpAnalyzerTest<Al0018VersionPropsNotImportedAnalyzer, DefaultVerifier> {
             TestCode = EmptyCode,
             TestState = {
                 AdditionalFiles = {
-                    ("Directory.Build.props", directoryBuildProps)
+                    ("Directory.Build.props", DirectoryBuildProps)
                 }
             }
         };
@@ -35,74 +35,74 @@ public sealed partial class Al0018AnalyzerTests {
             new DiagnosticResult(Al0018VersionPropsNotImportedAnalyzer.DiagnosticId, DiagnosticSeverity.Warning)
                 .WithLocation("Directory.Build.props", 1, 1));
 
-        await test.RunAsync(TestContext.Current.CancellationToken);
+        return test.RunAsync(TestContext.Current.CancellationToken);
     }
 
     [Fact]
-    public async Task ShouldNotReportWhenVersionPropsImported() {
-        var directoryBuildProps = """
-            <Project>
-                <Import Project="Version.props" Condition="Exists('Version.props')" />
-                <PropertyGroup>
-                    <SomeProperty>Value</SomeProperty>
-                </PropertyGroup>
-            </Project>
-            """;
+    public Task ShouldNotReportWhenVersionPropsImported() {
+        const string DirectoryBuildProps = """
+                                           <Project>
+                                               <Import Project="Version.props" Condition="Exists('Version.props')" />
+                                               <PropertyGroup>
+                                                   <SomeProperty>Value</SomeProperty>
+                                               </PropertyGroup>
+                                           </Project>
+                                           """;
 
         var test = new CSharpAnalyzerTest<Al0018VersionPropsNotImportedAnalyzer, DefaultVerifier> {
             TestCode = EmptyCode,
             TestState = {
                 AdditionalFiles = {
-                    ("Directory.Build.props", directoryBuildProps)
+                    ("Directory.Build.props", DirectoryBuildProps)
                 }
             }
         };
 
         // No diagnostics expected
-        await test.RunAsync(TestContext.Current.CancellationToken);
+        return test.RunAsync(TestContext.Current.CancellationToken);
     }
 
     [Fact]
-    public async Task ShouldNotReportWhenVersionPropsImportedWithPath() {
-        var directoryBuildProps = """
-            <Project>
-                <Import Project="../build/Version.props" />
-            </Project>
-            """;
+    public Task ShouldNotReportWhenVersionPropsImportedWithPath() {
+        const string DirectoryBuildProps = """
+                                           <Project>
+                                               <Import Project="../build/Version.props" />
+                                           </Project>
+                                           """;
 
         var test = new CSharpAnalyzerTest<Al0018VersionPropsNotImportedAnalyzer, DefaultVerifier> {
             TestCode = EmptyCode,
             TestState = {
                 AdditionalFiles = {
-                    ("Directory.Build.props", directoryBuildProps)
+                    ("Directory.Build.props", DirectoryBuildProps)
                 }
             }
         };
 
         // No diagnostics expected - Version.props is in the path
-        await test.RunAsync(TestContext.Current.CancellationToken);
+        return test.RunAsync(TestContext.Current.CancellationToken);
     }
 
     [Fact]
-    public async Task ShouldNotReportForOtherPropsFiles() {
-        var otherPropsFile = """
-            <Project>
-                <PropertyGroup>
-                    <SomeProperty>Value</SomeProperty>
-                </PropertyGroup>
-            </Project>
-            """;
+    public Task ShouldNotReportForOtherPropsFiles() {
+        const string OtherPropsFile = """
+                                      <Project>
+                                          <PropertyGroup>
+                                              <SomeProperty>Value</SomeProperty>
+                                          </PropertyGroup>
+                                      </Project>
+                                      """;
 
         var test = new CSharpAnalyzerTest<Al0018VersionPropsNotImportedAnalyzer, DefaultVerifier> {
             TestCode = EmptyCode,
             TestState = {
                 AdditionalFiles = {
-                    ("SomeOther.props", otherPropsFile)
+                    ("SomeOther.props", OtherPropsFile)
                 }
             }
         };
 
         // No diagnostics expected - only Directory.Build.props is checked
-        await test.RunAsync(TestContext.Current.CancellationToken);
+        return test.RunAsync(TestContext.Current.CancellationToken);
     }
 }

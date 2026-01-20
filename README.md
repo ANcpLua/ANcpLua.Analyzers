@@ -37,18 +37,22 @@ Or add to your project file:
 | AL0008 | Usage             | GetSchema must return null and not be abstract          |    ⚠️    |   ✔️    |    ✔️    |
 | AL0009 | Usage             | Don't call IXmlSerializable.GetSchema                   |    ⚠️    |   ✔️    |          |
 | AL0010 | Design            | Type should be partial for source generator support     |    ℹ️    |         |    ✔️    |
-| AL0011 | Threading         | Avoid lock keyword on non-Lock types                    |    ⚠️    |   ✔️    |          |
+| AL0011 | Threading         | Avoid lock keyword on non-Lock types                    |    ⚠️    |   ✔️    |    ✔️    |
 | AL0012 | OpenTelemetry     | Deprecated semantic convention attribute                |    ⚠️    |   ✔️    |    ✔️    |
 | AL0013 | OpenTelemetry     | Missing telemetry schema URL                            |    ℹ️    |   ✔️    |          |
 | AL0014 | Style             | Prefer pattern matching for null and zero comparisons   |    ℹ️    |   ✔️    |    ✔️    |
 | AL0015 | Style             | Normalize null-guard style                              |    ℹ️    |   ✔️    |    ✔️    |
 | AL0016 | Style             | Combine declaration with subsequent null-check          |    ℹ️    |   ✔️    |    ✔️    |
-| AL0017 | VersionManagement | Hardcoded package version in Directory.Packages.props   |    ⚠️    |   ✔️    |          |
+| AL0017 | VersionManagement | Hardcoded package version in Directory.Packages.props  |    ⚠️    |   ✔️    |          |
+| AL0018 | VersionManagement | Version.props not imported in Directory.Build.props    |    ⚠️    |   ✔️    |          |
 | AL0020 | AspNetCore        | IFormCollection requires explicit [FromForm]            |    ❌     |   ✔️    |          |
 | AL0021 | AspNetCore        | Multiple structured form sources                        |    ❌     |   ✔️    |          |
 | AL0022 | AspNetCore        | Mixed form collection and DTO                           |    ❌     |   ✔️    |          |
 | AL0023 | AspNetCore        | Unsupported form type                                   |    ❌     |   ✔️    |          |
 | AL0024 | AspNetCore        | Form and body conflict                                  |    ❌     |   ✔️    |          |
+| AL0025 | Usage             | Prefer static lambda when no captures                   |    ⚠️    |   ✔️    |    ✔️    |
+| AL0026 | Usage             | Avoid DateTime.Now/UtcNow, use TimeProvider             |    ⚠️    |   ✔️    |          |
+| AL0027 | Usage             | Avoid legacy JSON library, use System.Text.Json         |    ⚠️    |   ✔️    |          |
 
 **Legend:** ❌ Error · ⚠️ Warning · ℹ️ Info
 
@@ -109,12 +113,24 @@ dotnet_diagnostic.AL0016.severity = suggestion
 # AL0017: Hardcoded package version
 dotnet_diagnostic.AL0017.severity = warning
 
+# AL0018: Version.props not imported
+dotnet_diagnostic.AL0018.severity = warning
+
 # AL0020-AL0024: ASP.NET Core form binding
 dotnet_diagnostic.AL0020.severity = error
 dotnet_diagnostic.AL0021.severity = error
 dotnet_diagnostic.AL0022.severity = error
 dotnet_diagnostic.AL0023.severity = error
 dotnet_diagnostic.AL0024.severity = error
+
+# AL0025: Prefer static lambda
+dotnet_diagnostic.AL0025.severity = warning
+
+# AL0026: Avoid DateTime.Now/UtcNow
+dotnet_diagnostic.AL0026.severity = warning
+
+# AL0027: Avoid legacy JSON library
+dotnet_diagnostic.AL0027.severity = warning
 ```
 
 ## Examples

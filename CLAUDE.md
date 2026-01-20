@@ -1,6 +1,6 @@
 # CLAUDE.md - ANcpLua.Analyzers
 
-Roslyn analyzers for C# code quality (AL0001-AL0017, AL0020-AL0025).
+Roslyn analyzers for C# code quality (AL0001-AL0018, AL0020-AL0027).
 
 ## ⚡ Claude Rules
 
@@ -32,7 +32,7 @@ LAYER 3: qyl, other projects       ← END USERS
 
 ---
 
-## Rules (AL0001-AL0017, AL0020-AL0024)
+## Rules (AL0001-AL0018, AL0020-AL0027)
 
 | Rule | Severity | Description |
 |------|----------|-------------|
@@ -53,12 +53,15 @@ LAYER 3: qyl, other projects       ← END USERS
 | AL0015 | Info | Normalize null-guard style |
 | AL0016 | Info | Combine declaration with subsequent null-check |
 | AL0017 | Warning | Hardcoded package version in Directory.Packages.props |
+| AL0018 | Warning | Version.props not imported in Directory.Build.props |
 | AL0020 | Error | IFormCollection requires explicit [FromForm] |
 | AL0021 | Error | Multiple structured form sources |
 | AL0022 | Error | Mixed form collection and DTO |
 | AL0023 | Error | Unsupported form type |
 | AL0024 | Error | Form and body conflict |
 | AL0025 | Warning | Prefer static lambda |
+| AL0026 | Warning | Avoid DateTime.Now/UtcNow, use TimeProvider |
+| AL0027 | Warning | Avoid Newtonsoft.Json, use System.Text.Json |
 
 ## Commands
 
