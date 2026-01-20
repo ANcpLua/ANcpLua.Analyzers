@@ -284,4 +284,14 @@
     <data name="AL0027AnalyzerDescription" xml:space="preserve">
     <value>The legacy JSON library should be replaced with System.Text.Json for better performance and native .NET support.</value>
   </data>
+    <!-- AL0018: Version.props not imported -->
+    <data name="AL0018AnalyzerTitle" xml:space="preserve">
+    <value>Version.props not imported</value>
+  </data>
+    <data name="AL0018AnalyzerMessageFormat" xml:space="preserve">
+    <value>Directory.Build.props should import Version.props for centralized version management</value>
+  </data>
+    <data name="AL0018AnalyzerDescription" xml:space="preserve">
+    <value>Version.props should be imported in Directory.Build.props to enable centralized package version management using $(VariableName) syntax.</value>
+  </data>
 </root>
