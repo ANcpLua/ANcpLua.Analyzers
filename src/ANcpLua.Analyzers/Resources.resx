@@ -274,4 +274,14 @@
     <data name="AL0026AnalyzerDescription" xml:space="preserve">
     <value>DateTime.Now and DateTime.UtcNow make code difficult to test. Use TimeProvider.System.GetLocalNow() or GetUtcNow() instead, which can be mocked in tests.</value>
   </data>
+    <!-- AL0027: Avoid legacy JSON library -->
+    <data name="AL0027AnalyzerTitle" xml:space="preserve">
+    <value>Avoid legacy JSON library</value>
+  </data>
+    <data name="AL0027AnalyzerMessageFormat" xml:space="preserve">
+    <value>'{0}' is from a legacy JSON library. Use System.Text.Json instead.</value>
+  </data>
+    <data name="AL0027AnalyzerDescription" xml:space="preserve">
+    <value>The legacy JSON library should be replaced with System.Text.Json for better performance and native .NET support.</value>
+  </data>
 </root>

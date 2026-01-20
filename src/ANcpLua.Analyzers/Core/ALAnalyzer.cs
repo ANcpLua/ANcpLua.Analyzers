@@ -138,6 +138,9 @@ public static partial class DiagnosticIds {
 
     /// <summary>AL0026: Avoid DateTime time accessors - use TimeProvider instead.</summary>
     public const string AvoidDateTimeNow = "AL0026";
+
+    /// <summary>AL0027: Avoid legacy JSON library - use System.Text.Json instead.</summary>
+    public const string AvoidNewtonsoftJson = "AL0027";
 }
 
 /// <summary>
