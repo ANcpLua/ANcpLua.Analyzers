@@ -423,21 +423,21 @@ namespace ANcpLua.Analyzers {
             }
         }
 
-        internal static string AL0018AnalyzerTitle {
+        internal static string AL0027AnalyzerTitle {
             get {
-                return ResourceManager.GetString("AL0018AnalyzerTitle", resourceCulture);
+                return ResourceManager.GetString("AL0027AnalyzerTitle", resourceCulture);
             }
         }
 
-        internal static string AL0018AnalyzerMessageFormat {
+        internal static string AL0027AnalyzerMessageFormat {
             get {
-                return ResourceManager.GetString("AL0018AnalyzerMessageFormat", resourceCulture);
+                return ResourceManager.GetString("AL0027AnalyzerMessageFormat", resourceCulture);
             }
         }
 
-        internal static string AL0018AnalyzerDescription {
+        internal static string AL0027AnalyzerDescription {
             get {
-                return ResourceManager.GetString("AL0018AnalyzerDescription", resourceCulture);
+                return ResourceManager.GetString("AL0027AnalyzerDescription", resourceCulture);
             }
         }
     }
