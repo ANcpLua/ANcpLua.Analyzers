@@ -94,4 +94,7 @@
     <data name="AL0025CodeFixTitle" xml:space="preserve">
     <value>Make static</value>
   </data>
+    <data name="AL0011CodeFixTitle" xml:space="preserve">
+    <value>Use Lock type</value>
+  </data>
 </root>

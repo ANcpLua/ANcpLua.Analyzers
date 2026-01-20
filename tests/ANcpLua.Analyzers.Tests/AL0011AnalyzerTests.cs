@@ -1,4 +1,5 @@
 ﻿using ANcpLua.Analyzers.Analyzers;
+using ANcpLua.Analyzers.CodeFixes.CodeFixes;
 using ANcpLua.Roslyn.Utilities.Testing;
 
 namespace ANcpLua.Analyzers.Tests;
@@ -131,4 +132,70 @@ public sealed partial class Al0011AnalyzerTests : AnalyzerTest<Al0011LockKeyword
         }
         """,
         false);
+}
+
+/// <summary>
+///     Code fix tests for AL0011: Changes field type to System.Threading.Lock.
+/// </summary>
+public sealed partial class
+    Al0011CodeFixTests : CodeFixTest<Al0011LockKeywordAnalyzer, Al0011LockTypeCodeFixProvider> {
+    private const string LockTypePolyfill = """
+                                            namespace System.Threading {
+                                                public sealed class Lock {
+                                                    public Scope EnterScope() => default;
+                                                    public ref struct Scope : System.IDisposable {
+                                                        public void Dispose() { }
+                                                    }
+                                                }
+                                            }
+                                            """;
+
+    [Fact]
+    public Task ShouldChangeFieldTypeToLock() =>
+        VerifyAsync(
+            $$"""
+              {{LockTypePolyfill}}
+
+              public class C {
+                  private readonly object _syncRoot = new();
+                  void M() {
+                      [|lock|] (_syncRoot) { }
+                  }
+              }
+              """,
+            $$"""
+              {{LockTypePolyfill}}
+
+              public class C {
+                  private readonly System.Threading.Lock _syncRoot = new();
+                  void M() {
+                      lock (_syncRoot) { }
+                  }
+              }
+              """);
+
+    [Fact]
+    public Task ShouldChangeFieldTypeWithExplicitObjectCreation() =>
+        VerifyAsync(
+            $$"""
+              {{LockTypePolyfill}}
+
+              public class C {
+                  private readonly object _sync = new object();
+                  void M() {
+                      [|lock|] (_sync) { }
+                  }
+              }
+              """,
+            $$"""
+              {{LockTypePolyfill}}
+
+              public class C {
+                  private readonly System.Threading.Lock _sync = new();
+                  void M() {
+                      lock (_sync) { }
+                  }
+              }
+              """);
+
 }
