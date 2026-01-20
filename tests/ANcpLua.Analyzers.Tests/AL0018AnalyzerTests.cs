@@ -1,7 +1,7 @@
 using ANcpLua.Analyzers.Analyzers;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing;
+using AnalyzerTestBase = ANcpLua.Roslyn.Utilities.Testing.AnalyzerTest<ANcpLua.Analyzers.Analyzers.Al0018VersionPropsNotImportedAnalyzer>;
 
 namespace ANcpLua.Analyzers.Tests;
 
@@ -9,7 +9,7 @@ namespace ANcpLua.Analyzers.Tests;
 ///     Tests for AL0018: Version.props not imported.
 ///     Warns when Directory.Build.props doesn't import Version.props.
 /// </summary>
-public sealed partial class Al0018AnalyzerTests {
+public sealed partial class Al0018AnalyzerTests : AnalyzerTestBase {
     private const string EmptyCode = "public class C { }";
 
     [Fact]
@@ -22,20 +22,13 @@ public sealed partial class Al0018AnalyzerTests {
                                            </Project>
                                            """;
 
-        var test = new CSharpAnalyzerTest<Al0018VersionPropsNotImportedAnalyzer, DefaultVerifier> {
-            TestCode = EmptyCode,
-            TestState = {
-                AdditionalFiles = {
-                    ("Directory.Build.props", DirectoryBuildProps)
-                }
-            }
-        };
+        var expected = new DiagnosticResult(Al0018VersionPropsNotImportedAnalyzer.DiagnosticId, DiagnosticSeverity.Warning)
+            .WithLocation("Directory.Build.props", 1, 1);
 
-        test.ExpectedDiagnostics.Add(
-            new DiagnosticResult(Al0018VersionPropsNotImportedAnalyzer.DiagnosticId, DiagnosticSeverity.Warning)
-                .WithLocation("Directory.Build.props", 1, 1));
-
-        return test.RunAsync(TestContext.Current.CancellationToken);
+        return VerifyAsync(
+            EmptyCode,
+            [("Directory.Build.props", DirectoryBuildProps)],
+            [expected]);
     }
 
     [Fact]
@@ -49,17 +42,9 @@ public sealed partial class Al0018AnalyzerTests {
                                            </Project>
                                            """;
 
-        var test = new CSharpAnalyzerTest<Al0018VersionPropsNotImportedAnalyzer, DefaultVerifier> {
-            TestCode = EmptyCode,
-            TestState = {
-                AdditionalFiles = {
-                    ("Directory.Build.props", DirectoryBuildProps)
-                }
-            }
-        };
-
-        // No diagnostics expected
-        return test.RunAsync(TestContext.Current.CancellationToken);
+        return VerifyAsync(
+            EmptyCode,
+            [("Directory.Build.props", DirectoryBuildProps)]);
     }
 
     [Fact]
@@ -70,17 +55,9 @@ public sealed partial class Al0018AnalyzerTests {
                                            </Project>
                                            """;
 
-        var test = new CSharpAnalyzerTest<Al0018VersionPropsNotImportedAnalyzer, DefaultVerifier> {
-            TestCode = EmptyCode,
-            TestState = {
-                AdditionalFiles = {
-                    ("Directory.Build.props", DirectoryBuildProps)
-                }
-            }
-        };
-
-        // No diagnostics expected - Version.props is in the path
-        return test.RunAsync(TestContext.Current.CancellationToken);
+        return VerifyAsync(
+            EmptyCode,
+            [("Directory.Build.props", DirectoryBuildProps)]);
     }
 
     [Fact]
@@ -93,16 +70,8 @@ public sealed partial class Al0018AnalyzerTests {
                                       </Project>
                                       """;
 
-        var test = new CSharpAnalyzerTest<Al0018VersionPropsNotImportedAnalyzer, DefaultVerifier> {
-            TestCode = EmptyCode,
-            TestState = {
-                AdditionalFiles = {
-                    ("SomeOther.props", OtherPropsFile)
-                }
-            }
-        };
-
-        // No diagnostics expected - only Directory.Build.props is checked
-        return test.RunAsync(TestContext.Current.CancellationToken);
+        return VerifyAsync(
+            EmptyCode,
+            [("SomeOther.props", OtherPropsFile)]);
     }
 }
