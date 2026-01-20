@@ -130,6 +130,14 @@ public static partial class DiagnosticIds {
 
     /// <summary>AL0025: Anonymous function can be made static.</summary>
     public const string PreferStaticLambda = "AL0025";
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // BANNED APIS (AL0026+)
+    // These analyzers flag usage of deprecated or problematic APIs.
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /// <summary>AL0026: Avoid DateTime time accessors - use TimeProvider instead.</summary>
+    public const string AvoidDateTimeNow = "AL0026";
 }
 
 /// <summary>

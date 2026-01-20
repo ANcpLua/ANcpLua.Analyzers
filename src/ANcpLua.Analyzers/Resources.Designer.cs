@@ -404,5 +404,23 @@ namespace ANcpLua.Analyzers {
                 return ResourceManager.GetString("AL0025AnalyzerDescription", resourceCulture);
             }
         }
+
+        internal static string AL0026AnalyzerTitle {
+            get {
+                return ResourceManager.GetString("AL0026AnalyzerTitle", resourceCulture);
+            }
+        }
+
+        internal static string AL0026AnalyzerMessageFormat {
+            get {
+                return ResourceManager.GetString("AL0026AnalyzerMessageFormat", resourceCulture);
+            }
+        }
+
+        internal static string AL0026AnalyzerDescription {
+            get {
+                return ResourceManager.GetString("AL0026AnalyzerDescription", resourceCulture);
+            }
+        }
     }
 }

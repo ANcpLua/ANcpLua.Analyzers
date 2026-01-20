@@ -264,4 +264,14 @@
     <data name="AL0025AnalyzerDescription" xml:space="preserve">
     <value>Lambda expressions and anonymous methods that don't capture variables should be marked 'static' to avoid unnecessary allocations and improve performance.</value>
   </data>
+    <!-- AL0026: Avoid DateTime time accessors -->
+    <data name="AL0026AnalyzerTitle" xml:space="preserve">
+    <value>Avoid DateTime time accessors</value>
+  </data>
+    <data name="AL0026AnalyzerMessageFormat" xml:space="preserve">
+    <value>'{0}' should be replaced with TimeProvider.System.GetUtcNow() for better testability</value>
+  </data>
+    <data name="AL0026AnalyzerDescription" xml:space="preserve">
+    <value>DateTime time accessors make code difficult to test. Use TimeProvider.System.GetUtcNow() instead, which can be mocked in tests.</value>
+  </data>
 </root>
