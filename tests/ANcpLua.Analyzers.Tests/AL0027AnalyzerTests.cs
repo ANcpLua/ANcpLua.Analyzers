@@ -60,6 +60,19 @@ public sealed partial class Al0027AnalyzerTests : AnalyzerTest<Al0027AvoidNewton
                       """);
 
     [Fact]
+    public Task ShouldReportJObjectParse() =>
+        VerifyAsync($$"""
+                      {{SystemTextJsonPolyfill}}
+                      {{NewtonsoftJsonPolyfill}}
+
+                      public class C {
+                          void M() {
+                              var obj = [|Newtonsoft.Json.Linq.JObject.Parse("{}")|];
+                          }
+                      }
+                      """);
+
+    [Fact]
     public Task ShouldReportSettingsCreation() =>
         VerifyAsync($$"""
                       {{SystemTextJsonPolyfill}}

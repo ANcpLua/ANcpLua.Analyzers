@@ -77,6 +77,10 @@ public sealed partial class Al0027AvoidNewtonsoftJsonAnalyzer : AlAnalyzer {
         }
 
         var ns = type.ContainingNamespace?.ToDisplayString();
-        return ns is not null && ns.StartsWith(LegacyJsonNamespace, StringComparison.Ordinal);
+        // Check for exact namespace match or sub-namespace (with dot boundary)
+        // This avoids false positives like "Newtonsoft.JsonX"
+        return ns is not null &&
+               (string.Equals(ns, LegacyJsonNamespace, StringComparison.Ordinal) ||
+                ns.StartsWith(LegacyJsonNamespace + ".", StringComparison.Ordinal));
     }
 }
