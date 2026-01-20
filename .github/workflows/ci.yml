@@ -26,7 +26,7 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Verify pinned package versions
-        run: pwsh ./eng/verify-published-versions.ps1
+        run: pwsh ./verify-published-versions.ps1
 
       - name: Restore
         run: dotnet restore ANcpLua.Analyzers.slnx
