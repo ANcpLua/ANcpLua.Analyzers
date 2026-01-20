@@ -4,7 +4,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 
 /// <summary>
 ///     AL0026: Avoid System.DateTime time accessors.
-///     Suggests using TimeProvider.System.GetUtcNow() for better testability.
+///     Suggests using TimeProvider.System.GetLocalNow() or GetUtcNow() for better testability.
 ///     Only reports when TimeProvider is available (.NET 8+).
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
@@ -59,11 +59,15 @@ public sealed partial class Al0026AvoidDateTimeNowAnalyzer : AlAnalyzer {
             return;
         }
 
-        // Target the "Now" and "UtcNow" properties
-        if (property.Name is not ("Now" or "UtcNow")) {
+        // Target the "Now" and "UtcNow" properties with correct replacements
+        if (property.Name switch {
+            "Now" => "GetLocalNow",
+            "UtcNow" => "GetUtcNow",
+            _ => null
+        } is not { } replacement) {
             return;
         }
 
-        context.ReportDiagnostic(Rule, propertyRef.Syntax.GetLocation(), property.Name);
+        context.ReportDiagnostic(Rule, propertyRef.Syntax.GetLocation(), property.Name, replacement);
     }
 }

@@ -269,9 +269,9 @@
     <value>Avoid DateTime time accessors</value>
   </data>
     <data name="AL0026AnalyzerMessageFormat" xml:space="preserve">
-    <value>'{0}' should be replaced with TimeProvider.System.GetUtcNow() for better testability</value>
+    <value>'DateTime.{0}' should be replaced with 'TimeProvider.System.{1}()' for better testability</value>
   </data>
     <data name="AL0026AnalyzerDescription" xml:space="preserve">
-    <value>DateTime time accessors make code difficult to test. Use TimeProvider.System.GetUtcNow() instead, which can be mocked in tests.</value>
+    <value>DateTime.Now and DateTime.UtcNow make code difficult to test. Use TimeProvider.System.GetLocalNow() or GetUtcNow() instead, which can be mocked in tests.</value>
   </data>
 </root>
