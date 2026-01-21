@@ -32,21 +32,21 @@
        ROSLYN.UTILITIES (Runtime package)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Roslyn.Utilities">
-    <ANcpLuaRoslynUtilitiesVersion>1.15.0</ANcpLuaRoslynUtilitiesVersion>
+    <ANcpLuaRoslynUtilitiesVersion>1.16.0</ANcpLuaRoslynUtilitiesVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
        ROSLYN.UTILITIES.SOURCES (Source-only package for generators)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Roslyn.Utilities.Sources">
-    <ANcpLuaRoslynUtilitiesSourcesVersion>1.15.0</ANcpLuaRoslynUtilitiesSourcesVersion>
+    <ANcpLuaRoslynUtilitiesSourcesVersion>1.16.0</ANcpLuaRoslynUtilitiesSourcesVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
        ROSLYN.UTILITIES.TESTING (Analyzer/CodeFix/Generator test infrastructure)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Roslyn.Utilities.Testing">
-    <ANcpLuaRoslynUtilitiesTestingVersion>1.15.0</ANcpLuaRoslynUtilitiesTestingVersion>
+    <ANcpLuaRoslynUtilitiesTestingVersion>1.16.0</ANcpLuaRoslynUtilitiesTestingVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
@@ -70,12 +70,12 @@
        Used by: SDK, Roslyn.Utilities
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Meziantou">
-    <MeziantouFrameworkVersion>5.0.10</MeziantouFrameworkVersion>
-    <MeziantouFullPathVersion>1.1.12</MeziantouFullPathVersion>
-    <MeziantouTemporaryDirectoryVersion>1.0.30</MeziantouTemporaryDirectoryVersion>
-    <MeziantouThreadingVersion>2.0.3</MeziantouThreadingVersion>
-    <MeziantouDependencyScanningVersion>2.0.5</MeziantouDependencyScanningVersion>
-    <MeziantouAnalyzerVersion>2.0.188</MeziantouAnalyzerVersion>
+    <MeziantouFrameworkVersion>5.0.11</MeziantouFrameworkVersion>
+    <MeziantouFullPathVersion>1.1.13</MeziantouFullPathVersion>
+    <MeziantouTemporaryDirectoryVersion>1.0.31</MeziantouTemporaryDirectoryVersion>
+    <MeziantouThreadingVersion>2.0.4</MeziantouThreadingVersion>
+    <MeziantouDependencyScanningVersion>2.0.6</MeziantouDependencyScanningVersion>
+    <MeziantouAnalyzerVersion>2.0.284</MeziantouAnalyzerVersion>
     <MeziantouParallelTestFrameworkVersion>1.0.6</MeziantouParallelTestFrameworkVersion>
   </PropertyGroup>
 
