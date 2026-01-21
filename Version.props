@@ -50,7 +50,7 @@
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
-       ROSLYN ANALYZER TESTING (Beta from dotnet-tools feed)
+       ROSLYN ANALYZER TESTING
        Used by: Roslyn.Utilities.Testing, Analyzers.Tests
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Analyzer Testing">
