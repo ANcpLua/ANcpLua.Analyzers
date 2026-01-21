@@ -16,7 +16,7 @@
       <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="$(RoslynVersion)"/>
   -->
   <PropertyGroup Label="SDK Version (Auto-generated)">
-    <ANcpSdkPackageVersion>1.6.18</ANcpSdkPackageVersion>
+    <ANcpSdkPackageVersion>1.6.19</ANcpSdkPackageVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
@@ -54,7 +54,7 @@
        Used by: Roslyn.Utilities.Testing, Analyzers.Tests
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Analyzer Testing">
-    <AnalyzerTestingVersion>1.1.3-beta1.25564.1</AnalyzerTestingVersion>
+    <AnalyzerTestingVersion>1.1.3</AnalyzerTestingVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
