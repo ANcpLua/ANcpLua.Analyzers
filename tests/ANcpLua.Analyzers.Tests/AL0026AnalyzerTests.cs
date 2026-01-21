@@ -108,4 +108,21 @@ public sealed partial class Al0026AnalyzerTests : AnalyzerTest<Al0026AvoidDateTi
                           }
                       }
                       """);
+
+    [Fact]
+    public Task ShouldNotReportInsideTimeProviderImplementation() =>
+        VerifyAsync("""
+                    using System;
+
+                    namespace System {
+                        public abstract class TimeProvider {
+                            public static TimeProvider System { get; } = new SystemTimeProvider();
+                            public abstract DateTimeOffset GetUtcNow();
+                        }
+
+                        internal sealed class SystemTimeProvider : TimeProvider {
+                            public override DateTimeOffset GetUtcNow() => DateTimeOffset.UtcNow;
+                        }
+                    }
+                    """);
 }

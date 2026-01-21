@@ -35,7 +35,7 @@ public sealed partial class Al0026AvoidDateTimeNowAnalyzer : AlAnalyzer {
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
         // Only analyze if TimeProvider is available (.NET 8+)
-        if (context.Compilation.GetTypeByMetadataName(TimeProviderMetadataName) is null) {
+        if (context.Compilation.GetTypeByMetadataName(TimeProviderMetadataName) is not { } timeProviderType) {
             return;
         }
 
@@ -48,15 +48,22 @@ public sealed partial class Al0026AvoidDateTimeNowAnalyzer : AlAnalyzer {
         }
 
         context.RegisterOperationAction(
-            ctx => AnalyzePropertyReference(ctx, dateTimeType, dateTimeOffsetType),
+            ctx => AnalyzePropertyReference(ctx, dateTimeType, dateTimeOffsetType, timeProviderType),
             OperationKind.PropertyReference);
     }
 
     private static void AnalyzePropertyReference(
         OperationAnalysisContext context,
         INamedTypeSymbol? dateTimeType,
-        INamedTypeSymbol? dateTimeOffsetType) {
+        INamedTypeSymbol? dateTimeOffsetType,
+        INamedTypeSymbol timeProviderType) {
         if (context.Operation is not IPropertyReferenceOperation propertyRef) {
+            return;
+        }
+
+        // Skip if we're inside a TimeProvider implementation (polyfills need to call DateTime/DateTimeOffset)
+        if (context.ContainingSymbol?.ContainingType is { } enclosingType &&
+            InheritsFromOrEquals(enclosingType, timeProviderType)) {
             return;
         }
 
@@ -84,5 +91,18 @@ public sealed partial class Al0026AvoidDateTimeNowAnalyzer : AlAnalyzer {
 
         var typeName = isDateTime ? "DateTime" : "DateTimeOffset";
         context.ReportDiagnostic(Rule, propertyRef.Syntax.GetLocation(), typeName, property.Name, replacement);
+    }
+
+    private static bool InheritsFromOrEquals(INamedTypeSymbol type, INamedTypeSymbol baseType) {
+        var current = type;
+        while (current is not null) {
+            if (SymbolEqualityComparer.Default.Equals(current, baseType)) {
+                return true;
+            }
+
+            current = current.BaseType;
+        }
+
+        return false;
     }
 }
