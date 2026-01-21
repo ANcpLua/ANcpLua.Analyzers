@@ -1,211 +1,82 @@
----
-name: dotnet-test-mtp
-description: |
-  Microsoft Testing Platform (MTP) CLI reference for .NET test projects. Use when:
-  (1) Test errors show "Unknown option '--filter'" or "Unknown option '--logger'"
-  (2) Exit code 5 from test runner (invalid arguments)
-  (3) User asks about dotnet test filtering with xUnit v3, MSTest, NUnit, or TUnit
-  (4) Zero tests ran with MTP test projects
-  (5) Questions about --filter-query, --filter-class, --filter-method syntax
-  (6) VSTest options not working with modern test frameworks
-  (7) Migrating from VSTest to Microsoft.Testing.Platform
-  (8) Configuring global.json for .NET 10+ native MTP support
-  (9) CI/CD pipeline configuration for MTP tests (Azure DevOps, GitHub Actions)
----
+# ANcpLua.Analyzers - Analyzer Project
 
-# Microsoft Testing Platform (MTP) Reference
+This project contains all `DiagnosticAnalyzer` implementations (AL0001-AL0035).
 
-MTP is a lightweight, portable VSTest replacement embedded directly in test projects. No external runners needed.
+## Project Info
 
-## Quick Decision Tree
+| Property | Value |
+|----------|-------|
+| **Target** | netstandard2.0 |
+| **SDK** | ANcpLua.NET.Sdk |
+| **Version** | 1.9.0 |
+| **Roslyn** | 5.0.0 |
+
+## Structure
 
 ```
-Is OutputType=Exe set? → No → Add <OutputType>Exe</OutputType>
-Using .NET 10+?        → Yes → Use global.json { "test": { "runner": "Microsoft.Testing.Platform" } }
-Using .NET 8/9?        → Yes → Add <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
-Using xUnit v3?        → Yes → Use xunit.v3.mtp-v2 package for .NET 10
+Analyzers/
+  AL0001*.cs - AL0035*.cs    # Individual analyzer implementations
+Core/
+  ALAnalyzer.cs              # Base class + DiagnosticIds + DiagnosticCategories
+  DeprecatedOtelAttributes.cs
+  WellKnownTypes.cs
+Internal/
+  RoslynExtensions.cs        # Internal Roslyn helpers
+Resources.resx               # Localized strings
 ```
 
-## SDK-Specific Configuration
+## Analyzer Categories
 
-### .NET 10+ (Native Support)
+| Category | Rules | Description |
+|----------|-------|-------------|
+| Design | AL0001, AL0002, AL0006 | Code design issues |
+| Usage | AL0004, AL0005 | API usage patterns |
+| Reliability | AL0003 | Runtime reliability |
+| Threading | AL0011 | Thread safety |
+| OpenTelemetry | AL0012, AL0013 | OTel semantic conventions |
+| Style | AL0014, AL0015, AL0016 | Code style consistency |
+| VersionManagement | AL0017, AL0018, AL0019 | CPM/Version.props |
+| ASP.NET Core | AL0020-AL0024 | Form binding |
+| Performance | AL0025 | Static lambdas |
+| Banned APIs | AL0026, AL0027 | DateTime.Now, Newtonsoft |
+| Roslyn Utilities | AL0028-AL0035 | ANcpLua.Roslyn.Utilities extensions |
 
-```json
-{
-  "sdk": { "version": "10.0.100", "rollForward": "latestMinor" },
-  "test": { "runner": "Microsoft.Testing.Platform" }
+## Adding a New Analyzer
+
+1. Create `Analyzers/AL00XXDescriptionAnalyzer.cs`
+2. Add diagnostic ID to `Core/ALAnalyzer.cs` in `DiagnosticIds`
+3. Add localized strings to `Resources.resx`
+4. Inherit from `AlAnalyzer` base class
+5. Add corresponding code fix in CodeFixes project (if applicable)
+6. Add tests in Tests project
+
+## Base Class Pattern
+
+```csharp
+[DiagnosticAnalyzer(LanguageNames.CSharp)]
+public sealed partial class Al00XXMyAnalyzer : AlAnalyzer {
+    private static readonly DiagnosticDescriptor Rule = new(
+        DiagnosticIds.MyRule,
+        Title, MessageFormat, DiagnosticCategories.Category,
+        DiagnosticSeverity.Warning, true, Description,
+        HelpLinkBase);
+
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+
+    protected override void RegisterActions(AnalysisContext context) =>
+        context.RegisterSyntaxNodeAction(Analyze, SyntaxKind.Whatever);
 }
 ```
 
-No `--` separator needed. Run directly: `dotnet test --filter-method "*MyTest*"`
+## Severity Guidelines
 
-### .NET 8/9 (VSTest Compatibility Layer)
+| Severity | Use When |
+|----------|----------|
+| Error | Bug that will cause runtime failure |
+| Warning | Likely bug or anti-pattern |
+| Info | Style suggestion (IDE only, not in build output) |
 
-```xml
-<!-- Directory.Build.props or csproj -->
-<PropertyGroup>
-  <OutputType>Exe</OutputType>
-  <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
-</PropertyGroup>
-```
+## Key Dependencies
 
-Requires `--` separator: `dotnet test -- --filter-method "*MyTest*"`
-
-## Framework Opt-In Properties
-
-| Framework | Property                                                                      | Package                  |
-|-----------|-------------------------------------------------------------------------------|--------------------------|
-| MSTest    | `<EnableMSTestRunner>true</EnableMSTestRunner>`                               | MSTest 3.2.0+            |
-| NUnit     | `<EnableNUnitRunner>true</EnableNUnitRunner>`                                 | NUnit3TestAdapter 5.0.0+ |
-| xUnit v3  | `<UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>` | xunit.v3.mtp-v2          |
-| TUnit     | Built-in (always MTP)                                                         | TUnit                    |
-
-## xUnit v3 Package Variants (.NET 10 Critical)
-
-| Package            | MTP Version | Use Case                       |
-|--------------------|-------------|--------------------------------|
-| `xunit.v3`         | MTP v1      | Default, breaks on .NET 10 SDK |
-| `xunit.v3.mtp-v2`  | MTP v2      | **Required for .NET 10+**      |
-| `xunit.v3.mtp-v1`  | MTP v1      | Explicit v1 lock               |
-| `xunit.v3.mtp-off` | None        | VSTest only                    |
-
-## CLI Argument Mapping (VSTest → MTP)
-
-| VSTest                        | MTP                   | Notes                                             |
-|-------------------------------|-----------------------|---------------------------------------------------|
-| `--filter "FQN~X"`            | Framework-specific    | See below                                         |
-| `--logger trx`                | `--report-trx`        | Requires `Microsoft.Testing.Extensions.TrxReport` |
-| `--blame-crash`               | `--crashdump`         | Requires crash dump extension                     |
-| `--blame-hang`                | `--hangdump`          | Requires hang dump extension                      |
-| `--results-directory`         | `--results-directory` | Same                                              |
-| `-t` / `--list-tests`         | `--list-tests`        | Same                                              |
-| `--settings file.runsettings` | Framework-specific    | MSTest/NUnit still support                        |
-
-## Filtering by Framework
-
-### xUnit v3 (Unique Syntax)
-
-```bash
---filter-class "Namespace.Class"       # Exact class
---filter-method "*Pattern*"            # Wildcard method
---filter-namespace "Namespace"         # By namespace
---filter-trait "Category=Unit"         # By trait
---filter-not-class "IntegrationTests"  # Exclusion
---filter-query "/**[Category=Fast]"    # Query language
-```
-
-Query syntax: `/<assembly>/<namespace>/<class>/<method>[traits]`
-
-### MSTest / NUnit (VSTest-Compatible)
-
-```bash
-# Same syntax works with MTP
---filter "FullyQualifiedName~MyTest"
---filter "TestCategory=Unit"
-```
-
-## Running Tests
-
-```bash
-# Direct execution (fastest)
-./MyTests.exe
-
-# Via dotnet run
-dotnet run --project MyTests
-
-# Via dotnet test (.NET 10+)
-dotnet test --filter-method "*Should*"
-
-# Via dotnet test (.NET 8/9)
-dotnet test -- --filter-method "*Should*"
-```
-
-## Common Exit Codes
-
-| Code | Meaning                                 |
-|------|-----------------------------------------|
-| 0    | Success                                 |
-| 1    | Unknown error                           |
-| 2    | Tests failed                            |
-| 3    | Tests cancelled                         |
-| 5    | Invalid command line (wrong arguments!) |
-| 6    | No tests found                          |
-| 8    | Zero tests ran                          |
-
-Ignore specific codes: `--ignore-exit-code 8`
-
-## Troubleshooting
-
-### "Unknown option '--filter'"
-
-→ Using VSTest syntax with MTP. Use `--filter-method` / `--filter-class` for xUnit v3.
-
-### Exit Code 5 (Invalid Arguments)
-
-→ VSTest arguments passed to MTP runner. Check CLI mapping table above.
-
-### "Zero tests ran" / Exit Code 8
-
-1. Verify filter syntax matches your framework
-2. Check `--` separator for .NET 8/9
-3. Try `--list-tests` to see discovered tests
-4. Run `--filter-query "/**"` to test without filter
-
-### .NET 10 + xunit.v3 TypeLoadException
-
-```
-Could not load type 'Microsoft.Testing.Platform.Extensions.TestHost.IDataConsumer'
-```
-
-→ xunit.v3 default is MTP v1, incompatible with .NET 10. Switch to `xunit.v3.mtp-v2`.
-
-### Force VSTest Mode (Escape Hatch)
-
-```bash
-dotnet test -p:TestingPlatformDotnetTestSupport=false --filter "..."
-```
-
-## CI/CD Configuration
-
-### Azure DevOps (.NET 10+)
-
-```yaml
-- task: DotNetCoreCLI@2
-  displayName: Run Tests
-  inputs:
-    command: test
-    arguments: '--report-trx --results-directory $(Agent.TempDirectory)'
-```
-
-### GitHub Actions
-
-```yaml
-- name: Test
-  run: dotnet test --report-trx --results-directory ./TestResults
-```
-
-## MSBuild Properties Reference
-
-```xml
-<PropertyGroup>
-  <!-- Core MTP -->
-  <OutputType>Exe</OutputType>
-  <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
-  <UseMicrosoftTestingPlatform>true</UseMicrosoftTestingPlatform>
-  
-  <!-- Framework-specific -->
-  <EnableMSTestRunner>true</EnableMSTestRunner>       <!-- MSTest -->
-  <EnableNUnitRunner>true</EnableNUnitRunner>         <!-- NUnit -->
-  <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner> <!-- xUnit -->
-  
-  <!-- Entry point control -->
-  <GenerateTestingPlatformEntryPoint>false</GenerateTestingPlatformEntryPoint>
-  <IsTestingPlatformApplication>false</IsTestingPlatformApplication>
-  
-  <!-- Ignore exit codes -->
-  <TestingPlatformCommandLineArguments>--ignore-exit-code 8</TestingPlatformCommandLineArguments>
-</PropertyGroup>
-```
-
-See `references/migration-guide.md` for complete VSTest → MTP migration steps.
-See `references/extensions.md` for MTP extension packages (TRX, coverage, crash dump).
+- Microsoft.CodeAnalysis.CSharp (5.0.0)
+- ANcpLua.Roslyn.Utilities.Sources (1.16.0) - compile-time source package

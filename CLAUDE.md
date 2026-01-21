@@ -1,24 +1,24 @@
 # CLAUDE.md - ANcpLua.Analyzers
 
-Roslyn analyzers for C# code quality (AL0001-AL0028).
+Roslyn analyzers for C# code quality (AL0001-AL0035).
 
-## ⚡ Claude Rules
+## Claude Rules
 
 - **Never ask confirmation for requested actions** - If user asks for X, do X. Don't ask "do you want X?"
 - **Always commit and push with tags** - When releasing, create git tag and push
 
 **SDK:** ANcpLua.NET.Sdk | **Target:** .NET 10 + netstandard2.0
 
-## 🏗️ Ecosystem Position
+## Ecosystem Position
 
 ```
-LAYER 0: ANcpLua.Roslyn.Utilities  ← UPSTREAM (no SDK dependency!)
-         ↓ publishes .Sources
-LAYER 1: ANcpLua.NET.Sdk           ← SOURCE OF TRUTH (Version.props)
-         ↓ auto-syncs Version.props
-LAYER 2: ANcpLua.Analyzers         ← YOU ARE HERE (DOWNSTREAM)
-         ↓ consumed by
-LAYER 3: qyl, other projects       ← END USERS
+LAYER 0: ANcpLua.Roslyn.Utilities  <- UPSTREAM (no SDK dependency!)
+         | publishes .Sources
+LAYER 1: ANcpLua.NET.Sdk           <- SOURCE OF TRUTH (Version.props)
+         | auto-syncs Version.props
+LAYER 2: ANcpLua.Analyzers         <- YOU ARE HERE (DOWNSTREAM)
+         | consumed by
+LAYER 3: qyl, other projects       <- END USERS
 ```
 
 ### This Repo: LAYER 2 (Downstream)
@@ -32,7 +32,7 @@ LAYER 3: qyl, other projects       ← END USERS
 
 ---
 
-## Rules (AL0001-AL0031)
+## Rules (AL0001-AL0035)
 
 | Rule | Severity | Description |
 |------|----------|-------------|
@@ -67,6 +67,10 @@ LAYER 3: qyl, other projects       ← END USERS
 | AL0029 | Info | Use HasAttribute instead of GetAttributes() patterns |
 | AL0030 | Info | Use Implements/InheritsFrom instead of type hierarchy loops |
 | AL0031 | Info | Use IsMethodNamed/TryGetConstantValue instead of verbose patterns |
+| AL0032 | Info | Use OrEmpty() instead of null-coalescing with empty collections |
+| AL0033 | Info | Use ToImmutableArrayOrEmpty() instead of ?.ToImmutableArray() ?? Empty |
+| AL0034 | Info | Use WhereNotNull() instead of Where(x => x != null) |
+| AL0035 | Info | Use GetFullyQualifiedName/GetMetadataName() instead of ToDisplayString |
 
 ## Commands
 
@@ -115,9 +119,22 @@ tests/
 | CI uses real PackageId | Workflow passes `-p:PackageId=ANcpLua.Analyzers` |
 | Both DLLs required | Pack includes Analyzers.dll AND CodeFixes.dll |
 | Target: netstandard2.0 | Only ns2.0 assemblies go in nupkg |
-| **Info severity = IDE only** | `DiagnosticSeverity.Info` diagnostics (AL0010, AL0013, AL0015, AL0016, AL0028-AL0031) **only show in IDE**, not in `dotnet build` output. This is by design - MSBuild only shows Warning/Error by default. |
+| **Info severity = IDE only** | `DiagnosticSeverity.Info` diagnostics (AL0010, AL0013, AL0015, AL0016, AL0028-AL0035) **only show in IDE**, not in `dotnet build` output. This is by design - MSBuild only shows Warning/Error by default. |
 
-## GitHub Actions (Dec 2025)
+## Current Package Versions
+
+| Package | Version |
+|---------|---------|
+| ANcpLua.Analyzers | 1.9.0 |
+| ANcpLua.NET.Sdk | 1.6.21 |
+| ANcpLua.Roslyn.Utilities | 1.16.0 |
+| ANcpLua.Roslyn.Utilities.Testing | 1.16.0 |
+| Roslyn | 5.0.0 |
+| RoslynAnalyzers | 3.11.0 |
+| xunit.v3 | 3.2.2 |
+| AwesomeAssertions | 9.3.0 |
+
+## GitHub Actions (Jan 2026)
 
 ```yaml
 - uses: actions/checkout@v6
@@ -130,14 +147,14 @@ tests/
 Use condensed single-line `InlineData` with interpolated boilerplate:
 
 ```csharp
-// ✅ PREFERRED - Parameterized, condensed
+// PREFERRED - Parameterized, condensed
 [Theory]
 [InlineData("int i", "[|i|] = 10")]
 [InlineData("int i", "[|i|]++")]
 public Task ShouldReport(string param, string stmt) =>
     VerifyAsync($"public class C({param}) {{ void M() {{ {stmt}; }} }}");
 
-// ❌ AVOID - Verbose multi-line raw strings for simple cases
+// AVOID - Verbose multi-line raw strings for simple cases
 [InlineData("""
     public class C(int i) { void M() { [|i|] = 10; } }
     """)]
@@ -150,7 +167,7 @@ public Task ShouldReport(string param, string stmt) =>
 | [ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk) | MSBuild SDK that auto-injects this analyzer |
 | [ANcpLua.Roslyn.Utilities](https://github.com/ANcpLua/ANcpLua.Roslyn.Utilities) | Shared Roslyn helpers |
 
-## ⚠️ Common CI Errors
+## Common CI Errors
 
 ### SDK Version Not Found
 ```
@@ -167,8 +184,8 @@ sed -i '' 's/"ANcpLua.NET.Sdk": "X.X.X"/"ANcpLua.NET.Sdk": "LATEST"/' global.jso
 
 ### Release Order (CRITICAL!)
 ```
-1. Roslyn.Utilities → publish to NuGet
-2. SDK → update Version.props → publish to NuGet
-3. THEN sync Version.props to Analyzers  ← YOU ARE HERE
-4. Analyzers → can now build
+1. Roslyn.Utilities -> publish to NuGet
+2. SDK -> update Version.props -> publish to NuGet
+3. THEN sync Version.props to Analyzers  <- YOU ARE HERE
+4. Analyzers -> can now build
 ```
