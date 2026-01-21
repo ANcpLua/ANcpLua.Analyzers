@@ -4,11 +4,11 @@
       ANcpLua.Analyzers - Directory.Packages.props
       ═══════════════════════════════════════════════════════════════════════════
 
-      Version.props is a COPY from SDK (auto-synced via GitHub Actions).
-      This file only declares WHICH packages are used, not their versions.
+      LAYERING PATTERN: Local Version.props provides versions AHEAD of published SDK.
+      Once SDK publishes with these versions, local Version.props can be removed.
     -->
 
-    <!-- Import centralized versions from Version.props (unconditional - SDK also imports, but CPM needs it here) -->
+    <!-- Import local Version.props to override SDK-provided versions (ahead of SDK) -->
     <Import Project="$(MSBuildThisFileDirectory)Version.props"/>
 
     <PropertyGroup>

@@ -42,9 +42,11 @@ public sealed partial class Al0018AnalyzerTests : AnalyzerTestBase {
                                            </Project>
                                            """;
 
+        // Explicit empty diagnostics array to resolve overload ambiguity
         return VerifyAsync(
             EmptyCode,
-            [("Directory.Build.props", DirectoryBuildProps)]);
+            [("Directory.Build.props", DirectoryBuildProps)],
+            Array.Empty<DiagnosticResult>());
     }
 
     [Fact]
@@ -55,9 +57,11 @@ public sealed partial class Al0018AnalyzerTests : AnalyzerTestBase {
                                            </Project>
                                            """;
 
+        // Explicit empty diagnostics array to resolve overload ambiguity
         return VerifyAsync(
             EmptyCode,
-            [("Directory.Build.props", DirectoryBuildProps)]);
+            [("Directory.Build.props", DirectoryBuildProps)],
+            Array.Empty<DiagnosticResult>());
     }
 
     [Fact]
@@ -70,8 +74,10 @@ public sealed partial class Al0018AnalyzerTests : AnalyzerTestBase {
                                       </Project>
                                       """;
 
+        // Explicit empty diagnostics array to resolve overload ambiguity
         return VerifyAsync(
             EmptyCode,
-            [("SomeOther.props", OtherPropsFile)]);
+            [("SomeOther.props", OtherPropsFile)],
+            Array.Empty<DiagnosticResult>());
     }
 }

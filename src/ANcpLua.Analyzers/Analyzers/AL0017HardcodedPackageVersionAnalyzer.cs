@@ -68,19 +68,36 @@ public sealed partial class Al0017HardcodedPackageVersionAnalyzer : DiagnosticAn
         ["Microsoft.CodeAnalysis.CSharp.Workspaces"] = "RoslynVersion",
         ["Microsoft.CodeAnalysis.Common"] = "RoslynVersion",
         ["Microsoft.CodeAnalysis.Analyzers"] = "RoslynAnalyzersVersion",
-        // Testing
+
+        // Testing - xUnit v3
         ["xunit.v3"] = "XunitV3Version",
         ["xunit.v3.mtp-v2"] = "XunitV3Version",
         ["xunit.v3.mtp-v1"] = "XunitV3Version",
+        ["xunit.v3.mtp-off"] = "XunitV3Version",
+
+        // Testing - Assertions
         ["AwesomeAssertions"] = "AwesomeAssertionsVersion",
         ["AwesomeAssertions.Analyzers"] = "AwesomeAssertionsAnalyzersVersion",
+
+        // Testing - Loggers
         ["GitHubActionsTestLogger"] = "GitHubActionsTestLoggerVersion",
+
+        // Microsoft Testing Platform (MTP) Extensions
+        ["Microsoft.Testing.Extensions.CodeCoverage"] = "CodeCoverageVersion",
+        ["Microsoft.Testing.Extensions.TrxReport"] = "MTPExtensionsVersion",
+        ["Microsoft.Testing.Extensions.CrashDump"] = "MTPExtensionsVersion",
+        ["Microsoft.Testing.Extensions.HangDump"] = "MTPExtensionsVersion",
+        ["Microsoft.Testing.Extensions.Retry"] = "MTPExtensionsVersion",
+        ["Microsoft.NET.Test.Sdk"] = "TestSdkVersion",
+        ["Microsoft.Testing.Platform.MSBuild"] = "MTPExtensionsVersion",
+
         // Analyzer Testing
         ["Microsoft.CodeAnalysis.Analyzer.Testing"] = "AnalyzerTestingVersion",
         ["Microsoft.CodeAnalysis.CSharp.Analyzer.Testing"] = "AnalyzerTestingVersion",
         ["Microsoft.CodeAnalysis.CSharp.CodeFix.Testing"] = "AnalyzerTestingVersion",
         ["Microsoft.CodeAnalysis.CSharp.CodeRefactoring.Testing"] = "AnalyzerTestingVersion",
         ["Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing"] = "AnalyzerTestingVersion",
+
         // Meziantou
         ["Meziantou.Framework"] = "MeziantouFrameworkVersion",
         ["Meziantou.Framework.FullPath"] = "MeziantouFullPathVersion",
@@ -89,9 +106,16 @@ public sealed partial class Al0017HardcodedPackageVersionAnalyzer : DiagnosticAn
         ["Meziantou.Framework.DependencyScanning"] = "MeziantouDependencyScanningVersion",
         ["Meziantou.Analyzer"] = "MeziantouAnalyzerVersion",
         ["Meziantou.Xunit.v3.ParallelTestFramework"] = "MeziantouParallelTestFrameworkVersion",
+
         // Microsoft.Extensions
         ["Microsoft.Extensions.Hosting.Abstractions"] = "AspNetCoreVersion",
         ["Microsoft.Extensions.Logging"] = "AspNetCoreVersion",
+        ["Microsoft.Extensions.Logging.Abstractions"] = "AspNetCoreVersion",
+        ["Microsoft.Extensions.DependencyInjection"] = "AspNetCoreVersion",
+        ["Microsoft.Extensions.DependencyInjection.Abstractions"] = "AspNetCoreVersion",
+        ["Microsoft.Extensions.Configuration"] = "AspNetCoreVersion",
+        ["Microsoft.Extensions.Configuration.Abstractions"] = "AspNetCoreVersion",
+        ["Microsoft.Extensions.Options"] = "AspNetCoreVersion",
         ["Microsoft.AspNetCore.Mvc.Testing"] = "AspNetCoreVersion",
         ["Microsoft.AspNetCore.OpenApi"] = "AspNetCoreVersion",
         ["Microsoft.AspNetCore.Diagnostics.Middleware"] = "MicrosoftExtensionsVersion",
@@ -100,22 +124,40 @@ public sealed partial class Al0017HardcodedPackageVersionAnalyzer : DiagnosticAn
         ["Microsoft.Extensions.Telemetry"] = "MicrosoftExtensionsVersion",
         ["Microsoft.Bcl.AsyncInterfaces"] = "MicrosoftBclAsyncInterfacesVersion",
         ["Microsoft.Bcl.HashCode"] = "BclHashCodeVersion",
+
         // OpenTelemetry
+        ["OpenTelemetry"] = "OpenTelemetryVersion",
+        ["OpenTelemetry.Api"] = "OpenTelemetryVersion",
         ["OpenTelemetry.Exporter.Console"] = "OpenTelemetryVersion",
         ["OpenTelemetry.Exporter.OpenTelemetryProtocol"] = "OpenTelemetryVersion",
         ["OpenTelemetry.Extensions.Hosting"] = "OpenTelemetryVersion",
         ["OpenTelemetry.Instrumentation.AspNetCore"] = "OpenTelemetryVersion",
         ["OpenTelemetry.Instrumentation.Http"] = "OpenTelemetryVersion",
         ["OpenTelemetry.Instrumentation.Runtime"] = "OpenTelemetryVersion",
-        // Build Tools
+        ["OpenTelemetry.Instrumentation.SqlClient"] = "OpenTelemetryVersion",
+
+        // Build Tools & SDK Analyzers
         ["Basic.Reference.Assemblies.Net100"] = "BasicReferenceAssembliesVersion",
+        ["Basic.Reference.Assemblies.Net90"] = "BasicReferenceAssembliesVersion",
+        ["Basic.Reference.Assemblies.Net80"] = "BasicReferenceAssembliesVersion",
         ["Basic.Reference.Assemblies.NetStandard20"] = "BasicReferenceAssembliesVersion",
         ["MSBuild.StructuredLogger"] = "MSBuildStructuredLoggerVersion",
         ["NuGet.Protocol"] = "NuGetVersion",
         ["NuGet.Packaging"] = "NuGetVersion",
         ["Microsoft.SourceLink.GitHub"] = "MicrosoftSourceLinkVersion",
+        ["Microsoft.Sbom.Targets"] = "SbomTargetsVersion",
+        ["Microsoft.CodeAnalysis.BannedApiAnalyzers"] = "BannedApiAnalyzersVersion",
+        ["JonSkeet.RoslynAnalyzers"] = "JonSkeetAnalyzersVersion",
+
+        // ANcpLua Ecosystem
+        ["ANcpLua.Analyzers"] = "ANcpLuaAnalyzersVersion",
+        ["ANcpLua.Roslyn.Utilities"] = "ANcpLuaRoslynUtilitiesVersion",
+        ["ANcpLua.Roslyn.Utilities.Sources"] = "ANcpLuaRoslynUtilitiesSourcesVersion",
+        ["ANcpLua.Roslyn.Utilities.Testing"] = "ANcpLuaRoslynUtilitiesTestingVersion",
+
         // Other
-        ["JetBrains.Annotations"] = "JetBrainsAnnotationsVersion"
+        ["JetBrains.Annotations"] = "JetBrainsAnnotationsVersion",
+        ["System.Threading.Tasks.Extensions"] = "TasksExtensionsVersion"
     };
 
     /// <summary>Pattern to detect MSBuild property references like $(VariableName).</summary>

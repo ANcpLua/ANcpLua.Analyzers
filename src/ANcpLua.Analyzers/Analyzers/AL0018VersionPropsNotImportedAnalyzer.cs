@@ -4,20 +4,26 @@ using System.Xml.Linq;
 namespace ANcpLua.Analyzers.Analyzers;
 
 /// <summary>
-///     AL0018: Detects when Version.props is not imported in Directory.Build.props.
+///     AL0018: Detects when Version.props is not imported in Directory.Build.props or Directory.Packages.props.
 ///     Version.props should be imported for centralized version management.
 /// </summary>
 /// <remarks>
 ///     <para>
 ///         Central Package Management (CPM) works best when versions are defined as MSBuild
 ///         properties in a separate file (typically Version.props). This file should be
-///         imported in Directory.Build.props so all projects in the solution can reference
-///         the version variables.
+///         imported in Directory.Build.props or Directory.Packages.props so all projects
+///         in the solution can reference the version variables.
 ///     </para>
 ///     <para>
-///         The analyzer examines Directory.Build.props files added as additional files
-///         to the compilation. It flags files that don't contain an Import element
-///         referencing Version.props.
+///         The analyzer supports two valid import locations (per the layering pattern):
+///         - Directory.Build.props: Traditional location for MSBuild property imports
+///         - Directory.Packages.props: Valid for CPM scenarios where version variables
+///           are only used by PackageVersion items
+///     </para>
+///     <para>
+///         The analyzer examines both files when added as additional files to the
+///         compilation. It only flags Directory.Build.props if neither file imports
+///         Version.props.
 ///     </para>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
@@ -26,6 +32,7 @@ public sealed partial class Al0018VersionPropsNotImportedAnalyzer : DiagnosticAn
 
     private const string VersionPropsFileName = "Version.props";
     private const string DirectoryBuildPropsFileName = "Directory.Build.props";
+    private const string DirectoryPackagesPropsFileName = "Directory.Packages.props";
 
     private static readonly LocalizableResourceString Title = new(
         nameof(Resources.AL0018AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
@@ -51,17 +58,52 @@ public sealed partial class Al0018VersionPropsNotImportedAnalyzer : DiagnosticAn
     }
 
     private static void AnalyzeCompilation(CompilationAnalysisContext context) {
-        // Find Directory.Build.props in AdditionalFiles
+        // Find Directory.Build.props and Directory.Packages.props in AdditionalFiles
         var directoryBuildPropsFiles = context.Options.AdditionalFiles
             .Where(static f => f.Path.EndsWith(DirectoryBuildPropsFileName, StringComparison.OrdinalIgnoreCase))
             .ToList();
 
+        var directoryPackagesPropsFiles = context.Options.AdditionalFiles
+            .Where(static f => f.Path.EndsWith(DirectoryPackagesPropsFileName, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        // Check if Version.props is imported in Directory.Packages.props
+        // This is valid per the layering pattern
+        var hasImportInPackagesProps = directoryPackagesPropsFiles
+            .Any(f => HasVersionPropsImport(f, context.CancellationToken));
+
         foreach (var propsFile in directoryBuildPropsFiles) {
-            AnalyzePropsFile(context, propsFile);
+            AnalyzePropsFile(context, propsFile, hasImportInPackagesProps);
         }
     }
 
-    private static void AnalyzePropsFile(CompilationAnalysisContext context, AdditionalText propsFile) {
+    /// <summary>
+    ///     Checks if a props file imports Version.props.
+    /// </summary>
+    private static bool HasVersionPropsImport(AdditionalText propsFile, CancellationToken cancellationToken) {
+        if (propsFile.GetText(cancellationToken) is not { } sourceText) {
+            return false;
+        }
+
+        try {
+            var doc = XDocument.Parse(sourceText.ToString());
+
+            return doc.Descendants()
+                .Where(static e => e.Name.LocalName == "Import")
+                .Any(static import =>
+                    import.Attribute("Project") is { Value: { } projectValue } &&
+                    projectValue.Contains(VersionPropsFileName, StringComparison.OrdinalIgnoreCase));
+        } catch (Exception) {
+            return false;
+        }
+    }
+
+    private static void AnalyzePropsFile(CompilationAnalysisContext context, AdditionalText propsFile, bool hasImportInPackagesProps) {
+        // If Version.props is already imported in Directory.Packages.props, don't flag
+        if (hasImportInPackagesProps) {
+            return;
+        }
+
         if (propsFile.GetText(context.CancellationToken) is not { } sourceText) {
             return;
         }

@@ -294,4 +294,54 @@
     <data name="AL0018AnalyzerDescription" xml:space="preserve">
     <value>Version.props should be imported in Directory.Build.props to enable centralized package version management using $(VariableName) syntax.</value>
   </data>
+    <!-- AL0019: Undefined version variable -->
+    <data name="AL0019AnalyzerTitle" xml:space="preserve">
+    <value>Undefined version variable</value>
+  </data>
+    <data name="AL0019AnalyzerMessageFormat" xml:space="preserve">
+    <value>Package '{0}' uses undefined version variable '$({1})'. Define '{1}' in Version.props.</value>
+  </data>
+    <data name="AL0019AnalyzerDescription" xml:space="preserve">
+    <value>Version variables used in Directory.Packages.props must be defined in Version.props. Missing definitions cause silent build failures or empty version strings.</value>
+  </data>
+    <!-- AL0028: Use IsEqualTo -->
+    <data name="AL0028AnalyzerTitle" xml:space="preserve">
+    <value>Use IsEqualTo extension</value>
+  </data>
+    <data name="AL0028AnalyzerMessageFormat" xml:space="preserve">
+    <value>Use '{0}' instead of {1}</value>
+  </data>
+    <data name="AL0028AnalyzerDescription" xml:space="preserve">
+    <value>Use IsEqualTo extension instead of SymbolEqualityComparer.Default.Equals for cleaner symbol comparison.</value>
+  </data>
+    <!-- AL0029: Use HasAttribute -->
+    <data name="AL0029AnalyzerTitle" xml:space="preserve">
+    <value>Use HasAttribute extension</value>
+  </data>
+    <data name="AL0029AnalyzerMessageFormat" xml:space="preserve">
+    <value>Use '{0}' instead of {1}</value>
+  </data>
+    <data name="AL0029AnalyzerDescription" xml:space="preserve">
+    <value>Use HasAttribute extension instead of GetAttributes() LINQ queries or foreach loops for cleaner attribute checking.</value>
+  </data>
+    <!-- AL0030: Use type hierarchy extensions -->
+    <data name="AL0030AnalyzerTitle" xml:space="preserve">
+    <value>Use type hierarchy extension</value>
+  </data>
+    <data name="AL0030AnalyzerMessageFormat" xml:space="preserve">
+    <value>Use '{0}' instead of {1}</value>
+  </data>
+    <data name="AL0030AnalyzerDescription" xml:space="preserve">
+    <value>Use Implements or InheritsFrom extensions instead of manual AllInterfaces/BaseType iteration loops.</value>
+  </data>
+    <!-- AL0031: Use operation extensions -->
+    <data name="AL0031AnalyzerTitle" xml:space="preserve">
+    <value>Use operation extension</value>
+  </data>
+    <data name="AL0031AnalyzerMessageFormat" xml:space="preserve">
+    <value>Use '{0}' instead of {1}</value>
+  </data>
+    <data name="AL0031AnalyzerDescription" xml:space="preserve">
+    <value>Use IsMethodNamed or TryGetConstantValue extensions instead of verbose property access patterns.</value>
+  </data>
 </root>

@@ -1,6 +1,6 @@
 # CLAUDE.md - ANcpLua.Analyzers
 
-Roslyn analyzers for C# code quality (AL0001-AL0018, AL0020-AL0027).
+Roslyn analyzers for C# code quality (AL0001-AL0028).
 
 ## ⚡ Claude Rules
 
@@ -32,7 +32,7 @@ LAYER 3: qyl, other projects       ← END USERS
 
 ---
 
-## Rules (AL0001-AL0018, AL0020-AL0027)
+## Rules (AL0001-AL0031)
 
 | Rule | Severity | Description |
 |------|----------|-------------|
@@ -54,6 +54,7 @@ LAYER 3: qyl, other projects       ← END USERS
 | AL0016 | Info | Combine declaration with subsequent null-check |
 | AL0017 | Warning | Hardcoded package version in Directory.Packages.props |
 | AL0018 | Warning | Version.props not imported in Directory.Build.props |
+| AL0019 | Warning | Undefined version variable in Directory.Packages.props |
 | AL0020 | Error | IFormCollection requires explicit [FromForm] |
 | AL0021 | Error | Multiple structured form sources |
 | AL0022 | Error | Mixed form collection and DTO |
@@ -62,6 +63,10 @@ LAYER 3: qyl, other projects       ← END USERS
 | AL0025 | Warning | Prefer static lambda |
 | AL0026 | Warning | Avoid DateTime.Now/UtcNow, use TimeProvider |
 | AL0027 | Warning | Avoid Newtonsoft.Json, use System.Text.Json |
+| AL0028 | Info | Use IsEqualTo instead of SymbolEqualityComparer.Equals |
+| AL0029 | Info | Use HasAttribute instead of GetAttributes() patterns |
+| AL0030 | Info | Use Implements/InheritsFrom instead of type hierarchy loops |
+| AL0031 | Info | Use IsMethodNamed/TryGetConstantValue instead of verbose patterns |
 
 ## Commands
 

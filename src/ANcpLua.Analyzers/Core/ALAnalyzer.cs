@@ -27,6 +27,7 @@ public static partial class DiagnosticCategories {
     public const string Style = "Style";
     public const string VersionManagement = "VersionManagement";
     public const string AspNetCore = "ASP.NET Core";
+    public const string RoslynUtilities = "Roslyn Utilities";
 }
 
 /// <summary>
@@ -141,6 +142,23 @@ public static partial class DiagnosticIds {
 
     /// <summary>AL0027: Avoid legacy JSON library - use System.Text.Json instead.</summary>
     public const string AvoidNewtonsoftJson = "AL0027";
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // ROSLYN UTILITIES (AL0028-AL0031)
+    // These analyzers suggest using ANcpLua.Roslyn.Utilities extension methods.
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /// <summary>AL0028: Use IsEqualTo instead of SymbolEqualityComparer.Equals.</summary>
+    public const string UseIsEqualTo = "AL0028";
+
+    /// <summary>AL0029: Use HasAttribute instead of GetAttributes() patterns.</summary>
+    public const string UseHasAttribute = "AL0029";
+
+    /// <summary>AL0030: Use Implements/InheritsFrom instead of type hierarchy loops.</summary>
+    public const string UseTypeHierarchyExtensions = "AL0030";
+
+    /// <summary>AL0031: Use IsMethodNamed/TryGetConstantValue instead of verbose patterns.</summary>
+    public const string UseOperationExtensions = "AL0031";
 }
 
 /// <summary>

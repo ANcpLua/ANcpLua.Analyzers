@@ -22,6 +22,12 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///         Version.props and flags any $(VariableName) reference in Directory.Packages.props
 ///         Version attributes that isn't defined.
 ///     </para>
+///     <para>
+///         The analyzer recognizes well-known SDK-provided variables that are commonly
+///         supplied by custom MSBuild SDKs (like ANcpLua.NET.Sdk). These variables are
+///         not flagged as undefined even if not present in the local Version.props,
+///         supporting the layering pattern where SDK provides base versions.
+///     </para>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0019UndefinedVersionVariableAnalyzer : DiagnosticAnalyzer {
@@ -50,6 +56,81 @@ public sealed partial class Al0019UndefinedVersionVariableAnalyzer : DiagnosticA
 
     /// <summary>Pattern to extract MSBuild property name from $(VariableName) syntax.</summary>
     private static readonly Regex MsBuildPropertyPattern = new(@"^\$\(([^)]+)\)$", RegexOptions.Compiled);
+
+    /// <summary>
+    ///     Well-known variables that are commonly provided by MSBuild SDKs.
+    ///     These are not flagged as undefined even if not in local Version.props,
+    ///     supporting the layering pattern where SDK provides base versions.
+    /// </summary>
+    private static readonly HashSet<string> SdkProvidedVariables = new(StringComparer.OrdinalIgnoreCase) {
+        // Roslyn
+        "RoslynVersion",
+        "RoslynAnalyzersVersion",
+
+        // Testing - xUnit
+        "XunitV3Version",
+        "XunitMtpVersion",
+
+        // Testing - Assertions
+        "AwesomeAssertionsVersion",
+        "AwesomeAssertionsAnalyzersVersion",
+
+        // Testing - MTP Extensions
+        "MTPExtensionsVersion",
+        "CodeCoverageVersion",
+        "TestSdkVersion",
+        "DiagnosticsTestingVersion",
+        "GitHubActionsLoggerMTPVersion",
+        "GitHubActionsLoggerVSTestVersion",
+        "GitHubActionsTestLoggerVersion",
+
+        // Analyzer Testing
+        "AnalyzerTestingVersion",
+
+        // Reference Assemblies
+        "BasicReferenceAssembliesVersion",
+
+        // Meziantou
+        "MeziantouFrameworkVersion",
+        "MeziantouFullPathVersion",
+        "MeziantouTemporaryDirectoryVersion",
+        "MeziantouThreadingVersion",
+        "MeziantouDependencyScanningVersion",
+        "MeziantouAnalyzerVersion",
+        "MeziantouParallelTestFrameworkVersion",
+        "ParallelTestFrameworkVersion",
+
+        // Microsoft.Extensions
+        "MicrosoftExtensionsVersion",
+        "AspNetCoreVersion",
+        "MicrosoftBclAsyncInterfacesVersion",
+        "MvcTestingVersion",
+
+        // Legacy Polyfills
+        "BclAsyncInterfacesVersion",
+        "TasksExtensionsVersion",
+        "BclHashCodeVersion",
+
+        // OpenTelemetry
+        "OpenTelemetryVersion",
+
+        // Build Tools & Analyzers
+        "ANcpLuaAnalyzersVersion",
+        "ANcpLuaRoslynUtilitiesVersion",
+        "ANcpLuaRoslynUtilitiesSourcesVersion",
+        "ANcpLuaRoslynUtilitiesTestingVersion",
+        "SbomTargetsVersion",
+        "BannedApiAnalyzersVersion",
+        "JonSkeetAnalyzersVersion",
+        "NuGetVersion",
+        "MSBuildStructuredLoggerVersion",
+        "MicrosoftSourceLinkVersion",
+        "MicrosoftDeploymentDotNetReleasesVersion",
+
+        // Other
+        "JetBrainsAnnotationsVersion",
+        "ANcpSdkPackageVersion"
+    };
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
@@ -142,8 +223,14 @@ public sealed partial class Al0019UndefinedVersionVariableAnalyzer : DiagnosticA
 
                 var variableName = match.Groups[1].Value;
 
-                // Skip if the variable is defined
+                // Skip if the variable is defined in local Version.props
                 if (definedProperties.Contains(variableName)) {
+                    continue;
+                }
+
+                // Skip if the variable is a well-known SDK-provided variable
+                // This supports the layering pattern where SDK provides base versions
+                if (SdkProvidedVariables.Contains(variableName)) {
                     continue;
                 }
 
