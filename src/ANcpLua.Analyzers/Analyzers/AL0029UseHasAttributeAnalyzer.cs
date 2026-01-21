@@ -99,8 +99,35 @@ public sealed partial class Al0029UseHasAttributeAnalyzer : AlAnalyzer {
             IInvocationOperation invocation => invocation.TargetMethod.Name,
             IPropertyReferenceOperation propertyRef => propertyRef.Property.Name,
             IConversionOperation conversion => GetCollectionAccessName(conversion.Operand),
+            ILocalReferenceOperation localRef => GetLocalAssignmentSourceName(localRef),
             _ => null
         };
+
+    private static string? GetLocalAssignmentSourceName(ILocalReferenceOperation localRef) {
+        // Find the containing method/block and look for assignment to this local
+        if (localRef.GetContainingBlock() is not { } containingBlock) {
+            return null;
+        }
+
+        // Look for variable declaration with initialization
+        foreach (var operation in Microsoft.CodeAnalysis.Operations.OperationExtensions.Descendants(containingBlock)) {
+            if (operation is IVariableDeclaratorOperation declarator &&
+                SymbolEqualityComparer.Default.Equals(declarator.Symbol, localRef.Local) &&
+                declarator.Initializer?.Value is IInvocationOperation invocation) {
+                return invocation.TargetMethod.Name;
+            }
+
+            // Also check for simple assignments
+            if (operation is ISimpleAssignmentOperation assignment &&
+                assignment.Target is ILocalReferenceOperation targetLocal &&
+                SymbolEqualityComparer.Default.Equals(targetLocal.Local, localRef.Local) &&
+                assignment.Value is IInvocationOperation assignedInvocation) {
+                return assignedInvocation.TargetMethod.Name;
+            }
+        }
+
+        return null;
+    }
 
     private static bool ContainsAttributeClassComparison(IOperation? body) {
         if (body is null) {

@@ -76,14 +76,25 @@ public sealed partial class Al0030UseTypeHierarchyAnalyzer : AlAnalyzer {
         };
 
     private static bool ContainsSymbolEqualityComparison(IOperation? body, INamedTypeSymbol? symbolEqualityComparerType) {
-        if (body is null || symbolEqualityComparerType is null) {
+        if (body is null) {
             return false;
         }
 
         foreach (var descendant in Microsoft.CodeAnalysis.Operations.OperationExtensions.Descendants(body)) {
-            if (descendant is IInvocationOperation invocation &&
-                IsSymbolEqualityComparerEquals(invocation, symbolEqualityComparerType)) {
-                return true;
+            if (descendant is IInvocationOperation invocation) {
+                // Check for SymbolEqualityComparer.Default.Equals(a, b)
+                if (symbolEqualityComparerType is not null &&
+                    IsSymbolEqualityComparerEquals(invocation, symbolEqualityComparerType)) {
+                    return true;
+                }
+
+                // Also check for a.IsEqualTo(b) pattern (from ANcpLua.Roslyn.Utilities)
+                // Extension method signature: IsEqualTo(this ISymbol?, ISymbol?) has 2 parameters
+                if (invocation.TargetMethod.Name is "IsEqualTo" &&
+                    invocation.TargetMethod.IsExtensionMethod &&
+                    invocation.TargetMethod.Parameters.Length == 2) {
+                    return true;
+                }
             }
         }
 
@@ -105,10 +116,20 @@ public sealed partial class Al0030UseTypeHierarchyAnalyzer : AlAnalyzer {
                 hasBaseTypeAssignment = true;
             }
 
-            if (symbolEqualityComparerType is not null &&
-                operation is IInvocationOperation invocation &&
-                IsSymbolEqualityComparerEquals(invocation, symbolEqualityComparerType)) {
-                hasEqualityCheck = true;
+            if (operation is IInvocationOperation invocation) {
+                // Check for SymbolEqualityComparer.Default.Equals(a, b)
+                if (symbolEqualityComparerType is not null &&
+                    IsSymbolEqualityComparerEquals(invocation, symbolEqualityComparerType)) {
+                    hasEqualityCheck = true;
+                }
+
+                // Also check for a.IsEqualTo(b) pattern (from ANcpLua.Roslyn.Utilities)
+                // Extension method signature: IsEqualTo(this ISymbol?, ISymbol?) has 2 parameters
+                if (invocation.TargetMethod.Name is "IsEqualTo" &&
+                    invocation.TargetMethod.IsExtensionMethod &&
+                    invocation.TargetMethod.Parameters.Length == 2) {
+                    hasEqualityCheck = true;
+                }
             }
         }
 

@@ -3,7 +3,7 @@ using ANcpLua.Analyzers.Core;
 namespace ANcpLua.Analyzers.Analyzers;
 
 /// <summary>
-///     AL0026: Avoid System.DateTime time accessors.
+///     AL0026: Avoid System.DateTime and DateTimeOffset time accessors.
 ///     Suggests using TimeProvider.System.GetLocalNow() or GetUtcNow() for better testability.
 ///     Only reports when TimeProvider is available (.NET 8+).
 /// </summary>
@@ -11,6 +11,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 public sealed partial class Al0026AvoidDateTimeNowAnalyzer : AlAnalyzer {
     private const string TimeProviderMetadataName = "System.TimeProvider";
     private const string DateTimeMetadataName = "System.DateTime";
+    private const string DateTimeOffsetMetadataName = "System.DateTimeOffset";
 
     private static readonly LocalizableResourceString Title = new(
         nameof(Resources.AL0026AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
@@ -38,24 +39,37 @@ public sealed partial class Al0026AvoidDateTimeNowAnalyzer : AlAnalyzer {
             return;
         }
 
-        if (context.Compilation.GetTypeByMetadataName(DateTimeMetadataName) is not { } dateTimeType) {
+        var dateTimeType = context.Compilation.GetTypeByMetadataName(DateTimeMetadataName);
+        var dateTimeOffsetType = context.Compilation.GetTypeByMetadataName(DateTimeOffsetMetadataName);
+
+        // Need at least one of the types to analyze
+        if (dateTimeType is null && dateTimeOffsetType is null) {
             return;
         }
 
         context.RegisterOperationAction(
-            ctx => AnalyzePropertyReference(ctx, dateTimeType),
+            ctx => AnalyzePropertyReference(ctx, dateTimeType, dateTimeOffsetType),
             OperationKind.PropertyReference);
     }
 
-    private static void AnalyzePropertyReference(OperationAnalysisContext context, INamedTypeSymbol dateTimeType) {
+    private static void AnalyzePropertyReference(
+        OperationAnalysisContext context,
+        INamedTypeSymbol? dateTimeType,
+        INamedTypeSymbol? dateTimeOffsetType) {
         if (context.Operation is not IPropertyReferenceOperation propertyRef) {
             return;
         }
 
         var property = propertyRef.Property;
+        var containingType = property.ContainingType;
 
-        // Check if it's a DateTime static time property
-        if (!SymbolEqualityComparer.Default.Equals(property.ContainingType, dateTimeType)) {
+        // Check if it's a DateTime or DateTimeOffset static time property
+        var isDateTime = dateTimeType is not null &&
+                         SymbolEqualityComparer.Default.Equals(containingType, dateTimeType);
+        var isDateTimeOffset = dateTimeOffsetType is not null &&
+                               SymbolEqualityComparer.Default.Equals(containingType, dateTimeOffsetType);
+
+        if (!isDateTime && !isDateTimeOffset) {
             return;
         }
 
@@ -68,6 +82,7 @@ public sealed partial class Al0026AvoidDateTimeNowAnalyzer : AlAnalyzer {
             return;
         }
 
-        context.ReportDiagnostic(Rule, propertyRef.Syntax.GetLocation(), property.Name, replacement);
+        var typeName = isDateTime ? "DateTime" : "DateTimeOffset";
+        context.ReportDiagnostic(Rule, propertyRef.Syntax.GetLocation(), typeName, property.Name, replacement);
     }
 }

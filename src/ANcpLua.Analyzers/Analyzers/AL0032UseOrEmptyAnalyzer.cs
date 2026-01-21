@@ -1,0 +1,144 @@
+using ANcpLua.Analyzers.Core;
+
+namespace ANcpLua.Analyzers.Analyzers;
+
+/// <summary>
+///     AL0032: Suggests using OrEmpty() extension instead of null-coalescing with empty collections.
+/// </summary>
+/// <remarks>
+///     <list type="bullet">
+///         <item><c>collection ?? Array.Empty&lt;T&gt;()</c> → <c>collection.OrEmpty()</c></item>
+///         <item><c>collection ?? Enumerable.Empty&lt;T&gt;()</c> → <c>collection.OrEmpty()</c></item>
+///         <item><c>collection ?? []</c> → <c>collection.OrEmpty()</c></item>
+///     </list>
+/// </remarks>
+[DiagnosticAnalyzer(LanguageNames.CSharp)]
+public sealed partial class Al0032UseOrEmptyAnalyzer : AlAnalyzer {
+    private static readonly LocalizableResourceString Title = new(
+        nameof(Resources.AL0032AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
+
+    private static readonly LocalizableResourceString MessageFormat = new(
+        nameof(Resources.AL0032AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
+
+    private static readonly LocalizableResourceString Description = new(
+        nameof(Resources.AL0032AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
+
+    private static readonly DiagnosticDescriptor Rule = new(
+        DiagnosticIds.UseOrEmpty,
+        Title, MessageFormat, DiagnosticCategories.RoslynUtilities,
+        DiagnosticSeverity.Info, true, Description,
+        HelpLinkBase);
+
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+
+    protected override void RegisterActions(AnalysisContext context) =>
+        context.RegisterOperationAction(AnalyzeCoalesce, OperationKind.Coalesce);
+
+    private static void AnalyzeCoalesce(OperationAnalysisContext context) {
+        if (context.Operation is not ICoalesceOperation coalesce) {
+            return;
+        }
+
+        // Check if the right side is an empty collection pattern
+        if (!IsEmptyCollectionExpression(coalesce.WhenNull)) {
+            return;
+        }
+
+        // Check if the left side is an IEnumerable<T> type (excluding strings)
+        var leftType = coalesce.Value.Type;
+        if (leftType is null || leftType.SpecialType == SpecialType.System_String) {
+            return;
+        }
+
+        // Must be IEnumerable<T> or implement it (check via display string to avoid compilation lookup issues)
+        if (!IsEnumerableType(leftType)) {
+            return;
+        }
+
+        var leftName = GetOperandDisplayName(coalesce.Value);
+        context.ReportDiagnostic(Diagnostic.Create(Rule, coalesce.Syntax.GetLocation(),
+            $"{leftName}.OrEmpty()", "null-coalescing with empty collection"));
+    }
+
+    private static bool IsEmptyCollectionExpression(IOperation? operation) {
+        if (operation is null) {
+            return false;
+        }
+
+        // Unwrap conversions
+        while (operation is IConversionOperation conversion) {
+            operation = conversion.Operand;
+        }
+
+        // Check for collection expression [] (empty)
+        if (operation is ICollectionExpressionOperation { Elements.Length: 0 }) {
+            return true;
+        }
+
+        // Check for Array.Empty<T>() or Enumerable.Empty<T>()
+        // Use name-based comparison since these are well-known types
+        if (operation is IInvocationOperation invocation) {
+            var method = invocation.TargetMethod;
+            if (method.Name == "Empty" && method.IsStatic && method.Parameters.Length is 0) {
+                var containingType = method.ContainingType;
+                if (containingType is not null) {
+                    var typeName = containingType.Name;
+                    var namespaceName = containingType.ContainingNamespace?.ToDisplayString();
+                    if ((typeName == "Array" && namespaceName == "System") ||
+                        (typeName == "Enumerable" && namespaceName == "System.Linq")) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        // Check for new T[0] or new T[] { }
+        if (operation is IArrayCreationOperation arrayCreation) {
+            // Check if it's an empty array (size 0 or empty initializer)
+            if (arrayCreation.DimensionSizes.Length == 1 &&
+                arrayCreation.DimensionSizes[0].ConstantValue is { HasValue: true, Value: 0 }) {
+                return true;
+            }
+
+            if (arrayCreation.Initializer is { ElementValues.Length: 0 }) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool IsEnumerableType(ITypeSymbol type) {
+        // Direct match - check if it IS IEnumerable<T>
+        var displayName = type.OriginalDefinition.ToDisplayString();
+        if (displayName == "System.Collections.Generic.IEnumerable<T>") {
+            return true;
+        }
+
+        // Implements IEnumerable<T> - check interfaces via display string
+        foreach (var iface in type.AllInterfaces) {
+            var ifaceDisplayName = iface.OriginalDefinition.ToDisplayString();
+            if (ifaceDisplayName == "System.Collections.Generic.IEnumerable<T>") {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static string GetOperandDisplayName(IOperation operation) {
+        // Unwrap conversions
+        while (operation is IConversionOperation conversion) {
+            operation = conversion.Operand;
+        }
+
+        return operation switch {
+            ILocalReferenceOperation local => local.Local.Name,
+            IParameterReferenceOperation param => param.Parameter.Name,
+            IPropertyReferenceOperation prop => prop.Property.Name,
+            IFieldReferenceOperation field => field.Field.Name,
+            IInvocationOperation inv => $"{inv.TargetMethod.Name}()",
+            _ => "collection"
+        };
+    }
+}

@@ -110,5 +110,47 @@ namespace ANcpLua.Analyzers.CodeFixes {
                 return ResourceManager.GetString("AL0011CodeFixTitle", resourceCulture);
             }
         }
+
+        internal static string AL0026CodeFixTitle {
+            get {
+                return ResourceManager.GetString("AL0026CodeFixTitle", resourceCulture);
+            }
+        }
+
+        internal static string AL0028CodeFixTitle {
+            get {
+                return ResourceManager.GetString("AL0028CodeFixTitle", resourceCulture);
+            }
+        }
+
+        internal static string AL0031CodeFixTitle {
+            get {
+                return ResourceManager.GetString("AL0031CodeFixTitle", resourceCulture);
+            }
+        }
+
+        internal static string AL0027CodeFixTitle {
+            get {
+                return ResourceManager.GetString("AL0027CodeFixTitle", resourceCulture);
+            }
+        }
+
+        internal static string AL0029CodeFixTitle {
+            get {
+                return ResourceManager.GetString("AL0029CodeFixTitle", resourceCulture);
+            }
+        }
+
+        internal static string AL0030ImplementsCodeFixTitle {
+            get {
+                return ResourceManager.GetString("AL0030ImplementsCodeFixTitle", resourceCulture);
+            }
+        }
+
+        internal static string AL0030InheritsFromCodeFixTitle {
+            get {
+                return ResourceManager.GetString("AL0030InheritsFromCodeFixTitle", resourceCulture);
+            }
+        }
     }
 }

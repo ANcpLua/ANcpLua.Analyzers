@@ -13,7 +13,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0031UseOperationExtensionsAnalyzer : AlAnalyzer {
-    private const string IOperationTypeName = "Microsoft.CodeAnalysis.Operations.IOperation";
+    private const string IInvocationOperationTypeName = "Microsoft.CodeAnalysis.Operations.IInvocationOperation";
 
     private static readonly LocalizableResourceString Title = new(
         nameof(Resources.AL0031AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
@@ -36,8 +36,8 @@ public sealed partial class Al0031UseOperationExtensionsAnalyzer : AlAnalyzer {
         context.RegisterCompilationStartAction(OnCompilationStart);
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
-        // Only analyze if IOperation is referenced
-        if (context.Compilation.GetTypeByMetadataName(IOperationTypeName) is not { }) {
+        // Only analyze if IInvocationOperation is referenced (indicates Roslyn usage)
+        if (context.Compilation.GetTypeByMetadataName(IInvocationOperationTypeName) is not { }) {
             return;
         }
 
@@ -49,12 +49,12 @@ public sealed partial class Al0031UseOperationExtensionsAnalyzer : AlAnalyzer {
             return;
         }
 
-        // Pattern: invocation.TargetMethod.Name == "name" -> invocation.IsMethodNamed("name")
+        // Pattern: invocation.TargetMethod.Name == "name" -> invocation.IsMethodNamed(containingType, "name")
         if (binary.OperatorKind is BinaryOperatorKind.Equals or BinaryOperatorKind.NotEquals) {
             if (IsTargetMethodNameComparison(binary, out var methodName)) {
                 var suggestion = binary.OperatorKind == BinaryOperatorKind.Equals
-                    ? $"invocation.IsMethodNamed(\"{methodName}\")"
-                    : $"!invocation.IsMethodNamed(\"{methodName}\")";
+                    ? $"invocation.IsMethodNamed(containingType, \"{methodName}\")"
+                    : $"!invocation.IsMethodNamed(containingType, \"{methodName}\")";
                 context.ReportDiagnostic(Rule, binary.Syntax.GetLocation(),
                     suggestion, "TargetMethod.Name == comparison");
             }
@@ -75,9 +75,11 @@ public sealed partial class Al0031UseOperationExtensionsAnalyzer : AlAnalyzer {
             return false;
         }
 
-        if (propSide is IPropertyReferenceOperation { Property.Name: "Name" } nameProp &&
-            nameProp.Instance is IPropertyReferenceOperation { Property.Name: "TargetMethod" }) {
-            if (literalSide.ConstantValue is { HasValue: true, Value: string value }) {
+        if (propSide is IPropertyReferenceOperation { Property.Name: "Name", Instance: { } rawInstance } nameProp) {
+            // Unwrap conversions on the Instance to find the TargetMethod property access
+            var instance = UnwrapConversions(rawInstance);
+            if (instance is IPropertyReferenceOperation { Property.Name: "TargetMethod" } &&
+                literalSide.ConstantValue is { HasValue: true, Value: string value }) {
                 methodName = value;
                 return true;
             }
@@ -111,9 +113,11 @@ public sealed partial class Al0031UseOperationExtensionsAnalyzer : AlAnalyzer {
 
     private static bool IsConstantValueHasValueCheck(IBinaryOperation binary) {
         foreach (var descendant in Microsoft.CodeAnalysis.Operations.OperationExtensions.Descendants(binary)) {
-            if (descendant is IPropertyReferenceOperation { Property.Name: "HasValue" } hasValueProp &&
-                hasValueProp.Instance is IPropertyReferenceOperation { Property.Name: "ConstantValue" }) {
-                return true;
+            if (descendant is IPropertyReferenceOperation { Property.Name: "HasValue", Instance: { } rawInstance }) {
+                var instance = UnwrapConversions(rawInstance);
+                if (instance is IPropertyReferenceOperation { Property.Name: "ConstantValue" }) {
+                    return true;
+                }
             }
         }
 

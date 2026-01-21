@@ -115,6 +115,7 @@ tests/
 | CI uses real PackageId | Workflow passes `-p:PackageId=ANcpLua.Analyzers` |
 | Both DLLs required | Pack includes Analyzers.dll AND CodeFixes.dll |
 | Target: netstandard2.0 | Only ns2.0 assemblies go in nupkg |
+| **Info severity = IDE only** | `DiagnosticSeverity.Info` diagnostics (AL0010, AL0013, AL0015, AL0016, AL0028-AL0031) **only show in IDE**, not in `dotnet build` output. This is by design - MSBuild only shows Warning/Error by default. |
 
 ## GitHub Actions (Dec 2025)
 

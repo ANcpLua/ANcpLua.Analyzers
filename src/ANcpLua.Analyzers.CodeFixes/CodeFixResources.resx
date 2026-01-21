@@ -97,4 +97,25 @@
     <data name="AL0011CodeFixTitle" xml:space="preserve">
     <value>Use Lock type</value>
   </data>
+    <data name="AL0026CodeFixTitle" xml:space="preserve">
+    <value>Use TimeProvider</value>
+  </data>
+    <data name="AL0028CodeFixTitle" xml:space="preserve">
+    <value>Use IsEqualTo extension</value>
+  </data>
+    <data name="AL0031CodeFixTitle" xml:space="preserve">
+    <value>Use IsMethodNamed extension</value>
+  </data>
+    <data name="AL0027CodeFixTitle" xml:space="preserve">
+    <value>Use System.Text.Json</value>
+  </data>
+    <data name="AL0029CodeFixTitle" xml:space="preserve">
+    <value>Use HasAttribute extension</value>
+  </data>
+    <data name="AL0030ImplementsCodeFixTitle" xml:space="preserve">
+    <value>Use Implements extension</value>
+  </data>
+    <data name="AL0030InheritsFromCodeFixTitle" xml:space="preserve">
+    <value>Use InheritsFrom extension</value>
+  </data>
 </root>

@@ -264,15 +264,15 @@
     <data name="AL0025AnalyzerDescription" xml:space="preserve">
     <value>Lambda expressions and anonymous methods that don't capture variables should be marked 'static' to avoid unnecessary allocations and improve performance.</value>
   </data>
-    <!-- AL0026: Avoid DateTime time accessors -->
+    <!-- AL0026: Avoid DateTime/DateTimeOffset time accessors -->
     <data name="AL0026AnalyzerTitle" xml:space="preserve">
-    <value>Avoid DateTime time accessors</value>
+    <value>Avoid DateTime/DateTimeOffset time accessors</value>
   </data>
     <data name="AL0026AnalyzerMessageFormat" xml:space="preserve">
-    <value>'DateTime.{0}' should be replaced with 'TimeProvider.System.{1}()' for better testability</value>
+    <value>'{0}.{1}' should be replaced with 'TimeProvider.System.{2}()' for better testability</value>
   </data>
     <data name="AL0026AnalyzerDescription" xml:space="preserve">
-    <value>DateTime.Now and DateTime.UtcNow make code difficult to test. Use TimeProvider.System.GetLocalNow() or GetUtcNow() instead, which can be mocked in tests.</value>
+    <value>DateTime.Now/UtcNow and DateTimeOffset.Now/UtcNow make code difficult to test. Use TimeProvider.System.GetLocalNow() or GetUtcNow() instead, which can be mocked in tests.</value>
   </data>
     <!-- AL0027: Avoid legacy JSON library -->
     <data name="AL0027AnalyzerTitle" xml:space="preserve">
@@ -343,5 +343,45 @@
   </data>
     <data name="AL0031AnalyzerDescription" xml:space="preserve">
     <value>Use IsMethodNamed or TryGetConstantValue extensions instead of verbose property access patterns.</value>
+  </data>
+    <!-- AL0032: Use OrEmpty -->
+    <data name="AL0032AnalyzerTitle" xml:space="preserve">
+    <value>Use OrEmpty extension</value>
+  </data>
+    <data name="AL0032AnalyzerMessageFormat" xml:space="preserve">
+    <value>Use '{0}' instead of {1}</value>
+  </data>
+    <data name="AL0032AnalyzerDescription" xml:space="preserve">
+    <value>Use OrEmpty() extension instead of null-coalescing with Array.Empty, Enumerable.Empty, or collection expressions.</value>
+  </data>
+    <!-- AL0033: Use ToImmutableArrayOrEmpty -->
+    <data name="AL0033AnalyzerTitle" xml:space="preserve">
+    <value>Use ToImmutableArrayOrEmpty extension</value>
+  </data>
+    <data name="AL0033AnalyzerMessageFormat" xml:space="preserve">
+    <value>Use '{0}' instead of {1}</value>
+  </data>
+    <data name="AL0033AnalyzerDescription" xml:space="preserve">
+    <value>Use ToImmutableArrayOrEmpty() extension instead of null-conditional ToImmutableArray() with ImmutableArray.Empty fallback.</value>
+  </data>
+    <!-- AL0034: Use WhereNotNull -->
+    <data name="AL0034AnalyzerTitle" xml:space="preserve">
+    <value>Use WhereNotNull extension</value>
+  </data>
+    <data name="AL0034AnalyzerMessageFormat" xml:space="preserve">
+    <value>Use '{0}' instead of {1}</value>
+  </data>
+    <data name="AL0034AnalyzerDescription" xml:space="preserve">
+    <value>Use WhereNotNull() extension instead of Where(x => x != null) or Where(x => x is not null).</value>
+  </data>
+    <!-- AL0035: Use GetFullyQualifiedName/GetMetadataName -->
+    <data name="AL0035AnalyzerTitle" xml:space="preserve">
+    <value>Use symbol display string extension</value>
+  </data>
+    <data name="AL0035AnalyzerMessageFormat" xml:space="preserve">
+    <value>Use '{0}' instead of {1}</value>
+  </data>
+    <data name="AL0035AnalyzerDescription" xml:space="preserve">
+    <value>Use GetFullyQualifiedName() or GetMetadataName() extensions instead of ToDisplayString with SymbolDisplayFormat constants.</value>
   </data>
 </root>

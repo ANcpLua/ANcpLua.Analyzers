@@ -159,6 +159,18 @@ public static partial class DiagnosticIds {
 
     /// <summary>AL0031: Use IsMethodNamed/TryGetConstantValue instead of verbose patterns.</summary>
     public const string UseOperationExtensions = "AL0031";
+
+    /// <summary>AL0032: Use OrEmpty() instead of null-coalescing with empty collections.</summary>
+    public const string UseOrEmpty = "AL0032";
+
+    /// <summary>AL0033: Use ToImmutableArrayOrEmpty() instead of null-conditional with fallback.</summary>
+    public const string UseToImmutableArrayOrEmpty = "AL0033";
+
+    /// <summary>AL0034: Use WhereNotNull() instead of Where with null check.</summary>
+    public const string UseWhereNotNull = "AL0034";
+
+    /// <summary>AL0035: Use GetFullyQualifiedName/GetMetadataName() instead of ToDisplayString with format.</summary>
+    public const string UseToDisplayStringExtensions = "AL0035";
 }
 
 /// <summary>
