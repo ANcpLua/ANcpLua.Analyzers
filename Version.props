@@ -87,7 +87,6 @@
     <XunitV3Version>3.2.2</XunitV3Version>
     <AwesomeAssertionsVersion>9.3.0</AwesomeAssertionsVersion>
     <AwesomeAssertionsAnalyzersVersion>9.0.8</AwesomeAssertionsAnalyzersVersion>
-    <GitHubActionsTestLoggerVersion>3.0.1</GitHubActionsTestLoggerVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
@@ -99,7 +98,7 @@
     <CodeCoverageVersion>18.1.0</CodeCoverageVersion>
     <TestSdkVersion>18.0.1</TestSdkVersion>
     <DiagnosticsTestingVersion>10.0.0</DiagnosticsTestingVersion>
-    <!-- GitHubActionsTestLoggerVersion defined in Testing section above -->
+    <GitHubActionsLoggerMTPVersion>3.0.1</GitHubActionsLoggerMTPVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
