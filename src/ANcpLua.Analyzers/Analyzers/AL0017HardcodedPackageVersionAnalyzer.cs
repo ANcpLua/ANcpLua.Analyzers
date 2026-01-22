@@ -32,16 +32,16 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0017HardcodedPackageVersionAnalyzer : DiagnosticAnalyzer {
-    public const string DiagnosticId = DiagnosticIds.HardcodedPackageVersion;
+    private const string DiagnosticId = DiagnosticIds.HardcodedPackageVersion;
 
     /// <summary>Property key for the suggested variable name.</summary>
-    public const string SuggestedVariableKey = "SuggestedVariable";
+    private const string SuggestedVariableKey = "SuggestedVariable";
 
     /// <summary>Property key for the package name.</summary>
-    public const string PackageNameKey = "PackageName";
+    private const string PackageNameKey = "PackageName";
 
     /// <summary>Property key for the hardcoded version.</summary>
-    public const string HardcodedVersionKey = "HardcodedVersion";
+    private const string HardcodedVersionKey = "HardcodedVersion";
 
     private static readonly LocalizableResourceString Title = new(
         nameof(Resources.AL0017AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
@@ -161,7 +161,7 @@ public sealed partial class Al0017HardcodedPackageVersionAnalyzer : DiagnosticAn
     };
 
     /// <summary>Pattern to detect MSBuild property references like $(VariableName).</summary>
-    private static readonly Regex MsBuildPropertyPattern = new(@"^\$\(.+\)$", RegexOptions.Compiled);
+    private static readonly Regex MsBuildPropertyPattern = MyRegex();
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
@@ -262,4 +262,11 @@ public sealed partial class Al0017HardcodedPackageVersionAnalyzer : DiagnosticAn
             .Replace("_", string.Empty, StringComparison.Ordinal);
         return cleanName + "Version";
     }
+
+#if NET7_0_OR_GREATER
+    [GeneratedRegex(@"^\$\(.+\)$", RegexOptions.Compiled)]
+    private static partial Regex MyRegex();
+#else
+    private static Regex MyRegex() => new(@"^\$\(.+\)$", RegexOptions.Compiled);
+#endif
 }
