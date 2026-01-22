@@ -367,7 +367,8 @@ public sealed partial class Ar0002RefactoringTests : IDisposable {
     private static async Task<Document> ApplyCodeActionAsync(Document document, CodeAction action) {
         var operations = await action.GetOperationsAsync(TestContext.Current.CancellationToken);
         var applyChanges = operations.OfType<ApplyChangesOperation>().First();
-        return applyChanges.ChangedSolution.GetDocument(document.Id)!;
+        return applyChanges.ChangedSolution.GetDocument(document.Id)
+               ?? throw new InvalidOperationException("Document not found in changed solution");
     }
 
     private static async Task<Solution> ApplySolutionCodeActionAsync(CodeAction action) {

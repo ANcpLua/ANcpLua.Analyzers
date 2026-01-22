@@ -74,19 +74,19 @@ public sealed partial class Al0015PortableFormCodeFixTests : CodeFixTestWithEdit
                               }
                               """;
 
-        var expected = """
-                       using System;
+        const string Expected = """
+                                using System;
 
-                       public class TestClass
-                       {
-                           public void TestMethod(string? x)
-                           {
-                               x = x ?? throw new ArgumentNullException(nameof(x));
-                           }
-                       }
-                       """;
+                                public class TestClass
+                                {
+                                    public void TestMethod(string? x)
+                                    {
+                                        x = x ?? throw new ArgumentNullException(nameof(x));
+                                    }
+                                }
+                                """;
 
-        return VerifyAsync(Source, expected,
+        return VerifyAsync(Source, Expected,
             new Dictionary<string, string> {
                 {
                     "ancplua_target_framework", "netstandard2.0"

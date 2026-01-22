@@ -138,25 +138,24 @@ public sealed partial class Al0034UseWhereNotNullAnalyzer : AlAnalyzer {
             operation = conversion.Operand;
         }
 
-        // Pattern: x != null
-        if (operation is IBinaryOperation {
+        return operation switch {
+            // Pattern: x != null
+            IBinaryOperation {
                 OperatorKind: BinaryOperatorKind.NotEquals
-            } binary) {
-            return IsParameterAndNull(binary.LeftOperand, binary.RightOperand, parameter) ||
-                   IsParameterAndNull(binary.RightOperand, binary.LeftOperand, parameter);
-        }
-
-        // Pattern: x is not null
-        if (operation is IIsPatternOperation isPattern &&
-            IsParameterReference(isPattern.Value, parameter) &&
-            isPattern.Pattern is INegatedPatternOperation { Pattern: IConstantPatternOperation { Value.ConstantValue: { HasValue: true, Value: null } } }) {
-            return true;
-        }
+            } binary => IsParameterAndNull(binary.LeftOperand, binary.RightOperand, parameter) || IsParameterAndNull(binary.RightOperand, binary.LeftOperand, parameter),
+            // Pattern: x is not null
+            IIsPatternOperation isPattern when IsParameterReference(isPattern.Value, parameter) && isPattern.Pattern is INegatedPatternOperation {
+                Pattern: IConstantPatternOperation {
+                    Value.ConstantValue: {
+                        HasValue: true, Value: null
+                    }
+                }
+            } => true,
+            _ => false
+        };
 
         // Pattern: x is { } (object pattern matching not null)
         // This is more complex and we'll skip for simplicity - the main patterns are covered
-
-        return false;
     }
 
     private static bool IsParameterAndNull(IOperation left, IOperation right, IParameterSymbol parameter) => IsParameterReference(left, parameter) && IsNullLiteral(right);

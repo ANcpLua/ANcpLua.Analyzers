@@ -66,11 +66,7 @@ public sealed partial class Al0025PreferStaticLambdaAnalyzer : AlAnalyzer {
         }
 
         // Check if the lambda references 'this' implicitly
-        if (ReferencesThis(lambda, semanticModel)) {
-            return false;
-        }
-
-        return true;
+        return !ReferencesThis(lambda, semanticModel);
     }
 
     private static bool HasStaticModifier(AnonymousFunctionExpressionSyntax lambda) =>

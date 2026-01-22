@@ -16,45 +16,46 @@ dotnet add package ANcpLua.Analyzers
 
 ## Rules
 
-| Rule | Severity | Description |
-|:-----|:--------:|:------------|
-| [AL0001](https://ancplua.mintlify.app/analyzers/rules/AL0001) | Error | Don't reassign primary constructor parameters |
-| [AL0002](https://ancplua.mintlify.app/analyzers/rules/AL0002) | Warning | Don't repeat negated patterns |
-| [AL0003](https://ancplua.mintlify.app/analyzers/rules/AL0003) | Error | Don't divide by constant zero |
-| [AL0004](https://ancplua.mintlify.app/analyzers/rules/AL0004) | Warning | Use `is` for Span constant comparison |
-| [AL0005](https://ancplua.mintlify.app/analyzers/rules/AL0005) | Warning | Use `SequenceEqual` for Span comparison |
-| [AL0006](https://ancplua.mintlify.app/analyzers/rules/AL0006) | Warning | Field conflicts with primary constructor param |
-| [AL0007](https://ancplua.mintlify.app/analyzers/rules/AL0007) | Warning | `GetSchema` should be explicit interface |
-| [AL0008](https://ancplua.mintlify.app/analyzers/rules/AL0008) | Warning | `GetSchema` must return null |
-| [AL0009](https://ancplua.mintlify.app/analyzers/rules/AL0009) | Warning | Don't call `IXmlSerializable.GetSchema` |
-| [AL0010](https://ancplua.mintlify.app/analyzers/rules/AL0010) | Info | Type should be partial for generators |
-| [AL0011](https://ancplua.mintlify.app/analyzers/rules/AL0011) | Warning | Use `Lock` type instead of `lock` keyword |
-| [AL0012](https://ancplua.mintlify.app/analyzers/rules/AL0012) | Warning | Deprecated OTel semantic convention |
-| [AL0013](https://ancplua.mintlify.app/analyzers/rules/AL0013) | Info | Missing telemetry schema URL |
-| [AL0014](https://ancplua.mintlify.app/analyzers/rules/AL0014) | Warning | Use `is null` instead of `== null` |
-| [AL0015](https://ancplua.mintlify.app/analyzers/rules/AL0015) | Info | Normalize null-guard style |
-| [AL0016](https://ancplua.mintlify.app/analyzers/rules/AL0016) | Info | Combine declaration with null-check |
-| [AL0017](https://ancplua.mintlify.app/analyzers/rules/AL0017) | Warning | Hardcoded version in Directory.Packages.props |
-| [AL0018](https://ancplua.mintlify.app/analyzers/rules/AL0018) | Warning | Version.props not imported |
-| [AL0019](https://ancplua.mintlify.app/analyzers/rules/AL0019) | Warning | Undefined version variable |
-| AL0020-24 | Error | ASP.NET Core form binding issues |
-| [AL0025](https://ancplua.mintlify.app/analyzers/rules/AL0025) | Warning | Prefer static lambda |
-| [AL0026](https://ancplua.mintlify.app/analyzers/rules/AL0026) | Warning | Use `TimeProvider` instead of `DateTime.Now` |
-| [AL0027](https://ancplua.mintlify.app/analyzers/rules/AL0027) | Warning | Use `System.Text.Json` instead of Newtonsoft |
-| [AL0028](https://ancplua.mintlify.app/analyzers/rules/AL0028) | Info | Use `IsEqualTo` for symbol comparison |
-| [AL0029](https://ancplua.mintlify.app/analyzers/rules/AL0029) | Info | Use `HasAttribute` extension |
-| [AL0030](https://ancplua.mintlify.app/analyzers/rules/AL0030) | Info | Use `Implements`/`InheritsFrom` extensions |
-| [AL0031](https://ancplua.mintlify.app/analyzers/rules/AL0031) | Info | Use `IsMethodNamed`/`TryGetConstantValue` |
-| [AL0032](https://ancplua.mintlify.app/analyzers/rules/AL0032) | Info | Use `OrEmpty()` extension |
-| [AL0033](https://ancplua.mintlify.app/analyzers/rules/AL0033) | Info | Use `ToImmutableArrayOrEmpty()` extension |
-| [AL0034](https://ancplua.mintlify.app/analyzers/rules/AL0034) | Info | Use `WhereNotNull()` extension |
-| [AL0035](https://ancplua.mintlify.app/analyzers/rules/AL0035) | Info | Use `GetFullyQualifiedName`/`GetMetadataName` |
+| Rule                                                          | Severity | Description                                    |
+|:--------------------------------------------------------------|:--------:|:-----------------------------------------------|
+| [AL0001](https://ancplua.mintlify.app/analyzers/rules/AL0001) |  Error   | Don't reassign primary constructor parameters  |
+| [AL0002](https://ancplua.mintlify.app/analyzers/rules/AL0002) | Warning  | Don't repeat negated patterns                  |
+| [AL0003](https://ancplua.mintlify.app/analyzers/rules/AL0003) |  Error   | Don't divide by constant zero                  |
+| [AL0004](https://ancplua.mintlify.app/analyzers/rules/AL0004) | Warning  | Use `is` for Span constant comparison          |
+| [AL0005](https://ancplua.mintlify.app/analyzers/rules/AL0005) | Warning  | Use `SequenceEqual` for Span comparison        |
+| [AL0006](https://ancplua.mintlify.app/analyzers/rules/AL0006) | Warning  | Field conflicts with primary constructor param |
+| [AL0007](https://ancplua.mintlify.app/analyzers/rules/AL0007) | Warning  | `GetSchema` should be explicit interface       |
+| [AL0008](https://ancplua.mintlify.app/analyzers/rules/AL0008) | Warning  | `GetSchema` must return null                   |
+| [AL0009](https://ancplua.mintlify.app/analyzers/rules/AL0009) | Warning  | Don't call `IXmlSerializable.GetSchema`        |
+| [AL0010](https://ancplua.mintlify.app/analyzers/rules/AL0010) |   Info   | Type should be partial for generators          |
+| [AL0011](https://ancplua.mintlify.app/analyzers/rules/AL0011) | Warning  | Use `Lock` type instead of `lock` keyword      |
+| [AL0012](https://ancplua.mintlify.app/analyzers/rules/AL0012) | Warning  | Deprecated OTel semantic convention            |
+| [AL0013](https://ancplua.mintlify.app/analyzers/rules/AL0013) |   Info   | Missing telemetry schema URL                   |
+| [AL0014](https://ancplua.mintlify.app/analyzers/rules/AL0014) | Warning  | Use `is null` instead of `== null`             |
+| [AL0015](https://ancplua.mintlify.app/analyzers/rules/AL0015) |   Info   | Normalize null-guard style                     |
+| [AL0016](https://ancplua.mintlify.app/analyzers/rules/AL0016) |   Info   | Combine declaration with null-check            |
+| [AL0017](https://ancplua.mintlify.app/analyzers/rules/AL0017) | Warning  | Hardcoded version in Directory.Packages.props  |
+| [AL0018](https://ancplua.mintlify.app/analyzers/rules/AL0018) | Warning  | Version.props not imported                     |
+| [AL0019](https://ancplua.mintlify.app/analyzers/rules/AL0019) | Warning  | Undefined version variable                     |
+| AL0020-24                                                     |  Error   | ASP.NET Core form binding issues               |
+| [AL0025](https://ancplua.mintlify.app/analyzers/rules/AL0025) | Warning  | Prefer static lambda                           |
+| [AL0026](https://ancplua.mintlify.app/analyzers/rules/AL0026) | Warning  | Use `TimeProvider` instead of `DateTime.Now`   |
+| [AL0027](https://ancplua.mintlify.app/analyzers/rules/AL0027) | Warning  | Use `System.Text.Json` instead of Newtonsoft   |
+| [AL0028](https://ancplua.mintlify.app/analyzers/rules/AL0028) |   Info   | Use `IsEqualTo` for symbol comparison          |
+| [AL0029](https://ancplua.mintlify.app/analyzers/rules/AL0029) |   Info   | Use `HasAttribute` extension                   |
+| [AL0030](https://ancplua.mintlify.app/analyzers/rules/AL0030) |   Info   | Use `Implements`/`InheritsFrom` extensions     |
+| [AL0031](https://ancplua.mintlify.app/analyzers/rules/AL0031) |   Info   | Use `IsMethodNamed`/`TryGetConstantValue`      |
+| [AL0032](https://ancplua.mintlify.app/analyzers/rules/AL0032) |   Info   | Use `OrEmpty()` extension                      |
+| [AL0033](https://ancplua.mintlify.app/analyzers/rules/AL0033) |   Info   | Use `ToImmutableArrayOrEmpty()` extension      |
+| [AL0034](https://ancplua.mintlify.app/analyzers/rules/AL0034) |   Info   | Use `WhereNotNull()` extension                 |
+| [AL0035](https://ancplua.mintlify.app/analyzers/rules/AL0035) |   Info   | Use `GetFullyQualifiedName`/`GetMetadataName`  |
 
 **Legend:** Error = build error, Warning = build warning, Info = IDE only
 
 ## Code Fixes
 
-Automatic fixes available for: AL0002, AL0004, AL0005, AL0008, AL0010, AL0011, AL0012, AL0014, AL0015, AL0016, AL0025, AL0026, AL0027, AL0028, AL0029, AL0030, AL0031
+Automatic fixes available for: AL0002, AL0004, AL0005, AL0008, AL0010, AL0011, AL0012, AL0014, AL0015, AL0016, AL0025,
+AL0026, AL0027, AL0028, AL0029, AL0030, AL0031
 
 ## Configuration
 

@@ -16,7 +16,8 @@ public sealed partial class AnalyzerConventionTests {
         foreach (var type in analyzerTypes) {
             type.Name.Should().MatchRegex(@"^Al\d{4}.*Analyzer$");
 
-            var analyzer = (DiagnosticAnalyzer)Activator.CreateInstance(type)!;
+            var analyzer = Activator.CreateInstance(type) as DiagnosticAnalyzer
+                           ?? throw new InvalidOperationException($"Failed to create instance of {type.Name}");
             analyzer.SupportedDiagnostics.Should().NotBeEmpty();
 
             foreach (var descriptor in analyzer.SupportedDiagnostics) {

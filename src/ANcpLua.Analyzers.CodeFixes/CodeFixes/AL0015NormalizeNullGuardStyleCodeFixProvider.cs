@@ -1,5 +1,6 @@
 ﻿using ANcpLua.Analyzers.Analyzers;
 using ANcpLua.Analyzers.Core;
+// ReSharper disable All
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 

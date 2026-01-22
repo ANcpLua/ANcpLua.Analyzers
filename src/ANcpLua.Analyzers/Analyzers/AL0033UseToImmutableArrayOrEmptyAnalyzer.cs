@@ -60,26 +60,21 @@ public sealed partial class Al0033UseToImmutableArrayOrEmptyAnalyzer : AlAnalyze
             operation = conversion.Operand;
         }
 
-        // Check for ImmutableArray<T>.Empty field access
-        // Use display string check since GetTypeByMetadataName can fail for some compilation contexts
-        if (operation is IFieldReferenceOperation fieldRef) {
-            if (fieldRef.Field is {
+        switch (operation) {
+            // Check for ImmutableArray<T>.Empty field access
+            // Use display string check since GetTypeByMetadataName can fail for some compilation contexts
+            case IFieldReferenceOperation {
+                Field: {
                     Name: "Empty",
                     IsStatic: true
-                } &&
-                IsImmutableArrayType(fieldRef.Field.ContainingType)) {
+                }
+            } fieldRef when IsImmutableArrayType(fieldRef.Field.ContainingType):
+            // Also check for default(ImmutableArray<T>) or ImmutableArray<T>.default or just default
+            case IDefaultValueOperation defaultOp when IsImmutableArrayType(defaultOp.Type):
                 return true;
-            }
+            default:
+                return false;
         }
-
-        // Also check for default(ImmutableArray<T>) or ImmutableArray<T>.default or just default
-        if (operation is IDefaultValueOperation defaultOp) {
-            if (IsImmutableArrayType(defaultOp.Type)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private static bool IsImmutableArrayType(ITypeSymbol? type) {

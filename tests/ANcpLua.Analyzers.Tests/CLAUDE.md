@@ -4,12 +4,12 @@ Unit tests for all analyzers and code fixes using xUnit v3 and ANcpLua.Roslyn.Ut
 
 ## Project Info
 
-| Property | Value |
-|----------|-------|
-| **Target** | net10.0 |
-| **SDK** | ANcpLua.NET.Sdk |
-| **Test Framework** | xunit.v3.mtp-v2 (3.2.2) |
-| **Assertions** | AwesomeAssertions (9.3.0) |
+| Property              | Value                                     |
+|-----------------------|-------------------------------------------|
+| **Target**            | net10.0                                   |
+| **SDK**               | ANcpLua.NET.Sdk                           |
+| **Test Framework**    | xunit.v3.mtp-v2 (3.2.2)                   |
+| **Assertions**        | AwesomeAssertions (9.3.0)                 |
 | **Testing Utilities** | ANcpLua.Roslyn.Utilities.Testing (1.16.0) |
 
 ## Running Tests
@@ -67,12 +67,12 @@ public sealed class Al0010CodeFixTests : CodeFixTest<Al0010PartialTypeAnalyzer, 
 
 ## Key Test Classes from ANcpLua.Roslyn.Utilities.Testing
 
-| Class | Purpose |
-|-------|---------|
-| `AnalyzerTest<T>` | Base for analyzer-only tests |
-| `CodeFixTest<TAnalyzer, TFix>` | Base for code fix tests |
-| `CodeFixTestWithEditorConfig` | Tests with .editorconfig support |
-| `Test<TGenerator>` | Fluent API for generator tests |
+| Class                          | Purpose                          |
+|--------------------------------|----------------------------------|
+| `AnalyzerTest<T>`              | Base for analyzer-only tests     |
+| `CodeFixTest<TAnalyzer, TFix>` | Base for code fix tests          |
+| `CodeFixTestWithEditorConfig`  | Tests with .editorconfig support |
+| `Test<TGenerator>`             | Fluent API for generator tests   |
 
 ## Important Notes
 

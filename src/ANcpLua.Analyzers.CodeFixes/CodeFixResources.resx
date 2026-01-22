@@ -106,6 +106,9 @@
     <data name="AL0031CodeFixTitle" xml:space="preserve">
     <value>Use IsMethodNamed extension</value>
   </data>
+    <data name="AL0031CodeFixTitleTryGetConstantValue" xml:space="preserve">
+    <value>Use TryGetConstantValue extension</value>
+  </data>
     <data name="AL0027CodeFixTitle" xml:space="preserve">
     <value>Use System.Text.Json</value>
   </data>

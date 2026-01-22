@@ -64,18 +64,16 @@ public sealed partial class Al0026AnalyzerTests : AnalyzerTest<Al0026AvoidDateTi
                       """);
 
     [Fact]
-    public Task ShouldNotReportWhenTimeProviderNotAvailable() {
+    public Task ShouldNotReportWhenTimeProviderNotAvailable() =>
         // Test that analyzer does not report when TimeProvider type is missing
-        var code = $$"""
-                     using System;
-                     public class C {
-                         void M() {
-                             var time = {{DateTimeType}}.Now;
-                         }
-                     }
-                     """;
-        return VerifyAsync(code, false);
-    }
+        VerifyAsync("""
+                    using System;
+                    public class C {
+                        void M() {
+                            var time = DateTime.Now;
+                        }
+                    }
+                    """, false);
 
     [Fact]
     public Task ShouldNotReportOtherDateTimeProperties() =>

@@ -4,12 +4,12 @@ This project contains all `CodeFixProvider` and `CodeRefactoringProvider` implem
 
 ## Project Info
 
-| Property | Value |
-|----------|-------|
-| **Target** | netstandard2.0 |
-| **SDK** | ANcpLua.NET.Sdk |
-| **Version** | 1.9.0 |
-| **Roslyn** | 5.0.0 |
+| Property    | Value           |
+|-------------|-----------------|
+| **Target**  | netstandard2.0  |
+| **SDK**     | ANcpLua.NET.Sdk |
+| **Version** | 1.9.0           |
+| **Roslyn**  | 5.0.0           |
 
 ## Structure
 
@@ -41,31 +41,31 @@ CodeFixResources.resx            # Localized strings
 
 ## Available Code Fixes
 
-| Rule | Fix Description |
-|------|-----------------|
-| AL0002 | Simplify repeated negated pattern |
-| AL0004 | Convert to pattern matching `is "..."` |
-| AL0005 | Convert to `SequenceEqual` |
-| AL0008 | Make GetSchema return null |
-| AL0010 | Add `partial` modifier |
-| AL0011 | Convert to `Lock` type |
-| AL0012 | Replace deprecated OTel attribute |
-| AL0014 | Convert to `is null`/`is 0` pattern |
-| AL0015 | Normalize null-guard style |
-| AL0016 | Combine declaration with null-check |
-| AL0025 | Add `static` to lambda |
-| AL0026 | Replace DateTime.Now with TimeProvider |
+| Rule   | Fix Description                               |
+|--------|-----------------------------------------------|
+| AL0002 | Simplify repeated negated pattern             |
+| AL0004 | Convert to pattern matching `is "..."`        |
+| AL0005 | Convert to `SequenceEqual`                    |
+| AL0008 | Make GetSchema return null                    |
+| AL0010 | Add `partial` modifier                        |
+| AL0011 | Convert to `Lock` type                        |
+| AL0012 | Replace deprecated OTel attribute             |
+| AL0014 | Convert to `is null`/`is 0` pattern           |
+| AL0015 | Normalize null-guard style                    |
+| AL0016 | Combine declaration with null-check           |
+| AL0025 | Add `static` to lambda                        |
+| AL0026 | Replace DateTime.Now with TimeProvider        |
 | AL0027 | Replace Newtonsoft.Json with System.Text.Json |
-| AL0028 | Replace with `IsEqualTo` |
-| AL0029 | Replace with `HasAttribute` |
-| AL0030 | Replace with `Implements`/`InheritsFrom` |
-| AL0031 | Replace with operation extensions |
+| AL0028 | Replace with `IsEqualTo`                      |
+| AL0029 | Replace with `HasAttribute`                   |
+| AL0030 | Replace with `Implements`/`InheritsFrom`      |
+| AL0031 | Replace with operation extensions             |
 
 ## Refactorings (AR*)
 
-| Rule | Description |
-|------|-------------|
-| AR0001 | Convert SCREAMING_SNAKE_CASE to PascalCase |
+| Rule   | Description                                      |
+|--------|--------------------------------------------------|
+| AR0001 | Convert SCREAMING_SNAKE_CASE to PascalCase       |
 | AR0002 | Make lambda static (refactoring, not diagnostic) |
 
 ## Base Class Pattern

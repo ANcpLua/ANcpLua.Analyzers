@@ -82,13 +82,9 @@ public sealed partial class Al0029UseHasAttributeAnalyzer : AlAnalyzer {
             return true;
         }
 
-        if (method.IsExtensionMethod &&
-            invocation.Arguments.Length > 0 &&
-            GetUnderlyingInvocationName(invocation.Arguments[0].Value) == "GetAttributes") {
-            return true;
-        }
-
-        return false;
+        return method.IsExtensionMethod &&
+               invocation.Arguments.Length > 0 &&
+               GetUnderlyingInvocationName(invocation.Arguments[0].Value) == "GetAttributes";
     }
 
     private static string? GetUnderlyingInvocationName(IOperation? operation) =>
@@ -115,19 +111,19 @@ public sealed partial class Al0029UseHasAttributeAnalyzer : AlAnalyzer {
 
         // Look for variable declaration with initialization
         foreach (var operation in OperationExtensions.Descendants(containingBlock)) {
-            if (operation is IVariableDeclaratorOperation declarator &&
-                declarator.Symbol.IsEqualTo(localRef.Local) &&
-                declarator.Initializer?.Value is IInvocationOperation invocation) {
-                return invocation.TargetMethod.Name;
-            }
-
-            // Also check for simple assignments
-            if (operation is ISimpleAssignmentOperation {
-                    Target: ILocalReferenceOperation targetLocal
-                } assignment &&
-                targetLocal.Local.IsEqualTo(localRef.Local) &&
-                assignment.Value is IInvocationOperation assignedInvocation) {
-                return assignedInvocation.TargetMethod.Name;
+            switch (operation)
+            {
+                case IVariableDeclaratorOperation declarator when
+                    (declarator.Symbol.IsEqualTo(localRef.Local) &&
+                     declarator.Initializer?.Value is IInvocationOperation invocation):
+                    return invocation.TargetMethod.Name;
+                // Also check for simple assignments
+                case ISimpleAssignmentOperation {
+                        Target: ILocalReferenceOperation targetLocal
+                    } assignment when
+                    targetLocal.Local.IsEqualTo(localRef.Local) &&
+                    assignment.Value is IInvocationOperation assignedInvocation:
+                    return assignedInvocation.TargetMethod.Name;
             }
         }
 
