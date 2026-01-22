@@ -71,10 +71,8 @@ public sealed partial class Al0026AvoidDateTimeNowAnalyzer : AlAnalyzer {
         var containingType = property.ContainingType;
 
         // Check if it's a DateTime or DateTimeOffset static time property
-        var isDateTime = dateTimeType is not null &&
-                         SymbolEqualityComparer.Default.Equals(containingType, dateTimeType);
-        var isDateTimeOffset = dateTimeOffsetType is not null &&
-                               SymbolEqualityComparer.Default.Equals(containingType, dateTimeOffsetType);
+        var isDateTime = dateTimeType is not null && containingType.IsEqualTo(dateTimeType);
+        var isDateTimeOffset = dateTimeOffsetType is not null && containingType.IsEqualTo(dateTimeOffsetType);
 
         if (!isDateTime && !isDateTimeOffset) {
             return;
@@ -93,16 +91,6 @@ public sealed partial class Al0026AvoidDateTimeNowAnalyzer : AlAnalyzer {
         context.ReportDiagnostic(Rule, propertyRef.Syntax.GetLocation(), typeName, property.Name, replacement);
     }
 
-    private static bool InheritsFromOrEquals(INamedTypeSymbol type, INamedTypeSymbol baseType) {
-        var current = type;
-        while (current is not null) {
-            if (SymbolEqualityComparer.Default.Equals(current, baseType)) {
-                return true;
-            }
-
-            current = current.BaseType;
-        }
-
-        return false;
-    }
+    private static bool InheritsFromOrEquals(INamedTypeSymbol type, INamedTypeSymbol baseType) =>
+        type.IsEqualTo(baseType) || type.InheritsFrom(baseType);
 }

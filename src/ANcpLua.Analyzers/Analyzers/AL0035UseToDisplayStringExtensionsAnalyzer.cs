@@ -105,37 +105,8 @@ public sealed partial class Al0035UseToDisplayStringExtensionsAnalyzer : AlAnaly
         return null;
     }
 
-    private static bool IsOrImplementsITypeSymbol(ITypeSymbol type, INamedTypeSymbol iTypeSymbol) {
-        // Direct match
-        if (SymbolEqualityComparer.Default.Equals(type, iTypeSymbol)) {
-            return true;
-        }
-
-        // Check if it implements ITypeSymbol
-        foreach (var iface in type.AllInterfaces) {
-            if (SymbolEqualityComparer.Default.Equals(iface, iTypeSymbol)) {
-                return true;
-            }
-        }
-
-        // Check base types
-        var baseType = type.BaseType;
-        while (baseType is not null) {
-            if (SymbolEqualityComparer.Default.Equals(baseType, iTypeSymbol)) {
-                return true;
-            }
-
-            foreach (var iface in baseType.AllInterfaces) {
-                if (SymbolEqualityComparer.Default.Equals(iface, iTypeSymbol)) {
-                    return true;
-                }
-            }
-
-            baseType = baseType.BaseType;
-        }
-
-        return false;
-    }
+    private static bool IsOrImplementsITypeSymbol(ITypeSymbol type, INamedTypeSymbol iTypeSymbol) =>
+        type.IsEqualTo(iTypeSymbol) || type.Implements(iTypeSymbol) || type.InheritsFrom(iTypeSymbol);
 
     private static IOperation? GetFormatArgument(IInvocationOperation invocation) {
         // ToDisplayString has optional format parameter
@@ -167,7 +138,7 @@ public sealed partial class Al0035UseToDisplayStringExtensionsAnalyzer : AlAnaly
 
         // Check for SymbolDisplayFormat.FullyQualifiedFormat or CSharpErrorMessageFormat
         if (formatArg is IPropertyReferenceOperation propRef) {
-            if (!SymbolEqualityComparer.Default.Equals(propRef.Property.ContainingType, symbolDisplayFormat)) {
+            if (!propRef.Property.ContainingType.IsEqualTo(symbolDisplayFormat)) {
                 return (null, null);
             }
 
@@ -180,7 +151,7 @@ public sealed partial class Al0035UseToDisplayStringExtensionsAnalyzer : AlAnaly
 
         // Check for field reference (some versions may expose as field)
         if (formatArg is IFieldReferenceOperation fieldRef) {
-            if (!SymbolEqualityComparer.Default.Equals(fieldRef.Field.ContainingType, symbolDisplayFormat)) {
+            if (!fieldRef.Field.ContainingType.IsEqualTo(symbolDisplayFormat)) {
                 return (null, null);
             }
 

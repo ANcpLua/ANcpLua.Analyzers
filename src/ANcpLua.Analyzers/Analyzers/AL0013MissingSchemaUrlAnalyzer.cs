@@ -113,25 +113,9 @@ public sealed partial class Al0013MissingSchemaUrlAnalyzer : AlAnalyzer {
             return false;
         }
 
-        var currentType = receiverType;
-        while (currentType is not null) {
-            if (currentType is INamedTypeSymbol namedCurrent &&
-                otelBuilderTypes.Any(t => SymbolEqualityComparer.Default.Equals(t, namedCurrent))) {
-                return true;
-            }
-
-            currentType = currentType.BaseType;
-        }
-
-        if (receiverType is INamedTypeSymbol namedType) {
-            foreach (var iface in namedType.AllInterfaces) {
-                if (otelBuilderTypes.Any(t => SymbolEqualityComparer.Default.Equals(t, iface))) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        // Check if receiver type inherits from or implements any OTel builder type
+        return otelBuilderTypes.Any(builderType =>
+            receiverType.InheritsFrom(builderType) || receiverType.Implements(builderType));
     }
 
     private static bool CheckForSchemaUrl(SyntaxNode invocation) {
