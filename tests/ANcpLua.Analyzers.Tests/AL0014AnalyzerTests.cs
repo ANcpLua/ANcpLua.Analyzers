@@ -7,7 +7,7 @@ namespace ANcpLua.Analyzers.Tests;
 /// <summary>
 ///     Tests for AL0014: Prefer pattern matching over equality operators for null and zero comparisons.
 /// </summary>
-public sealed class Al0014AnalyzerTests : AnalyzerTest<Al0014PreferPatternMatchingAnalyzer> {
+public sealed partial class Al0014AnalyzerTests : AnalyzerTest<Al0014PreferPatternMatchingAnalyzer> {
     [Theory]
     [InlineData("object? o", "[|o == null|]")]
     [InlineData("object? o", "[|o != null|]")]
@@ -103,7 +103,7 @@ public sealed class Al0014AnalyzerTests : AnalyzerTest<Al0014PreferPatternMatchi
 /// <summary>
 ///     Code fix tests for AL0014: Converts equality comparisons to pattern matching.
 /// </summary>
-public sealed class Al0014CodeFixTests : CodeFixTest<Al0014PreferPatternMatchingAnalyzer, Al0014CodeFixProvider> {
+public sealed partial class Al0014CodeFixTests : CodeFixTest<Al0014PreferPatternMatchingAnalyzer, Al0014CodeFixProvider> {
     [Fact]
     public Task ShouldConvertEqualsNullToIsNull() => VerifyAsync(
         """

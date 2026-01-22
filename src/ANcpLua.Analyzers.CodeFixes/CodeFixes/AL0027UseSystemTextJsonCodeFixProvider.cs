@@ -11,7 +11,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 /// </remarks>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0027UseSystemTextJsonCodeFixProvider))]
 [Shared]
-public sealed class Al0027UseSystemTextJsonCodeFixProvider : CodeFixProvider {
+public sealed partial class Al0027UseSystemTextJsonCodeFixProvider : CodeFixProvider {
     public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.AvoidNewtonsoftJson];
 
     public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;

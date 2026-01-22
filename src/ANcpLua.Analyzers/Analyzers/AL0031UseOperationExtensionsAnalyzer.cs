@@ -16,7 +16,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     </list>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class Al0031UseOperationExtensionsAnalyzer : AlAnalyzer {
+public sealed partial class Al0031UseOperationExtensionsAnalyzer : AlAnalyzer {
     private const string IInvocationOperationTypeName = "Microsoft.CodeAnalysis.Operations.IInvocationOperation";
 
     private static readonly LocalizableResourceString Title = new(

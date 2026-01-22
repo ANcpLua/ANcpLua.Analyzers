@@ -6,7 +6,7 @@ namespace ANcpLua.Analyzers.Tests;
 /// <summary>
 ///     Tests for AL0029: Use HasAttribute extension instead of GetAttributes() patterns.
 /// </summary>
-public sealed class Al0029UseHasAttributeTests : AnalyzerTest<Al0029UseHasAttributeAnalyzer> {
+public sealed partial class Al0029UseHasAttributeTests : AnalyzerTest<Al0029UseHasAttributeAnalyzer> {
     private const string RoslynPolyfill = """
                                           namespace Microsoft.CodeAnalysis {
                                               public interface ISymbol {

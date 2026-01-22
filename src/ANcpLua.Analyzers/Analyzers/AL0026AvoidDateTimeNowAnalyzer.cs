@@ -8,7 +8,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     Only reports when TimeProvider is available (.NET 8+).
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class Al0026AvoidDateTimeNowAnalyzer : AlAnalyzer {
+public sealed partial class Al0026AvoidDateTimeNowAnalyzer : AlAnalyzer {
     private const string TimeProviderMetadataName = "System.TimeProvider";
     private const string DateTimeMetadataName = "System.DateTime";
     private const string DateTimeOffsetMetadataName = "System.DateTimeOffset";

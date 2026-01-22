@@ -31,7 +31,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     </para>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class Al0017HardcodedPackageVersionAnalyzer : DiagnosticAnalyzer {
+public sealed partial class Al0017HardcodedPackageVersionAnalyzer : DiagnosticAnalyzer {
     public const string DiagnosticId = DiagnosticIds.HardcodedPackageVersion;
 
     /// <summary>Property key for the suggested variable name.</summary>

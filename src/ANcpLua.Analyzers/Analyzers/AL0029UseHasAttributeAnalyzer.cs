@@ -16,7 +16,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     </list>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class Al0029UseHasAttributeAnalyzer : AlAnalyzer {
+public sealed partial class Al0029UseHasAttributeAnalyzer : AlAnalyzer {
     private const string ISymbolTypeName = "Microsoft.CodeAnalysis.ISymbol";
 
     private static readonly LocalizableResourceString Title = new(

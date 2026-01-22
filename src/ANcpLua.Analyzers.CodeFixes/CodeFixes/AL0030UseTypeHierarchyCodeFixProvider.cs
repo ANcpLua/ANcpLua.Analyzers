@@ -12,7 +12,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 /// </remarks>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0030UseTypeHierarchyCodeFixProvider))]
 [Shared]
-public sealed class Al0030UseTypeHierarchyCodeFixProvider : CodeFixProvider {
+public sealed partial class Al0030UseTypeHierarchyCodeFixProvider : CodeFixProvider {
     public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.UseTypeHierarchyExtensions];
 
     public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;

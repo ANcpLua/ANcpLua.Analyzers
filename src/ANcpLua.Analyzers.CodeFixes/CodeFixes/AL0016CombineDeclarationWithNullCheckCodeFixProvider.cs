@@ -8,7 +8,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 /// </summary>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0016CombineDeclarationWithNullCheckCodeFixProvider))]
 [Shared]
-public sealed class Al0016CombineDeclarationWithNullCheckCodeFixProvider
+public sealed partial class Al0016CombineDeclarationWithNullCheckCodeFixProvider
     : AlCodeFixProvider<LocalDeclarationStatementSyntax> {
     public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.CombineDeclarationWithNullCheck];
 

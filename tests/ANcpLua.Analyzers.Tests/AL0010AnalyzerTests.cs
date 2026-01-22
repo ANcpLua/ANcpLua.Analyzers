@@ -8,7 +8,7 @@ namespace ANcpLua.Analyzers.Tests;
 ///     Tests for AL0010: Type should be partial for source generator support.
 ///     Note: This analyzer is disabled by default (DiagnosticSeverity.Info, enabledByDefault: false).
 /// </summary>
-public sealed class Al0010AnalyzerTests : AnalyzerTest<Al0010PartialTypeAnalyzer> {
+public sealed partial class Al0010AnalyzerTests : AnalyzerTest<Al0010PartialTypeAnalyzer> {
     [Theory]
     [InlineData("public class [|C|] { }")]
     [InlineData("public struct [|S|] { }")]
@@ -31,7 +31,7 @@ public sealed class Al0010AnalyzerTests : AnalyzerTest<Al0010PartialTypeAnalyzer
 /// <summary>
 ///     Code fix tests for AL0010: Adds partial modifier to types.
 /// </summary>
-public sealed class Al0010CodeFixTests : CodeFixTest<Al0010PartialTypeAnalyzer, Al0010PartialTypeCodeFixProvider> {
+public sealed partial class Al0010CodeFixTests : CodeFixTest<Al0010PartialTypeAnalyzer, Al0010PartialTypeCodeFixProvider> {
     [Theory]
     [InlineData("public class [|C|] { }", "public partial class C { }")]
     [InlineData("public struct [|S|] { }", "public partial struct S { }")]

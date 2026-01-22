@@ -6,7 +6,7 @@ namespace ANcpLua.Analyzers.Tests;
 /// <summary>
 ///     Tests for AL0034: Use WhereNotNull() instead of Where with null check.
 /// </summary>
-public sealed class Al0034UseWhereNotNullTests : AnalyzerTest<Al0034UseWhereNotNullAnalyzer> {
+public sealed partial class Al0034UseWhereNotNullTests : AnalyzerTest<Al0034UseWhereNotNullAnalyzer> {
     [Fact]
     public Task ShouldReportWhereWithNotEqualsNull() =>
         VerifyAsync("""

@@ -9,7 +9,7 @@ namespace ANcpLua.Analyzers.Tests;
 ///     C# 14 allows span == "string" via implicit conversions, but pattern matching
 ///     (span is "string") expresses intent more clearly.
 /// </summary>
-public sealed class Al0004AnalyzerTests : AnalyzerTest<Al0004ToAl0005SpanComparisonAnalyzer> {
+public sealed partial class Al0004AnalyzerTests : AnalyzerTest<Al0004ToAl0005SpanComparisonAnalyzer> {
     [Theory]
     [InlineData("""
                 using System;
@@ -69,7 +69,7 @@ public sealed class Al0004AnalyzerTests : AnalyzerTest<Al0004ToAl0005SpanCompari
 ///     Tests for AL0005: Use SequenceEqual when comparing Span and a non-constant.
 ///     For non-constant comparisons, SequenceEqual expresses content comparison intent clearly.
 /// </summary>
-public sealed class Al0005AnalyzerTests : AnalyzerTest<Al0004ToAl0005SpanComparisonAnalyzer> {
+public sealed partial class Al0005AnalyzerTests : AnalyzerTest<Al0004ToAl0005SpanComparisonAnalyzer> {
     [Theory]
     [InlineData("""
                 using System;
@@ -124,7 +124,7 @@ public sealed class Al0005AnalyzerTests : AnalyzerTest<Al0004ToAl0005SpanCompari
 ///     Edge case tests for collection expression handling in AL0004/AL0005.
 ///     Verifies the fix for DescendantNodes().Single() bug.
 /// </summary>
-public sealed class
+public sealed partial class
     Al0004ToAl0005CollectionExpressionEdgeCasesTests : AnalyzerTest<Al0004ToAl0005SpanComparisonAnalyzer> {
     [Theory]
     [InlineData("[1, 2]", "AL0004")]
@@ -162,7 +162,7 @@ public sealed class
 /// <summary>
 ///     Code fix tests for AL0004: Converts Span equality to pattern matching.
 /// </summary>
-public sealed class Al0004CodeFixTests : CodeFixTest<Al0004ToAl0005SpanComparisonAnalyzer, Al0004CodeFixProvider> {
+public sealed partial class Al0004CodeFixTests : CodeFixTest<Al0004ToAl0005SpanComparisonAnalyzer, Al0004CodeFixProvider> {
     [Fact]
     public Task ShouldConvertStringLiteralToPatternMatching() => VerifyAsync(
         """
@@ -243,7 +243,7 @@ public sealed class Al0004CodeFixTests : CodeFixTest<Al0004ToAl0005SpanCompariso
 /// <summary>
 ///     Code fix tests for AL0005: Converts Span equality to SequenceEqual.
 /// </summary>
-public sealed class Al0005CodeFixTests : CodeFixTest<Al0004ToAl0005SpanComparisonAnalyzer, Al0005CodeFixProvider> {
+public sealed partial class Al0005CodeFixTests : CodeFixTest<Al0004ToAl0005SpanComparisonAnalyzer, Al0005CodeFixProvider> {
     [Fact]
     public Task ShouldConvertToSequenceEqual() => VerifyAsync(
         """

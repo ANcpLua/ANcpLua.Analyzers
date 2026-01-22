@@ -9,7 +9,7 @@ namespace ANcpLua.Analyzers.Tests;
 ///     Tests for AL0019: Undefined version variable.
 ///     Warns when $(VariableName) is used in Directory.Packages.props but not defined in Version.props.
 /// </summary>
-public sealed class Al0019AnalyzerTests : AnalyzerTestBase {
+public sealed partial class Al0019AnalyzerTests : AnalyzerTestBase {
     private const string EmptyCode = "public class C { }";
 
     [Fact]

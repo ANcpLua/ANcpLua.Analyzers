@@ -17,7 +17,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     </list>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class Al0035UseToDisplayStringExtensionsAnalyzer : AlAnalyzer {
+public sealed partial class Al0035UseToDisplayStringExtensionsAnalyzer : AlAnalyzer {
     private const string ITypeSymbolTypeName = "Microsoft.CodeAnalysis.ITypeSymbol";
     private const string SymbolDisplayFormatTypeName = "Microsoft.CodeAnalysis.SymbolDisplayFormat";
 

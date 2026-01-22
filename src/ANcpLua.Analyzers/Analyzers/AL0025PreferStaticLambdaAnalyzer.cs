@@ -8,7 +8,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     and can therefore be marked with the 'static' modifier for better performance.
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class Al0025PreferStaticLambdaAnalyzer : AlAnalyzer {
+public sealed partial class Al0025PreferStaticLambdaAnalyzer : AlAnalyzer {
     private static readonly LocalizableResourceString Title = new(
         nameof(Resources.AL0025AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
 

@@ -9,7 +9,7 @@ namespace ANcpLua.Analyzers.Tests;
 ///     Tests for AL0018: Version.props not imported.
 ///     Warns when Directory.Build.props doesn't import Version.props.
 /// </summary>
-public sealed class Al0018AnalyzerTests : AnalyzerTestBase {
+public sealed partial class Al0018AnalyzerTests : AnalyzerTestBase {
     private const string EmptyCode = "public class C { }";
 
     [Fact]

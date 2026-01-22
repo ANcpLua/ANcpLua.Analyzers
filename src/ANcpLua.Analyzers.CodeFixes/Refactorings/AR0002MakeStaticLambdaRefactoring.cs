@@ -11,7 +11,7 @@ namespace ANcpLua.Analyzers.CodeFixes.Refactorings;
 /// </summary>
 [ExportCodeRefactoringProvider(LanguageNames.CSharp, Name = nameof(Ar0002MakeStaticLambdaRefactoring))]
 [Shared]
-public sealed class Ar0002MakeStaticLambdaRefactoring : CodeRefactoringProvider {
+public sealed partial class Ar0002MakeStaticLambdaRefactoring : CodeRefactoringProvider {
     public override async Task ComputeRefactoringsAsync(CodeRefactoringContext context) {
         var document = context.Document;
         if (await document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false) is not { } root) {

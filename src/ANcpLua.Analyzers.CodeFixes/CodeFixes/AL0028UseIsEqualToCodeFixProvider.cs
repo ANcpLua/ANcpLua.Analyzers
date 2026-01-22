@@ -10,7 +10,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 /// </remarks>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0028UseIsEqualToCodeFixProvider))]
 [Shared]
-public sealed class Al0028UseIsEqualToCodeFixProvider : AlCodeFixProvider<InvocationExpressionSyntax> {
+public sealed partial class Al0028UseIsEqualToCodeFixProvider : AlCodeFixProvider<InvocationExpressionSyntax> {
     public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.UseIsEqualTo];
 
     protected override CodeAction CreateCodeAction(

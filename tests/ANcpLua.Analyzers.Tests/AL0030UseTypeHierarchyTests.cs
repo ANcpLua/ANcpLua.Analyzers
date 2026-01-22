@@ -6,7 +6,7 @@ namespace ANcpLua.Analyzers.Tests;
 /// <summary>
 ///     Tests for AL0030: Use Implements/InheritsFrom extensions instead of manual loops.
 /// </summary>
-public sealed class Al0030UseTypeHierarchyTests : AnalyzerTest<Al0030UseTypeHierarchyAnalyzer> {
+public sealed partial class Al0030UseTypeHierarchyTests : AnalyzerTest<Al0030UseTypeHierarchyAnalyzer> {
     private const string RoslynPolyfill = """
                                           namespace Microsoft.CodeAnalysis {
                                               public interface ISymbol { }

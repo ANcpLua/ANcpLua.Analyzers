@@ -9,7 +9,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 /// </summary>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0011LockTypeCodeFixProvider))]
 [Shared]
-public sealed class Al0011LockTypeCodeFixProvider : CodeFixProvider {
+public sealed partial class Al0011LockTypeCodeFixProvider : CodeFixProvider {
     private const string LockTypeMetadataName = "System.Threading.Lock";
 
     public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.AvoidLockKeywordOnNonLockTypes];

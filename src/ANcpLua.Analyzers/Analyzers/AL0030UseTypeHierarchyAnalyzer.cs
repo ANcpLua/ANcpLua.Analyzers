@@ -19,7 +19,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     </list>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class Al0030UseTypeHierarchyAnalyzer : AlAnalyzer {
+public sealed partial class Al0030UseTypeHierarchyAnalyzer : AlAnalyzer {
     private const string SymbolEqualityComparerTypeName = "Microsoft.CodeAnalysis.SymbolEqualityComparer";
     private const string ITypeSymbolTypeName = "Microsoft.CodeAnalysis.ITypeSymbol";
 

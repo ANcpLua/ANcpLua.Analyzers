@@ -12,7 +12,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     </list>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class Al0034UseWhereNotNullAnalyzer : AlAnalyzer {
+public sealed partial class Al0034UseWhereNotNullAnalyzer : AlAnalyzer {
     private static readonly LocalizableResourceString Title = new(
         nameof(Resources.AL0034AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
 

@@ -8,7 +8,7 @@ namespace ANcpLua.Analyzers.Tests;
 /// <summary>
 ///     Tests for AL0020-AL0024: Form binding analyzers for ASP.NET Core.
 /// </summary>
-public sealed class Al0020ToAl0024AnalyzerTests {
+public sealed partial class Al0020ToAl0024AnalyzerTests {
     private const string Stubs = """
                                  namespace Microsoft.AspNetCore.Mvc {
                                      [System.AttributeUsage(System.AttributeTargets.Parameter)]

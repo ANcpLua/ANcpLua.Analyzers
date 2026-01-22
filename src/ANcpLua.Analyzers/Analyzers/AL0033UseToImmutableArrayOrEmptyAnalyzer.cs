@@ -10,7 +10,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     <c>collection.ToImmutableArrayOrEmpty()</c>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class Al0033UseToImmutableArrayOrEmptyAnalyzer : AlAnalyzer {
+public sealed partial class Al0033UseToImmutableArrayOrEmptyAnalyzer : AlAnalyzer {
     private static readonly LocalizableResourceString Title = new(
         nameof(Resources.AL0033AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
 

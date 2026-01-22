@@ -30,7 +30,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     </para>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class Al0004ToAl0005SpanComparisonAnalyzer : AlAnalyzer {
+public sealed partial class Al0004ToAl0005SpanComparisonAnalyzer : AlAnalyzer {
     public const string DiagnosticIdAl0004 = DiagnosticIds.UsePatternMatchingForSpanConstantComparison;
     public const string DiagnosticIdAl0005 = DiagnosticIds.UseSequenceEqualForSpanNonConstantComparison;
 

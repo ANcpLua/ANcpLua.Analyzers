@@ -10,7 +10,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 /// </remarks>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0031UseOperationExtensionsCodeFixProvider))]
 [Shared]
-public sealed class Al0031UseOperationExtensionsCodeFixProvider : AlCodeFixProvider<BinaryExpressionSyntax> {
+public sealed partial class Al0031UseOperationExtensionsCodeFixProvider : AlCodeFixProvider<BinaryExpressionSyntax> {
     public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.UseOperationExtensions];
 
     protected override CodeAction? CreateCodeAction(

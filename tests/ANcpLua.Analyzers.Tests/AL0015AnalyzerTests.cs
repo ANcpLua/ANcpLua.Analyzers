@@ -9,7 +9,7 @@ namespace ANcpLua.Analyzers.Tests;
 ///     Covers detection of simple ArgumentNullException null-guards and code fix generation
 ///     for both BCL and portable forms based on target framework and EditorConfig settings.
 /// </summary>
-public sealed class Al0015AnalyzerTests : AnalyzerTest<Al0015NormalizeNullGuardStyleAnalyzer> {
+public sealed partial class Al0015AnalyzerTests : AnalyzerTest<Al0015NormalizeNullGuardStyleAnalyzer> {
     [Theory]
     [InlineData("string? x", "x is null", "nameof(x)")]
     [InlineData("object? obj", "obj == null", "nameof(obj)")]
@@ -53,7 +53,7 @@ public sealed class Al0015AnalyzerTests : AnalyzerTest<Al0015NormalizeNullGuardS
 ///     Tests both BCL form (ArgumentNullException.ThrowIfNull) and portable form
 ///     (coalesce assignment) generation based on configuration.
 /// </summary>
-public sealed class Al0015PortableFormCodeFixTests : CodeFixTestWithEditorConfig<Al0015NormalizeNullGuardStyleAnalyzer
+public sealed partial class Al0015PortableFormCodeFixTests : CodeFixTestWithEditorConfig<Al0015NormalizeNullGuardStyleAnalyzer
     , Al0015NormalizeNullGuardStyleCodeFixProvider> {
     /// <summary>
     ///     Test 1: netstandard2.0 without ThrowIfNull produces portable form.
@@ -297,7 +297,7 @@ public sealed class Al0015PortableFormCodeFixTests : CodeFixTestWithEditorConfig
 ///     BCL form code fix tests for AL0015.
 ///     Tests ArgumentNullException.ThrowIfNull generation when available.
 /// </summary>
-public sealed class Al0015BclFormCodeFixTests : CodeFixTestWithEditorConfig<Al0015NormalizeNullGuardStyleAnalyzer,
+public sealed partial class Al0015BclFormCodeFixTests : CodeFixTestWithEditorConfig<Al0015NormalizeNullGuardStyleAnalyzer,
     Al0015NormalizeNullGuardStyleCodeFixProvider> {
     /// <summary>
     ///     Test 2: net10.0 with single target produces BCL form.
@@ -504,7 +504,7 @@ public sealed class Al0015BclFormCodeFixTests : CodeFixTestWithEditorConfig<Al00
 ///     Multi-target stability tests for AL0015.
 ///     Verifies that multi-target projects always use portable form for consistency.
 /// </summary>
-public sealed class Al0015MultiTargetTests : CodeFixTestWithEditorConfig<Al0015NormalizeNullGuardStyleAnalyzer,
+public sealed partial class Al0015MultiTargetTests : CodeFixTestWithEditorConfig<Al0015NormalizeNullGuardStyleAnalyzer,
     Al0015NormalizeNullGuardStyleCodeFixProvider> {
     /// <summary>
     ///     Test 3: Multi-target with netstandard2.0;net10.0 produces portable form.
@@ -651,7 +651,7 @@ public sealed class Al0015MultiTargetTests : CodeFixTestWithEditorConfig<Al0015N
 /// <summary>
 ///     Edge case and rejection tests for AL0015.
 /// </summary>
-public sealed class Al0015EdgeCasesTests : CodeFixTestWithEditorConfig<Al0015NormalizeNullGuardStyleAnalyzer,
+public sealed partial class Al0015EdgeCasesTests : CodeFixTestWithEditorConfig<Al0015NormalizeNullGuardStyleAnalyzer,
     Al0015NormalizeNullGuardStyleCodeFixProvider> {
     /// <summary>
     ///     Test 4: BCL mode forced but ThrowIfNull unavailable - falls back to portable.

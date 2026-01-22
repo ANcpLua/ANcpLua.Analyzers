@@ -3,7 +3,7 @@ using ANcpLua.Roslyn.Utilities.Testing;
 
 namespace ANcpLua.Analyzers.Tests;
 
-public sealed class Al0006AnalyzerTests : AnalyzerTest<Al0006FieldNameConflictWithPrimaryConstructorAnalyzer> {
+public sealed partial class Al0006AnalyzerTests : AnalyzerTest<Al0006FieldNameConflictWithPrimaryConstructorAnalyzer> {
     [Fact]
     public Task ShouldReportDiagnostic() =>
         VerifyAsync("""

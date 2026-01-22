@@ -13,7 +13,7 @@ namespace ANcpLua.Analyzers.Tests;
 ///     On .NET 9+, it only suppresses the warning when locking on System.Threading.Lock.
 ///     Tests use a polyfill to simulate the Lock type.
 /// </remarks>
-public sealed class Al0011AnalyzerTests : AnalyzerTest<Al0011LockKeywordAnalyzer> {
+public sealed partial class Al0011AnalyzerTests : AnalyzerTest<Al0011LockKeywordAnalyzer> {
     [Theory]
     [InlineData("""
                 namespace System.Threading {
@@ -137,7 +137,7 @@ public sealed class Al0011AnalyzerTests : AnalyzerTest<Al0011LockKeywordAnalyzer
 /// <summary>
 ///     Code fix tests for AL0011: Changes field type to System.Threading.Lock.
 /// </summary>
-public sealed class
+public sealed partial class
     Al0011CodeFixTests : CodeFixTest<Al0011LockKeywordAnalyzer, Al0011LockTypeCodeFixProvider> {
     private const string LockTypePolyfill = """
                                             namespace System.Threading {

@@ -32,7 +32,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     </para>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class Al0007ToAl0009IXmlSerializableAnalyzer : AlAnalyzer {
+public sealed partial class Al0007ToAl0009IXmlSerializableAnalyzer : AlAnalyzer {
     private static readonly LocalizableResourceString TitleAl0007 = new(
         nameof(Resources.AL0007AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
 

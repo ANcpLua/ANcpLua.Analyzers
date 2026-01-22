@@ -26,7 +26,7 @@ namespace ANcpLua.Analyzers.Core;
 ///         </list>
 ///     </para>
 /// </remarks>
-public static class DeprecatedOtelAttributes {
+public static partial class DeprecatedOtelAttributes {
     /// <summary>
     ///     Deprecated attribute names mapped to replacements.
     /// </summary>

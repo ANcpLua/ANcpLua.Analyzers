@@ -27,7 +27,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     </para>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class Al0020ToAl0024FormBindingAnalyzer : AlAnalyzer {
+public sealed partial class Al0020ToAl0024FormBindingAnalyzer : AlAnalyzer {
     private static readonly DiagnosticDescriptor RuleAl0020 = CreateRule(
         DiagnosticIds.FormCollectionRequiresExplicitAttribute, "AL0020");
 
