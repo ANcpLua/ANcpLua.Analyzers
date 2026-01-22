@@ -28,6 +28,7 @@ public static partial class DiagnosticCategories {
     public const string VersionManagement = "VersionManagement";
     public const string AspNetCore = "ASP.NET Core";
     public const string RoslynUtilities = "Roslyn Utilities";
+    public const string AotTesting = "AOT Testing";
 }
 
 /// <summary>
@@ -166,6 +167,38 @@ public static partial class DiagnosticIds {
 
     /// <summary>AL0035: Use GetFullyQualifiedName/GetMetadataName() instead of ToDisplayString with format.</summary>
     public const string UseToDisplayStringExtensions = "AL0035";
+
+    /// <summary>AL0036: Use Guard.NotNull instead of ?? throw new ArgumentNullException.</summary>
+    public const string UseGuardNotNull = "AL0036";
+
+    /// <summary>AL0037: Use TryParse extensions instead of verbose TryParse patterns.</summary>
+    public const string UseTryParseExtensions = "AL0037";
+
+    /// <summary>AL0038: Use GetOrNull instead of TryGetValue patterns.</summary>
+    public const string UseGetOrNull = "AL0038";
+
+    /// <summary>AL0039: Use StringComparison extensions for clearer intent.</summary>
+    public const string UseStringComparisonExtensions = "AL0039";
+
+    /// <summary>AL0040: Use attribute argument extraction extensions.</summary>
+    public const string UseAttributeExtensions = "AL0040";
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // AOT/TRIM TESTING (AL0041-AL0044)
+    // These analyzers enforce correct usage of AOT/Trim testing attributes.
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /// <summary>AL0041: Method with [AotTest] or [TrimTest] must return int.</summary>
+    public const string AotTestMustReturnInt = "AL0041";
+
+    /// <summary>AL0042: [AotTest]/[TrimTest] method should return 100 on success.</summary>
+    public const string AotTestExitCode100 = "AL0042";
+
+    /// <summary>AL0043: [TrimSafe] code must not call methods with [RequiresUnreferencedCode].</summary>
+    public const string TrimSafeViolation = "AL0043";
+
+    /// <summary>AL0044: [AotSafe] code must not call methods with [RequiresDynamicCode].</summary>
+    public const string AotSafeViolation = "AL0044";
 }
 
 /// <summary>

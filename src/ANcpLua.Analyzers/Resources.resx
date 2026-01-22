@@ -384,4 +384,94 @@
     <data name="AL0035AnalyzerDescription" xml:space="preserve">
     <value>Use GetFullyQualifiedName() or GetMetadataName() extensions instead of ToDisplayString with SymbolDisplayFormat constants.</value>
   </data>
+    <!-- AL0036: Use Guard.NotNull -->
+    <data name="AL0036AnalyzerTitle" xml:space="preserve">
+    <value>Use Guard.NotNull extension</value>
+  </data>
+    <data name="AL0036AnalyzerMessageFormat" xml:space="preserve">
+    <value>Use 'Guard.NotNull({0})' instead of null-coalescing throw</value>
+  </data>
+    <data name="AL0036AnalyzerDescription" xml:space="preserve">
+    <value>Use Guard.NotNull() extension instead of null-coalescing throw new ArgumentNullException pattern.</value>
+  </data>
+    <!-- AL0037: Use TryParse extensions -->
+    <data name="AL0037AnalyzerTitle" xml:space="preserve">
+    <value>Use TryParse extension</value>
+  </data>
+    <data name="AL0037AnalyzerMessageFormat" xml:space="preserve">
+    <value>Use '{0}' instead of verbose TryParse pattern</value>
+  </data>
+    <data name="AL0037AnalyzerDescription" xml:space="preserve">
+    <value>Use TryParse extension methods (TryParseInt32, TryParseGuid, etc.) instead of verbose Type.TryParse ternary patterns.</value>
+  </data>
+    <!-- AL0038: Use GetOrNull/GetOrDefault -->
+    <data name="AL0038AnalyzerTitle" xml:space="preserve">
+    <value>Use GetOrNull/GetOrDefault extension</value>
+  </data>
+    <data name="AL0038AnalyzerMessageFormat" xml:space="preserve">
+    <value>Use '{0}' instead of TryGetValue pattern</value>
+  </data>
+    <data name="AL0038AnalyzerDescription" xml:space="preserve">
+    <value>Use GetOrNull() or GetOrDefault() extensions instead of verbose TryGetValue ternary patterns.</value>
+  </data>
+    <!-- AL0039: Use StringComparison extensions -->
+    <data name="AL0039AnalyzerTitle" xml:space="preserve">
+    <value>Use StringComparison extension</value>
+  </data>
+    <data name="AL0039AnalyzerMessageFormat" xml:space="preserve">
+    <value>Use '{0}' for clearer intent</value>
+  </data>
+    <data name="AL0039AnalyzerDescription" xml:space="preserve">
+    <value>Use StringComparison extensions (EqualsOrdinal, ContainsIgnoreCase, etc.) instead of methods with StringComparison enum parameter.</value>
+  </data>
+    <!-- AL0040: Use attribute extensions -->
+    <data name="AL0040AnalyzerTitle" xml:space="preserve">
+    <value>Use attribute argument extraction extension</value>
+  </data>
+    <data name="AL0040AnalyzerMessageFormat" xml:space="preserve">
+    <value>Use '{0}' instead of direct ConstructorArguments/NamedArguments access</value>
+  </data>
+    <data name="AL0040AnalyzerDescription" xml:space="preserve">
+    <value>Use GetConstructorArgument or GetNamedArgument extensions instead of direct array access on AttributeData.</value>
+  </data>
+    <!-- AL0041: AotTest must return int -->
+    <data name="AL0041AnalyzerTitle" xml:space="preserve">
+    <value>Method with [AotTest] or [TrimTest] must return int</value>
+  </data>
+    <data name="AL0041AnalyzerMessageFormat" xml:space="preserve">
+    <value>Method '{0}' has [{1}] attribute but returns '{2}' instead of 'int'</value>
+  </data>
+    <data name="AL0041AnalyzerDescription" xml:space="preserve">
+    <value>Methods decorated with [AotTest] or [TrimTest] attributes must return int as their exit code. The test harness expects an integer return value to determine success or failure.</value>
+  </data>
+    <!-- AL0042: AotTest should return 100 -->
+    <data name="AL0042AnalyzerTitle" xml:space="preserve">
+    <value>[AotTest]/[TrimTest] method should return 100 on success</value>
+  </data>
+    <data name="AL0042AnalyzerMessageFormat" xml:space="preserve">
+    <value>{0}</value>
+  </data>
+    <data name="AL0042AnalyzerDescription" xml:space="preserve">
+    <value>By convention, AOT/Trim test methods should return 100 to indicate success. Other values are reserved for failure conditions.</value>
+  </data>
+    <!-- AL0043: TrimSafe violation -->
+    <data name="AL0043AnalyzerTitle" xml:space="preserve">
+    <value>[TrimSafe] code must not call methods with [RequiresUnreferencedCode]</value>
+  </data>
+    <data name="AL0043AnalyzerMessageFormat" xml:space="preserve">
+    <value>Method '{0}' is marked [TrimSafe] but calls '{1}' which has [RequiresUnreferencedCode]</value>
+  </data>
+    <data name="AL0043AnalyzerDescription" xml:space="preserve">
+    <value>Code marked with [TrimSafe] guarantees it will work correctly in trimmed applications. Calling methods with [RequiresUnreferencedCode] violates this guarantee because those methods may fail at runtime when types are trimmed.</value>
+  </data>
+    <!-- AL0044: AotSafe violation -->
+    <data name="AL0044AnalyzerTitle" xml:space="preserve">
+    <value>[AotSafe] code must not call methods with [RequiresDynamicCode]</value>
+  </data>
+    <data name="AL0044AnalyzerMessageFormat" xml:space="preserve">
+    <value>Method '{0}' is marked [AotSafe] but calls '{1}' which has [RequiresDynamicCode]</value>
+  </data>
+    <data name="AL0044AnalyzerDescription" xml:space="preserve">
+    <value>Code marked with [AotSafe] guarantees it will work correctly in AOT-compiled applications. Calling methods with [RequiresDynamicCode] violates this guarantee because those methods rely on runtime code generation which is not available in AOT scenarios.</value>
+  </data>
 </root>
