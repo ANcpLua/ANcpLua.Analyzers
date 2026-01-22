@@ -9,26 +9,26 @@ namespace ANcpLua.Analyzers.Tests;
 ///     Tests for AL0019: Undefined version variable.
 ///     Warns when $(VariableName) is used in Directory.Packages.props but not defined in Version.props.
 /// </summary>
-public sealed partial class Al0019AnalyzerTests : AnalyzerTestBase {
+public sealed class Al0019AnalyzerTests : AnalyzerTestBase {
     private const string EmptyCode = "public class C { }";
 
     [Fact]
     public Task ShouldReportWhenVariableNotDefined() {
         const string VersionProps = """
-            <Project>
-                <PropertyGroup>
-                    <RoslynVersion>4.0.0</RoslynVersion>
-                </PropertyGroup>
-            </Project>
-            """;
+                                    <Project>
+                                        <PropertyGroup>
+                                            <RoslynVersion>4.0.0</RoslynVersion>
+                                        </PropertyGroup>
+                                    </Project>
+                                    """;
 
         const string DirectoryPackagesProps = """
-            <Project>
-                <ItemGroup>
-                    <PackageVersion Include="SomePackage" Version="$(UndefinedVersion)" />
-                </ItemGroup>
-            </Project>
-            """;
+                                              <Project>
+                                                  <ItemGroup>
+                                                      <PackageVersion Include="SomePackage" Version="$(UndefinedVersion)" />
+                                                  </ItemGroup>
+                                              </Project>
+                                              """;
 
         var expected = new DiagnosticResult(Al0019UndefinedVersionVariableAnalyzer.DiagnosticId, DiagnosticSeverity.Warning)
             .WithLocation("Directory.Packages.props", 3, 47)
@@ -43,20 +43,20 @@ public sealed partial class Al0019AnalyzerTests : AnalyzerTestBase {
     [Fact]
     public Task ShouldNotReportWhenVariableIsDefined() {
         const string VersionProps = """
-            <Project>
-                <PropertyGroup>
-                    <RoslynVersion>4.0.0</RoslynVersion>
-                </PropertyGroup>
-            </Project>
-            """;
+                                    <Project>
+                                        <PropertyGroup>
+                                            <RoslynVersion>4.0.0</RoslynVersion>
+                                        </PropertyGroup>
+                                    </Project>
+                                    """;
 
         const string DirectoryPackagesProps = """
-            <Project>
-                <ItemGroup>
-                    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="$(RoslynVersion)" />
-                </ItemGroup>
-            </Project>
-            """;
+                                              <Project>
+                                                  <ItemGroup>
+                                                      <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="$(RoslynVersion)" />
+                                                  </ItemGroup>
+                                              </Project>
+                                              """;
 
         // Explicit empty diagnostics array to resolve overload ambiguity
         return VerifyAsync(
@@ -68,20 +68,20 @@ public sealed partial class Al0019AnalyzerTests : AnalyzerTestBase {
     [Fact]
     public Task ShouldNotReportForHardcodedVersions() {
         const string VersionProps = """
-            <Project>
-                <PropertyGroup>
-                    <RoslynVersion>4.0.0</RoslynVersion>
-                </PropertyGroup>
-            </Project>
-            """;
+                                    <Project>
+                                        <PropertyGroup>
+                                            <RoslynVersion>4.0.0</RoslynVersion>
+                                        </PropertyGroup>
+                                    </Project>
+                                    """;
 
         const string DirectoryPackagesProps = """
-            <Project>
-                <ItemGroup>
-                    <PackageVersion Include="SomePackage" Version="1.0.0" />
-                </ItemGroup>
-            </Project>
-            """;
+                                              <Project>
+                                                  <ItemGroup>
+                                                      <PackageVersion Include="SomePackage" Version="1.0.0" />
+                                                  </ItemGroup>
+                                              </Project>
+                                              """;
 
         // AL0017 handles hardcoded versions, not AL0019
         // Explicit empty diagnostics array to resolve overload ambiguity
@@ -94,21 +94,21 @@ public sealed partial class Al0019AnalyzerTests : AnalyzerTestBase {
     [Fact]
     public Task ShouldReportMultipleUndefinedVariables() {
         const string VersionProps = """
-            <Project>
-                <PropertyGroup>
-                    <RoslynVersion>4.0.0</RoslynVersion>
-                </PropertyGroup>
-            </Project>
-            """;
+                                    <Project>
+                                        <PropertyGroup>
+                                            <RoslynVersion>4.0.0</RoslynVersion>
+                                        </PropertyGroup>
+                                    </Project>
+                                    """;
 
         const string DirectoryPackagesProps = """
-            <Project>
-                <ItemGroup>
-                    <PackageVersion Include="Package1" Version="$(Undefined1)" />
-                    <PackageVersion Include="Package2" Version="$(Undefined2)" />
-                </ItemGroup>
-            </Project>
-            """;
+                                              <Project>
+                                                  <ItemGroup>
+                                                      <PackageVersion Include="Package1" Version="$(Undefined1)" />
+                                                      <PackageVersion Include="Package2" Version="$(Undefined2)" />
+                                                  </ItemGroup>
+                                              </Project>
+                                              """;
 
         var expected1 = new DiagnosticResult(Al0019UndefinedVersionVariableAnalyzer.DiagnosticId, DiagnosticSeverity.Warning)
             .WithLocation("Directory.Packages.props", 3, 44)
@@ -127,20 +127,20 @@ public sealed partial class Al0019AnalyzerTests : AnalyzerTestBase {
     [Fact]
     public Task ShouldHandleCaseInsensitiveVariableNames() {
         const string VersionProps = """
-            <Project>
-                <PropertyGroup>
-                    <RoslynVersion>4.0.0</RoslynVersion>
-                </PropertyGroup>
-            </Project>
-            """;
+                                    <Project>
+                                        <PropertyGroup>
+                                            <RoslynVersion>4.0.0</RoslynVersion>
+                                        </PropertyGroup>
+                                    </Project>
+                                    """;
 
         const string DirectoryPackagesProps = """
-            <Project>
-                <ItemGroup>
-                    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="$(roslynversion)" />
-                </ItemGroup>
-            </Project>
-            """;
+                                              <Project>
+                                                  <ItemGroup>
+                                                      <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="$(roslynversion)" />
+                                                  </ItemGroup>
+                                              </Project>
+                                              """;
 
         // MSBuild properties are case-insensitive
         // Explicit empty diagnostics array to resolve overload ambiguity
@@ -153,12 +153,12 @@ public sealed partial class Al0019AnalyzerTests : AnalyzerTestBase {
     [Fact]
     public Task ShouldHandleMissingVersionProps() {
         const string DirectoryPackagesProps = """
-            <Project>
-                <ItemGroup>
-                    <PackageVersion Include="SomePackage" Version="$(AnyVariable)" />
-                </ItemGroup>
-            </Project>
-            """;
+                                              <Project>
+                                                  <ItemGroup>
+                                                      <PackageVersion Include="SomePackage" Version="$(AnyVariable)" />
+                                                  </ItemGroup>
+                                              </Project>
+                                              """;
 
         // When Version.props is missing, all variables are undefined
         var expected = new DiagnosticResult(Al0019UndefinedVersionVariableAnalyzer.DiagnosticId, DiagnosticSeverity.Warning)
@@ -174,24 +174,24 @@ public sealed partial class Al0019AnalyzerTests : AnalyzerTestBase {
     [Fact]
     public Task ShouldHandleNestedPropertyGroups() {
         const string VersionProps = """
-            <Project>
-                <PropertyGroup Label="Roslyn">
-                    <RoslynVersion>4.0.0</RoslynVersion>
-                </PropertyGroup>
-                <PropertyGroup Label="Testing">
-                    <XunitVersion>2.0.0</XunitVersion>
-                </PropertyGroup>
-            </Project>
-            """;
+                                    <Project>
+                                        <PropertyGroup Label="Roslyn">
+                                            <RoslynVersion>4.0.0</RoslynVersion>
+                                        </PropertyGroup>
+                                        <PropertyGroup Label="Testing">
+                                            <XunitVersion>2.0.0</XunitVersion>
+                                        </PropertyGroup>
+                                    </Project>
+                                    """;
 
         const string DirectoryPackagesProps = """
-            <Project>
-                <ItemGroup>
-                    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="$(RoslynVersion)" />
-                    <PackageVersion Include="xunit" Version="$(XunitVersion)" />
-                </ItemGroup>
-            </Project>
-            """;
+                                              <Project>
+                                                  <ItemGroup>
+                                                      <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="$(RoslynVersion)" />
+                                                      <PackageVersion Include="xunit" Version="$(XunitVersion)" />
+                                                  </ItemGroup>
+                                              </Project>
+                                              """;
 
         // Explicit empty diagnostics array to resolve overload ambiguity
         return VerifyAsync(
@@ -203,12 +203,12 @@ public sealed partial class Al0019AnalyzerTests : AnalyzerTestBase {
     [Fact]
     public Task ShouldNotReportForPackagesPropsOtherFiles() {
         const string OtherPropsFile = """
-            <Project>
-                <ItemGroup>
-                    <PackageVersion Include="SomePackage" Version="$(UndefinedVersion)" />
-                </ItemGroup>
-            </Project>
-            """;
+                                      <Project>
+                                          <ItemGroup>
+                                              <PackageVersion Include="SomePackage" Version="$(UndefinedVersion)" />
+                                          </ItemGroup>
+                                      </Project>
+                                      """;
 
         // Only Directory.Packages.props is analyzed
         // Explicit empty diagnostics array to resolve overload ambiguity

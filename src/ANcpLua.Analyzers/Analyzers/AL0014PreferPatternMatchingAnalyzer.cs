@@ -24,9 +24,9 @@ namespace ANcpLua.Analyzers.Analyzers;
 public sealed partial class Al0014PreferPatternMatchingAnalyzer : AlAnalyzer {
     public const string DiagnosticId = DiagnosticIds.PreferPatternMatchingForNullAndZero;
 
-    internal const string PropertyIsNullCheck = "IsNullCheck";
-    internal const string PropertyIsNegated = "IsNegated";
-    internal const string PropertyExpressionIsLeft = "ExpressionIsLeft";
+    private const string PropertyIsNullCheck = "IsNullCheck";
+    private const string PropertyIsNegated = "IsNegated";
+    private const string PropertyExpressionIsLeft = "ExpressionIsLeft";
 
     private static readonly DiagnosticDescriptor Rule = new(
         DiagnosticId,
@@ -140,13 +140,12 @@ public sealed partial class Al0014PreferPatternMatchingAnalyzer : AlAnalyzer {
 
     private static bool IsInsidePatternContext(SyntaxNode node) {
         for (var current = node.Parent; current is not null; current = current.Parent) {
-            if (current is IsPatternExpressionSyntax or CasePatternSwitchLabelSyntax) {
-                return true;
-            }
-
-            // For switch expressions, only skip if we're in the pattern part, not the expression part
-            if (current is SwitchExpressionArmSyntax arm && node.SpanStart >= arm.Expression.SpanStart) {
-                return false;
+            switch (current) {
+                case IsPatternExpressionSyntax or CasePatternSwitchLabelSyntax:
+                    return true;
+                // For switch expressions, only skip if we're in the pattern part, not the expression part
+                case SwitchExpressionArmSyntax arm when node.SpanStart >= arm.Expression.SpanStart:
+                    return false;
             }
         }
 

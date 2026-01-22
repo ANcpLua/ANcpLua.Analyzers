@@ -7,11 +7,12 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 /// </summary>
 /// <remarks>
 ///     <c>foreach (var iface in type.AllInterfaces) if (Equals(iface, target)) ...</c> → <c>type.Implements(target)</c>
-///     <c>while (base != null) { if (Equals(base, target)) ... base = base.BaseType; }</c> → <c>type.InheritsFrom(target)</c>
+///     <c>while (base != null) { if (Equals(base, target)) ... base = base.BaseType; }</c> →
+///     <c>type.InheritsFrom(target)</c>
 /// </remarks>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0030UseTypeHierarchyCodeFixProvider))]
 [Shared]
-public sealed partial class Al0030UseTypeHierarchyCodeFixProvider : CodeFixProvider {
+public sealed class Al0030UseTypeHierarchyCodeFixProvider : CodeFixProvider {
     public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.UseTypeHierarchyExtensions];
 
     public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
@@ -31,7 +32,7 @@ public sealed partial class Al0030UseTypeHierarchyCodeFixProvider : CodeFixProvi
             context.RegisterCodeFix(
                 CodeAction.Create(
                     CodeFixResources.AL0030ImplementsCodeFixTitle,
-                    _ => ConvertToImplements(context.Document, root, forEachStatement, typeExpr!, targetExpr!),
+                    _ => ConvertToImplements(context.Document, root, forEachStatement, typeExpr, targetExpr),
                     nameof(Al0030UseTypeHierarchyCodeFixProvider) + "_Implements"),
                 diagnostic);
         }
@@ -42,7 +43,7 @@ public sealed partial class Al0030UseTypeHierarchyCodeFixProvider : CodeFixProvi
             context.RegisterCodeFix(
                 CodeAction.Create(
                     CodeFixResources.AL0030InheritsFromCodeFixTitle,
-                    _ => ConvertToInheritsFrom(context.Document, root, whileStatement, baseTypeExpr!, baseTargetExpr!),
+                    _ => ConvertToInheritsFrom(context.Document, root, whileStatement, baseTypeExpr, baseTargetExpr),
                     nameof(Al0030UseTypeHierarchyCodeFixProvider) + "_InheritsFrom"),
                 diagnostic);
         }
@@ -50,8 +51,8 @@ public sealed partial class Al0030UseTypeHierarchyCodeFixProvider : CodeFixProvi
 
     private static bool TryExtractAllInterfacesInfo(
         ForEachStatementSyntax forEach,
-        out ExpressionSyntax? typeExpr,
-        out ExpressionSyntax? targetExpr) {
+        [NotNullWhen(true)] out ExpressionSyntax? typeExpr,
+        [NotNullWhen(true)] out ExpressionSyntax? targetExpr) {
         typeExpr = null;
         targetExpr = null;
 
@@ -70,8 +71,8 @@ public sealed partial class Al0030UseTypeHierarchyCodeFixProvider : CodeFixProvi
 
     private static bool TryExtractBaseTypeInfo(
         WhileStatementSyntax whileLoop,
-        out ExpressionSyntax? typeExpr,
-        out ExpressionSyntax? targetExpr) {
+        [NotNullWhen(true)] out ExpressionSyntax? typeExpr,
+        [NotNullWhen(true)] out ExpressionSyntax? targetExpr) {
         typeExpr = null;
         targetExpr = null;
 
@@ -190,7 +191,7 @@ public sealed partial class Al0030UseTypeHierarchyCodeFixProvider : CodeFixProvi
         if (index >= 0 && index + 1 < statements.Count &&
             statements[index + 1] is ReturnStatementSyntax followingReturn &&
             IsDefaultReturnValue(followingReturn.Expression)) {
-            return root.RemoveNode(followingReturn, SyntaxRemoveOptions.KeepNoTrivia)!;
+            return root.RemoveNode(followingReturn, SyntaxRemoveOptions.KeepNoTrivia) ?? root;
         }
 
         return root;

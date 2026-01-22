@@ -32,7 +32,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     </para>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed partial class Al0007ToAl0009IXmlSerializableAnalyzer : AlAnalyzer {
+public sealed class Al0007ToAl0009IXmlSerializableAnalyzer : AlAnalyzer {
     private static readonly LocalizableResourceString TitleAl0007 = new(
         nameof(Resources.AL0007AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
 
@@ -90,7 +90,6 @@ public sealed partial class Al0007ToAl0009IXmlSerializableAnalyzer : AlAnalyzer 
             return;
         }
 
-
         if (ixmlSerializable.GetMembers("GetSchema").OfType<IMethodSymbol>().FirstOrDefault()
             is not { } getSchemaMethod) {
             return;
@@ -119,12 +118,10 @@ public sealed partial class Al0007ToAl0009IXmlSerializableAnalyzer : AlAnalyzer 
             return;
         }
 
-
         if (!methodSymbol.ExplicitInterfaceImplementations.Any(i =>
                 SymbolEqualityComparer.Default.Equals(i, interfaceGetSchema))) {
             context.ReportDiagnostic(RuleAl0007, methodSymbol.Locations[0]);
         }
-
 
         if (methodSymbol.IsAbstract || ReturnsNonNullValue(methodDeclaration, context.SemanticModel)) {
             var location = methodDeclaration.DescendantNodes()
@@ -142,7 +139,6 @@ public sealed partial class Al0007ToAl0009IXmlSerializableAnalyzer : AlAnalyzer 
         IMethodSymbol interfaceGetSchema) {
         var invocation = (IInvocationOperation)context.Operation;
         var targetMethod = invocation.TargetMethod;
-
 
         if (SymbolEqualityComparer.Default.Equals(targetMethod, interfaceGetSchema) ||
             IsGetSchemaImplementation(targetMethod, ixmlSerializable)) {
@@ -165,10 +161,10 @@ public sealed partial class Al0007ToAl0009IXmlSerializableAnalyzer : AlAnalyzer 
     private static bool ReturnsNonNullValue(SyntaxNode methodDeclaration, SemanticModel model) {
         foreach (var node in methodDeclaration.DescendantNodes()) {
             if (node switch {
-                ReturnStatementSyntax returnStatement => returnStatement.Expression,
-                ArrowExpressionClauseSyntax arrow => arrow.Expression,
-                _ => null
-            } is not { } expression) {
+                    ReturnStatementSyntax returnStatement => returnStatement.Expression,
+                    ArrowExpressionClauseSyntax arrow => arrow.Expression,
+                    _ => null
+                } is not { } expression) {
                 continue;
             }
 

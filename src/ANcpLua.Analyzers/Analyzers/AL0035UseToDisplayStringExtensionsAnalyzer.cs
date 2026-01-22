@@ -7,12 +7,17 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </summary>
 /// <remarks>
 ///     <list type="bullet">
-///         <item><c>type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)</c> → <c>type.GetFullyQualifiedName()</c></item>
-///         <item><c>type.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat)</c> → <c>type.GetMetadataName()</c></item>
+///         <item>
+///             <c>type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)</c> →
+///             <c>type.GetFullyQualifiedName()</c>
+///         </item>
+///         <item>
+///             <c>type.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat)</c> → <c>type.GetMetadataName()</c>
+///         </item>
 ///     </list>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed partial class Al0035UseToDisplayStringExtensionsAnalyzer : AlAnalyzer {
+public sealed class Al0035UseToDisplayStringExtensionsAnalyzer : AlAnalyzer {
     private const string ITypeSymbolTypeName = "Microsoft.CodeAnalysis.ITypeSymbol";
     private const string SymbolDisplayFormatTypeName = "Microsoft.CodeAnalysis.SymbolDisplayFormat";
 
@@ -142,7 +147,7 @@ public sealed partial class Al0035UseToDisplayStringExtensionsAnalyzer : AlAnaly
 
         // If single argument and it's a SymbolDisplayFormat, that's the format
         if (invocation.Arguments.Length == 1 ||
-            (invocation.TargetMethod.IsExtensionMethod && invocation.Arguments.Length == 2)) {
+            invocation.TargetMethod.IsExtensionMethod && invocation.Arguments.Length == 2) {
             var formatArgIndex = invocation.TargetMethod.IsExtensionMethod ? 1 : 0;
             if (invocation.Arguments.Length > formatArgIndex) {
                 return invocation.Arguments[formatArgIndex].Value;

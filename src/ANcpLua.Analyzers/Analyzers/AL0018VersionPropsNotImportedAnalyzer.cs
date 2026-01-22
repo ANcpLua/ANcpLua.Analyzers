@@ -1,4 +1,5 @@
 using ANcpLua.Analyzers.Core;
+using Microsoft.CodeAnalysis.Text;
 using System.Xml.Linq;
 
 namespace ANcpLua.Analyzers.Analyzers;
@@ -18,7 +19,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///         The analyzer supports two valid import locations (per the layering pattern):
 ///         - Directory.Build.props: Traditional location for MSBuild property imports
 ///         - Directory.Packages.props: Valid for CPM scenarios where version variables
-///           are only used by PackageVersion items
+///         are only used by PackageVersion items
 ///     </para>
 ///     <para>
 ///         The analyzer examines both files when added as additional files to the
@@ -27,7 +28,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     </para>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed partial class Al0018VersionPropsNotImportedAnalyzer : DiagnosticAnalyzer {
+public sealed class Al0018VersionPropsNotImportedAnalyzer : DiagnosticAnalyzer {
     public const string DiagnosticId = DiagnosticIds.VersionPropsNotImported;
 
     private const string VersionPropsFileName = "Version.props";
@@ -123,9 +124,9 @@ public sealed partial class Al0018VersionPropsNotImportedAnalyzer : DiagnosticAn
             if (!hasVersionPropsImport) {
                 // Report diagnostic at the start of the file
                 var location = Location.Create(propsFile.Path, sourceText.Lines[0].Span,
-                    new Microsoft.CodeAnalysis.Text.LinePositionSpan(
-                        new Microsoft.CodeAnalysis.Text.LinePosition(0, 0),
-                        new Microsoft.CodeAnalysis.Text.LinePosition(0, 0)));
+                    new LinePositionSpan(
+                        new LinePosition(0, 0),
+                        new LinePosition(0, 0)));
 
                 var diagnostic = Diagnostic.Create(Rule, location);
                 context.ReportDiagnostic(diagnostic);

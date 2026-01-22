@@ -1,4 +1,5 @@
 using ANcpLua.Analyzers.Core;
+using OperationExtensions = Microsoft.CodeAnalysis.Operations.OperationExtensions;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -7,12 +8,18 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </summary>
 /// <remarks>
 ///     <list type="bullet">
-///         <item><c>foreach (var iface in type.AllInterfaces) if (Equals(iface, target))</c> → <c>type.Implements(target)</c></item>
-///         <item><c>while (baseType != null) { if (Equals(baseType, target)) ... baseType = baseType.BaseType; }</c> → <c>type.InheritsFrom(target)</c></item>
+///         <item>
+///             <c>foreach (var iface in type.AllInterfaces) if (Equals(iface, target))</c> →
+///             <c>type.Implements(target)</c>
+///         </item>
+///         <item>
+///             <c>while (baseType != null) { if (Equals(baseType, target)) ... baseType = baseType.BaseType; }</c> →
+///             <c>type.InheritsFrom(target)</c>
+///         </item>
 ///     </list>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed partial class Al0030UseTypeHierarchyAnalyzer : AlAnalyzer {
+public sealed class Al0030UseTypeHierarchyAnalyzer : AlAnalyzer {
     private const string SymbolEqualityComparerTypeName = "Microsoft.CodeAnalysis.SymbolEqualityComparer";
     private const string ITypeSymbolTypeName = "Microsoft.CodeAnalysis.ITypeSymbol";
 
@@ -37,7 +44,7 @@ public sealed partial class Al0030UseTypeHierarchyAnalyzer : AlAnalyzer {
         context.RegisterCompilationStartAction(OnCompilationStart);
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
-        if (context.Compilation.GetTypeByMetadataName(ITypeSymbolTypeName) is not { }) {
+        if (context.Compilation.GetTypeByMetadataName(ITypeSymbolTypeName) is null) {
             return;
         }
 
@@ -80,7 +87,7 @@ public sealed partial class Al0030UseTypeHierarchyAnalyzer : AlAnalyzer {
             return false;
         }
 
-        foreach (var descendant in Microsoft.CodeAnalysis.Operations.OperationExtensions.Descendants(body)) {
+        foreach (var descendant in OperationExtensions.Descendants(body)) {
             if (descendant is IInvocationOperation invocation) {
                 // Check for SymbolEqualityComparer.Default.Equals(a, b)
                 if (symbolEqualityComparerType is not null &&
@@ -90,9 +97,11 @@ public sealed partial class Al0030UseTypeHierarchyAnalyzer : AlAnalyzer {
 
                 // Also check for a.IsEqualTo(b) pattern (from ANcpLua.Roslyn.Utilities)
                 // Extension method signature: IsEqualTo(this ISymbol?, ISymbol?) has 2 parameters
-                if (invocation.TargetMethod.Name is "IsEqualTo" &&
-                    invocation.TargetMethod.IsExtensionMethod &&
-                    invocation.TargetMethod.Parameters.Length == 2) {
+                if (invocation.TargetMethod is {
+                        Name: "IsEqualTo",
+                        IsExtensionMethod: true,
+                        Parameters.Length: 2
+                    }) {
                     return true;
                 }
             }
@@ -106,13 +115,14 @@ public sealed partial class Al0030UseTypeHierarchyAnalyzer : AlAnalyzer {
         var hasBaseTypeAssignment = false;
         var hasEqualityCheck = false;
 
-        foreach (var operation in Microsoft.CodeAnalysis.Operations.OperationExtensions.Descendants(whileLoop)) {
+        foreach (var operation in OperationExtensions.Descendants(whileLoop)) {
             if (operation is IPropertyReferenceOperation { Property.Name: "BaseType" }) {
                 hasBaseTypeAccess = true;
             }
 
-            if (operation is ISimpleAssignmentOperation assignment &&
-                assignment.Value is IPropertyReferenceOperation { Property.Name: "BaseType" }) {
+            if (operation is ISimpleAssignmentOperation {
+                    Value: IPropertyReferenceOperation { Property.Name: "BaseType" }
+                }) {
                 hasBaseTypeAssignment = true;
             }
 
@@ -125,9 +135,11 @@ public sealed partial class Al0030UseTypeHierarchyAnalyzer : AlAnalyzer {
 
                 // Also check for a.IsEqualTo(b) pattern (from ANcpLua.Roslyn.Utilities)
                 // Extension method signature: IsEqualTo(this ISymbol?, ISymbol?) has 2 parameters
-                if (invocation.TargetMethod.Name is "IsEqualTo" &&
-                    invocation.TargetMethod.IsExtensionMethod &&
-                    invocation.TargetMethod.Parameters.Length == 2) {
+                if (invocation.TargetMethod is {
+                        Name: "IsEqualTo",
+                        IsExtensionMethod: true,
+                        Parameters.Length: 2
+                    }) {
                     hasEqualityCheck = true;
                 }
             }

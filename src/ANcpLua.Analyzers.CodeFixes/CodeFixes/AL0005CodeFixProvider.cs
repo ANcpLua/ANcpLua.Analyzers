@@ -7,7 +7,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 /// </summary>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0005CodeFixProvider))]
 [Shared]
-public sealed partial class Al0005CodeFixProvider : AlCodeFixProvider<BinaryExpressionSyntax> {
+public sealed class Al0005CodeFixProvider : AlCodeFixProvider<BinaryExpressionSyntax> {
     public override ImmutableArray<string> FixableDiagnosticIds =>
         [Al0004ToAl0005SpanComparisonAnalyzer.DiagnosticIdAl0005];
 

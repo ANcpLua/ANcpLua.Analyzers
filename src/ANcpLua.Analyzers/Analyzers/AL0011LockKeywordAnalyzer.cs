@@ -7,7 +7,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     In .NET 9+, lock(Lock) is valid and preferred - only warn on lock(object).
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed partial class Al0011LockKeywordAnalyzer : AlAnalyzer {
+public sealed class Al0011LockKeywordAnalyzer : AlAnalyzer {
     private const string LockTypeMetadataName = "System.Threading.Lock";
 
     private static readonly LocalizableResourceString Title = new(
@@ -43,7 +43,6 @@ public sealed partial class Al0011LockKeywordAnalyzer : AlAnalyzer {
 
         var lockExpressionType =
             context.SemanticModel.GetTypeInfo(lockStatement.Expression, context.CancellationToken).Type;
-
 
         if (lockType is not null && SymbolEqualityComparer.Default.Equals(lockExpressionType, lockType)) {
             return;

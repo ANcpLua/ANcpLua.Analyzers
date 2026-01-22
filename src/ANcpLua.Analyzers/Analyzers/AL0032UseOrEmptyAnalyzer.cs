@@ -13,7 +13,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     </list>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed partial class Al0032UseOrEmptyAnalyzer : AlAnalyzer {
+public sealed class Al0032UseOrEmptyAnalyzer : AlAnalyzer {
     private static readonly LocalizableResourceString Title = new(
         nameof(Resources.AL0032AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
 
@@ -70,39 +70,46 @@ public sealed partial class Al0032UseOrEmptyAnalyzer : AlAnalyzer {
             operation = conversion.Operand;
         }
 
-        // Check for collection expression [] (empty)
-        if (operation is ICollectionExpressionOperation { Elements.Length: 0 }) {
-            return true;
-        }
-
-        // Check for Array.Empty<T>() or Enumerable.Empty<T>()
-        // Use name-based comparison since these are well-known types
-        if (operation is IInvocationOperation invocation) {
-            var method = invocation.TargetMethod;
-            if (method.Name == "Empty" && method.IsStatic && method.Parameters.Length is 0) {
-                var containingType = method.ContainingType;
-                if (containingType is not null) {
-                    var typeName = containingType.Name;
-                    var namespaceName = containingType.ContainingNamespace?.ToDisplayString();
-                    if ((typeName == "Array" && namespaceName == "System") ||
-                        (typeName == "Enumerable" && namespaceName == "System.Linq")) {
-                        return true;
+        switch (operation) {
+            // Check for collection expression [] (empty)
+            case ICollectionExpressionOperation { Elements.Length: 0 }:
+                return true;
+            // Check for Array.Empty<T>() or Enumerable.Empty<T>()
+            // Use name-based comparison since these are well-known types
+            case IInvocationOperation invocation: {
+                var method = invocation.TargetMethod;
+                if (method is {
+                        Name: "Empty",
+                        IsStatic: true,
+                        Parameters.Length: 0
+                    }) {
+                    var containingType = method.ContainingType;
+                    if (containingType is not null) {
+                        var typeName = containingType.Name;
+                        var namespaceName = containingType.ContainingNamespace?.ToDisplayString();
+                        if (typeName == "Array" && namespaceName == "System" ||
+                            typeName == "Enumerable" && namespaceName == "System.Linq") {
+                            return true;
+                        }
                     }
                 }
-            }
-        }
 
-        // Check for new T[0] or new T[] { }
-        if (operation is IArrayCreationOperation arrayCreation) {
+                break;
+            }
+            // Check for new T[0] or new T[] { }
             // Check if it's an empty array (size 0 or empty initializer)
-            if (arrayCreation.DimensionSizes.Length == 1 &&
-                arrayCreation.DimensionSizes[0].ConstantValue is { HasValue: true, Value: 0 }) {
+            case IArrayCreationOperation {
+                DimensionSizes: [
+                    {
+                        ConstantValue:
+                        { HasValue: true, Value: 0 }
+                    }
+                ]
+            }:
+            case IArrayCreationOperation {
+                Initializer.ElementValues.Length: 0
+            }:
                 return true;
-            }
-
-            if (arrayCreation.Initializer is { ElementValues.Length: 0 }) {
-                return true;
-            }
         }
 
         return false;

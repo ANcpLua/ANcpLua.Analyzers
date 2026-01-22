@@ -9,7 +9,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     <c>SymbolEqualityComparer.Default.Equals(a, b)</c> → <c>a.IsEqualTo(b)</c>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed partial class Al0028UseIsEqualToAnalyzer : AlAnalyzer {
+public sealed class Al0028UseIsEqualToAnalyzer : AlAnalyzer {
     private const string SymbolEqualityComparerTypeName = "Microsoft.CodeAnalysis.SymbolEqualityComparer";
     private const string ISymbolTypeName = "Microsoft.CodeAnalysis.ISymbol";
 
@@ -34,7 +34,7 @@ public sealed partial class Al0028UseIsEqualToAnalyzer : AlAnalyzer {
         context.RegisterCompilationStartAction(OnCompilationStart);
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
-        if (context.Compilation.GetTypeByMetadataName(ISymbolTypeName) is not { }) {
+        if (context.Compilation.GetTypeByMetadataName(ISymbolTypeName) is null) {
             return;
         }
 

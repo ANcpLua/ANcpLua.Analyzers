@@ -7,7 +7,7 @@ namespace ANcpLua.Analyzers.Tests;
 ///     Tests for AL0026: Avoid DateTime time accessors.
 ///     Warns on static DateTime time properties when TimeProvider is available.
 /// </summary>
-public sealed partial class Al0026AnalyzerTests : AnalyzerTest<Al0026AvoidDateTimeNowAnalyzer> {
+public sealed class Al0026AnalyzerTests : AnalyzerTest<Al0026AvoidDateTimeNowAnalyzer> {
     private const string TimeProviderPolyfill = """
                                                 namespace System {
                                                     public abstract class TimeProvider {
@@ -67,13 +67,13 @@ public sealed partial class Al0026AnalyzerTests : AnalyzerTest<Al0026AvoidDateTi
     public Task ShouldNotReportWhenTimeProviderNotAvailable() {
         // Test that analyzer does not report when TimeProvider type is missing
         var code = $$"""
-            using System;
-            public class C {
-                void M() {
-                    var time = {{DateTimeType}}.Now;
-                }
-            }
-            """;
+                     using System;
+                     public class C {
+                         void M() {
+                             var time = {{DateTimeType}}.Now;
+                         }
+                     }
+                     """;
         return VerifyAsync(code, false);
     }
 

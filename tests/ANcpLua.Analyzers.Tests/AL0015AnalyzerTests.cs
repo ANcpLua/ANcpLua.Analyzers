@@ -9,7 +9,7 @@ namespace ANcpLua.Analyzers.Tests;
 ///     Covers detection of simple ArgumentNullException null-guards and code fix generation
 ///     for both BCL and portable forms based on target framework and EditorConfig settings.
 /// </summary>
-public sealed partial class Al0015AnalyzerTests : AnalyzerTest<Al0015NormalizeNullGuardStyleAnalyzer> {
+public sealed class Al0015AnalyzerTests : AnalyzerTest<Al0015NormalizeNullGuardStyleAnalyzer> {
     [Theory]
     [InlineData("string? x", "x is null", "nameof(x)")]
     [InlineData("object? obj", "obj == null", "nameof(obj)")]
@@ -53,7 +53,7 @@ public sealed partial class Al0015AnalyzerTests : AnalyzerTest<Al0015NormalizeNu
 ///     Tests both BCL form (ArgumentNullException.ThrowIfNull) and portable form
 ///     (coalesce assignment) generation based on configuration.
 /// </summary>
-public sealed partial class Al0015PortableFormCodeFixTests : CodeFixTestWithEditorConfig<Al0015NormalizeNullGuardStyleAnalyzer
+public sealed class Al0015PortableFormCodeFixTests : CodeFixTestWithEditorConfig<Al0015NormalizeNullGuardStyleAnalyzer
     , Al0015NormalizeNullGuardStyleCodeFixProvider> {
     /// <summary>
     ///     Test 1: netstandard2.0 without ThrowIfNull produces portable form.
@@ -88,7 +88,11 @@ public sealed partial class Al0015PortableFormCodeFixTests : CodeFixTestWithEdit
 
         return VerifyAsync(Source, expected,
             new Dictionary<string, string> {
-                { "ancplua_target_framework", "netstandard2.0" }, { "ancplua_nullguard_style", "auto" }
+                {
+                    "ancplua_target_framework", "netstandard2.0"
+                }, {
+                    "ancplua_nullguard_style", "auto"
+                }
             }, null, false);
     }
 
@@ -126,7 +130,11 @@ public sealed partial class Al0015PortableFormCodeFixTests : CodeFixTestWithEdit
 
         return VerifyAsync(Source, Expected,
             new Dictionary<string, string> {
-                { "ancplua_target_framework", "netstandard2.0" }, { "ancplua_nullguard_style", "auto" }
+                {
+                    "ancplua_target_framework", "netstandard2.0"
+                }, {
+                    "ancplua_nullguard_style", "auto"
+                }
             }, null, false);
     }
 
@@ -160,7 +168,11 @@ public sealed partial class Al0015PortableFormCodeFixTests : CodeFixTestWithEdit
                                 """;
 
         return VerifyAsync(Source, Expected,
-            new Dictionary<string, string> { { "ancplua_target_framework", "netstandard2.0" } },
+            new Dictionary<string, string> {
+                {
+                    "ancplua_target_framework", "netstandard2.0"
+                }
+            },
             null, false);
     }
 
@@ -194,7 +206,11 @@ public sealed partial class Al0015PortableFormCodeFixTests : CodeFixTestWithEdit
                                 """;
 
         return VerifyAsync(Source, Expected,
-            new Dictionary<string, string> { { "ancplua_nullguard_style", "portable" } });
+            new Dictionary<string, string> {
+                {
+                    "ancplua_nullguard_style", "portable"
+                }
+            });
     }
 
     /// <summary>
@@ -228,7 +244,11 @@ public sealed partial class Al0015PortableFormCodeFixTests : CodeFixTestWithEdit
 
         return VerifyAsync(Source, Expected,
             new Dictionary<string, string> {
-                { "ancplua_target_framework", "net10.0" }, { "ancplua_nullguard_style", "portable" }
+                {
+                    "ancplua_target_framework", "net10.0"
+                }, {
+                    "ancplua_nullguard_style", "portable"
+                }
             });
     }
 
@@ -264,8 +284,12 @@ public sealed partial class Al0015PortableFormCodeFixTests : CodeFixTestWithEdit
 
         return VerifyAsync(Source, Expected,
             new Dictionary<string, string> {
-                { "ancplua_target_framework", "net10.0" }, { "ancplua_nullguard_style", "portable" }
-            }, null);
+                {
+                    "ancplua_target_framework", "net10.0"
+                }, {
+                    "ancplua_nullguard_style", "portable"
+                }
+            });
     }
 }
 
@@ -273,7 +297,7 @@ public sealed partial class Al0015PortableFormCodeFixTests : CodeFixTestWithEdit
 ///     BCL form code fix tests for AL0015.
 ///     Tests ArgumentNullException.ThrowIfNull generation when available.
 /// </summary>
-public sealed partial class Al0015BclFormCodeFixTests : CodeFixTestWithEditorConfig<Al0015NormalizeNullGuardStyleAnalyzer,
+public sealed class Al0015BclFormCodeFixTests : CodeFixTestWithEditorConfig<Al0015NormalizeNullGuardStyleAnalyzer,
     Al0015NormalizeNullGuardStyleCodeFixProvider> {
     /// <summary>
     ///     Test 2: net10.0 with single target produces BCL form.
@@ -310,7 +334,11 @@ public sealed partial class Al0015BclFormCodeFixTests : CodeFixTestWithEditorCon
 
         return VerifyAsync(Source, Expected,
             new Dictionary<string, string> {
-                { "ancplua_target_framework", "net10.0" }, { "ancplua_nullguard_style", "auto" }
+                {
+                    "ancplua_target_framework", "net10.0"
+                }, {
+                    "ancplua_nullguard_style", "auto"
+                }
             });
     }
 
@@ -348,7 +376,11 @@ public sealed partial class Al0015BclFormCodeFixTests : CodeFixTestWithEditorCon
 
         return VerifyAsync(Source, Expected,
             new Dictionary<string, string> {
-                { "ancplua_target_framework", "net10.0" }, { "ancplua_nullguard_style", "auto" }
+                {
+                    "ancplua_target_framework", "net10.0"
+                }, {
+                    "ancplua_nullguard_style", "auto"
+                }
             });
     }
 
@@ -382,7 +414,11 @@ public sealed partial class Al0015BclFormCodeFixTests : CodeFixTestWithEditorCon
                                 """;
 
         return VerifyAsync(Source, Expected,
-            new Dictionary<string, string> { { "ancplua_target_framework", "net10.0" } });
+            new Dictionary<string, string> {
+                {
+                    "ancplua_target_framework", "net10.0"
+                }
+            });
     }
 
     /// <summary>
@@ -416,7 +452,11 @@ public sealed partial class Al0015BclFormCodeFixTests : CodeFixTestWithEditorCon
 
         return VerifyAsync(Source, Expected,
             new Dictionary<string, string> {
-                { "ancplua_target_framework", "net10.0" }, { "ancplua_nullguard_style", "auto" }
+                {
+                    "ancplua_target_framework", "net10.0"
+                }, {
+                    "ancplua_nullguard_style", "auto"
+                }
             });
     }
 
@@ -451,7 +491,11 @@ public sealed partial class Al0015BclFormCodeFixTests : CodeFixTestWithEditorCon
 
         return VerifyAsync(Source, Expected,
             new Dictionary<string, string> {
-                { "ancplua_target_framework", "netstandard2.0" }, { "ancplua_nullguard_style", "bcl" }
+                {
+                    "ancplua_target_framework", "netstandard2.0"
+                }, {
+                    "ancplua_nullguard_style", "bcl"
+                }
             });
     }
 }
@@ -460,7 +504,7 @@ public sealed partial class Al0015BclFormCodeFixTests : CodeFixTestWithEditorCon
 ///     Multi-target stability tests for AL0015.
 ///     Verifies that multi-target projects always use portable form for consistency.
 /// </summary>
-public sealed partial class Al0015MultiTargetTests : CodeFixTestWithEditorConfig<Al0015NormalizeNullGuardStyleAnalyzer,
+public sealed class Al0015MultiTargetTests : CodeFixTestWithEditorConfig<Al0015NormalizeNullGuardStyleAnalyzer,
     Al0015NormalizeNullGuardStyleCodeFixProvider> {
     /// <summary>
     ///     Test 3: Multi-target with netstandard2.0;net10.0 produces portable form.
@@ -497,7 +541,11 @@ public sealed partial class Al0015MultiTargetTests : CodeFixTestWithEditorConfig
 
         return VerifyAsync(Source, Expected,
             new Dictionary<string, string> {
-                { "ancplua_is_multi_target", "true" }, { "ancplua_nullguard_style", "auto" }
+                {
+                    "ancplua_is_multi_target", "true"
+                }, {
+                    "ancplua_nullguard_style", "auto"
+                }
             }, null, false);
     }
 
@@ -532,7 +580,11 @@ public sealed partial class Al0015MultiTargetTests : CodeFixTestWithEditorConfig
 
         return VerifyAsync(Source, Expected,
             new Dictionary<string, string> {
-                { "ancplua_is_multi_target", "true" }, { "ancplua_nullguard_style", "auto" }
+                {
+                    "ancplua_is_multi_target", "true"
+                }, {
+                    "ancplua_nullguard_style", "auto"
+                }
             }, null, false);
     }
 
@@ -587,7 +639,11 @@ public sealed partial class Al0015MultiTargetTests : CodeFixTestWithEditorConfig
 
         return VerifyAsync(Source, Expected,
             new Dictionary<string, string> {
-                { "ancplua_is_multi_target", "true" }, { "ancplua_nullguard_style", "auto" }
+                {
+                    "ancplua_is_multi_target", "true"
+                }, {
+                    "ancplua_nullguard_style", "auto"
+                }
             }, null, false);
     }
 }
@@ -595,7 +651,7 @@ public sealed partial class Al0015MultiTargetTests : CodeFixTestWithEditorConfig
 /// <summary>
 ///     Edge case and rejection tests for AL0015.
 /// </summary>
-public sealed partial class Al0015EdgeCasesTests : CodeFixTestWithEditorConfig<Al0015NormalizeNullGuardStyleAnalyzer,
+public sealed class Al0015EdgeCasesTests : CodeFixTestWithEditorConfig<Al0015NormalizeNullGuardStyleAnalyzer,
     Al0015NormalizeNullGuardStyleCodeFixProvider> {
     /// <summary>
     ///     Test 4: BCL mode forced but ThrowIfNull unavailable - falls back to portable.
@@ -632,7 +688,11 @@ public sealed partial class Al0015EdgeCasesTests : CodeFixTestWithEditorConfig<A
 
         return VerifyAsync(Source, Expected,
             new Dictionary<string, string> {
-                { "ancplua_target_framework", "netstandard2.0" }, { "ancplua_nullguard_style", "bcl" }
+                {
+                    "ancplua_target_framework", "netstandard2.0"
+                }, {
+                    "ancplua_nullguard_style", "bcl"
+                }
             }, null, false);
     }
 }

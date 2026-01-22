@@ -3,7 +3,7 @@
 /// <summary>
 ///     Base class for all ANcpLua code fix providers.
 /// </summary>
-public abstract partial class AlCodeFixProvider<TNode> : CodeFixProvider where TNode : CSharpSyntaxNode {
+public abstract class AlCodeFixProvider<TNode> : CodeFixProvider where TNode : CSharpSyntaxNode {
     public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
     public sealed override async Task RegisterCodeFixesAsync(CodeFixContext context) {

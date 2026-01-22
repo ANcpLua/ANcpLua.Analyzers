@@ -12,7 +12,7 @@ namespace ANcpLua.Analyzers.Tests;
 ///     Integration tests for AR0002: Make Static Lambda Refactoring.
 ///     These tests verify the refactoring actually applies changes correctly.
 /// </summary>
-public sealed partial class Ar0002RefactoringTests : IDisposable {
+public sealed class Ar0002RefactoringTests : IDisposable {
     private static readonly MetadataReference[] References = [
         MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
         MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location),

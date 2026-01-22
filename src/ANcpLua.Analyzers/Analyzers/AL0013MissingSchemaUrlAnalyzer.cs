@@ -25,7 +25,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     </para>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed partial class Al0013MissingSchemaUrlAnalyzer : AlAnalyzer {
+public sealed class Al0013MissingSchemaUrlAnalyzer : AlAnalyzer {
     private static readonly LocalizableResourceString Title = new(
         nameof(Resources.AL0013AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
 
@@ -113,7 +113,6 @@ public sealed partial class Al0013MissingSchemaUrlAnalyzer : AlAnalyzer {
             return false;
         }
 
-
         var currentType = receiverType;
         while (currentType is not null) {
             if (currentType is INamedTypeSymbol namedCurrent &&
@@ -123,7 +122,6 @@ public sealed partial class Al0013MissingSchemaUrlAnalyzer : AlAnalyzer {
 
             currentType = currentType.BaseType;
         }
-
 
         if (receiverType is INamedTypeSymbol namedType) {
             foreach (var iface in namedType.AllInterfaces) {

@@ -8,7 +8,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 /// </summary>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0016CombineDeclarationWithNullCheckCodeFixProvider))]
 [Shared]
-public sealed partial class Al0016CombineDeclarationWithNullCheckCodeFixProvider
+public sealed class Al0016CombineDeclarationWithNullCheckCodeFixProvider
     : AlCodeFixProvider<LocalDeclarationStatementSyntax> {
     public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.CombineDeclarationWithNullCheck];
 
@@ -47,10 +47,8 @@ public sealed partial class Al0016CombineDeclarationWithNullCheckCodeFixProvider
         CancellationToken ct) {
         var editor = await DocumentEditor.CreateAsync(document, ct);
 
-
         var patternText = $"{initializer.WithoutTrivia().NormalizeWhitespace()} is not {{ }} {variableName}";
         var condition = SyntaxFactory.ParseExpression(patternText);
-
 
         if (initializer is AssignmentExpressionSyntax or ConditionalExpressionSyntax or LambdaExpressionSyntax) {
             patternText = $"({initializer.WithoutTrivia().NormalizeWhitespace()}) is not {{ }} {variableName}";

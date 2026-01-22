@@ -6,7 +6,7 @@ namespace ANcpLua.Analyzers.Tests;
 /// <summary>
 ///     Tests for AL0028: Use IsEqualTo extension instead of SymbolEqualityComparer.Equals.
 /// </summary>
-public sealed partial class Al0028UseIsEqualToTests : AnalyzerTest<Al0028UseIsEqualToAnalyzer> {
+public sealed class Al0028UseIsEqualToTests : AnalyzerTest<Al0028UseIsEqualToAnalyzer> {
     private const string RoslynPolyfill = """
                                           namespace Microsoft.CodeAnalysis {
                                               public interface ISymbol { }

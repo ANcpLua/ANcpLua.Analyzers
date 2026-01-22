@@ -6,10 +6,11 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     AL0033: Suggests using ToImmutableArrayOrEmpty() instead of null-conditional with fallback.
 /// </summary>
 /// <remarks>
-///     <c>collection?.ToImmutableArray() ?? ImmutableArray&lt;T&gt;.Empty</c> → <c>collection.ToImmutableArrayOrEmpty()</c>
+///     <c>collection?.ToImmutableArray() ?? ImmutableArray&lt;T&gt;.Empty</c> →
+///     <c>collection.ToImmutableArrayOrEmpty()</c>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed partial class Al0033UseToImmutableArrayOrEmptyAnalyzer : AlAnalyzer {
+public sealed class Al0033UseToImmutableArrayOrEmptyAnalyzer : AlAnalyzer {
     private static readonly LocalizableResourceString Title = new(
         nameof(Resources.AL0033AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
 
@@ -62,8 +63,10 @@ public sealed partial class Al0033UseToImmutableArrayOrEmptyAnalyzer : AlAnalyze
         // Check for ImmutableArray<T>.Empty field access
         // Use display string check since GetTypeByMetadataName can fail for some compilation contexts
         if (operation is IFieldReferenceOperation fieldRef) {
-            if (fieldRef.Field.Name == "Empty" &&
-                fieldRef.Field.IsStatic &&
+            if (fieldRef.Field is {
+                    Name: "Empty",
+                    IsStatic: true
+                } &&
                 IsImmutableArrayType(fieldRef.Field.ContainingType)) {
                 return true;
             }
@@ -102,13 +105,13 @@ public sealed partial class Al0033UseToImmutableArrayOrEmptyAnalyzer : AlAnalyze
         }
 
         // Check for null-conditional invocation: source?.ToImmutableArray()
-        if (operation is IConditionalAccessOperation conditionalAccess) {
-            if (conditionalAccess.WhenNotNull is IInvocationOperation invocation) {
-                if (invocation.TargetMethod.Name == "ToImmutableArray") {
-                    sourceName = GetOperandDisplayName(conditionalAccess.Operation);
-                    return true;
+        if (operation is IConditionalAccessOperation {
+                WhenNotNull: IInvocationOperation {
+                    TargetMethod.Name: "ToImmutableArray"
                 }
-            }
+            } conditionalAccess) {
+            sourceName = GetOperandDisplayName(conditionalAccess.Operation);
+            return true;
         }
 
         return false;

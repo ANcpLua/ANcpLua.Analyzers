@@ -11,7 +11,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 /// </remarks>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0027UseSystemTextJsonCodeFixProvider))]
 [Shared]
-public sealed partial class Al0027UseSystemTextJsonCodeFixProvider : CodeFixProvider {
+public sealed class Al0027UseSystemTextJsonCodeFixProvider : CodeFixProvider {
     public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.AvoidNewtonsoftJson];
 
     public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
@@ -31,7 +31,7 @@ public sealed partial class Al0027UseSystemTextJsonCodeFixProvider : CodeFixProv
             context.RegisterCodeFix(
                 CodeAction.Create(
                     CodeFixResources.AL0027CodeFixTitle,
-                    _ => ConvertToSystemTextJson(context.Document, root, invocation, methodName!, typeArgs),
+                    _ => ConvertToSystemTextJson(context.Document, root, invocation, methodName, typeArgs),
                     nameof(Al0027UseSystemTextJsonCodeFixProvider)),
                 diagnostic);
         }
@@ -39,7 +39,7 @@ public sealed partial class Al0027UseSystemTextJsonCodeFixProvider : CodeFixProv
 
     private static bool TryGetJsonConvertReplacement(
         InvocationExpressionSyntax invocation,
-        out string? replacementMethod,
+        [NotNullWhen(true)] out string? replacementMethod,
         out TypeArgumentListSyntax? typeArgs) {
         replacementMethod = null;
         typeArgs = null;
@@ -56,7 +56,7 @@ public sealed partial class Al0027UseSystemTextJsonCodeFixProvider : CodeFixProv
 
         var methodName = memberAccess.Name switch {
             GenericNameSyntax generic => generic.Identifier.Text,
-            SimpleNameSyntax simple => simple.Identifier.Text,
+            not null => memberAccess.Name.Identifier.Text,
             _ => null
         };
 

@@ -7,7 +7,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 /// </summary>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0002CodeFixProvider))]
 [Shared]
-public sealed partial class Al0002CodeFixProvider : AlCodeFixProvider<UnaryPatternSyntax> {
+public sealed class Al0002CodeFixProvider : AlCodeFixProvider<UnaryPatternSyntax> {
     public override ImmutableArray<string> FixableDiagnosticIds =>
         [Al0002DontRepeatNegatedPatternAnalyzer.DiagnosticId];
 
@@ -29,7 +29,6 @@ public sealed partial class Al0002CodeFixProvider : AlCodeFixProvider<UnaryPatte
         ExpressionOrPatternSyntax parent,
         SyntaxNode root) {
         var notPatterns = notPattern.DescendantNodesAndSelf().OfType<UnaryPatternSyntax>().ToArray();
-
 
         var lastPattern = notPatterns[^1];
         var realPattern = notPatterns.Length % 2 is 0

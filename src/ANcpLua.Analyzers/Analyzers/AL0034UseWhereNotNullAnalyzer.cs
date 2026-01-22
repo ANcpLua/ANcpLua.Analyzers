@@ -12,7 +12,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     </list>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed partial class Al0034UseWhereNotNullAnalyzer : AlAnalyzer {
+public sealed class Al0034UseWhereNotNullAnalyzer : AlAnalyzer {
     private static readonly LocalizableResourceString Title = new(
         nameof(Resources.AL0034AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
 
@@ -119,19 +119,13 @@ public sealed partial class Al0034UseWhereNotNullAnalyzer : AlAnalyzer {
 
         // The body should be a single expression that checks the parameter is not null
         var body = lambda.Body;
-        if (body is IBlockOperation block) {
-            // If it's a block, look for a single return statement
-            if (block.Operations.Length == 1 &&
-                block.Operations[0] is IReturnOperation returnOp &&
-                returnOp.ReturnedValue is { } returnValue) {
-                return IsNotNullCheck(returnValue, parameter);
+        // If it's a block, look for a single return statement
+        return body.Operations is [
+            IReturnOperation {
+                ReturnedValue:
+                { } returnValue
             }
-
-            return false;
-        }
-
-        // Direct expression body
-        return IsNotNullCheck(body, parameter);
+        ] && IsNotNullCheck(returnValue, parameter);
     }
 
     private static bool IsNotNullCheck(IOperation? operation, IParameterSymbol parameter) {
@@ -145,8 +139,9 @@ public sealed partial class Al0034UseWhereNotNullAnalyzer : AlAnalyzer {
         }
 
         // Pattern: x != null
-        if (operation is IBinaryOperation binary &&
-            binary.OperatorKind == BinaryOperatorKind.NotEquals) {
+        if (operation is IBinaryOperation {
+                OperatorKind: BinaryOperatorKind.NotEquals
+            } binary) {
             return IsParameterAndNull(binary.LeftOperand, binary.RightOperand, parameter) ||
                    IsParameterAndNull(binary.RightOperand, binary.LeftOperand, parameter);
         }
@@ -164,9 +159,7 @@ public sealed partial class Al0034UseWhereNotNullAnalyzer : AlAnalyzer {
         return false;
     }
 
-    private static bool IsParameterAndNull(IOperation left, IOperation right, IParameterSymbol parameter) {
-        return IsParameterReference(left, parameter) && IsNullLiteral(right);
-    }
+    private static bool IsParameterAndNull(IOperation left, IOperation right, IParameterSymbol parameter) => IsParameterReference(left, parameter) && IsNullLiteral(right);
 
     private static bool IsParameterReference(IOperation? operation, IParameterSymbol parameter) {
         while (operation is IConversionOperation conversion) {

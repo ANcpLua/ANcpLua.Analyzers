@@ -9,7 +9,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 /// </summary>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0015NormalizeNullGuardStyleCodeFixProvider))]
 [Shared]
-public sealed partial class Al0015NormalizeNullGuardStyleCodeFixProvider : AlCodeFixProvider<IfStatementSyntax> {
+public sealed class Al0015NormalizeNullGuardStyleCodeFixProvider : AlCodeFixProvider<IfStatementSyntax> {
     public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.NormalizeNullGuardStyle];
 
     protected override CodeAction? CreateCodeAction(Document document,

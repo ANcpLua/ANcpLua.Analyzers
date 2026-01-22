@@ -1,4 +1,5 @@
 using ANcpLua.Analyzers.Core;
+using OperationExtensions = Microsoft.CodeAnalysis.Operations.OperationExtensions;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -8,11 +9,14 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// <remarks>
 ///     <list type="bullet">
 ///         <item><c>invocation.TargetMethod.Name == "name"</c> → <c>invocation.IsMethodNamed("name")</c></item>
-///         <item><c>operation.ConstantValue.HasValue &amp;&amp; operation.ConstantValue.Value is T</c> → <c>operation.TryGetConstantValue&lt;T&gt;(out value)</c></item>
+///         <item>
+///             <c>operation.ConstantValue.HasValue &amp;&amp; operation.ConstantValue.Value is T</c> →
+///             <c>operation.TryGetConstantValue&lt;T&gt;(out value)</c>
+///         </item>
 ///     </list>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed partial class Al0031UseOperationExtensionsAnalyzer : AlAnalyzer {
+public sealed class Al0031UseOperationExtensionsAnalyzer : AlAnalyzer {
     private const string IInvocationOperationTypeName = "Microsoft.CodeAnalysis.Operations.IInvocationOperation";
 
     private static readonly LocalizableResourceString Title = new(
@@ -37,7 +41,7 @@ public sealed partial class Al0031UseOperationExtensionsAnalyzer : AlAnalyzer {
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
         // Only analyze if IInvocationOperation is referenced (indicates Roslyn usage)
-        if (context.Compilation.GetTypeByMetadataName(IInvocationOperationTypeName) is not { }) {
+        if (context.Compilation.GetTypeByMetadataName(IInvocationOperationTypeName) is null) {
             return;
         }
 
@@ -75,7 +79,7 @@ public sealed partial class Al0031UseOperationExtensionsAnalyzer : AlAnalyzer {
             return false;
         }
 
-        if (propSide is IPropertyReferenceOperation { Property.Name: "Name", Instance: { } rawInstance } nameProp) {
+        if (propSide is IPropertyReferenceOperation { Property.Name: "Name", Instance: { } rawInstance }) {
             // Unwrap conversions on the Instance to find the TargetMethod property access
             var instance = UnwrapConversions(rawInstance);
             if (instance is IPropertyReferenceOperation { Property.Name: "TargetMethod" } &&
@@ -112,7 +116,7 @@ public sealed partial class Al0031UseOperationExtensionsAnalyzer : AlAnalyzer {
     }
 
     private static bool IsConstantValueHasValueCheck(IBinaryOperation binary) {
-        foreach (var descendant in Microsoft.CodeAnalysis.Operations.OperationExtensions.Descendants(binary)) {
+        foreach (var descendant in OperationExtensions.Descendants(binary)) {
             if (descendant is IPropertyReferenceOperation { Property.Name: "HasValue", Instance: { } rawInstance }) {
                 var instance = UnwrapConversions(rawInstance);
                 if (instance is IPropertyReferenceOperation { Property.Name: "ConstantValue" }) {

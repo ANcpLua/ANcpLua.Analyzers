@@ -7,7 +7,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 /// </summary>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0008IXmlSerializableCodeFixProvider))]
 [Shared]
-public sealed partial class Al0008IXmlSerializableCodeFixProvider : CodeFixProvider {
+public sealed class Al0008IXmlSerializableCodeFixProvider : CodeFixProvider {
     public override ImmutableArray<string> FixableDiagnosticIds =>
         [DiagnosticIds.GetSchemaMustReturnNull];
 

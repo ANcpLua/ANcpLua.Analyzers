@@ -1,4 +1,5 @@
 using ANcpLua.Analyzers.Core;
+using OperationExtensions = Microsoft.CodeAnalysis.Operations.OperationExtensions;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -8,11 +9,14 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// <remarks>
 ///     <list type="bullet">
 ///         <item><c>symbol.GetAttributes().Any(...)</c> → <c>symbol.HasAttribute(name)</c></item>
-///         <item><c>foreach (var attr in symbol.GetAttributes()) if (attr.AttributeClass...)</c> → <c>symbol.HasAttribute(name)</c></item>
+///         <item>
+///             <c>foreach (var attr in symbol.GetAttributes()) if (attr.AttributeClass...)</c> →
+///             <c>symbol.HasAttribute(name)</c>
+///         </item>
 ///     </list>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed partial class Al0029UseHasAttributeAnalyzer : AlAnalyzer {
+public sealed class Al0029UseHasAttributeAnalyzer : AlAnalyzer {
     private const string ISymbolTypeName = "Microsoft.CodeAnalysis.ISymbol";
 
     private static readonly LocalizableResourceString Title = new(
@@ -36,7 +40,7 @@ public sealed partial class Al0029UseHasAttributeAnalyzer : AlAnalyzer {
         context.RegisterCompilationStartAction(OnCompilationStart);
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
-        if (context.Compilation.GetTypeByMetadataName(ISymbolTypeName) is not { }) {
+        if (context.Compilation.GetTypeByMetadataName(ISymbolTypeName) is null) {
             return;
         }
 
@@ -110,7 +114,7 @@ public sealed partial class Al0029UseHasAttributeAnalyzer : AlAnalyzer {
         }
 
         // Look for variable declaration with initialization
-        foreach (var operation in Microsoft.CodeAnalysis.Operations.OperationExtensions.Descendants(containingBlock)) {
+        foreach (var operation in OperationExtensions.Descendants(containingBlock)) {
             if (operation is IVariableDeclaratorOperation declarator &&
                 SymbolEqualityComparer.Default.Equals(declarator.Symbol, localRef.Local) &&
                 declarator.Initializer?.Value is IInvocationOperation invocation) {
@@ -118,8 +122,9 @@ public sealed partial class Al0029UseHasAttributeAnalyzer : AlAnalyzer {
             }
 
             // Also check for simple assignments
-            if (operation is ISimpleAssignmentOperation assignment &&
-                assignment.Target is ILocalReferenceOperation targetLocal &&
+            if (operation is ISimpleAssignmentOperation {
+                    Target: ILocalReferenceOperation targetLocal
+                } assignment &&
                 SymbolEqualityComparer.Default.Equals(targetLocal.Local, localRef.Local) &&
                 assignment.Value is IInvocationOperation assignedInvocation) {
                 return assignedInvocation.TargetMethod.Name;
@@ -134,7 +139,7 @@ public sealed partial class Al0029UseHasAttributeAnalyzer : AlAnalyzer {
             return false;
         }
 
-        foreach (var descendant in Microsoft.CodeAnalysis.Operations.OperationExtensions.Descendants(body)) {
+        foreach (var descendant in OperationExtensions.Descendants(body)) {
             if (descendant is IPropertyReferenceOperation { Property.Name: "AttributeClass" }) {
                 return true;
             }

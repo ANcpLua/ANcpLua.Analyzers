@@ -10,7 +10,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 /// </remarks>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0031UseOperationExtensionsCodeFixProvider))]
 [Shared]
-public sealed partial class Al0031UseOperationExtensionsCodeFixProvider : AlCodeFixProvider<BinaryExpressionSyntax> {
+public sealed class Al0031UseOperationExtensionsCodeFixProvider : AlCodeFixProvider<BinaryExpressionSyntax> {
     public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.UseOperationExtensions];
 
     protected override CodeAction? CreateCodeAction(
@@ -25,14 +25,14 @@ public sealed partial class Al0031UseOperationExtensionsCodeFixProvider : AlCode
 
         return CodeAction.Create(
             CodeFixResources.AL0031CodeFixTitle,
-            _ => ConvertToIsMethodNamed(document, binary, root, invocationExpr!, methodName!),
+            _ => ConvertToIsMethodNamed(document, binary, root, invocationExpr, methodName),
             nameof(Al0031UseOperationExtensionsCodeFixProvider));
     }
 
     private static bool TryGetMethodNameComparison(
         BinaryExpressionSyntax binary,
-        out ExpressionSyntax? invocationExpr,
-        out string? methodName) {
+        [NotNullWhen(true)] out ExpressionSyntax? invocationExpr,
+        [NotNullWhen(true)] out string? methodName) {
         invocationExpr = null;
         methodName = null;
 
@@ -43,8 +43,10 @@ public sealed partial class Al0031UseOperationExtensionsCodeFixProvider : AlCode
         }
 
         // Check for .TargetMethod.Name pattern
-        if (memberAccess is MemberAccessExpressionSyntax { Name.Identifier.Text: "Name" } nameAccess &&
-            nameAccess.Expression is MemberAccessExpressionSyntax { Name.Identifier.Text: "TargetMethod" } targetMethodAccess) {
+        if (memberAccess is {
+                Name.Identifier.Text: "Name",
+                Expression: MemberAccessExpressionSyntax { Name.Identifier.Text: "TargetMethod" } targetMethodAccess
+            }) {
             invocationExpr = targetMethodAccess.Expression;
             methodName = literal.Token.ValueText;
             return true;
@@ -55,14 +57,18 @@ public sealed partial class Al0031UseOperationExtensionsCodeFixProvider : AlCode
 
     private static (MemberAccessExpressionSyntax? memberAccess, LiteralExpressionSyntax? literal)
         GetMemberAccessAndLiteral(BinaryExpressionSyntax binary) {
-        if (binary.Left is MemberAccessExpressionSyntax leftMember &&
-            binary.Right is LiteralExpressionSyntax rightLiteral &&
+        if (binary is {
+                Left: MemberAccessExpressionSyntax leftMember,
+                Right: LiteralExpressionSyntax rightLiteral
+            } &&
             rightLiteral.IsKind(SyntaxKind.StringLiteralExpression)) {
             return (leftMember, rightLiteral);
         }
 
-        if (binary.Right is MemberAccessExpressionSyntax rightMember &&
-            binary.Left is LiteralExpressionSyntax leftLiteral &&
+        if (binary is {
+                Right: MemberAccessExpressionSyntax rightMember,
+                Left: LiteralExpressionSyntax leftLiteral
+            } &&
             leftLiteral.IsKind(SyntaxKind.StringLiteralExpression)) {
             return (rightMember, leftLiteral);
         }

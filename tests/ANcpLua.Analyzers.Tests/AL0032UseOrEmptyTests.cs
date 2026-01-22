@@ -6,7 +6,7 @@ namespace ANcpLua.Analyzers.Tests;
 /// <summary>
 ///     Tests for AL0032: Use OrEmpty() instead of null-coalescing with empty collections.
 /// </summary>
-public sealed partial class Al0032UseOrEmptyTests : AnalyzerTest<Al0032UseOrEmptyAnalyzer> {
+public sealed class Al0032UseOrEmptyTests : AnalyzerTest<Al0032UseOrEmptyAnalyzer> {
     [Fact]
     public Task ShouldReportArrayEmpty() =>
         VerifyAsync("""

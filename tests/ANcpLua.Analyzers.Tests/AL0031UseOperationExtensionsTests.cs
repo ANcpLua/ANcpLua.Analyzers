@@ -6,7 +6,7 @@ namespace ANcpLua.Analyzers.Tests;
 /// <summary>
 ///     Tests for AL0031: Use IsMethodNamed/TryGetConstantValue instead of verbose patterns.
 /// </summary>
-public sealed partial class Al0031UseOperationExtensionsTests : AnalyzerTest<Al0031UseOperationExtensionsAnalyzer> {
+public sealed class Al0031UseOperationExtensionsTests : AnalyzerTest<Al0031UseOperationExtensionsAnalyzer> {
     private const string RoslynPolyfill = """
                                           namespace Microsoft.CodeAnalysis {
                                               public interface IMethodSymbol {

@@ -6,11 +6,12 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 ///     Code fix for AL0029: Converts GetAttributes() LINQ patterns to HasAttribute extension.
 /// </summary>
 /// <remarks>
-///     <c>symbol.GetAttributes().Any(a => a.AttributeClass?.ToDisplayString() == "X")</c> → <c>symbol.HasAttribute("X")</c>
+///     <c>symbol.GetAttributes().Any(a => a.AttributeClass?.ToDisplayString() == "X")</c> →
+///     <c>symbol.HasAttribute("X")</c>
 /// </remarks>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0029UseHasAttributeCodeFixProvider))]
 [Shared]
-public sealed partial class Al0029UseHasAttributeCodeFixProvider : CodeFixProvider {
+public sealed class Al0029UseHasAttributeCodeFixProvider : CodeFixProvider {
     public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.UseHasAttribute];
 
     public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
@@ -30,7 +31,7 @@ public sealed partial class Al0029UseHasAttributeCodeFixProvider : CodeFixProvid
             context.RegisterCodeFix(
                 CodeAction.Create(
                     CodeFixResources.AL0029CodeFixTitle,
-                    _ => ConvertToHasAttribute(context.Document, root, invocation, symbolExpr!, attributeName!),
+                    _ => ConvertToHasAttribute(context.Document, root, invocation, symbolExpr, attributeName),
                     nameof(Al0029UseHasAttributeCodeFixProvider)),
                 diagnostic);
         }
@@ -38,8 +39,8 @@ public sealed partial class Al0029UseHasAttributeCodeFixProvider : CodeFixProvid
 
     private static bool TryExtractAttributeInfo(
         InvocationExpressionSyntax invocation,
-        out ExpressionSyntax? symbolExpr,
-        out string? attributeName) {
+        [NotNullWhen(true)] out ExpressionSyntax? symbolExpr,
+        [NotNullWhen(true)] out string? attributeName) {
         symbolExpr = null;
         attributeName = null;
 

@@ -10,7 +10,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 /// </summary>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0025StaticLambdaCodeFixProvider))]
 [Shared]
-public sealed partial class Al0025StaticLambdaCodeFixProvider : CodeFixProvider {
+public sealed class Al0025StaticLambdaCodeFixProvider : CodeFixProvider {
     public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.PreferStaticLambda];
 
     public override FixAllProvider GetFixAllProvider() => Al0025FixAllProvider.Instance;
@@ -62,7 +62,7 @@ public sealed partial class Al0025StaticLambdaCodeFixProvider : CodeFixProvider 
     ///     Custom FixAllProvider that processes all diagnostics in a document at once,
     ///     applying fixes from bottom to top to preserve span positions.
     /// </summary>
-    private sealed partial class Al0025FixAllProvider : DocumentBasedFixAllProvider {
+    private sealed class Al0025FixAllProvider : DocumentBasedFixAllProvider {
         public static readonly Al0025FixAllProvider Instance = new();
 
         protected override async Task<Document?> FixAllAsync(

@@ -1,5 +1,4 @@
 using ANcpLua.Analyzers.Core;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Editing;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
@@ -10,7 +9,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 /// </summary>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0011LockTypeCodeFixProvider))]
 [Shared]
-public sealed partial class Al0011LockTypeCodeFixProvider : CodeFixProvider {
+public sealed class Al0011LockTypeCodeFixProvider : CodeFixProvider {
     private const string LockTypeMetadataName = "System.Threading.Lock";
 
     public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.AvoidLockKeywordOnNonLockTypes];
@@ -88,7 +87,7 @@ public sealed partial class Al0011LockTypeCodeFixProvider : CodeFixProvider {
         Document document,
         VariableDeclaratorSyntax declarator,
         CancellationToken cancellationToken) {
-        if (await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false) is not { }) {
+        if (await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false) is null) {
             return document;
         }
 
@@ -113,8 +112,9 @@ public sealed partial class Al0011LockTypeCodeFixProvider : CodeFixProvider {
         // Update initializer if present
         if (declarator.Initializer?.Value is ObjectCreationExpressionSyntax or ImplicitObjectCreationExpressionSyntax) {
             // Check if C# 9+ is available for target-typed new()
-            var useImplicitNew = editor.SemanticModel.Compilation is CSharpCompilation csharp &&
-                                 csharp.LanguageVersion >= LanguageVersion.CSharp9;
+            var useImplicitNew = editor.SemanticModel.Compilation is CSharpCompilation {
+                LanguageVersion: >= LanguageVersion.CSharp9
+            };
 
             ExpressionSyntax newInitializer;
             if (useImplicitNew) {

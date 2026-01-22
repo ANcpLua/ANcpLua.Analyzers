@@ -25,7 +25,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     </para>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed partial class Al0003DontDivideByConstantZeroAnalyzer : AlAnalyzer {
+public sealed class Al0003DontDivideByConstantZeroAnalyzer : AlAnalyzer {
     public const string DiagnosticId = DiagnosticIds.DontDivideByConstantZero;
 
     private static readonly LocalizableResourceString Title = new(
@@ -77,7 +77,6 @@ public sealed partial class Al0003DontDivideByConstantZeroAnalyzer : AlAnalyzer 
             SpecialType.System_Decimal) {
             return true;
         }
-
 
         var fullName = typeSymbol.ToDisplayString();
         return fullName is "System.Int128" or "System.UInt128";

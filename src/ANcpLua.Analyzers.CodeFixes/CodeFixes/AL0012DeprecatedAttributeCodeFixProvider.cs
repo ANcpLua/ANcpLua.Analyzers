@@ -12,7 +12,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 /// </remarks>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0012DeprecatedAttributeCodeFixProvider))]
 [Shared]
-public sealed partial class Al0012DeprecatedAttributeCodeFixProvider : CodeFixProvider {
+public sealed class Al0012DeprecatedAttributeCodeFixProvider : CodeFixProvider {
     public override ImmutableArray<string> FixableDiagnosticIds =>
         [DiagnosticIds.DeprecatedSemanticConventionAttribute];
 

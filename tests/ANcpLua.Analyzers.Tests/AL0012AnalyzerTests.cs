@@ -7,7 +7,7 @@ namespace ANcpLua.Analyzers.Tests;
 /// <summary>
 ///     Tests for AL0012: Detects usage of deprecated OpenTelemetry semantic convention attributes.
 /// </summary>
-public sealed partial class Al0012AnalyzerTests : AnalyzerTest<Al0012DeprecatedAttributeAnalyzer> {
+public sealed class Al0012AnalyzerTests : AnalyzerTest<Al0012DeprecatedAttributeAnalyzer> {
     [Theory]
     [InlineData("""
                 using System.Collections.Generic;
@@ -137,7 +137,7 @@ public sealed partial class Al0012AnalyzerTests : AnalyzerTest<Al0012DeprecatedA
 /// <summary>
 ///     Code fix tests for AL0012: Replaces deprecated attributes with modern equivalents.
 /// </summary>
-public sealed partial class
+public sealed class
     Al0012CodeFixTests : CodeFixTest<Al0012DeprecatedAttributeAnalyzer, Al0012DeprecatedAttributeCodeFixProvider> {
     [Fact]
     public Task ShouldReplaceHttpMethod() => VerifyAsync(

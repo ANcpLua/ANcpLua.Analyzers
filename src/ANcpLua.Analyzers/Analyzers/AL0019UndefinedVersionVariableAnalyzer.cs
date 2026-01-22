@@ -34,10 +34,10 @@ public sealed partial class Al0019UndefinedVersionVariableAnalyzer : DiagnosticA
     public const string DiagnosticId = DiagnosticIds.UndefinedVersionVariable;
 
     /// <summary>Property key for the undefined variable name.</summary>
-    public const string VariableNameKey = "VariableName";
+    private const string VariableNameKey = "VariableName";
 
     /// <summary>Property key for the package name.</summary>
-    public const string PackageNameKey = "PackageName";
+    private const string PackageNameKey = "PackageName";
 
     private static readonly LocalizableResourceString Title = new(
         nameof(Resources.AL0019AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
@@ -55,7 +55,7 @@ public sealed partial class Al0019UndefinedVersionVariableAnalyzer : DiagnosticA
         WellKnownDiagnosticTags.CompilationEnd);
 
     /// <summary>Pattern to extract MSBuild property name from $(VariableName) syntax.</summary>
-    private static readonly Regex MsBuildPropertyPattern = new(@"^\$\(([^)]+)\)$", RegexOptions.Compiled);
+    private static readonly Regex MsBuildPropertyPattern = MyRegex();
 
     /// <summary>
     ///     Well-known variables that are commonly provided by MSBuild SDKs.
@@ -266,4 +266,11 @@ public sealed partial class Al0019UndefinedVersionVariableAnalyzer : DiagnosticA
 
         return Location.None;
     }
+
+#if NET7_0_OR_GREATER
+    [GeneratedRegex(@"^\$\(([^)]+)\)$", RegexOptions.Compiled)]
+    private static partial Regex MyRegex();
+#else
+    private static Regex MyRegex() => new(@"^\$\(([^)]+)\)$", RegexOptions.Compiled);
+#endif
 }

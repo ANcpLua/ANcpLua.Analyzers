@@ -7,7 +7,7 @@ namespace ANcpLua.Analyzers.Tests;
 ///     Convention validation tests that run against ALL analyzers in the assembly.
 ///     Catches naming violations, missing help links, and other convention issues at build time.
 /// </summary>
-public sealed partial class AnalyzerConventionTests {
+public sealed class AnalyzerConventionTests {
     [Fact]
     public void AllAnalyzersFollowConventions() {
         var analyzerTypes = typeof(AlAnalyzer).Assembly.GetTypes()
@@ -22,9 +22,7 @@ public sealed partial class AnalyzerConventionTests {
             foreach (var descriptor in analyzer.SupportedDiagnostics) {
                 descriptor.Id.Should().StartWith("AL");
 
-
                 descriptor.HelpLinkUri.Should().NotBeNullOrEmpty($"{descriptor.Id} missing HelpLinkUri");
-
 
                 descriptor.Title.ToString().Should().NotBeNullOrWhiteSpace($"{descriptor.Id} has empty Title");
             }

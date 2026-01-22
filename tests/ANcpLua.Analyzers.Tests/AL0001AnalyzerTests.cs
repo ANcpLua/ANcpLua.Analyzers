@@ -3,7 +3,7 @@ using ANcpLua.Roslyn.Utilities.Testing;
 
 namespace ANcpLua.Analyzers.Tests;
 
-public sealed partial class
+public sealed class
     Al0001AnalyzerTests : AnalyzerTest<Al0001ProhibitPrimaryConstructorParameterReassignmentAnalyzer> {
     [Theory]
     [InlineData("int i", "[|i|] = 10")]

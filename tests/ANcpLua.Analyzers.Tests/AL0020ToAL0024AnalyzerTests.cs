@@ -8,7 +8,7 @@ namespace ANcpLua.Analyzers.Tests;
 /// <summary>
 ///     Tests for AL0020-AL0024: Form binding analyzers for ASP.NET Core.
 /// </summary>
-public sealed partial class Al0020ToAl0024AnalyzerTests {
+public sealed class Al0020ToAl0024AnalyzerTests {
     private const string Stubs = """
                                  namespace Microsoft.AspNetCore.Mvc {
                                      [System.AttributeUsage(System.AttributeTargets.Parameter)]
@@ -30,9 +30,7 @@ public sealed partial class Al0020ToAl0024AnalyzerTests {
 
     private static Task VerifyAsync(string source) {
         var test = new CSharpAnalyzerTest<Al0020ToAl0024FormBindingAnalyzer, DefaultVerifier> {
-            TestCode = (Stubs + "\n" + source).ReplaceLineEndings(),
-            ReferenceAssemblies = new ReferenceAssemblies("net10.0"),
-            MarkupOptions = MarkupOptions.UseFirstDescriptor
+            TestCode = (Stubs + "\n" + source).ReplaceLineEndings(), ReferenceAssemblies = new ReferenceAssemblies("net10.0"), MarkupOptions = MarkupOptions.UseFirstDescriptor
         };
         test.TestState.AdditionalReferences.AddRange(Net100.References.All);
         return test.RunAsync();

@@ -8,7 +8,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     Only reports when TimeProvider is available (.NET 8+).
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed partial class Al0026AvoidDateTimeNowAnalyzer : AlAnalyzer {
+public sealed class Al0026AvoidDateTimeNowAnalyzer : AlAnalyzer {
     private const string TimeProviderMetadataName = "System.TimeProvider";
     private const string DateTimeMetadataName = "System.DateTime";
     private const string DateTimeOffsetMetadataName = "System.DateTimeOffset";
@@ -62,7 +62,7 @@ public sealed partial class Al0026AvoidDateTimeNowAnalyzer : AlAnalyzer {
         }
 
         // Skip if we're inside a TimeProvider implementation (polyfills need to call DateTime/DateTimeOffset)
-        if (context.ContainingSymbol?.ContainingType is { } enclosingType &&
+        if (context.ContainingSymbol.ContainingType is { } enclosingType &&
             InheritsFromOrEquals(enclosingType, timeProviderType)) {
             return;
         }
@@ -82,10 +82,10 @@ public sealed partial class Al0026AvoidDateTimeNowAnalyzer : AlAnalyzer {
 
         // Target the "Now" and "UtcNow" properties with correct replacements
         if (property.Name switch {
-            "Now" => "GetLocalNow",
-            "UtcNow" => "GetUtcNow",
-            _ => null
-        } is not { } replacement) {
+                "Now" => "GetLocalNow",
+                "UtcNow" => "GetUtcNow",
+                _ => null
+            } is not { } replacement) {
             return;
         }
 

@@ -10,7 +10,7 @@ namespace ANcpLua.Analyzers.CodeFixes.Refactorings;
 /// </summary>
 [ExportCodeRefactoringProvider(LanguageNames.CSharp, Name = nameof(Ar0001SnakeCaseToPascalCaseRefactoring))]
 [Shared]
-public sealed partial class Ar0001SnakeCaseToPascalCaseRefactoring : CodeRefactoringProvider {
+public sealed class Ar0001SnakeCaseToPascalCaseRefactoring : CodeRefactoringProvider {
     private static readonly Regex ScreamingSnakeCasePattern = new("^[A-Z0-9_]+$", RegexOptions.Compiled);
 
     public override async Task ComputeRefactoringsAsync(CodeRefactoringContext context) {

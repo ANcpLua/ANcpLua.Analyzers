@@ -7,7 +7,7 @@ namespace ANcpLua.Analyzers.Tests;
 ///     Tests for AL0027: Avoid legacy JSON library.
 ///     Warns on usage of types from the Newtonsoft.Json namespace.
 /// </summary>
-public sealed partial class Al0027AnalyzerTests : AnalyzerTest<Al0027AvoidNewtonsoftJsonAnalyzer> {
+public sealed class Al0027AnalyzerTests : AnalyzerTest<Al0027AvoidNewtonsoftJsonAnalyzer> {
     private const string NewtonsoftJsonPolyfill = """
                                                   namespace Newtonsoft.Json {
                                                       public static class JsonConvert {

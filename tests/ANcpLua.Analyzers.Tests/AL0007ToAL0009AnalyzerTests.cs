@@ -7,7 +7,7 @@ namespace ANcpLua.Analyzers.Tests;
 /// <summary>
 ///     Tests for AL0007: GetSchema should be explicitly implemented.
 /// </summary>
-public sealed partial class Al0007AnalyzerTests : AnalyzerTest<Al0007ToAl0009IXmlSerializableAnalyzer> {
+public sealed class Al0007AnalyzerTests : AnalyzerTest<Al0007ToAl0009IXmlSerializableAnalyzer> {
     [Theory]
     [InlineData("""
                 using System.Xml;
@@ -51,7 +51,7 @@ public sealed partial class Al0007AnalyzerTests : AnalyzerTest<Al0007ToAl0009IXm
 /// <summary>
 ///     Tests for AL0008: GetSchema must return null and not be abstract.
 /// </summary>
-public sealed partial class Al0008AnalyzerTests : AnalyzerTest<Al0007ToAl0009IXmlSerializableAnalyzer> {
+public sealed class Al0008AnalyzerTests : AnalyzerTest<Al0007ToAl0009IXmlSerializableAnalyzer> {
     [Theory]
     [InlineData("""
                 using System.Xml;
@@ -120,7 +120,7 @@ public sealed partial class Al0008AnalyzerTests : AnalyzerTest<Al0007ToAl0009IXm
 /// <summary>
 ///     Tests for AL0009: Don't call GetSchema.
 /// </summary>
-public sealed partial class Al0009AnalyzerTests : AnalyzerTest<Al0007ToAl0009IXmlSerializableAnalyzer> {
+public sealed class Al0009AnalyzerTests : AnalyzerTest<Al0007ToAl0009IXmlSerializableAnalyzer> {
     [Theory]
     [InlineData("""
                 using System.Xml;
@@ -145,7 +145,7 @@ public sealed partial class Al0009AnalyzerTests : AnalyzerTest<Al0007ToAl0009IXm
 /// <summary>
 ///     Code fix tests for AL0008: Makes GetSchema return null.
 /// </summary>
-public sealed partial class
+public sealed class
     Al0008CodeFixTests : CodeFixTest<Al0007ToAl0009IXmlSerializableAnalyzer, Al0008IXmlSerializableCodeFixProvider> {
     [Fact]
     public Task ShouldReplaceNonNullReturnWithNull() => VerifyAsync(

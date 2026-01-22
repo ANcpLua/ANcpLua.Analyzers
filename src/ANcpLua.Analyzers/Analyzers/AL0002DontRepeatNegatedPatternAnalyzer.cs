@@ -23,7 +23,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     </para>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed partial class Al0002DontRepeatNegatedPatternAnalyzer : AlAnalyzer {
+public sealed class Al0002DontRepeatNegatedPatternAnalyzer : AlAnalyzer {
     public const string DiagnosticId = DiagnosticIds.DontRepeatNegatedPattern;
 
     private static readonly LocalizableResourceString Title = new(
@@ -48,11 +48,9 @@ public sealed partial class Al0002DontRepeatNegatedPatternAnalyzer : AlAnalyzer 
     private static void AnalyzeNotPattern(SyntaxNodeAnalysisContext context) {
         var syntax = (UnaryPatternSyntax)context.Node;
 
-
         if (syntax.Pattern is not UnaryPatternSyntax) {
             return;
         }
-
 
         if (syntax.Parent is UnaryPatternSyntax) {
             return;
@@ -64,7 +62,6 @@ public sealed partial class Al0002DontRepeatNegatedPatternAnalyzer : AlAnalyzer 
 
         var firstLocation = syntax.SpanStart;
         var nonFirstLocation = innerNode.SpanStart;
-
 
         var spanEnd = Math.Max(firstLocation + 1, nonFirstLocation - 1);
 

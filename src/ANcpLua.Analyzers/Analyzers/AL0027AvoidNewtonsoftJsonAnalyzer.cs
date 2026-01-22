@@ -7,7 +7,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     Reports usage of types from the legacy JSON namespace.
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed partial class Al0027AvoidNewtonsoftJsonAnalyzer : AlAnalyzer {
+public sealed class Al0027AvoidNewtonsoftJsonAnalyzer : AlAnalyzer {
     // Split to avoid static analysis false positives
     private const string LegacyJsonVendor = "Newtonsoft";
     private const string LegacyJsonNamespace = LegacyJsonVendor + ".Json";

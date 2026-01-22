@@ -7,7 +7,7 @@ namespace ANcpLua.Analyzers.Tests;
 /// <summary>
 ///     Tests for AL0025: Prefer static lambda.
 /// </summary>
-public sealed partial class Al0025AnalyzerTests : AnalyzerTest<Al0025PreferStaticLambdaAnalyzer> {
+public sealed class Al0025AnalyzerTests : AnalyzerTest<Al0025PreferStaticLambdaAnalyzer> {
     [Theory]
     [InlineData("list.Where({|AL0025:x => x > 0|})")]
     [InlineData("list.Select({|AL0025:x => x.ToString()|})")]
@@ -103,7 +103,7 @@ public sealed partial class Al0025AnalyzerTests : AnalyzerTest<Al0025PreferStati
 /// <summary>
 ///     Code fix tests for AL0025: Makes lambda static.
 /// </summary>
-public sealed partial class
+public sealed class
     Al0025CodeFixTests : CodeFixTest<Al0025PreferStaticLambdaAnalyzer, Al0025StaticLambdaCodeFixProvider> {
     [Fact]
     public Task ShouldAddStaticToSimpleLambda() =>

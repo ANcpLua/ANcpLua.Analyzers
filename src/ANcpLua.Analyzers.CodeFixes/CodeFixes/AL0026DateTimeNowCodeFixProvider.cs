@@ -11,7 +11,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 /// </remarks>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0026DateTimeNowCodeFixProvider))]
 [Shared]
-public sealed partial class Al0026DateTimeNowCodeFixProvider : AlCodeFixProvider<MemberAccessExpressionSyntax> {
+public sealed class Al0026DateTimeNowCodeFixProvider : AlCodeFixProvider<MemberAccessExpressionSyntax> {
     public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.AvoidDateTimeNow];
 
     protected override CodeAction CreateCodeAction(

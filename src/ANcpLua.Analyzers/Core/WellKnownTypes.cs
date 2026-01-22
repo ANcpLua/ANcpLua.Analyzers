@@ -17,7 +17,7 @@ internal enum WellKnownType {
     Count // Must be last - used for array sizing
 }
 
-internal static partial class WellKnownTypeNames {
+internal static class WellKnownTypeNames {
     private static readonly string[] Names = [
         "Microsoft.AspNetCore.Mvc.FromFormAttribute",
         "Microsoft.AspNetCore.Mvc.FromBodyAttribute",
@@ -33,7 +33,7 @@ internal static partial class WellKnownTypeNames {
 ///     Caches resolved INamedTypeSymbol instances for well-known types.
 ///     Create once per compilation via <see cref="Create" />.
 /// </summary>
-internal sealed partial class WellKnownTypeCache {
+internal sealed class WellKnownTypeCache {
     private readonly INamedTypeSymbol?[] _cache = new INamedTypeSymbol?[(int)WellKnownType.Count];
     private readonly Compilation _compilation;
 
