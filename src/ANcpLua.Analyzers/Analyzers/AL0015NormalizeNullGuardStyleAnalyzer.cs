@@ -37,7 +37,6 @@ public sealed partial class Al0015NormalizeNullGuardStyleAnalyzer : AlAnalyzer {
             .OfType<IMethodSymbol>()
             .Any(static m => m is { IsStatic: true, Parameters.Length: >= 1 }) ?? false;
 
-
         var hasThrowIfNullBcl = context.Compilation
             .GetTypeByMetadataName("System.ArgumentNullException")
             ?.GetMembers("ThrowIfNull")
@@ -76,12 +75,10 @@ public sealed partial class Al0015NormalizeNullGuardStyleAnalyzer : AlAnalyzer {
         var config = context.Options.AnalyzerConfigOptionsProvider.GetOptions(ifStatement.SyntaxTree);
         var global = context.Options.AnalyzerConfigOptionsProvider.GlobalOptions;
 
-
         var isMultiTarget = isMultiTargetGlobal
                             || GetConfigBool(config, global, "ancplua_is_multi_target");
 
         var configStyle = GetConfigValue(config, global, "ancplua_nullguard_style", "auto").ToUpperInvariant();
-
 
         var targetStyle = ComputeTargetStyle(hasThrowHelper, hasThrowIfNullBcl, isMultiTarget, configStyle);
 
@@ -122,13 +119,12 @@ public sealed partial class Al0015NormalizeNullGuardStyleAnalyzer : AlAnalyzer {
 
         switch (condition) {
             case IsPatternExpressionSyntax {
-                Pattern: ConstantPatternSyntax { Expression: LiteralExpressionSyntax l }
-            } p
+                    Pattern: ConstantPatternSyntax { Expression: LiteralExpressionSyntax l }
+                } p
                 when l.IsKind(SyntaxKind.NullLiteralExpression)
                      && p.Expression is IdentifierNameSyntax id:
                 identifier = id.Identifier.Text;
                 return true;
-
 
             case BinaryExpressionSyntax { Left: var left, Right: var right } bin
                 when bin.IsKind(SyntaxKind.EqualsExpression): {
@@ -156,7 +152,6 @@ public sealed partial class Al0015NormalizeNullGuardStyleAnalyzer : AlAnalyzer {
             _ => null
         };
 
-
     private static bool IsArgumentNullExceptionThrow(
         ThrowStatementSyntax throwStmt,
         SemanticModel model,
@@ -171,7 +166,6 @@ public sealed partial class Al0015NormalizeNullGuardStyleAnalyzer : AlAnalyzer {
         if (creation.ArgumentList?.Arguments.Count != 1) {
             return false;
         }
-
 
         var typeSymbol = model.GetTypeInfo(creation.Type).Type;
         var isArgumentNullException = typeSymbol is not null
@@ -188,9 +182,9 @@ public sealed partial class Al0015NormalizeNullGuardStyleAnalyzer : AlAnalyzer {
 
         return arg switch {
             InvocationExpressionSyntax {
-                Expression: IdentifierNameSyntax { Identifier.Text: "nameof" },
-                ArgumentList.Arguments.Count: 1
-            } inv when inv.ArgumentList.Arguments[0].Expression is IdentifierNameSyntax argId
+                    Expression: IdentifierNameSyntax { Identifier.Text: "nameof" },
+                    ArgumentList.Arguments.Count: 1
+                } inv when inv.ArgumentList.Arguments[0].Expression is IdentifierNameSyntax argId
                 => argId.Identifier.Text == targetParam,
             LiteralExpressionSyntax lit when lit.IsKind(SyntaxKind.StringLiteralExpression) =>
                 lit.Token.ValueText == targetParam,

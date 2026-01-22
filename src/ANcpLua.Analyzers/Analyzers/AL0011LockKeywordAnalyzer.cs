@@ -44,7 +44,7 @@ public sealed partial class Al0011LockKeywordAnalyzer : AlAnalyzer {
         var lockExpressionType =
             context.SemanticModel.GetTypeInfo(lockStatement.Expression, context.CancellationToken).Type;
 
-        if (lockType is not null && SymbolEqualityComparer.Default.Equals(lockExpressionType, lockType)) {
+        if (lockType is not null && lockExpressionType.IsEqualTo(lockType)) {
             return;
         }
 

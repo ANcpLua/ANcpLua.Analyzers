@@ -167,7 +167,7 @@ public sealed partial class Al0034UseWhereNotNullAnalyzer : AlAnalyzer {
         }
 
         return operation is IParameterReferenceOperation paramRef &&
-               SymbolEqualityComparer.Default.Equals(paramRef.Parameter, parameter);
+               paramRef.Parameter.IsEqualTo(parameter);
     }
 
     private static bool IsNullLiteral(IOperation? operation) {

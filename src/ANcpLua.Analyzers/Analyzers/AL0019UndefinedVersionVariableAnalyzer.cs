@@ -1,6 +1,7 @@
 using ANcpLua.Analyzers.Core;
 using Microsoft.CodeAnalysis.Text;
 using System.Text.RegularExpressions;
+using System.Xml;
 using System.Xml.Linq;
 
 namespace ANcpLua.Analyzers.Analyzers;
@@ -256,7 +257,7 @@ public sealed partial class Al0019UndefinedVersionVariableAnalyzer : DiagnosticA
     }
 
     private static Location CreateLocation(AdditionalText propsFile, SourceText sourceText, XAttribute attribute) {
-        System.Xml.IXmlLineInfo lineInfo = attribute;
+        IXmlLineInfo lineInfo = attribute;
         if (lineInfo.HasLineInfo()) {
             var linePosition = new LinePosition(lineInfo.LineNumber - 1, lineInfo.LinePosition - 1);
             var textSpan = sourceText.Lines[lineInfo.LineNumber - 1].Span;

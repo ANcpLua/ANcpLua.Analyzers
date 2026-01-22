@@ -53,7 +53,7 @@ internal sealed partial class WellKnownTypeCache {
 
         var wellKnown = Get(type);
         return wellKnown is not null &&
-               SymbolEqualityComparer.Default.Equals(symbol.OriginalDefinition, wellKnown.OriginalDefinition);
+               symbol.OriginalDefinition.IsEqualTo(wellKnown.OriginalDefinition);
     }
 
     public bool HasAttribute(ISymbol symbol, WellKnownType attributeType) {
@@ -63,7 +63,6 @@ internal sealed partial class WellKnownTypeCache {
 
         return symbol.GetAttributes().Any(attr =>
             attr.AttributeClass is not null &&
-            SymbolEqualityComparer.Default.Equals(attr.AttributeClass.OriginalDefinition,
-                attrSymbol.OriginalDefinition));
+            attr.AttributeClass.OriginalDefinition.IsEqualTo(attrSymbol.OriginalDefinition));
     }
 }

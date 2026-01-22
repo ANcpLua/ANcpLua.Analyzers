@@ -94,8 +94,8 @@ public sealed partial class Al0004ToAl0005SpanComparisonAnalyzer : AlAnalyzer {
         }
 
         var leftDef = leftType.OriginalDefinition;
-        if (!SymbolEqualityComparer.Default.Equals(leftDef, spanType) &&
-            !SymbolEqualityComparer.Default.Equals(leftDef, readOnlySpanType)) {
+        if (!leftDef.IsEqualTo(spanType) &&
+            !leftDef.IsEqualTo(readOnlySpanType)) {
             return;
         }
 

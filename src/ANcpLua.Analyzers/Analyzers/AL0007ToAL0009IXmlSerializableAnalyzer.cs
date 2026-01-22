@@ -119,7 +119,7 @@ public sealed partial class Al0007ToAl0009IXmlSerializableAnalyzer : AlAnalyzer 
         }
 
         if (!methodSymbol.ExplicitInterfaceImplementations.Any(i =>
-                SymbolEqualityComparer.Default.Equals(i, interfaceGetSchema))) {
+                i.IsEqualTo(interfaceGetSchema))) {
             context.ReportDiagnostic(RuleAl0007, methodSymbol.Locations[0]);
         }
 
@@ -140,7 +140,7 @@ public sealed partial class Al0007ToAl0009IXmlSerializableAnalyzer : AlAnalyzer 
         var invocation = (IInvocationOperation)context.Operation;
         var targetMethod = invocation.TargetMethod;
 
-        if (SymbolEqualityComparer.Default.Equals(targetMethod, interfaceGetSchema) ||
+        if (targetMethod.IsEqualTo(interfaceGetSchema) ||
             IsGetSchemaImplementation(targetMethod, ixmlSerializable)) {
             context.ReportDiagnostic(RuleAl0009, invocation.Syntax.GetLocation());
         }

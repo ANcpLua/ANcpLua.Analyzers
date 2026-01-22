@@ -109,7 +109,7 @@ public sealed partial class Al0025PreferStaticLambdaAnalyzer : AlAnalyzer {
 
     private static bool IsInstanceMemberOfType(ISymbol symbol, INamedTypeSymbol containingType) {
         // Must be from the same type
-        if (!SymbolEqualityComparer.Default.Equals(symbol.ContainingType, containingType)) {
+        if (!symbol.ContainingType.IsEqualTo(containingType)) {
             return false;
         }
 

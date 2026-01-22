@@ -26,7 +26,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0003DontDivideByConstantZeroAnalyzer : AlAnalyzer {
-    public const string DiagnosticId = DiagnosticIds.DontDivideByConstantZero;
+    private const string DiagnosticId = DiagnosticIds.DontDivideByConstantZero;
 
     private static readonly LocalizableResourceString Title = new(
         nameof(Resources.AL0003AnalyzerTitle), Resources.ResourceManager, typeof(Resources));

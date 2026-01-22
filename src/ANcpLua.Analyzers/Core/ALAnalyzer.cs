@@ -52,7 +52,6 @@ public static partial class DiagnosticIds {
     /// <summary>AL0006: Field name conflicts with primary constructor parameter.</summary>
     public const string FieldNameConflictsWithPrimaryConstructorParameter = "AL0006";
 
-
     /// <summary>AL0007: GetSchema should be explicitly implemented.</summary>
     public const string GetSchemaShouldBeExplicitlyImplemented = "AL0007";
 
@@ -62,10 +61,8 @@ public static partial class DiagnosticIds {
     /// <summary>AL0009: Don't call IXmlSerializable.GetSchema.</summary>
     public const string DontCallGetSchema = "AL0009";
 
-
     /// <summary>AL0010: Type should be partial for source generator support.</summary>
     public const string TypeShouldBePartial = "AL0010";
-
 
     /// <summary>AL0011: Avoid lock keyword on non-Lock types.</summary>
     public const string AvoidLockKeywordOnNonLockTypes = "AL0011";
@@ -76,10 +73,8 @@ public static partial class DiagnosticIds {
     /// <summary>AL0013: Missing telemetry schema URL.</summary>
     public const string MissingTelemetrySchemaUrl = "AL0013";
 
-
     /// <summary>AR0001: Convert SCREAMING_SNAKE_CASE to PascalCase.</summary>
     public const string SnakeCaseToPascalCase = "AR0001";
-
 
     /// <summary>AL0014: Prefer pattern matching for null and zero comparisons.</summary>
     public const string PreferPatternMatchingForNullAndZero = "AL0014";

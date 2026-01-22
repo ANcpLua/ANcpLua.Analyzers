@@ -116,7 +116,7 @@ public sealed partial class Al0029UseHasAttributeAnalyzer : AlAnalyzer {
         // Look for variable declaration with initialization
         foreach (var operation in OperationExtensions.Descendants(containingBlock)) {
             if (operation is IVariableDeclaratorOperation declarator &&
-                SymbolEqualityComparer.Default.Equals(declarator.Symbol, localRef.Local) &&
+                declarator.Symbol.IsEqualTo(localRef.Local) &&
                 declarator.Initializer?.Value is IInvocationOperation invocation) {
                 return invocation.TargetMethod.Name;
             }
@@ -125,7 +125,7 @@ public sealed partial class Al0029UseHasAttributeAnalyzer : AlAnalyzer {
             if (operation is ISimpleAssignmentOperation {
                     Target: ILocalReferenceOperation targetLocal
                 } assignment &&
-                SymbolEqualityComparer.Default.Equals(targetLocal.Local, localRef.Local) &&
+                targetLocal.Local.IsEqualTo(localRef.Local) &&
                 assignment.Value is IInvocationOperation assignedInvocation) {
                 return assignedInvocation.TargetMethod.Name;
             }
