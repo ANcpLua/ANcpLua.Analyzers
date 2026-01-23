@@ -102,6 +102,14 @@
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
+       AOT TESTING
+       Used by: SDK (AotTesting package)
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <PropertyGroup Label="AotTesting">
+    <ANcpLuaAotTestingVersion>1.0.0</ANcpLuaAotTestingVersion>
+  </PropertyGroup>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
        ANALYZERS (SDK-injected)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Analyzers">
