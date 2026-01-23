@@ -32,21 +32,21 @@
        ROSLYN.UTILITIES (Runtime package)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Roslyn.Utilities">
-    <ANcpLuaRoslynUtilitiesVersion>1.16.0</ANcpLuaRoslynUtilitiesVersion>
+    <ANcpLuaRoslynUtilitiesVersion>1.18.3</ANcpLuaRoslynUtilitiesVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
        ROSLYN.UTILITIES.SOURCES (Source-only package for generators)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Roslyn.Utilities.Sources">
-    <ANcpLuaRoslynUtilitiesSourcesVersion>1.16.0</ANcpLuaRoslynUtilitiesSourcesVersion>
+    <ANcpLuaRoslynUtilitiesSourcesVersion>1.18.3</ANcpLuaRoslynUtilitiesSourcesVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
        ROSLYN.UTILITIES.TESTING (Analyzer/CodeFix/Generator test infrastructure)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Roslyn.Utilities.Testing">
-    <ANcpLuaRoslynUtilitiesTestingVersion>1.16.0</ANcpLuaRoslynUtilitiesTestingVersion>
+    <ANcpLuaRoslynUtilitiesTestingVersion>1.18.3</ANcpLuaRoslynUtilitiesTestingVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
@@ -113,7 +113,7 @@
        ANALYZERS (SDK-injected)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Analyzers">
-    <ANcpLuaAnalyzersVersion>1.9.0</ANcpLuaAnalyzersVersion>
+    <ANcpLuaAnalyzersVersion>1.10.2</ANcpLuaAnalyzersVersion>
     <SbomTargetsVersion>4.1.5</SbomTargetsVersion>
     <BannedApiAnalyzersVersion>3.3.4</BannedApiAnalyzersVersion>
     <JonSkeetAnalyzersVersion>1.0.0-beta.6</JonSkeetAnalyzersVersion>
