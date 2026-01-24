@@ -60,11 +60,10 @@ namespace ANcpLua.Roslyn.Utilities;
 /// </code>
 /// </example>
 #if ANCPLUA_ROSLYN_PUBLIC
-public
+public static partial class Guard
 #else
-internal
+internal static partial class Guard
 #endif
-    static partial class Guard
 {
     /// <summary>
     ///     Validates that a value is not <c>null</c> and returns it.
