@@ -24,6 +24,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0002DontRepeatNegatedPatternAnalyzer : AlAnalyzer {
+    /// <summary>AL0002: Don't repeat negated patterns.</summary>
     public const string DiagnosticId = DiagnosticIds.DontRepeatNegatedPattern;
 
     private static readonly LocalizableResourceString Title = new(
@@ -40,8 +41,10 @@ public sealed partial class Al0002DontRepeatNegatedPatternAnalyzer : AlAnalyzer 
         DiagnosticSeverity.Warning, true, Description,
         HelpLinkBase);
 
+    /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
+    /// <summary>Registers syntax node actions to analyze negated patterns.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterSyntaxNodeAction(AnalyzeNotPattern, SyntaxKind.NotPattern);
 

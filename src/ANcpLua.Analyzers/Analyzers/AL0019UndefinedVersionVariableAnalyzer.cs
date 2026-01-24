@@ -32,6 +32,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0019UndefinedVersionVariableAnalyzer : DiagnosticAnalyzer {
+    /// <summary>AL0019: Undefined version variable.</summary>
     public const string DiagnosticId = DiagnosticIds.UndefinedVersionVariable;
 
     /// <summary>Property key for the undefined variable name.</summary>
@@ -58,11 +59,7 @@ public sealed partial class Al0019UndefinedVersionVariableAnalyzer : DiagnosticA
     /// <summary>Pattern to extract MSBuild property name from $(VariableName) syntax.</summary>
     private static readonly Regex MsBuildPropertyPattern = MyRegex();
 
-    /// <summary>
-    ///     Well-known variables that are commonly provided by MSBuild SDKs.
-    ///     These are not flagged as undefined even if not in local Version.props,
-    ///     supporting the layering pattern where SDK provides base versions.
-    /// </summary>
+    /// <summary>Well-known variables commonly provided by MSBuild SDKs (not flagged as undefined).</summary>
     private static readonly HashSet<string> SdkProvidedVariables = new(StringComparer.OrdinalIgnoreCase) {
         // Roslyn
         "RoslynVersion",
@@ -133,8 +130,10 @@ public sealed partial class Al0019UndefinedVersionVariableAnalyzer : DiagnosticA
         "ANcpSdkPackageVersion"
     };
 
+    /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
+    /// <summary>Initializes the analyzer and registers compilation-level actions.</summary>
     public override void Initialize(AnalysisContext context) {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
         context.EnableConcurrentExecution();

@@ -26,6 +26,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0003DontDivideByConstantZeroAnalyzer : AlAnalyzer {
+    /// <summary>AL0003: Don't divide by constant zero.</summary>
     private const string DiagnosticId = DiagnosticIds.DontDivideByConstantZero;
 
     private static readonly LocalizableResourceString Title = new(
@@ -42,8 +43,10 @@ public sealed partial class Al0003DontDivideByConstantZeroAnalyzer : AlAnalyzer 
         DiagnosticSeverity.Error, true, Description,
         HelpLinkBase);
 
+    /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
+    /// <summary>Registers operation actions to analyze binary operations for division by zero.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterOperationAction(BinaryOperationAction, OperationKind.Binary);
 

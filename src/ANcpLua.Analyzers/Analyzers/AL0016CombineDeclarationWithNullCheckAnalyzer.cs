@@ -27,6 +27,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0016CombineDeclarationWithNullCheckAnalyzer : AlAnalyzer {
+    /// <summary>AL0016: Combine declaration with subsequent null-check.</summary>
     public const string DiagnosticId = DiagnosticIds.CombineDeclarationWithNullCheck;
 
     private static readonly DiagnosticDescriptor Rule = new(
@@ -39,8 +40,10 @@ public sealed partial class Al0016CombineDeclarationWithNullCheckAnalyzer : AlAn
         "Combines a variable declaration and an immediate null-check into a single pattern match.",
         HelpLinkBase);
 
+    /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
+    /// <summary>Registers syntax node actions to analyze local variable declarations.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterSyntaxNodeAction(AnalyzeDeclaration, SyntaxKind.LocalDeclarationStatement);
 

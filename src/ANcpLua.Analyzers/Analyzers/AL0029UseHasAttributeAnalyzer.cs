@@ -17,6 +17,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0029UseHasAttributeAnalyzer : AlAnalyzer {
+    /// <summary>Metadata name for ISymbol.</summary>
     private const string ISymbolTypeName = "Microsoft.CodeAnalysis.ISymbol";
 
     private static readonly LocalizableResourceString Title = new(
@@ -34,8 +35,10 @@ public sealed partial class Al0029UseHasAttributeAnalyzer : AlAnalyzer {
         DiagnosticSeverity.Info, true, Description,
         HelpLinkBase);
 
+    /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
+    /// <summary>Registers compilation start action to analyze GetAttributes usage patterns.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterCompilationStartAction(OnCompilationStart);
 

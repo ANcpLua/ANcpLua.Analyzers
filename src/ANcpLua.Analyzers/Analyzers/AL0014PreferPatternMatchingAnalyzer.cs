@@ -22,10 +22,14 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0014PreferPatternMatchingAnalyzer : AlAnalyzer {
+    /// <summary>AL0014: Prefer pattern matching for null and zero comparisons.</summary>
     public const string DiagnosticId = DiagnosticIds.PreferPatternMatchingForNullAndZero;
 
+    /// <summary>Property key indicating whether this is a null check.</summary>
     private const string PropertyIsNullCheck = "IsNullCheck";
+    /// <summary>Property key indicating whether the pattern is negated.</summary>
     private const string PropertyIsNegated = "IsNegated";
+    /// <summary>Property key indicating whether the expression is on the left side.</summary>
     private const string PropertyExpressionIsLeft = "ExpressionIsLeft";
 
     private static readonly DiagnosticDescriptor Rule = new(
@@ -39,8 +43,10 @@ public sealed partial class Al0014PreferPatternMatchingAnalyzer : AlAnalyzer {
         "For null checks, it also bypasses overloaded equality operators.",
         HelpLinkBase);
 
+    /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
+    /// <summary>Registers compilation start action to analyze binary operations for null/zero comparisons.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterCompilationStartAction(compilationContext => {
             var expressionType = compilationContext.Compilation

@@ -21,7 +21,7 @@
              CA2249: Use Contains - ns2.0 lacks Contains(char, StringComparison), must use IndexOf
              IDE0055: Multi-TFM formatting conflicts (dotnet format creates TFM merge markers)
              Note: CA1308 handled via file-level pragma in AR0001 (intentional for case conversion) -->
-        <NoWarn>$(NoWarn);RS0030;CA1849;CA2249;IDE0055</NoWarn>
+        <NoWarn>$(NoWarn);RS0030;CA1849;CA2249;IDE0055;CS1591</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>

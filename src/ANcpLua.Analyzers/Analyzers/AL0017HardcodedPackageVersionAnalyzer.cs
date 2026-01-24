@@ -32,6 +32,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0017HardcodedPackageVersionAnalyzer : DiagnosticAnalyzer {
+    /// <summary>AL0017: Hardcoded package version in Directory.Packages.props.</summary>
     private const string DiagnosticId = DiagnosticIds.HardcodedPackageVersion;
 
     /// <summary>Property key for the suggested variable name.</summary>
@@ -163,8 +164,10 @@ public sealed partial class Al0017HardcodedPackageVersionAnalyzer : DiagnosticAn
     /// <summary>Pattern to detect MSBuild property references like $(VariableName).</summary>
     private static readonly Regex MsBuildPropertyPattern = MyRegex();
 
+    /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
+    /// <summary>Initializes the analyzer and registers compilation-level actions.</summary>
     public override void Initialize(AnalysisContext context) {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
         context.EnableConcurrentExecution();
@@ -178,7 +181,35 @@ public sealed partial class Al0017HardcodedPackageVersionAnalyzer : DiagnosticAn
             .ToList();
 
         foreach (var propsFile in propsFiles) {
+            // Skip if using CPM native mode (ManagePackageVersionsCentrally=true)
+            // In CPM native mode, hardcoded versions in Directory.Packages.props are intentional
+            if (IsCpmNativeMode(propsFile, context.CancellationToken)) {
+                continue;
+            }
+
             AnalyzePropsFile(context, propsFile);
+        }
+    }
+
+    /// <summary>
+    ///     Checks if the props file uses CPM native mode (ManagePackageVersionsCentrally=true).
+    ///     When CPM native mode is active, hardcoded versions are the intended pattern.
+    /// </summary>
+    private static bool IsCpmNativeMode(AdditionalText propsFile, CancellationToken cancellationToken) {
+        if (propsFile.GetText(cancellationToken) is not { } sourceText) {
+            return false;
+        }
+
+        try {
+            var doc = XDocument.Parse(sourceText.ToString());
+
+            // Check for <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+            return doc.Descendants()
+                .Any(static e =>
+                    e.Name.LocalName == "ManagePackageVersionsCentrally" &&
+                    string.Equals(e.Value.Trim(), "true", StringComparison.OrdinalIgnoreCase));
+        } catch (Exception) {
+            return false;
         }
     }
 

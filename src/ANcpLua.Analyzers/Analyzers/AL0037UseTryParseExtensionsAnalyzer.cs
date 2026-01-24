@@ -26,7 +26,7 @@ public sealed partial class Al0037UseTryParseExtensionsAnalyzer : AlAnalyzer {
     private static readonly DiagnosticDescriptor Rule = new(
         DiagnosticIds.UseTryParseExtensions,
         Title, MessageFormat, DiagnosticCategories.RoslynUtilities,
-        DiagnosticSeverity.Info, true, Description,
+        DiagnosticSeverities.Suggestion, true, Description,
         HelpLinkBase);
 
     // Mapping from type name to extension method name
@@ -53,7 +53,11 @@ public sealed partial class Al0037UseTryParseExtensionsAnalyzer : AlAnalyzer {
         ["float"] = "TryParseSingle"
     };
 
+    /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+
+    /// <summary>Registers syntax or operation actions for analysis.</summary>
 
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterOperationAction(AnalyzeConditional, OperationKind.Conditional);
@@ -121,7 +125,7 @@ public sealed partial class Al0037UseTryParseExtensionsAnalyzer : AlAnalyzer {
         var whenTrue = UnwrapConversions(conditional.WhenTrue);
 
         // Check if WhenTrue is referencing a local that was declared in the out argument
-        if (whenTrue is not ILocalReferenceOperation localRef) {
+        if (whenTrue is not ILocalReferenceOperation) {
             return false;
         }
 
@@ -130,7 +134,10 @@ public sealed partial class Al0037UseTryParseExtensionsAnalyzer : AlAnalyzer {
 
         return whenFalse switch {
             IDefaultValueOperation => true,
-            ILiteralOperation { ConstantValue.HasValue: true, ConstantValue.Value: null } => true,
+            ILiteralOperation {
+                ConstantValue:
+                { HasValue: true, Value: null }
+            } => true,
             IConversionOperation { Operand: IDefaultValueOperation } => true,
             ILiteralOperation => true, // Any constant (including 0, false, etc.)
             _ => false

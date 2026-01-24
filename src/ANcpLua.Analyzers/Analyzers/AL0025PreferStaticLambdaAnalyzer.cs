@@ -24,8 +24,10 @@ public sealed partial class Al0025PreferStaticLambdaAnalyzer : AlAnalyzer {
         DiagnosticSeverity.Warning, true, Description,
         HelpLinkBase);
 
+    /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
+    /// <summary>Registers syntax node actions to analyze lambdas and anonymous methods.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterSyntaxNodeAction(
             AnalyzeLambda,

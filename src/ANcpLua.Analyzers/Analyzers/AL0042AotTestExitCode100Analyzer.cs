@@ -43,7 +43,11 @@ public sealed partial class Al0042AotTestExitCode100Analyzer : AlAnalyzer {
         DiagnosticSeverity.Info, true, Description,
         HelpLinkBase);
 
+    /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [WarningRule, InfoRule];
+
+    /// <summary>Registers syntax or operation actions for analysis.</summary>
 
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterSyntaxNodeAction(AnalyzeMethodDeclaration, SyntaxKind.MethodDeclaration);

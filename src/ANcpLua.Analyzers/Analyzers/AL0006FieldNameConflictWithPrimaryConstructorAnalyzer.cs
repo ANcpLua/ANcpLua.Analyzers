@@ -41,8 +41,10 @@ public sealed partial class Al0006FieldNameConflictWithPrimaryConstructorAnalyze
         DiagnosticSeverity.Warning, true, Description,
         HelpLinkBase);
 
+    /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
+    /// <summary>Registers syntax node actions to analyze field declarations for naming conflicts.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterSyntaxNodeAction(SyntaxNodeAction, SyntaxKind.FieldDeclaration);
 

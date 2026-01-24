@@ -8,9 +8,11 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0027AvoidNewtonsoftJsonAnalyzer : AlAnalyzer {
-    // Split to avoid static analysis false positives
+    /// <summary>Legacy JSON library vendor name (split to avoid static analysis false positives).</summary>
     private const string LegacyJsonVendor = "Newtonsoft";
+    /// <summary>Legacy JSON library namespace.</summary>
     private const string LegacyJsonNamespace = LegacyJsonVendor + ".Json";
+    /// <summary>Modern JSON library namespace.</summary>
     private const string SystemTextJsonNamespace = "System.Text.Json";
 
     private static readonly LocalizableResourceString Title = new(
@@ -28,8 +30,10 @@ public sealed partial class Al0027AvoidNewtonsoftJsonAnalyzer : AlAnalyzer {
         DiagnosticSeverity.Warning, true, Description,
         HelpLinkBase);
 
+    /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
+    /// <summary>Registers compilation start action to analyze type symbol references.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterCompilationStartAction(OnCompilationStart);
 

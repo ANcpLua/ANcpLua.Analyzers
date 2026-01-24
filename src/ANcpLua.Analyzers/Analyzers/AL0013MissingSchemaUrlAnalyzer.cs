@@ -41,6 +41,7 @@ public sealed partial class Al0013MissingSchemaUrlAnalyzer : AlAnalyzer {
         DiagnosticSeverity.Info, true, Description,
         HelpLinkBase);
 
+    /// <summary>Set of method names that configure OTel resources.</summary>
     private static readonly HashSet<string> ResourceConfigMethods = [
         "ConfigureResource",
         "SetResourceBuilder",
@@ -49,6 +50,7 @@ public sealed partial class Al0013MissingSchemaUrlAnalyzer : AlAnalyzer {
         "ConfigureOpenTelemetry"
     ];
 
+    /// <summary>Array of known OTel builder type names to check for resource configuration.</summary>
     private static readonly string[] OtelBuilderTypeNames = [
         "OpenTelemetry.Trace.TracerProviderBuilder",
         "OpenTelemetry.Metrics.MeterProviderBuilder",
@@ -57,8 +59,10 @@ public sealed partial class Al0013MissingSchemaUrlAnalyzer : AlAnalyzer {
         "OpenTelemetry.IOpenTelemetryBuilder"
     ];
 
+    /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
+    /// <summary>Registers compilation start action to analyze OTel resource configurations.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterCompilationStartAction(OnCompilationStart);
 

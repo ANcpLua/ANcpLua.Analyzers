@@ -20,7 +20,9 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0030UseTypeHierarchyAnalyzer : AlAnalyzer {
+    /// <summary>Metadata name for SymbolEqualityComparer.</summary>
     private const string SymbolEqualityComparerTypeName = "Microsoft.CodeAnalysis.SymbolEqualityComparer";
+    /// <summary>Metadata name for ITypeSymbol.</summary>
     private const string ITypeSymbolTypeName = "Microsoft.CodeAnalysis.ITypeSymbol";
 
     private static readonly LocalizableResourceString Title = new(
@@ -38,8 +40,10 @@ public sealed partial class Al0030UseTypeHierarchyAnalyzer : AlAnalyzer {
         DiagnosticSeverity.Info, true, Description,
         HelpLinkBase);
 
+    /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
+    /// <summary>Registers compilation start action to analyze type hierarchy iteration patterns.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterCompilationStartAction(OnCompilationStart);
 

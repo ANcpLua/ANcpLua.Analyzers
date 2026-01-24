@@ -31,7 +31,9 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0004ToAl0005SpanComparisonAnalyzer : AlAnalyzer {
+    /// <summary>AL0004: Use pattern matching when comparing Span and a constant.</summary>
     public const string DiagnosticIdAl0004 = DiagnosticIds.UsePatternMatchingForSpanConstantComparison;
+    /// <summary>AL0005: Use SequenceEqual when comparing Span and a non-constant.</summary>
     public const string DiagnosticIdAl0005 = DiagnosticIds.UseSequenceEqualForSpanNonConstantComparison;
 
     private static readonly LocalizableResourceString TitleAl0004 = new(
@@ -62,8 +64,10 @@ public sealed partial class Al0004ToAl0005SpanComparisonAnalyzer : AlAnalyzer {
         DiagnosticSeverity.Warning, true, DescriptionAl0005,
         HelpLinkBase);
 
+    /// <summary>Gets the diagnostic descriptors for the supported diagnostics (AL0004 and AL0005).</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [RuleAl0004, RuleAl0005];
 
+    /// <summary>Registers compilation start action to analyze Span comparison operations.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterCompilationStartAction(CompilationStartAction);
 

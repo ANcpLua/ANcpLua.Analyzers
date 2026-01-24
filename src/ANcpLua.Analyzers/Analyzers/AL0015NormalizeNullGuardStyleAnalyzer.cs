@@ -9,10 +9,14 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0015NormalizeNullGuardStyleAnalyzer : AlAnalyzer {
+    /// <summary>AL0015: Normalize null-guard style.</summary>
     private const string DiagnosticId = DiagnosticIds.NormalizeNullGuardStyle;
 
+    /// <summary>Property key for the parameter identifier.</summary>
     public const string PropertyIdentifier = "Id";
+    /// <summary>Property key for the exception type name.</summary>
     public const string PropertyTypeName = "Type";
+    /// <summary>Property key for the target null-guard style.</summary>
     public const string PropertyStyle = "Style";
 
     private static readonly DiagnosticDescriptor Rule = new(
@@ -25,8 +29,10 @@ public sealed partial class Al0015NormalizeNullGuardStyleAnalyzer : AlAnalyzer {
         "Null-guards should be normalized to the preferred project style (Throw, BCL, or Portable).",
         HelpLinkBase);
 
+    /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
+    /// <summary>Registers compilation start action to analyze if statements with null-guards.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterCompilationStartAction(OnCompilationStart);
 

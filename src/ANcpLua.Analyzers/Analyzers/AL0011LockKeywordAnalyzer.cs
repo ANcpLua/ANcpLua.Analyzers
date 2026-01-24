@@ -8,6 +8,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0011LockKeywordAnalyzer : AlAnalyzer {
+    /// <summary>Metadata name for the System.Threading.Lock type (.NET 9+).</summary>
     private const string LockTypeMetadataName = "System.Threading.Lock";
 
     private static readonly LocalizableResourceString Title = new(
@@ -25,8 +26,10 @@ public sealed partial class Al0011LockKeywordAnalyzer : AlAnalyzer {
         DiagnosticSeverity.Warning, true, Description,
         HelpLinkBase);
 
+    /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
+    /// <summary>Registers compilation start action to analyze lock statements.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterCompilationStartAction(OnCompilationStart);
 

@@ -29,10 +29,14 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0018VersionPropsNotImportedAnalyzer : DiagnosticAnalyzer {
+    /// <summary>AL0018: Version.props not imported.</summary>
     public const string DiagnosticId = DiagnosticIds.VersionPropsNotImported;
 
+    /// <summary>Filename for Version.props.</summary>
     private const string VersionPropsFileName = "Version.props";
+    /// <summary>Filename for Directory.Build.props.</summary>
     private const string DirectoryBuildPropsFileName = "Directory.Build.props";
+    /// <summary>Filename for Directory.Packages.props.</summary>
     private const string DirectoryPackagesPropsFileName = "Directory.Packages.props";
 
     private static readonly LocalizableResourceString Title = new(
@@ -50,8 +54,10 @@ public sealed partial class Al0018VersionPropsNotImportedAnalyzer : DiagnosticAn
         AlAnalyzer.HelpLinkBase,
         WellKnownDiagnosticTags.CompilationEnd);
 
+    /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
+    /// <summary>Initializes the analyzer and registers compilation-level actions.</summary>
     public override void Initialize(AnalysisContext context) {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
         context.EnableConcurrentExecution();
@@ -68,6 +74,12 @@ public sealed partial class Al0018VersionPropsNotImportedAnalyzer : DiagnosticAn
             .Where(static f => f.Path.EndsWith(DirectoryPackagesPropsFileName, StringComparison.OrdinalIgnoreCase))
             .ToList();
 
+        // Skip if using CPM native mode (ManagePackageVersionsCentrally=true)
+        // In CPM native mode, Version.props is not needed - versions are defined directly in Directory.Packages.props
+        if (directoryPackagesPropsFiles.Any(f => IsCpmNativeMode(f, context.CancellationToken))) {
+            return;
+        }
+
         // Check if Version.props is imported in Directory.Packages.props
         // This is valid per the layering pattern
         var hasImportInPackagesProps = directoryPackagesPropsFiles
@@ -75,6 +87,28 @@ public sealed partial class Al0018VersionPropsNotImportedAnalyzer : DiagnosticAn
 
         foreach (var propsFile in directoryBuildPropsFiles) {
             AnalyzePropsFile(context, propsFile, hasImportInPackagesProps);
+        }
+    }
+
+    /// <summary>
+    ///     Checks if the props file uses CPM native mode (ManagePackageVersionsCentrally=true).
+    ///     When CPM native mode is active, Version.props import is not required.
+    /// </summary>
+    private static bool IsCpmNativeMode(AdditionalText propsFile, CancellationToken cancellationToken) {
+        if (propsFile.GetText(cancellationToken) is not { } sourceText) {
+            return false;
+        }
+
+        try {
+            var doc = XDocument.Parse(sourceText.ToString());
+
+            // Check for <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+            return doc.Descendants()
+                .Any(static e =>
+                    e.Name.LocalName == "ManagePackageVersionsCentrally" &&
+                    string.Equals(e.Value.Trim(), "true", StringComparison.OrdinalIgnoreCase));
+        } catch (Exception) {
+            return false;
         }
     }
 

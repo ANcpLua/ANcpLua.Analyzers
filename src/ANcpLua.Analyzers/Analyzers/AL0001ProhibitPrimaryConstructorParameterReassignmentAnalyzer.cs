@@ -25,6 +25,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0001ProhibitPrimaryConstructorParameterReassignmentAnalyzer : AlAnalyzer {
+    /// <summary>AL0001: Prohibit reassignment of primary constructor parameters.</summary>
     private const string DiagnosticId = DiagnosticIds.ProhibitPrimaryConstructorParameterReassignment;
 
     private static readonly LocalizableResourceString Title = new(
@@ -41,8 +42,10 @@ public sealed partial class Al0001ProhibitPrimaryConstructorParameterReassignmen
         DiagnosticSeverity.Error, true, Description,
         HelpLinkBase);
 
+    /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
+    /// <summary>Registers syntax and operation actions to analyze primary constructor parameter reassignments.</summary>
     protected override void RegisterActions(AnalysisContext context) {
         context.RegisterOperationAction(AnalyzeAssignment, OperationKind.SimpleAssignment);
         context.RegisterOperationAction(AnalyzeAssignment, OperationKind.CompoundAssignment);

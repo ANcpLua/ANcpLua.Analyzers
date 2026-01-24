@@ -26,10 +26,14 @@ public sealed partial class Al0040UseAttributeExtensionsAnalyzer : AlAnalyzer {
     private static readonly DiagnosticDescriptor Rule = new(
         DiagnosticIds.UseAttributeExtensions,
         Title, MessageFormat, DiagnosticCategories.RoslynUtilities,
-        DiagnosticSeverity.Info, true, Description,
+        DiagnosticSeverities.Suggestion, true, Description,
         HelpLinkBase);
 
+    /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+
+    /// <summary>Registers syntax or operation actions for analysis.</summary>
 
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterOperationAction(AnalyzePropertyReference, OperationKind.PropertyReference);

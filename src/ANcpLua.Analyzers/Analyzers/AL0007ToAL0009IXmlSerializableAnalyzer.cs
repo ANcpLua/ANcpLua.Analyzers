@@ -78,9 +78,11 @@ public sealed partial class Al0007ToAl0009IXmlSerializableAnalyzer : AlAnalyzer 
         DiagnosticSeverity.Error, true, DescriptionAl0009,
         HelpLinkBase);
 
+    /// <summary>Gets the diagnostic descriptors for the supported diagnostics (AL0007, AL0008, AL0009).</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
         [RuleAl0007, RuleAl0008, RuleAl0009];
 
+    /// <summary>Registers compilation start action to analyze IXmlSerializable implementations.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterCompilationStartAction(OnCompilationStart);
 

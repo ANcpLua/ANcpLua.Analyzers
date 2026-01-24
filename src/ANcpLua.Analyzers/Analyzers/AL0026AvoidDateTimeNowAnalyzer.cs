@@ -9,8 +9,11 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0026AvoidDateTimeNowAnalyzer : AlAnalyzer {
+    /// <summary>Metadata name for System.TimeProvider (.NET 8+).</summary>
     private const string TimeProviderMetadataName = "System.TimeProvider";
+    /// <summary>Metadata name for System.DateTime.</summary>
     private const string DateTimeMetadataName = "System.DateTime";
+    /// <summary>Metadata name for System.DateTimeOffset.</summary>
     private const string DateTimeOffsetMetadataName = "System.DateTimeOffset";
 
     private static readonly LocalizableResourceString Title = new(
@@ -28,8 +31,10 @@ public sealed partial class Al0026AvoidDateTimeNowAnalyzer : AlAnalyzer {
         DiagnosticSeverity.Warning, true, Description,
         HelpLinkBase);
 
+    /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
+    /// <summary>Registers compilation start action to analyze DateTime member access.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterCompilationStartAction(OnCompilationStart);
 

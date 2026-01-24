@@ -43,9 +43,11 @@ public sealed partial class Al0020ToAl0024FormBindingAnalyzer : AlAnalyzer {
     private static readonly DiagnosticDescriptor RuleAl0024 = CreateRule(
         DiagnosticIds.FormAndBodyConflict, "AL0024");
 
+    /// <summary>Gets the diagnostic descriptors for the supported diagnostics (AL0020-AL0024).</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
         [RuleAl0020, RuleAl0021, RuleAl0022, RuleAl0023, RuleAl0024];
 
+    /// <summary>Creates a diagnostic descriptor for form binding rules.</summary>
     private static DiagnosticDescriptor CreateRule(string id, string ruleNumber) => new(
         id,
         new LocalizableResourceString($"{ruleNumber}AnalyzerTitle", Resources.ResourceManager, typeof(Resources)),
@@ -57,6 +59,7 @@ public sealed partial class Al0020ToAl0024FormBindingAnalyzer : AlAnalyzer {
         new LocalizableResourceString($"{ruleNumber}AnalyzerDescription", Resources.ResourceManager, typeof(Resources)),
         HelpLinkBase);
 
+    /// <summary>Registers method symbol actions to analyze endpoint parameter binding.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterCompilationStartAction(OnCompilationStart);
 

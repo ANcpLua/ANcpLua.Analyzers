@@ -25,10 +25,14 @@ public sealed partial class Al0036UseGuardNotNullAnalyzer : AlAnalyzer {
     private static readonly DiagnosticDescriptor Rule = new(
         DiagnosticIds.UseGuardNotNull,
         Title, MessageFormat, DiagnosticCategories.RoslynUtilities,
-        DiagnosticSeverity.Info, true, Description,
+        DiagnosticSeverities.Suggestion, true, Description,
         HelpLinkBase);
 
+    /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+
+    /// <summary>Registers syntax or operation actions for analysis.</summary>
 
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterOperationAction(AnalyzeCoalesce, OperationKind.Coalesce);
