@@ -1,4 +1,4 @@
-using ANcpLua.Analyzers.Core;
+﻿using ANcpLua.Analyzers.Core;
 using OperationExtensions = Microsoft.CodeAnalysis.Operations.OperationExtensions;
 
 namespace ANcpLua.Analyzers.Analyzers;
@@ -102,10 +102,10 @@ public sealed partial class Al0030UseTypeHierarchyAnalyzer : AlAnalyzer {
                 // Also check for a.IsEqualTo(b) pattern (from ANcpLua.Roslyn.Utilities)
                 // Extension method signature: IsEqualTo(this ISymbol?, ISymbol?) has 2 parameters
                 if (invocation.TargetMethod is {
-                        Name: "IsEqualTo",
-                        IsExtensionMethod: true,
-                        Parameters.Length: 2
-                    }) {
+                    Name: "IsEqualTo",
+                    IsExtensionMethod: true,
+                    Parameters.Length: 2
+                }) {
                     return true;
                 }
             }
@@ -120,8 +120,7 @@ public sealed partial class Al0030UseTypeHierarchyAnalyzer : AlAnalyzer {
         var hasEqualityCheck = false;
 
         foreach (var operation in OperationExtensions.Descendants(whileLoop)) {
-            switch (operation)
-            {
+            switch (operation) {
                 case IPropertyReferenceOperation { Property.Name: "BaseType" }:
                     hasBaseTypeAccess = true;
                     break;
@@ -130,8 +129,7 @@ public sealed partial class Al0030UseTypeHierarchyAnalyzer : AlAnalyzer {
                 }:
                     hasBaseTypeAssignment = true;
                     break;
-                case IInvocationOperation invocation:
-                {
+                case IInvocationOperation invocation: {
                     // Check for SymbolEqualityComparer.Default.Equals(a, b)
                     if (symbolEqualityComparerType is not null &&
                         IsSymbolEqualityComparerEquals(invocation, symbolEqualityComparerType)) {
@@ -141,10 +139,10 @@ public sealed partial class Al0030UseTypeHierarchyAnalyzer : AlAnalyzer {
                     // Also check for a.IsEqualTo(b) pattern (from ANcpLua.Roslyn.Utilities)
                     // Extension method signature: IsEqualTo(this ISymbol?, ISymbol?) has 2 parameters
                     if (invocation.TargetMethod is {
-                            Name: "IsEqualTo",
-                            IsExtensionMethod: true,
-                            Parameters.Length: 2
-                        }) {
+                        Name: "IsEqualTo",
+                        IsExtensionMethod: true,
+                        Parameters.Length: 2
+                    }) {
                         hasEqualityCheck = true;
                     }
 

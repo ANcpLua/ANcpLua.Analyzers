@@ -1,4 +1,4 @@
-using ANcpLua.Analyzers.Core;
+﻿using ANcpLua.Analyzers.Core;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -83,10 +83,10 @@ public sealed partial class Al0032UseOrEmptyAnalyzer : AlAnalyzer {
             case IInvocationOperation invocation: {
                 var method = invocation.TargetMethod;
                 if (method is {
-                        Name: "Empty",
-                        IsStatic: true,
-                        Parameters.Length: 0
-                    }) {
+                    Name: "Empty",
+                    IsStatic: true,
+                    Parameters.Length: 0
+                }) {
                     var containingType = method.ContainingType;
                     if (containingType is not null) {
                         var typeName = containingType.Name;
@@ -105,8 +105,7 @@ public sealed partial class Al0032UseOrEmptyAnalyzer : AlAnalyzer {
             case IArrayCreationOperation {
                 DimensionSizes: [
                     {
-                        ConstantValue:
-                        { HasValue: true, Value: 0 }
+                        ConstantValue: { HasValue: true, Value: 0 }
                     }
                 ]
             }:

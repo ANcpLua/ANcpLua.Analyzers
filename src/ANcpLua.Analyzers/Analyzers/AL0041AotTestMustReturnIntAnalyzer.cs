@@ -1,4 +1,4 @@
-using ANcpLua.Analyzers.Core;
+﻿using ANcpLua.Analyzers.Core;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -78,10 +78,10 @@ public sealed partial class Al0041AotTestMustReturnIntAnalyzer : AlAnalyzer {
     private static AttributeData? GetAotOrTrimTestAttribute(IMethodSymbol method) {
         foreach (var attribute in method.GetAttributes()) {
             var attributeName = attribute.AttributeClass?.Name;
-            if (attributeName == AotTestAttributeName ||
-                attributeName == TrimTestAttributeName ||
-                attributeName == $"{AotTestAttributeName}Attribute" ||
-                attributeName == $"{TrimTestAttributeName}Attribute") {
+            if (attributeName is AotTestAttributeName or
+                TrimTestAttributeName or
+                $"{AotTestAttributeName}Attribute" or
+                $"{TrimTestAttributeName}Attribute") {
                 return attribute;
             }
         }

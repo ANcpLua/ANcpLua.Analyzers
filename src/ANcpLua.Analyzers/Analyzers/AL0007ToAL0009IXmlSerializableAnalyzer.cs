@@ -163,10 +163,10 @@ public sealed partial class Al0007ToAl0009IXmlSerializableAnalyzer : AlAnalyzer 
     private static bool ReturnsNonNullValue(SyntaxNode methodDeclaration, SemanticModel model) {
         foreach (var node in methodDeclaration.DescendantNodes()) {
             if (node switch {
-                    ReturnStatementSyntax returnStatement => returnStatement.Expression,
-                    ArrowExpressionClauseSyntax arrow => arrow.Expression,
-                    _ => null
-                } is not { } expression) {
+                ReturnStatementSyntax returnStatement => returnStatement.Expression,
+                ArrowExpressionClauseSyntax arrow => arrow.Expression,
+                _ => null
+            } is not { } expression) {
                 continue;
             }
 

@@ -1,4 +1,4 @@
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 
 namespace ANcpLua.Roslyn.Utilities;
 
@@ -203,12 +203,15 @@ internal static partial class Guard
     /// }
     /// </code>
     /// </example>
-    public static string NotNullOrEmpty([NotNull] string? value, [CallerArgumentExpression(nameof(value))] string? paramName = null)
-    {
-        if (value is null)
+    public static string NotNullOrEmpty([NotNull] string? value, [CallerArgumentExpression(nameof(value))] string? paramName = null) {
+        if (value is null) {
             throw new ArgumentNullException(paramName);
-        if (value.Length is 0)
+        }
+
+        if (value.Length is 0) {
             throw new ArgumentException("Value cannot be empty.", paramName);
+        }
+
         return value;
     }
 
@@ -230,12 +233,15 @@ internal static partial class Guard
     /// }
     /// </code>
     /// </example>
-    public static string NotNullOrWhiteSpace([NotNull] string? value, [CallerArgumentExpression(nameof(value))] string? paramName = null)
-    {
-        if (value is null)
+    public static string NotNullOrWhiteSpace([NotNull] string? value, [CallerArgumentExpression(nameof(value))] string? paramName = null) {
+        if (value is null) {
             throw new ArgumentNullException(paramName);
-        if (string.IsNullOrWhiteSpace(value))
+        }
+
+        if (string.IsNullOrWhiteSpace(value)) {
             throw new ArgumentException("Value cannot be empty or whitespace.", paramName);
+        }
+
         return value;
     }
 
@@ -331,12 +337,15 @@ internal static partial class Guard
     /// </example>
     public static IReadOnlyCollection<T> NotNullOrEmpty<T>(
         [NotNull] IReadOnlyCollection<T>? value,
-        [CallerArgumentExpression(nameof(value))] string? paramName = null)
-    {
-        if (value is null)
+        [CallerArgumentExpression(nameof(value))] string? paramName = null) {
+        if (value is null) {
             throw new ArgumentNullException(paramName);
-        if (value.Count is 0)
+        }
+
+        if (value.Count is 0) {
             throw new ArgumentException("Collection cannot be empty.", paramName);
+        }
+
         return value;
     }
 
@@ -363,10 +372,11 @@ internal static partial class Guard
     /// </code>
     /// </example>
     public static T InRange<T>(T value, T min, T max, [CallerArgumentExpression(nameof(value))] string? paramName = null)
-        where T : IComparable<T>
-    {
-        if (value.CompareTo(min) < 0 || value.CompareTo(max) > 0)
+        where T : IComparable<T> {
+        if (value.CompareTo(min) < 0 || value.CompareTo(max) > 0) {
             throw new ArgumentOutOfRangeException(paramName, value, $"Value must be between {min} and {max}.");
+        }
+
         return value;
     }
 
@@ -391,10 +401,11 @@ internal static partial class Guard
     /// }
     /// </code>
     /// </example>
-    public static int ValidIndex(int index, int count, [CallerArgumentExpression(nameof(index))] string? paramName = null)
-    {
-        if (index < 0 || index >= count)
+    public static int ValidIndex(int index, int count, [CallerArgumentExpression(nameof(index))] string? paramName = null) {
+        if (index < 0 || index >= count) {
             throw new ArgumentOutOfRangeException(paramName, index, $"Index must be between 0 and {count - 1}.");
+        }
+
         return index;
     }
 
@@ -419,10 +430,10 @@ internal static partial class Guard
     public static void That(
         [DoesNotReturnIf(false)] bool condition,
         string message,
-        [CallerArgumentExpression(nameof(condition))] string? paramName = null)
-    {
-        if (!condition)
+        [CallerArgumentExpression(nameof(condition))] string? paramName = null) {
+        if (!condition) {
             throw new ArgumentException(message, paramName);
+        }
     }
 
     /// <summary>
@@ -449,10 +460,11 @@ internal static partial class Guard
         T value,
         Func<T, bool> predicate,
         string message,
-        [CallerArgumentExpression(nameof(value))] string? paramName = null)
-    {
-        if (!predicate(value))
+        [CallerArgumentExpression(nameof(value))] string? paramName = null) {
+        if (!predicate(value)) {
             throw new ArgumentException(message, paramName);
+        }
+
         return value;
     }
 }

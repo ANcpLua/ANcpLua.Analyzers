@@ -1,4 +1,4 @@
-using ANcpLua.Analyzers.Core;
+﻿using ANcpLua.Analyzers.Core;
 using OperationExtensions = Microsoft.CodeAnalysis.Operations.OperationExtensions;
 
 namespace ANcpLua.Analyzers.Analyzers;
@@ -114,16 +114,15 @@ public sealed partial class Al0029UseHasAttributeAnalyzer : AlAnalyzer {
 
         // Look for variable declaration with initialization
         foreach (var operation in OperationExtensions.Descendants(containingBlock)) {
-            switch (operation)
-            {
+            switch (operation) {
                 case IVariableDeclaratorOperation declarator when
                     (declarator.Symbol.IsEqualTo(localRef.Local) &&
                      declarator.Initializer?.Value is IInvocationOperation invocation):
                     return invocation.TargetMethod.Name;
                 // Also check for simple assignments
                 case ISimpleAssignmentOperation {
-                        Target: ILocalReferenceOperation targetLocal
-                    } assignment when
+                    Target: ILocalReferenceOperation targetLocal
+                } assignment when
                     targetLocal.Local.IsEqualTo(localRef.Local) &&
                     assignment.Value is IInvocationOperation assignedInvocation:
                     return assignedInvocation.TargetMethod.Name;

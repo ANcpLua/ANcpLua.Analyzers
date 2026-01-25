@@ -1,4 +1,4 @@
-using ANcpLua.Analyzers.Core;
+﻿using ANcpLua.Analyzers.Core;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -85,10 +85,10 @@ public sealed partial class Al0026AvoidDateTimeNowAnalyzer : AlAnalyzer {
 
         // Target the "Now" and "UtcNow" properties with correct replacements
         if (property.Name switch {
-                "Now" => "GetLocalNow",
-                "UtcNow" => "GetUtcNow",
-                _ => null
-            } is not { } replacement) {
+            "Now" => "GetLocalNow",
+            "UtcNow" => "GetUtcNow",
+            _ => null
+        } is not { } replacement) {
             return;
         }
 

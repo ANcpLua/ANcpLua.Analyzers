@@ -1,4 +1,4 @@
-using ANcpLua.Analyzers.Core;
+﻿using ANcpLua.Analyzers.Core;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -105,10 +105,10 @@ public sealed partial class Al0033UseToImmutableArrayOrEmptyAnalyzer : AlAnalyze
 
         // Check for null-conditional invocation: source?.ToImmutableArray()
         if (operation is IConditionalAccessOperation {
-                WhenNotNull: IInvocationOperation {
-                    TargetMethod.Name: "ToImmutableArray"
-                }
-            } conditionalAccess) {
+            WhenNotNull: IInvocationOperation {
+                TargetMethod.Name: "ToImmutableArray"
+            }
+        } conditionalAccess) {
             sourceName = GetOperandDisplayName(conditionalAccess.Operation);
             return true;
         }

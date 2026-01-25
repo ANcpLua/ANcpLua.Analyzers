@@ -1,4 +1,4 @@
-using ANcpLua.Analyzers.Core;
+﻿using ANcpLua.Analyzers.Core;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -51,8 +51,7 @@ public sealed partial class Al0040UseAttributeExtensionsAnalyzer : AlAnalyzer {
                 if (innerProp.Instance is IArrayElementReferenceOperation arrayAccess) {
                     AnalyzeConstructorArgumentsAccess(context, propRef, arrayAccess);
                 }
-            }
-            else if (propRef.Instance is IArrayElementReferenceOperation directArrayAccess) {
+            } else if (propRef.Instance is IArrayElementReferenceOperation directArrayAccess) {
                 // Direct array access pattern
                 AnalyzeConstructorArgumentsAccess(context, propRef, directArrayAccess);
             }

@@ -125,8 +125,8 @@ public sealed partial class Al0015NormalizeNullGuardStyleAnalyzer : AlAnalyzer {
 
         switch (condition) {
             case IsPatternExpressionSyntax {
-                    Pattern: ConstantPatternSyntax { Expression: LiteralExpressionSyntax l }
-                } p
+                Pattern: ConstantPatternSyntax { Expression: LiteralExpressionSyntax l }
+            } p
                 when l.IsKind(SyntaxKind.NullLiteralExpression)
                      && p.Expression is IdentifierNameSyntax id:
                 identifier = id.Identifier.Text;
@@ -188,9 +188,9 @@ public sealed partial class Al0015NormalizeNullGuardStyleAnalyzer : AlAnalyzer {
 
         return arg switch {
             InvocationExpressionSyntax {
-                    Expression: IdentifierNameSyntax { Identifier.Text: "nameof" },
-                    ArgumentList.Arguments.Count: 1
-                } inv when inv.ArgumentList.Arguments[0].Expression is IdentifierNameSyntax argId
+                Expression: IdentifierNameSyntax { Identifier.Text: "nameof" },
+                ArgumentList.Arguments.Count: 1
+            } inv when inv.ArgumentList.Arguments[0].Expression is IdentifierNameSyntax argId
                 => argId.Identifier.Text == targetParam,
             LiteralExpressionSyntax lit when lit.IsKind(SyntaxKind.StringLiteralExpression) =>
                 lit.Token.ValueText == targetParam,

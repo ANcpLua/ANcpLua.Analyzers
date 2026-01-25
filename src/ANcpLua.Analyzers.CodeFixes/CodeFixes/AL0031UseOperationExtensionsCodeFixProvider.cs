@@ -1,4 +1,4 @@
-using ANcpLua.Analyzers.Core;
+﻿using ANcpLua.Analyzers.Core;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
@@ -58,9 +58,9 @@ public sealed partial class Al0031UseOperationExtensionsCodeFixProvider : AlCode
 
         // Check for .TargetMethod.Name pattern
         if (memberAccess is {
-                Name.Identifier.Text: "Name",
-                Expression: MemberAccessExpressionSyntax { Name.Identifier.Text: "TargetMethod" } targetMethodAccess
-            }) {
+            Name.Identifier.Text: "Name",
+            Expression: MemberAccessExpressionSyntax { Name.Identifier.Text: "TargetMethod" } targetMethodAccess
+        }) {
             invocationExpr = targetMethodAccess.Expression;
             methodName = literal.Token.ValueText;
             return true;
@@ -72,17 +72,17 @@ public sealed partial class Al0031UseOperationExtensionsCodeFixProvider : AlCode
     private static (MemberAccessExpressionSyntax? memberAccess, LiteralExpressionSyntax? literal)
         GetMemberAccessAndLiteral(BinaryExpressionSyntax binary) {
         if (binary is {
-                Left: MemberAccessExpressionSyntax leftMember,
-                Right: LiteralExpressionSyntax rightLiteral
-            } &&
+            Left: MemberAccessExpressionSyntax leftMember,
+            Right: LiteralExpressionSyntax rightLiteral
+        } &&
             rightLiteral.IsKind(SyntaxKind.StringLiteralExpression)) {
             return (leftMember, rightLiteral);
         }
 
         if (binary is {
-                Right: MemberAccessExpressionSyntax rightMember,
-                Left: LiteralExpressionSyntax leftLiteral
-            } &&
+            Right: MemberAccessExpressionSyntax rightMember,
+            Left: LiteralExpressionSyntax leftLiteral
+        } &&
             leftLiteral.IsKind(SyntaxKind.StringLiteralExpression)) {
             return (rightMember, leftLiteral);
         }
@@ -146,10 +146,9 @@ public sealed partial class Al0031UseOperationExtensionsCodeFixProvider : AlCode
         }
 
         // Find the HasValue check and is pattern
-        ExpressionSyntax? hasValueExpr = null;
         IsPatternExpressionSyntax? isPattern = null;
 
-        if (TryExtractConstantValueHasValue(binary.Left, out hasValueExpr) &&
+        if (TryExtractConstantValueHasValue(binary.Left, out var hasValueExpr) &&
             binary.Right is IsPatternExpressionSyntax rightPattern) {
             isPattern = rightPattern;
         } else if (TryExtractConstantValueHasValue(binary.Right, out hasValueExpr) &&
@@ -191,11 +190,11 @@ public sealed partial class Al0031UseOperationExtensionsCodeFixProvider : AlCode
 
         // Pattern: X.ConstantValue.HasValue
         if (expr is MemberAccessExpressionSyntax {
-                Name.Identifier.Text: "HasValue",
-                Expression: MemberAccessExpressionSyntax {
-                    Name.Identifier.Text: "ConstantValue"
-                } constantValue
-            }) {
+            Name.Identifier.Text: "HasValue",
+            Expression: MemberAccessExpressionSyntax {
+                Name.Identifier.Text: "ConstantValue"
+            } constantValue
+        }) {
             constantValueExpr = constantValue;
             return true;
         }
@@ -210,11 +209,11 @@ public sealed partial class Al0031UseOperationExtensionsCodeFixProvider : AlCode
 
         // Pattern: X.ConstantValue.Value
         if (expr is MemberAccessExpressionSyntax {
-                Name.Identifier.Text: "Value",
-                Expression: MemberAccessExpressionSyntax {
-                    Name.Identifier.Text: "ConstantValue"
-                } constantValue
-            }) {
+            Name.Identifier.Text: "Value",
+            Expression: MemberAccessExpressionSyntax {
+                Name.Identifier.Text: "ConstantValue"
+            } constantValue
+        }) {
             constantValueExpr = constantValue;
             return true;
         }
@@ -270,7 +269,7 @@ public sealed partial class Al0031UseOperationExtensionsCodeFixProvider : AlCode
                 SyntaxFactory.GenericName(
                     SyntaxFactory.Identifier("TryGetConstantValue"),
                     SyntaxFactory.TypeArgumentList(
-                        SyntaxFactory.SingletonSeparatedList<TypeSyntax>(
+                        SyntaxFactory.SingletonSeparatedList(
                             SyntaxFactory.ParseTypeName(typeName))))),
             SyntaxFactory.ArgumentList(
                 SyntaxFactory.SingletonSeparatedList(

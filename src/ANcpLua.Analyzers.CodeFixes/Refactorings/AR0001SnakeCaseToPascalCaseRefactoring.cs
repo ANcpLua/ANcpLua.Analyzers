@@ -25,8 +25,8 @@ public sealed partial class Ar0001SnakeCaseToPascalCaseRefactoring : CodeRefacto
                 break;
 
             case VariableDeclaratorSyntax {
-                    Parent: VariableDeclarationSyntax { Parent: FieldDeclarationSyntax field }
-                } variable
+                Parent: VariableDeclarationSyntax { Parent: FieldDeclarationSyntax field }
+            } variable
                 when field.Modifiers.Any(static m => m.IsKind(SyntaxKind.ConstKeyword)) &&
                      IsScreamingSnakeCase(variable.Identifier.Text):
                 RegisterRefactoring(context, document, variable.Identifier.Text,

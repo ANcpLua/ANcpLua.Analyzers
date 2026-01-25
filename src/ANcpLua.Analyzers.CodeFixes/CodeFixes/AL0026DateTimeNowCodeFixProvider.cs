@@ -1,4 +1,4 @@
-using ANcpLua.Analyzers.Core;
+﻿using ANcpLua.Analyzers.Core;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
@@ -30,10 +30,10 @@ public sealed partial class Al0026DateTimeNowCodeFixProvider : AlCodeFixProvider
         SyntaxNode root) {
         // Determine the replacement method based on the property name
         if (memberAccess.Name.Identifier.Text switch {
-                "Now" => "GetLocalNow",
-                "UtcNow" => "GetUtcNow",
-                _ => null
-            } is not { } methodName) {
+            "Now" => "GetLocalNow",
+            "UtcNow" => "GetUtcNow",
+            _ => null
+        } is not { } methodName) {
             return Task.FromResult(document);
         }
 

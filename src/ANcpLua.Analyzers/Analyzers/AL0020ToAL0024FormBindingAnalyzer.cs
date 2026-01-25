@@ -150,8 +150,8 @@ public sealed partial class Al0020ToAl0024FormBindingAnalyzer : AlAnalyzer {
 
     private static bool IsPrimitive(ITypeSymbol type) {
         if (type is INamedTypeSymbol {
-                IsGenericType: true, ConstructedFrom.SpecialType: SpecialType.System_Nullable_T
-            } namedType) {
+            IsGenericType: true, ConstructedFrom.SpecialType: SpecialType.System_Nullable_T
+        } namedType) {
             type = namedType.TypeArguments[0];
         }
 

@@ -1,4 +1,4 @@
-using ANcpLua.Analyzers.Core;
+﻿using ANcpLua.Analyzers.Core;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -135,8 +135,7 @@ public sealed partial class Al0037UseTryParseExtensionsAnalyzer : AlAnalyzer {
         return whenFalse switch {
             IDefaultValueOperation => true,
             ILiteralOperation {
-                ConstantValue:
-                { HasValue: true, Value: null }
+                ConstantValue: { HasValue: true, Value: null }
             } => true,
             IConversionOperation { Operand: IDefaultValueOperation } => true,
             ILiteralOperation => true, // Any constant (including 0, false, etc.)

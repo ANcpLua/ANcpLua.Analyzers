@@ -1,4 +1,4 @@
-using ANcpLua.Analyzers.Core;
+﻿using ANcpLua.Analyzers.Core;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -85,8 +85,7 @@ public sealed partial class Al0042AotTestExitCode100Analyzer : AlAnalyzer {
             // For expression-bodied methods, check the expression
             if (methodDeclaration.ExpressionBody is { } expressionBody) {
                 CheckReturnValue(context, expressionBody.Expression, InfoRule);
-            }
-            else {
+            } else {
                 // Block-bodied method with no return statements - implicit return
                 var location = methodDeclaration.Identifier.GetLocation();
                 context.ReportDiagnostic(
@@ -136,10 +135,10 @@ public sealed partial class Al0042AotTestExitCode100Analyzer : AlAnalyzer {
     private static bool HasAotOrTrimTestAttribute(IMethodSymbol method) {
         foreach (var attribute in method.GetAttributes()) {
             var attributeName = attribute.AttributeClass?.Name;
-            if (attributeName == AotTestAttributeName ||
-                attributeName == TrimTestAttributeName ||
-                attributeName == $"{AotTestAttributeName}Attribute" ||
-                attributeName == $"{TrimTestAttributeName}Attribute") {
+            if (attributeName is AotTestAttributeName or
+                TrimTestAttributeName or
+                $"{AotTestAttributeName}Attribute" or
+                $"{TrimTestAttributeName}Attribute") {
                 return true;
             }
         }

@@ -1,4 +1,4 @@
-using ANcpLua.Analyzers.Core;
+﻿using ANcpLua.Analyzers.Core;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -126,8 +126,7 @@ public sealed partial class Al0034UseWhereNotNullAnalyzer : AlAnalyzer {
         // If it's a block, look for a single return statement
         return body.Operations is [
             IReturnOperation {
-                ReturnedValue:
-                { } returnValue
+                ReturnedValue: { } returnValue
             }
         ] && IsNotNullCheck(returnValue, parameter);
     }
