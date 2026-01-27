@@ -14,6 +14,18 @@ internal enum WellKnownType {
     IFormFileCollection,
     IFormCollection,
 
+    // Primitives
+    SystemGuid,
+    TimeSpan,
+    DateTimeOffset,
+    DateOnly,
+    TimeOnly,
+    Uri,
+
+    // Roslyn types
+    AttributeData,
+    TypedConstant,
+
     Count // Must be last - used for array sizing
 }
 
@@ -23,7 +35,15 @@ internal static partial class WellKnownTypeNames {
         "Microsoft.AspNetCore.Mvc.FromBodyAttribute",
         "Microsoft.AspNetCore.Http.IFormFile",
         "Microsoft.AspNetCore.Http.IFormFileCollection",
-        "Microsoft.AspNetCore.Http.IFormCollection"
+        "Microsoft.AspNetCore.Http.IFormCollection",
+        "System.Guid",
+        "System.TimeSpan",
+        "System.DateTimeOffset",
+        "System.DateOnly",
+        "System.TimeOnly",
+        "System.Uri",
+        "Microsoft.CodeAnalysis.AttributeData",
+        "Microsoft.CodeAnalysis.TypedConstant"
     ];
 
     public static string GetName(WellKnownType type) => Names[(int)type];
@@ -39,7 +59,10 @@ internal sealed partial class WellKnownTypeCache {
 
     private WellKnownTypeCache(Compilation compilation) => _compilation = compilation;
 
-    public static WellKnownTypeCache Create(Compilation compilation) => new(compilation);
+    public static WellKnownTypeCache Create(Compilation compilation) {
+        Throw.IfNull(compilation);
+        return new WellKnownTypeCache(compilation);
+    }
 
     public INamedTypeSymbol? Get(WellKnownType type) {
         var index = (int)type;
@@ -57,12 +80,6 @@ internal sealed partial class WellKnownTypeCache {
     }
 
     public bool HasAttribute(ISymbol symbol, WellKnownType attributeType) {
-        if (Get(attributeType) is not { } attrSymbol) {
-            return false;
-        }
-
-        return symbol.GetAttributes().Any(attr =>
-            attr.AttributeClass is not null &&
-            attr.AttributeClass.OriginalDefinition.IsEqualTo(attrSymbol.OriginalDefinition));
+        return Get(attributeType) is { } attrSymbol && symbol.HasAttribute(attrSymbol);
     }
 }

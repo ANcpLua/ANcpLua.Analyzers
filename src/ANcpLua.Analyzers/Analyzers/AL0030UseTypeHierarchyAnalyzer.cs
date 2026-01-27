@@ -1,5 +1,5 @@
 ﻿using ANcpLua.Analyzers.Core;
-using OperationExtensions = Microsoft.CodeAnalysis.Operations.OperationExtensions;
+using MsOperationExtensions = Microsoft.CodeAnalysis.Operations.OperationExtensions;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -61,7 +61,7 @@ public sealed partial class Al0030UseTypeHierarchyAnalyzer : AlAnalyzer {
 
     private static void AnalyzeLoop(OperationAnalysisContext context, INamedTypeSymbol? symbolEqualityComparerType) {
         if (context.Operation is IForEachLoopOperation forEachLoop) {
-            var collectionName = GetCollectionAccessName(forEachLoop.Collection);
+            var collectionName = forEachLoop.Collection.GetCollectionSourceName();
 
             if (collectionName is "AllInterfaces" &&
                 ContainsSymbolEqualityComparison(forEachLoop.Body, symbolEqualityComparerType)) {
@@ -78,20 +78,12 @@ public sealed partial class Al0030UseTypeHierarchyAnalyzer : AlAnalyzer {
         }
     }
 
-    private static string? GetCollectionAccessName(IOperation? collection) =>
-        collection switch {
-            IInvocationOperation invocation => invocation.TargetMethod.Name,
-            IPropertyReferenceOperation propertyRef => propertyRef.Property.Name,
-            IConversionOperation conversion => GetCollectionAccessName(conversion.Operand),
-            _ => null
-        };
-
     private static bool ContainsSymbolEqualityComparison(IOperation? body, INamedTypeSymbol? symbolEqualityComparerType) {
         if (body is null) {
             return false;
         }
 
-        foreach (var descendant in OperationExtensions.Descendants(body)) {
+        foreach (var descendant in MsOperationExtensions.Descendants(body)) {
             if (descendant is IInvocationOperation invocation) {
                 // Check for SymbolEqualityComparer.Default.Equals(a, b)
                 if (symbolEqualityComparerType is not null &&
@@ -119,7 +111,7 @@ public sealed partial class Al0030UseTypeHierarchyAnalyzer : AlAnalyzer {
         var hasBaseTypeAssignment = false;
         var hasEqualityCheck = false;
 
-        foreach (var operation in OperationExtensions.Descendants(whileLoop)) {
+        foreach (var operation in MsOperationExtensions.Descendants(whileLoop)) {
             switch (operation) {
                 case IPropertyReferenceOperation { Property.Name: "BaseType" }:
                     hasBaseTypeAccess = true;

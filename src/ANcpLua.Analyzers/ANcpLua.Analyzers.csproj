@@ -30,7 +30,7 @@
              RS0030: Banned APIs - analyzer needs access to banned patterns to detect them
              CA2249: Use Contains - ns2.0 lacks Contains(char, StringComparison), must use IndexOf
              IDE0055: Multi-TFM formatting conflicts (dotnet format creates TFM merge markers) -->
-        <NoWarn>$(NoWarn);RS1025;RS1026;RS1041;RS0030;IDE0055</NoWarn>
+        <NoWarn>$(NoWarn);RS1025;RS1026;RS1041;RS0030;IDE0055;CA2249</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>

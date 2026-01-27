@@ -1,5 +1,5 @@
 ﻿using ANcpLua.Analyzers.Core;
-using OperationExtensions = Microsoft.CodeAnalysis.Operations.OperationExtensions;
+using MsOperationExtensions = Microsoft.CodeAnalysis.Operations.OperationExtensions;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -67,7 +67,7 @@ public sealed partial class Al0029UseHasAttributeAnalyzer : AlAnalyzer {
             return;
         }
 
-        var collectionName = GetCollectionAccessName(forEachLoop.Collection);
+        var collectionName = forEachLoop.Collection.GetCollectionSourceName();
         if (collectionName is "GetAttributes" && ContainsAttributeClassComparison(forEachLoop.Body)) {
             context.ReportDiagnostic(Rule, forEachLoop.Syntax.GetLocation(),
                 "symbol.HasAttribute(name)", "foreach over GetAttributes()");
@@ -97,47 +97,12 @@ public sealed partial class Al0029UseHasAttributeAnalyzer : AlAnalyzer {
             _ => null
         };
 
-    private static string? GetCollectionAccessName(IOperation? collection) =>
-        collection switch {
-            IInvocationOperation invocation => invocation.TargetMethod.Name,
-            IPropertyReferenceOperation propertyRef => propertyRef.Property.Name,
-            IConversionOperation conversion => GetCollectionAccessName(conversion.Operand),
-            ILocalReferenceOperation localRef => GetLocalAssignmentSourceName(localRef),
-            _ => null
-        };
-
-    private static string? GetLocalAssignmentSourceName(ILocalReferenceOperation localRef) {
-        // Find the containing method/block and look for assignment to this local
-        if (localRef.GetContainingBlock() is not { } containingBlock) {
-            return null;
-        }
-
-        // Look for variable declaration with initialization
-        foreach (var operation in OperationExtensions.Descendants(containingBlock)) {
-            switch (operation) {
-                case IVariableDeclaratorOperation declarator when
-                    (declarator.Symbol.IsEqualTo(localRef.Local) &&
-                     declarator.Initializer?.Value is IInvocationOperation invocation):
-                    return invocation.TargetMethod.Name;
-                // Also check for simple assignments
-                case ISimpleAssignmentOperation {
-                    Target: ILocalReferenceOperation targetLocal
-                } assignment when
-                    targetLocal.Local.IsEqualTo(localRef.Local) &&
-                    assignment.Value is IInvocationOperation assignedInvocation:
-                    return assignedInvocation.TargetMethod.Name;
-            }
-        }
-
-        return null;
-    }
-
     private static bool ContainsAttributeClassComparison(IOperation? body) {
         if (body is null) {
             return false;
         }
 
-        foreach (var descendant in OperationExtensions.Descendants(body)) {
+        foreach (var descendant in MsOperationExtensions.Descendants(body)) {
             if (descendant is IPropertyReferenceOperation { Property.Name: "AttributeClass" }) {
                 return true;
             }

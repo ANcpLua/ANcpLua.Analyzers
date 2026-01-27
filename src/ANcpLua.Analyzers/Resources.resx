@@ -384,15 +384,15 @@
     <data name="AL0035AnalyzerDescription" xml:space="preserve">
     <value>Use GetFullyQualifiedName() or GetMetadataName() extensions instead of ToDisplayString with SymbolDisplayFormat constants.</value>
   </data>
-    <!-- AL0036: Use Guard.NotNull -->
+    <!-- AL0036: Use null-guard helper -->
     <data name="AL0036AnalyzerTitle" xml:space="preserve">
-    <value>Use Guard.NotNull extension</value>
+    <value>Use null-guard helper</value>
   </data>
     <data name="AL0036AnalyzerMessageFormat" xml:space="preserve">
-    <value>Use 'Guard.NotNull({0})' instead of null-coalescing throw</value>
+    <value>Use '{0}' instead of null-coalescing throw</value>
   </data>
     <data name="AL0036AnalyzerDescription" xml:space="preserve">
-    <value>Use Guard.NotNull() extension instead of null-coalescing throw new ArgumentNullException pattern.</value>
+    <value>Use null-guard helpers (Throw.IfNull or Guard.NotNull) instead of verbose null-coalescing throw new ArgumentNullException patterns.</value>
   </data>
     <!-- AL0037: Use TryParse extensions -->
     <data name="AL0037AnalyzerTitle" xml:space="preserve">

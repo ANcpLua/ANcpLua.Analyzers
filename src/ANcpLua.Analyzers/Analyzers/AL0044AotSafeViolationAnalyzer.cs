@@ -59,14 +59,14 @@ public sealed partial class Al0044AotSafeViolationAnalyzer : AlAnalyzer {
         }
 
         // Check if the calling method is marked [AotSafe]
-        if (!HasAttribute(callingMethod, AotSafeAttributeName)) {
+        if (!callingMethod.HasAttributeByShortName(AotSafeAttributeName)) {
             return;
         }
 
         var targetMethod = invocation.TargetMethod;
 
         // Check if the called method has [RequiresDynamicCode]
-        if (!HasAttribute(targetMethod, RequiresDynamicCodeAttributeName)) {
+        if (!targetMethod.HasAttributeByShortName(RequiresDynamicCodeAttributeName)) {
             return;
         }
 
@@ -74,21 +74,6 @@ public sealed partial class Al0044AotSafeViolationAnalyzer : AlAnalyzer {
         var callingMethodName = callingMethod.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
         var targetMethodName = targetMethod.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
 
-        context.ReportDiagnostic(
-            Rule,
-            invocation.Syntax.GetLocation(),
-            callingMethodName,
-            targetMethodName);
-    }
-
-    private static bool HasAttribute(ISymbol symbol, string attributeName) {
-        foreach (var attribute in symbol.GetAttributes()) {
-            var name = attribute.AttributeClass?.Name;
-            if (name == attributeName || name == $"{attributeName}Attribute") {
-                return true;
-            }
-        }
-
-        return false;
+        context.ReportDiagnostic(Rule, invocation.Syntax.GetLocation(), callingMethodName, targetMethodName);
     }
 }

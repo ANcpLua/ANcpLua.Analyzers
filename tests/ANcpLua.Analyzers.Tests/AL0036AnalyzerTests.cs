@@ -48,4 +48,17 @@ public sealed partial class Al0036AnalyzerTests : AnalyzerTest<Al0036UseGuardNot
             string M(string? x) => x ?? "default";
         }
         """);
+
+    [Fact]
+    public Task ShouldSuggestThrowIfNullWhenHelperAvailable() => VerifyAsync("""
+        using System;
+        namespace Microsoft.Shared.Diagnostics {
+            public static class Throw {
+                public static void IfNull(object? argument) { }
+            }
+        }
+        public class C {
+            string M(string? x) => [|x ?? throw new ArgumentNullException(nameof(x))|];
+        }
+        """);
 }

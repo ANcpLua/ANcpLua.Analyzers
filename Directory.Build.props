@@ -22,7 +22,7 @@
              CA2208: ArgumentException instantiation - reviewed and acceptable
              CA1031: Catch general exception - some analyzers need broad catches
              RS2008: Release tracking - not using release tracking
-             AL0026: TEMPORARY - SDK 1.6.21 polyfill triggers this; remove after SDK update
+             AL0026: TEMPORARY - existing analyzer version flags SDK polyfills; remove after bootstrap
              NOTE: CA1307 REMOVED - now using SDK 1.3.27 StringExtensions polyfill -->
         <NoWarn>$(NoWarn);NU1701;CA1034;CA2208;CA1031;RS2008;AL0026</NoWarn>
 

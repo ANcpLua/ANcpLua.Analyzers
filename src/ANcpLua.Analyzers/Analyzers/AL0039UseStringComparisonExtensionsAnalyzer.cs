@@ -97,12 +97,12 @@ public sealed partial class Al0039UseStringComparisonExtensionsAnalyzer : AlAnal
         }
 
         // Build the suggestion
-        var receiverName = GetOperandName(invocation.Instance);
+        var receiverName = invocation.Instance.GetOperandName("str");
         var extensionName = $"{method.Name}{suffix}";
         var argName = GetFirstStringArgument(invocation);
         var suggestion = $"{receiverName}.{extensionName}({argName})";
 
-        context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.Syntax.GetLocation(), suggestion));
+        context.ReportDiagnostic(Rule, invocation.Syntax.GetLocation(), suggestion);
     }
 
     private static int CountNonStringComparisonArgs(IInvocationOperation invocation) {
@@ -165,29 +165,9 @@ public sealed partial class Al0039UseStringComparisonExtensionsAnalyzer : AlAnal
                 }
             }
 
-            return GetOperandName(arg.Value);
+            return arg.Value.GetOperandName();
         }
 
         return "value";
-    }
-
-    private static string GetOperandName(IOperation? operation) {
-        if (operation is null) {
-            return "str";
-        }
-
-        // Unwrap conversions
-        while (operation is IConversionOperation conversion) {
-            operation = conversion.Operand;
-        }
-
-        return operation switch {
-            ILocalReferenceOperation local => local.Local.Name,
-            IParameterReferenceOperation param => param.Parameter.Name,
-            IPropertyReferenceOperation prop => prop.Property.Name,
-            IFieldReferenceOperation field => field.Field.Name,
-            ILiteralOperation { ConstantValue.HasValue: true, ConstantValue.Value: string s } => $"\"{s}\"",
-            _ => "str"
-        };
     }
 }
