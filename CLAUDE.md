@@ -1,6 +1,6 @@
 # CLAUDE.md - ANcpLua.Analyzers
 
-Roslyn analyzers for C# code quality (AL0001-AL0035).
+Roslyn analyzers for C# code quality (AL0001-AL0044).
 
 ## Claude Rules
 
@@ -32,7 +32,7 @@ LAYER 3: qyl, other projects       <- END USERS
 
 ---
 
-## Rules (AL0001-AL0035)
+## Rules (AL0001-AL0044)
 
 | Rule | Severity | Description |
 |------|----------|-------------|
@@ -61,8 +61,8 @@ LAYER 3: qyl, other projects       <- END USERS
 | AL0023 | Error | Unsupported form type |
 | AL0024 | Error | Form and body conflict |
 | AL0025 | Warning | Prefer static lambda |
-| AL0026 | Warning | Avoid DateTime.Now/UtcNow, use TimeProvider |
-| AL0027 | Warning | Avoid Newtonsoft.Json, use System.Text.Json |
+| AL0026 | Warning | Avoid legacy time APIs, use TimeProvider |
+| AL0027 | Warning | Avoid legacy JSON libs, use System.Text.Json |
 | AL0028 | Info | Use IsEqualTo instead of SymbolEqualityComparer.Equals |
 | AL0029 | Info | Use HasAttribute instead of GetAttributes() patterns |
 | AL0030 | Info | Use Implements/InheritsFrom instead of type hierarchy loops |
@@ -71,6 +71,15 @@ LAYER 3: qyl, other projects       <- END USERS
 | AL0033 | Info | Use ToImmutableArrayOrEmpty() instead of ?.ToImmutableArray() ?? Empty |
 | AL0034 | Info | Use WhereNotNull() instead of Where(x => x != null) |
 | AL0035 | Info | Use GetFullyQualifiedName/GetMetadataName() instead of ToDisplayString |
+| AL0036 | Warning | Use Guard.NotNull() instead of null-coalescing throw |
+| AL0037 | Warning | Use TryParseInt32/Guid/etc. extension methods |
+| AL0038 | Warning | Use GetOrNull/GetOrDefault instead of TryGetValue |
+| AL0039 | Warning | Use EqualsIgnoreCase/StartsWithOrdinal etc. extensions |
+| AL0040 | Warning | Use GetConstructorArgument/GetNamedArgument extensions |
+| AL0041 | Error | [AotTest]/[TrimTest] must return int |
+| AL0042 | Warning | [AotTest]/[TrimTest] should return 100 on success |
+| AL0043 | Warning | [TrimSafe] code must not call [RequiresUnreferencedCode] |
+| AL0044 | Warning | [AotSafe] code must not call [RequiresDynamicCode] |
 
 ## Commands
 
@@ -125,9 +134,9 @@ tests/
 
 | Package | Version |
 |---------|---------|
-| ANcpLua.Analyzers | 1.10.2 |
+| ANcpLua.Analyzers | 1.10.4 |
 | ANcpLua.NET.Sdk | 1.6.21 |
-| ANcpLua.Roslyn.Utilities | 1.16.0 |
+| ANcpLua.Roslyn.Utilities | 1.17.0 |
 | ANcpLua.Roslyn.Utilities.Testing | 1.16.0 |
 | Roslyn | 5.0.0 |
 | RoslynAnalyzers | 3.11.0 |

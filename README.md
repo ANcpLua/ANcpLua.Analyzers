@@ -49,6 +49,15 @@ dotnet add package ANcpLua.Analyzers
 | [AL0033](https://ancplua.mintlify.app/analyzers/rules/AL0033) |   Info   | Use `ToImmutableArrayOrEmpty()` extension      |
 | [AL0034](https://ancplua.mintlify.app/analyzers/rules/AL0034) |   Info   | Use `WhereNotNull()` extension                 |
 | [AL0035](https://ancplua.mintlify.app/analyzers/rules/AL0035) |   Info   | Use `GetFullyQualifiedName`/`GetMetadataName`  |
+| [AL0036](https://ancplua.mintlify.app/analyzers/rules/AL0036) | Warning  | Use `Guard.NotNull()` instead of throw pattern |
+| [AL0037](https://ancplua.mintlify.app/analyzers/rules/AL0037) | Warning  | Use `TryParseInt32()` etc. extensions          |
+| [AL0038](https://ancplua.mintlify.app/analyzers/rules/AL0038) | Warning  | Use `GetOrNull()`/`GetOrDefault()` extensions  |
+| [AL0039](https://ancplua.mintlify.app/analyzers/rules/AL0039) | Warning  | Use `EqualsIgnoreCase()` etc. extensions       |
+| [AL0040](https://ancplua.mintlify.app/analyzers/rules/AL0040) | Warning  | Use `GetConstructorArgument<T>()` extensions   |
+| [AL0041](https://ancplua.mintlify.app/analyzers/rules/AL0041) |  Error   | `[AotTest]`/`[TrimTest]` must return `int`     |
+| [AL0042](https://ancplua.mintlify.app/analyzers/rules/AL0042) | Warning  | `[AotTest]`/`[TrimTest]` should return 100     |
+| [AL0043](https://ancplua.mintlify.app/analyzers/rules/AL0043) | Warning  | `[TrimSafe]` violates trim safety              |
+| [AL0044](https://ancplua.mintlify.app/analyzers/rules/AL0044) | Warning  | `[AotSafe]` violates AOT safety                |
 
 **Legend:** Error = build error, Warning = build warning, Info = IDE only
 
