@@ -121,4 +121,7 @@
     <data name="AL0030InheritsFromCodeFixTitle" xml:space="preserve">
     <value>Use InheritsFrom extension</value>
   </data>
+    <data name="AL0039CodeFixTitle" xml:space="preserve">
+    <value>Use StringComparison extension</value>
+  </data>
 </root>

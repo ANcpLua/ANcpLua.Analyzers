@@ -32,6 +32,7 @@ CodeFixes/
   AL0029UseHasAttributeCodeFixProvider.cs
   AL0030UseTypeHierarchyCodeFixProvider.cs
   AL0031UseOperationExtensionsCodeFixProvider.cs
+  AL0039UseStringComparisonExtensionsCodeFixProvider.cs
   ALCodeFixProvider.cs           # Base class
 Refactorings/
   AR0001SnakeCaseToPascalCaseRefactoring.cs
@@ -60,6 +61,7 @@ CodeFixResources.resx            # Localized strings
 | AL0029 | Replace with `HasAttribute`                   |
 | AL0030 | Replace with `Implements`/`InheritsFrom`      |
 | AL0031 | Replace with operation extensions             |
+| AL0039 | Replace with StringComparison extensions      |
 
 ## Refactorings (AR*)
 
