@@ -46,4 +46,28 @@ public sealed partial class Al0039AnalyzerTests : AnalyzerTest<Al0039UseStringCo
             bool M(string s, string other) => s.Equals(other);
         }
         """);
+
+    [Fact]
+    public Task ShouldNotReportForIndexOfWithStartIndex() => VerifyAsync("""
+        using System;
+        public class C {
+            int M(string s, int pos) => s.IndexOf("x", pos, StringComparison.Ordinal);
+        }
+        """);
+
+    [Fact]
+    public Task ShouldReportForIndexOfWithoutStartIndex() => VerifyAsync("""
+        using System;
+        public class C {
+            int M(string s) => [|s.IndexOf("x", StringComparison.Ordinal)|];
+        }
+        """);
+
+    [Fact]
+    public Task ShouldNotReportForLastIndexOf() => VerifyAsync("""
+        using System;
+        public class C {
+            int M(string s) => s.LastIndexOf("x", StringComparison.Ordinal);
+        }
+        """);
 }

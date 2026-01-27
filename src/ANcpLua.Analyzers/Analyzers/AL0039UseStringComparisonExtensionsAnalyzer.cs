@@ -31,13 +31,13 @@ public sealed partial class Al0039UseStringComparisonExtensionsAnalyzer : AlAnal
         HelpLinkBase);
 
     // Methods that have StringComparison extension equivalents
+    // Note: LastIndexOf is NOT included - no extension exists for it
     private static readonly HashSet<string> SupportedMethods = [
         "Equals",
         "StartsWith",
         "EndsWith",
         "Contains",
-        "IndexOf",
-        "LastIndexOf"
+        "IndexOf"
     ];
 
     // Mapping from StringComparison value to extension suffix
@@ -82,6 +82,14 @@ public sealed partial class Al0039UseStringComparisonExtensionsAnalyzer : AlAnal
             return;
         }
 
+        // Extensions only exist for simple cases (value + StringComparison).
+        // If there are additional parameters (startIndex, count), skip.
+        // Expected: 2 args for simple case (value + StringComparison)
+        var nonComparisonArgCount = CountNonStringComparisonArgs(invocation);
+        if (nonComparisonArgCount > 1) {
+            return;
+        }
+
         // Get the StringComparison value
         var comparisonValue = GetStringComparisonValue(comparisonArg);
         if (comparisonValue is null || !ComparisonToSuffix.TryGetValue(comparisonValue, out var suffix)) {
@@ -95,6 +103,24 @@ public sealed partial class Al0039UseStringComparisonExtensionsAnalyzer : AlAnal
         var suggestion = $"{receiverName}.{extensionName}({argName})";
 
         context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.Syntax.GetLocation(), suggestion));
+    }
+
+    private static int CountNonStringComparisonArgs(IInvocationOperation invocation) {
+        var count = 0;
+        foreach (var arg in invocation.Arguments) {
+            var type = arg.Value.Type;
+            if (type is null) {
+                count++;
+                continue;
+            }
+
+            var typeName = type.ToDisplayString();
+            if (typeName is not ("System.StringComparison" or "StringComparison")) {
+                count++;
+            }
+        }
+
+        return count;
     }
 
     private static IArgumentOperation? FindStringComparisonArgument(IInvocationOperation invocation) {
