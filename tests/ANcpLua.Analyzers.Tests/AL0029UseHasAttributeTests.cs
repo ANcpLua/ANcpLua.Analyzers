@@ -15,11 +15,19 @@ public sealed partial class Al0029UseHasAttributeTests : AnalyzerTest<Al0029UseH
                                               public interface INamedTypeSymbol : ISymbol { }
                                               public class AttributeData {
                                                   public INamedTypeSymbol? AttributeClass { get; }
+                                                  public System.Collections.Immutable.ImmutableArray<TypedConstant> ConstructorArguments { get; }
+                                                  public System.Collections.Immutable.ImmutableArray<System.Collections.Generic.KeyValuePair<string, TypedConstant>> NamedArguments { get; }
+                                                  public SyntaxReference? ApplicationSyntaxReference { get; }
                                               }
+                                              public struct TypedConstant {
+                                                  public object? Value { get; }
+                                              }
+                                              public class SyntaxReference { }
                                           }
                                           namespace System.Collections.Immutable {
                                               public struct ImmutableArray<T> : System.Collections.Generic.IEnumerable<T> {
                                                   public int Length => 0;
+                                                  public T this[int index] => default!;
                                                   public System.Collections.Generic.IEnumerator<T> GetEnumerator() => null!;
                                                   System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => null!;
                                               }
@@ -79,6 +87,63 @@ public sealed partial class Al0029UseHasAttributeTests : AnalyzerTest<Al0029UseH
                               foreach (var attr in symbol.GetAttributes()) {
                                   System.Console.WriteLine(attr);
                               }
+                          }
+                      }
+                      """);
+
+    [Fact]
+    public Task ShouldNotReportForeachWhenExtractingConstructorArguments() =>
+        VerifyAsync($$"""
+                      {{RoslynPolyfill}}
+
+                      public class C {
+                          string? M(Microsoft.CodeAnalysis.ISymbol symbol) {
+                              foreach (var attr in symbol.GetAttributes()) {
+                                  if (attr.AttributeClass?.ToString() == "GetAttribute") {
+                                      // Extracting data - not just checking existence
+                                      if (attr.ConstructorArguments.Length > 0) {
+                                          return attr.ConstructorArguments[0].Value?.ToString();
+                                      }
+                                  }
+                              }
+                              return null;
+                          }
+                      }
+                      """);
+
+    [Fact]
+    public Task ShouldNotReportForeachWhenExtractingNamedArguments() =>
+        VerifyAsync($$"""
+                      {{RoslynPolyfill}}
+
+                      public class C {
+                          void M(Microsoft.CodeAnalysis.ISymbol symbol) {
+                              foreach (var attr in symbol.GetAttributes()) {
+                                  if (attr.AttributeClass?.ToString() == "MyAttribute") {
+                                      // Extracting named arguments - valid use case
+                                      foreach (var namedArg in attr.NamedArguments) {
+                                          System.Console.WriteLine(namedArg.Key);
+                                      }
+                                  }
+                              }
+                          }
+                      }
+                      """);
+
+    [Fact]
+    public Task ShouldNotReportForeachWhenExtractingSyntaxReference() =>
+        VerifyAsync($$"""
+                      {{RoslynPolyfill}}
+
+                      public class C {
+                          object? M(Microsoft.CodeAnalysis.ISymbol symbol) {
+                              foreach (var attr in symbol.GetAttributes()) {
+                                  if (attr.AttributeClass?.ToString() == "MyAttribute") {
+                                      // Getting location - valid use case
+                                      return attr.ApplicationSyntaxReference;
+                                  }
+                              }
+                              return null;
                           }
                       }
                       """);

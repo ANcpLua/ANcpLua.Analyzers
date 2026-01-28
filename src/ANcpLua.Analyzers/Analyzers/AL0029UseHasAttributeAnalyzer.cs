@@ -68,7 +68,9 @@ public sealed partial class Al0029UseHasAttributeAnalyzer : AlAnalyzer {
         }
 
         var collectionName = forEachLoop.Collection.GetCollectionSourceName();
-        if (collectionName is "GetAttributes" && ContainsAttributeClassComparison(forEachLoop.Body)) {
+        if (collectionName is "GetAttributes" &&
+            ContainsAttributeClassComparison(forEachLoop.Body) &&
+            !ExtractsAttributeData(forEachLoop.Body)) {
             context.ReportDiagnostic(Rule, forEachLoop.Syntax.GetLocation(),
                 "symbol.HasAttribute(name)", "foreach over GetAttributes()");
         }
@@ -105,6 +107,28 @@ public sealed partial class Al0029UseHasAttributeAnalyzer : AlAnalyzer {
         foreach (var descendant in MsOperationExtensions.Descendants(body)) {
             if (descendant is IPropertyReferenceOperation { Property.Name: "AttributeClass" }) {
                 return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    ///     Checks if the loop body extracts data from AttributeData beyond just checking existence.
+    ///     When true, the foreach pattern is valid and shouldn't trigger AL0029.
+    /// </summary>
+    private static bool ExtractsAttributeData(IOperation? body) {
+        if (body is null) {
+            return false;
+        }
+
+        foreach (var descendant in MsOperationExtensions.Descendants(body)) {
+            if (descendant is IPropertyReferenceOperation { Property.Name: var propName }) {
+                // These properties extract data from the attribute, not just check existence
+                if (propName is "ConstructorArguments" or "NamedArguments" or
+                    "ApplicationSyntaxReference" or "AttributeConstructor") {
+                    return true;
+                }
             }
         }
 
