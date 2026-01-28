@@ -60,8 +60,15 @@ public sealed partial class Al0041AotTestMustReturnIntAnalyzer : AlAnalyzer {
             return;
         }
 
-        // Skip non-test methods
-        if (GetAotOrTrimTestAttribute(method) is not { } attribute) {
+        // Check for AotTest or TrimTest attribute
+        string? attributeName = null;
+        if (method.HasAttributeByShortName(AotTestAttributeName)) {
+            attributeName = AotTestAttributeName;
+        } else if (method.HasAttributeByShortName(TrimTestAttributeName)) {
+            attributeName = TrimTestAttributeName;
+        }
+
+        if (attributeName is null) {
             return;
         }
 
@@ -70,22 +77,7 @@ public sealed partial class Al0041AotTestMustReturnIntAnalyzer : AlAnalyzer {
             return;
         }
 
-        var attributeName = attribute.AttributeClass?.Name ?? "Unknown";
         var returnTypeName = method.ReturnType.ToDisplayString();
         context.ReportDiagnostic(Rule, method.Locations[0], method.Name, attributeName, returnTypeName);
-    }
-
-    private static AttributeData? GetAotOrTrimTestAttribute(IMethodSymbol method) {
-        foreach (var attribute in method.GetAttributes()) {
-            var attributeName = attribute.AttributeClass?.Name;
-            if (attributeName is AotTestAttributeName or
-                TrimTestAttributeName or
-                $"{AotTestAttributeName}Attribute" or
-                $"{TrimTestAttributeName}Attribute") {
-                return attribute;
-            }
-        }
-
-        return null;
     }
 }

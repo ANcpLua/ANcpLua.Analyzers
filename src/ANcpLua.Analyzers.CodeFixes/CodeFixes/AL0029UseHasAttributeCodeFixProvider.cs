@@ -90,7 +90,7 @@ public sealed partial class Al0029UseHasAttributeCodeFixProvider : CodeFixProvid
     private static Task<Document> ConvertToHasAttribute(
         Document document,
         SyntaxNode root,
-        InvocationExpressionSyntax invocation,
+        SyntaxNode invocation,
         ExpressionSyntax symbolExpr,
         string attributeName) {
         // Create: symbol.HasAttribute("attributeName")

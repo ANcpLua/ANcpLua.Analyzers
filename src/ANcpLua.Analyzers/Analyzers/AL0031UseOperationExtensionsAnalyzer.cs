@@ -120,15 +120,31 @@ public sealed partial class Al0031UseOperationExtensionsAnalyzer : AlAnalyzer {
     }
 
     private static bool IsConstantValueHasValueCheck(IBinaryOperation binary) {
+        var hasHasValueCheck = false;
+        var hasValueAccess = false;
+
         foreach (var descendant in OperationExtensions.Descendants(binary)) {
-            if (descendant is IPropertyReferenceOperation { Property.Name: "HasValue", Instance: { } rawInstance }) {
-                var instance = UnwrapConversions(rawInstance);
-                if (instance is IPropertyReferenceOperation { Property.Name: "ConstantValue" }) {
-                    return true;
-                }
+            if (descendant is not IPropertyReferenceOperation propRef) {
+                continue;
+            }
+
+            var instance = propRef.Instance is { } rawInstance ? UnwrapConversions(rawInstance) : null;
+
+            // Check for .HasValue on ConstantValue
+            if (propRef.Property.Name == "HasValue" &&
+                instance is IPropertyReferenceOperation { Property.Name: "ConstantValue" }) {
+                hasHasValueCheck = true;
+            }
+
+            // Check for .Value on ConstantValue
+            if (propRef.Property.Name == "Value" &&
+                instance is IPropertyReferenceOperation { Property.Name: "ConstantValue" }) {
+                hasValueAccess = true;
             }
         }
 
-        return false;
+        // Only suggest TryGetConstantValue when both .HasValue and .Value are accessed
+        // Just checking .HasValue alone is a valid pattern that doesn't need refactoring
+        return hasHasValueCheck && hasValueAccess;
     }
 }

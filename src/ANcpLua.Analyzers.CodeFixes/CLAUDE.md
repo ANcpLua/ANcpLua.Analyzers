@@ -8,7 +8,7 @@ This project contains all `CodeFixProvider` and `CodeRefactoringProvider` implem
 |-------------|-----------------|
 | **Target**  | netstandard2.0  |
 | **SDK**     | ANcpLua.NET.Sdk |
-| **Version** | 1.9.0           |
+| **Version** | 1.10.7          |
 | **Roslyn**  | 5.0.0           |
 
 ## Structure
@@ -32,7 +32,15 @@ CodeFixes/
   AL0029UseHasAttributeCodeFixProvider.cs
   AL0030UseTypeHierarchyCodeFixProvider.cs
   AL0031UseOperationExtensionsCodeFixProvider.cs
+  AL0032UseOrEmptyCodeFixProvider.cs
+  AL0033UseToImmutableArrayOrEmptyCodeFixProvider.cs
+  AL0034UseWhereNotNullCodeFixProvider.cs
+  AL0035UseToDisplayStringExtensionsCodeFixProvider.cs
+  AL0036UseGuardNotNullCodeFixProvider.cs
+  AL0037UseTryParseExtensionsCodeFixProvider.cs
+  AL0038UseGetOrNullCodeFixProvider.cs
   AL0039UseStringComparisonExtensionsCodeFixProvider.cs
+  AL0040UseAttributeExtensionsCodeFixProvider.cs
   ALCodeFixProvider.cs           # Base class
 Refactorings/
   AR0001SnakeCaseToPascalCaseRefactoring.cs
@@ -61,7 +69,15 @@ CodeFixResources.resx            # Localized strings
 | AL0029 | Replace with `HasAttribute`                   |
 | AL0030 | Replace with `Implements`/`InheritsFrom`      |
 | AL0031 | Replace with operation extensions             |
+| AL0032 | Replace with `OrEmpty()` extension            |
+| AL0033 | Replace with `ToImmutableArrayOrEmpty()`      |
+| AL0034 | Replace with `WhereNotNull()` extension       |
+| AL0035 | Replace with display string extensions        |
+| AL0036 | Replace with `Guard.NotNull()`                |
+| AL0037 | Replace with TryParse extensions              |
+| AL0038 | Replace with `GetOrNull()` extension          |
 | AL0039 | Replace with StringComparison extensions      |
+| AL0040 | Replace with `GetConstructorArgument<T>()`    |
 
 ## Refactorings (AR*)
 

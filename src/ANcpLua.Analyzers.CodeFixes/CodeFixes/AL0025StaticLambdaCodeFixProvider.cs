@@ -30,7 +30,7 @@ public sealed partial class Al0025StaticLambdaCodeFixProvider : CodeFixProvider 
         return Task.CompletedTask;
     }
 
-    internal static async Task<Document> MakeStaticAsync(
+    private static async Task<Document> MakeStaticAsync(
         Document document,
         TextSpan span,
         CancellationToken cancellationToken) {

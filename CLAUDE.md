@@ -134,7 +134,7 @@ tests/
 
 | Package | Version |
 |---------|---------|
-| ANcpLua.Analyzers | 1.10.4 |
+| ANcpLua.Analyzers | 1.10.7 |
 | ANcpLua.NET.Sdk | 1.6.21 |
 | ANcpLua.Roslyn.Utilities | 1.17.0 |
 | ANcpLua.Roslyn.Utilities.Testing | 1.16.0 |

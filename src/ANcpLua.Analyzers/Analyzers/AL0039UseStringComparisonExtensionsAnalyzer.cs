@@ -158,11 +158,9 @@ public sealed partial class Al0039UseStringComparisonExtensionsAnalyzer : AlAnal
         foreach (var arg in invocation.Arguments) {
             // Skip StringComparison arguments
             var type = arg.Value.Type;
-            if (type is not null) {
-                var typeName = type.ToDisplayString();
-                if (typeName is "System.StringComparison" or "StringComparison") {
-                    continue;
-                }
+            var typeName = type?.ToDisplayString();
+            if (typeName is "System.StringComparison" or "StringComparison") {
+                continue;
             }
 
             return arg.Value.GetOperandName();

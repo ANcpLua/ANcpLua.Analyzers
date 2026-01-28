@@ -69,7 +69,7 @@ public sealed partial class Al0040UseAttributeExtensionsAnalyzer : AlAnalyzer {
 
     private static void AnalyzeConstructorArgumentsAccess(
         OperationAnalysisContext context,
-        IPropertyReferenceOperation valueAccess,
+        IOperation valueAccess,
         IArrayElementReferenceOperation arrayAccess) {
         // Check if the array is ConstructorArguments
         if (arrayAccess.ArrayReference is not IPropertyReferenceOperation arrayProp) {
@@ -95,7 +95,7 @@ public sealed partial class Al0040UseAttributeExtensionsAnalyzer : AlAnalyzer {
 
     private static void AnalyzeConstructorArgumentsIndexing(
         OperationAnalysisContext context,
-        IPropertyReferenceOperation propRef,
+        IMemberReferenceOperation propRef,
         IOperation arrayElementRef) {
         if (!IsAttributeDataType(propRef.Instance?.Type)) {
             return;
@@ -116,24 +116,14 @@ public sealed partial class Al0040UseAttributeExtensionsAnalyzer : AlAnalyzer {
     }
 
     private static bool IsTypedConstantType(ITypeSymbol? type) {
-        if (type is null) {
-            return false;
-        }
-
-        var typeName = type.ToDisplayString();
-        return typeName is
-            "Microsoft.CodeAnalysis.TypedConstant" or
+        var typeName = type?.ToDisplayString();
+        return typeName is "Microsoft.CodeAnalysis.TypedConstant" or
             "TypedConstant";
     }
 
     private static bool IsAttributeDataType(ITypeSymbol? type) {
-        if (type is null) {
-            return false;
-        }
-
-        var typeName = type.ToDisplayString();
-        return typeName is
-            "Microsoft.CodeAnalysis.AttributeData" or
+        var typeName = type?.ToDisplayString();
+        return typeName is "Microsoft.CodeAnalysis.AttributeData" or
             "AttributeData";
     }
 

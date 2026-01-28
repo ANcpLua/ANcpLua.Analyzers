@@ -140,12 +140,12 @@ public sealed partial class Al0038UseGetOrNullAnalyzer : AlAnalyzer {
         return (dictName, keyName, extensionName);
     }
 
-    private static IOperation UnwrapConversions(IOperation? operation) {
+    private static IOperation? UnwrapConversions(IOperation? operation) {
         while (operation is IConversionOperation conversion) {
             operation = conversion.Operand;
         }
 
-        return operation!;
+        return operation;
     }
 
     private static string GetOperandName(IOperation? operation) {

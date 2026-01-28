@@ -66,7 +66,7 @@ public sealed partial class Al0042AotTestExitCode100Analyzer : AlAnalyzer {
 
         // Check if method returns int
         var intType = context.SemanticModel.Compilation.GetSpecialType(SpecialType.System_Int32);
-        if (intType is null || !methodSymbol.ReturnType.IsEqualTo(intType)) {
+        if (!methodSymbol.ReturnType.IsEqualTo(intType)) {
             return;
         }
 
@@ -107,7 +107,7 @@ public sealed partial class Al0042AotTestExitCode100Analyzer : AlAnalyzer {
 
     private static void CheckReturnValue(
         SyntaxNodeAnalysisContext context,
-        ExpressionSyntax expression,
+        CSharpSyntaxNode expression,
         DiagnosticDescriptor rule) {
         var constantValue = context.SemanticModel.GetConstantValue(expression, context.CancellationToken);
 
@@ -132,17 +132,7 @@ public sealed partial class Al0042AotTestExitCode100Analyzer : AlAnalyzer {
             $"Return value should be {ExpectedExitCode} for success, not {actualValue}");
     }
 
-    private static bool HasAotOrTrimTestAttribute(IMethodSymbol method) {
-        foreach (var attribute in method.GetAttributes()) {
-            var attributeName = attribute.AttributeClass?.Name;
-            if (attributeName is AotTestAttributeName or
-                TrimTestAttributeName or
-                $"{AotTestAttributeName}Attribute" or
-                $"{TrimTestAttributeName}Attribute") {
-                return true;
-            }
-        }
-
-        return false;
-    }
+    private static bool HasAotOrTrimTestAttribute(IMethodSymbol method) =>
+        method.HasAttributeByShortName(AotTestAttributeName) ||
+        method.HasAttributeByShortName(TrimTestAttributeName);
 }

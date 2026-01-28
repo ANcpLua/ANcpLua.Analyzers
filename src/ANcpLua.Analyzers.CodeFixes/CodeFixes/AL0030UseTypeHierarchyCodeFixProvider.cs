@@ -96,36 +96,40 @@ public sealed partial class Al0030UseTypeHierarchyCodeFixProvider : CodeFixProvi
         return targetExpr is not null;
     }
 
-    private static ExpressionSyntax? FindComparisonTarget(StatementSyntax body, string iteratorName) {
+    private static ExpressionSyntax? FindComparisonTarget(SyntaxNode body, string iteratorName) {
         foreach (var invocation in body.DescendantNodes().OfType<InvocationExpressionSyntax>()) {
             if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess) {
                 continue;
             }
 
-            // Pattern 1: SymbolEqualityComparer.*.Equals(iterator, target)
-            if (memberAccess.Name.Identifier.Text == "Equals" &&
-                memberAccess.Expression is MemberAccessExpressionSyntax {
-                    Expression: IdentifierNameSyntax { Identifier.Text: "SymbolEqualityComparer" }
-                } &&
-                invocation.ArgumentList.Arguments.Count == 2) {
-                var arg0 = invocation.ArgumentList.Arguments[0].Expression;
-                var arg1 = invocation.ArgumentList.Arguments[1].Expression;
+            switch (memberAccess.Name.Identifier.Text)
+            {
+                // Pattern 1: SymbolEqualityComparer.*.Equals(iterator, target)
+                case "Equals" when
+                    memberAccess.Expression is MemberAccessExpressionSyntax {
+                        Expression: IdentifierNameSyntax { Identifier.Text: "SymbolEqualityComparer" }
+                    } &&
+                    invocation.ArgumentList.Arguments.Count == 2:
+                {
+                    var arg0 = invocation.ArgumentList.Arguments[0].Expression;
+                    var arg1 = invocation.ArgumentList.Arguments[1].Expression;
 
-                if (arg0 is IdentifierNameSyntax { Identifier.Text: var name0 } && name0 == iteratorName) {
-                    return arg1;
+                    if (arg0 is IdentifierNameSyntax { Identifier.Text: var name0 } && name0 == iteratorName) {
+                        return arg1;
+                    }
+
+                    if (arg1 is IdentifierNameSyntax { Identifier.Text: var name1 } && name1 == iteratorName) {
+                        return arg0;
+                    }
+
+                    break;
                 }
-
-                if (arg1 is IdentifierNameSyntax { Identifier.Text: var name1 } && name1 == iteratorName) {
-                    return arg0;
-                }
-            }
-
-            // Pattern 2: iterator.IsEqualTo(target) from ANcpLua.Roslyn.Utilities
-            if (memberAccess.Name.Identifier.Text == "IsEqualTo" &&
-                memberAccess.Expression is IdentifierNameSyntax { Identifier.Text: var receiverName } &&
-                receiverName == iteratorName &&
-                invocation.ArgumentList.Arguments.Count == 1) {
-                return invocation.ArgumentList.Arguments[0].Expression;
+                // Pattern 2: iterator.IsEqualTo(target) from ANcpLua.Roslyn.Utilities
+                case "IsEqualTo" when
+                    memberAccess.Expression is IdentifierNameSyntax { Identifier.Text: var receiverName } &&
+                    receiverName == iteratorName &&
+                    invocation.ArgumentList.Arguments.Count == 1:
+                    return invocation.ArgumentList.Arguments[0].Expression;
             }
         }
 
@@ -135,7 +139,7 @@ public sealed partial class Al0030UseTypeHierarchyCodeFixProvider : CodeFixProvi
     private static Task<Document> ConvertToImplements(
         Document document,
         SyntaxNode root,
-        ForEachStatementSyntax forEach,
+        SyntaxNode forEach,
         ExpressionSyntax typeExpr,
         ExpressionSyntax targetExpr) {
         // Create: type.Implements(target)
@@ -156,7 +160,7 @@ public sealed partial class Al0030UseTypeHierarchyCodeFixProvider : CodeFixProvi
     private static Task<Document> ConvertToInheritsFrom(
         Document document,
         SyntaxNode root,
-        WhileStatementSyntax whileLoop,
+        SyntaxNode whileLoop,
         ExpressionSyntax typeExpr,
         ExpressionSyntax targetExpr) {
         // Create: type.InheritsFrom(target)
@@ -174,7 +178,7 @@ public sealed partial class Al0030UseTypeHierarchyCodeFixProvider : CodeFixProvi
         return Task.FromResult(document.WithSyntaxRoot(newRoot));
     }
 
-    private static SyntaxNode RemoveFollowingReturnStatement(SyntaxNode root, ReturnStatementSyntax newStatement) {
+    private static SyntaxNode RemoveFollowingReturnStatement(SyntaxNode root, SyntaxNode newStatement) {
         // Find the new statement in the updated tree
         var statementInNewTree = root.DescendantNodes()
             .OfType<ReturnStatementSyntax>()

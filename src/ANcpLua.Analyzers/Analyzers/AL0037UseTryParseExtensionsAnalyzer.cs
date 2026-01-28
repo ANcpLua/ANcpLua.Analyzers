@@ -143,12 +143,12 @@ public sealed partial class Al0037UseTryParseExtensionsAnalyzer : AlAnalyzer {
         };
     }
 
-    private static IOperation UnwrapConversions(IOperation? operation) {
+    private static IOperation? UnwrapConversions(IOperation? operation) {
         while (operation is IConversionOperation conversion) {
             operation = conversion.Operand;
         }
 
-        return operation!;
+        return operation;
     }
 
     private static string GetStringArgumentName(IInvocationOperation invocation) {

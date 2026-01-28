@@ -106,11 +106,7 @@ public sealed partial class Al0034UseWhereNotNullAnalyzer : AlAnalyzer {
         }
 
         // Fallback: for instance-style calls, predicate is usually Arguments[0]
-        if (invocation.Arguments.Length >= 1) {
-            return invocation.Arguments[0];
-        }
-
-        return null;
+        return invocation.Arguments.Length >= 1 ? invocation.Arguments[0] : null;
     }
 
     private static bool IsNullCheckLambda(IAnonymousFunctionOperation lambda) {
