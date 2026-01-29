@@ -135,9 +135,7 @@ public sealed partial class Al0040UseAttributeExtensionsAnalyzer : AlAnalyzer {
         var index = arrayAccess.Indices[0];
 
         // Unwrap conversions
-        while (index is IConversionOperation conversion) {
-            index = conversion.Operand;
-        }
+        index = OperationHelper.UnwrapConversions(index);
 
         if (index is ILiteralOperation { ConstantValue.HasValue: true } literal) {
             return literal.ConstantValue.Value?.ToString() ?? "0";
@@ -151,22 +149,6 @@ public sealed partial class Al0040UseAttributeExtensionsAnalyzer : AlAnalyzer {
         return operation.Parent;
     }
 
-    private static string GetOperandName(IOperation? operation) {
-        if (operation is null) {
-            return "attr";
-        }
-
-        // Unwrap conversions
-        while (operation is IConversionOperation conversion) {
-            operation = conversion.Operand;
-        }
-
-        return operation switch {
-            ILocalReferenceOperation local => local.Local.Name,
-            IParameterReferenceOperation param => param.Parameter.Name,
-            IPropertyReferenceOperation prop => prop.Property.Name,
-            IFieldReferenceOperation field => field.Field.Name,
-            _ => "attr"
-        };
-    }
+    private static string GetOperandName(IOperation? operation) =>
+        OperationHelper.GetOperandName(operation, "attr");
 }

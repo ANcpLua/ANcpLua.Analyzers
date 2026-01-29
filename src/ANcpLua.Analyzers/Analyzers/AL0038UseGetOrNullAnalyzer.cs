@@ -101,14 +101,14 @@ public sealed partial class Al0038UseGetOrNullAnalyzer : AlAnalyzer {
 
     private static bool IsTryGetValuePattern(IConditionalOperation conditional) {
         // The WhenTrue should reference the out variable
-        var whenTrue = UnwrapConversions(conditional.WhenTrue);
+        var whenTrue = OperationHelper.UnwrapConversions(conditional.WhenTrue);
 
         if (whenTrue is not ILocalReferenceOperation) {
             return false;
         }
 
         // The WhenFalse should be null, default, or a constant
-        var whenFalse = UnwrapConversions(conditional.WhenFalse);
+        var whenFalse = OperationHelper.UnwrapConversions(conditional.WhenFalse);
 
         return whenFalse switch {
             IDefaultValueOperation => true,
@@ -130,7 +130,7 @@ public sealed partial class Al0038UseGetOrNullAnalyzer : AlAnalyzer {
             : "key";
 
         // Determine extension: GetOrNull if WhenFalse is null, GetOrDefault otherwise
-        var whenFalse = UnwrapConversions(conditional.WhenFalse);
+        var whenFalse = OperationHelper.UnwrapConversions(conditional.WhenFalse);
         var extensionName = whenFalse switch {
             ILiteralOperation { ConstantValue.HasValue: true, ConstantValue.Value: null } => "GetOrNull",
             IDefaultValueOperation => "GetOrNull",
@@ -140,31 +140,6 @@ public sealed partial class Al0038UseGetOrNullAnalyzer : AlAnalyzer {
         return (dictName, keyName, extensionName);
     }
 
-    private static IOperation? UnwrapConversions(IOperation? operation) {
-        while (operation is IConversionOperation conversion) {
-            operation = conversion.Operand;
-        }
-
-        return operation;
-    }
-
-    private static string GetOperandName(IOperation? operation) {
-        if (operation is null) {
-            return "dict";
-        }
-
-        // Unwrap conversions
-        while (operation is IConversionOperation conversion) {
-            operation = conversion.Operand;
-        }
-
-        return operation switch {
-            ILocalReferenceOperation local => local.Local.Name,
-            IParameterReferenceOperation param => param.Parameter.Name,
-            IPropertyReferenceOperation prop => prop.Property.Name,
-            IFieldReferenceOperation field => field.Field.Name,
-            IInvocationOperation inv => $"{inv.TargetMethod.Name}()",
-            _ => "dict"
-        };
-    }
+    private static string GetOperandName(IOperation? operation) =>
+        OperationHelper.GetOperandName(operation, "dict");
 }

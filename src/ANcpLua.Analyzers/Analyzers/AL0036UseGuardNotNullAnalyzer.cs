@@ -59,9 +59,7 @@ public sealed partial class Al0036UseGuardNotNullAnalyzer : AlAnalyzer {
         }
 
         // Unwrap conversions
-        while (operation is IConversionOperation conversion) {
-            operation = conversion.Operand;
-        }
+        operation = OperationHelper.UnwrapConversions(operation);
 
         // Check for throw expression
         if (operation is not IThrowOperation throwOp) {
@@ -74,9 +72,7 @@ public sealed partial class Al0036UseGuardNotNullAnalyzer : AlAnalyzer {
         }
 
         // Unwrap conversions
-        while (exception is IConversionOperation exConversion) {
-            exception = exConversion.Operand;
-        }
+        exception = OperationHelper.UnwrapConversions(exception);
 
         // Check if it's creating an ArgumentNullException
         if (exception is not IObjectCreationOperation { Type: { } exceptionType }) {
@@ -88,19 +84,6 @@ public sealed partial class Al0036UseGuardNotNullAnalyzer : AlAnalyzer {
         return typeName is "System.ArgumentNullException" or "ArgumentNullException";
     }
 
-    private static string GetOperandName(IOperation operation) {
-        // Unwrap conversions
-        while (operation is IConversionOperation conversion) {
-            operation = conversion.Operand;
-        }
-
-        return operation switch {
-            ILocalReferenceOperation local => local.Local.Name,
-            IParameterReferenceOperation param => param.Parameter.Name,
-            IPropertyReferenceOperation prop => prop.Property.Name,
-            IFieldReferenceOperation field => field.Field.Name,
-            IInvocationOperation inv => $"{inv.TargetMethod.Name}()",
-            _ => "value"
-        };
-    }
+    private static string GetOperandName(IOperation operation) =>
+        OperationHelper.GetOperandName(operation, "value");
 }

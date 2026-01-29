@@ -70,9 +70,7 @@ public sealed partial class Al0032UseOrEmptyAnalyzer : AlAnalyzer {
         }
 
         // Unwrap conversions
-        while (operation is IConversionOperation conversion) {
-            operation = conversion.Operand;
-        }
+        operation = OperationHelper.UnwrapConversions(operation);
 
         switch (operation) {
             // Check for collection expression [] (empty)
@@ -136,19 +134,6 @@ public sealed partial class Al0032UseOrEmptyAnalyzer : AlAnalyzer {
         return false;
     }
 
-    private static string GetOperandDisplayName(IOperation operation) {
-        // Unwrap conversions
-        while (operation is IConversionOperation conversion) {
-            operation = conversion.Operand;
-        }
-
-        return operation switch {
-            ILocalReferenceOperation local => local.Local.Name,
-            IParameterReferenceOperation param => param.Parameter.Name,
-            IPropertyReferenceOperation prop => prop.Property.Name,
-            IFieldReferenceOperation field => field.Field.Name,
-            IInvocationOperation inv => $"{inv.TargetMethod.Name}()",
-            _ => "collection"
-        };
-    }
+    private static string GetOperandDisplayName(IOperation operation) =>
+        OperationHelper.GetOperandName(operation, "collection");
 }

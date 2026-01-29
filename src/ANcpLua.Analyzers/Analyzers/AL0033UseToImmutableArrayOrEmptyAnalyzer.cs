@@ -60,9 +60,7 @@ public sealed partial class Al0033UseToImmutableArrayOrEmptyAnalyzer : AlAnalyze
         }
 
         // Unwrap conversions
-        while (operation is IConversionOperation conversion) {
-            operation = conversion.Operand;
-        }
+        operation = OperationHelper.UnwrapConversions(operation);
 
         switch (operation) {
             // Check for ImmutableArray<T>.Empty field access
@@ -99,9 +97,7 @@ public sealed partial class Al0033UseToImmutableArrayOrEmptyAnalyzer : AlAnalyze
         }
 
         // Unwrap conversions
-        while (operation is IConversionOperation conversion) {
-            operation = conversion.Operand;
-        }
+        operation = OperationHelper.UnwrapConversions(operation);
 
         // Check for null-conditional invocation: source?.ToImmutableArray()
         if (operation is IConditionalAccessOperation {
@@ -116,19 +112,6 @@ public sealed partial class Al0033UseToImmutableArrayOrEmptyAnalyzer : AlAnalyze
         return false;
     }
 
-    private static string GetOperandDisplayName(IOperation operation) {
-        // Unwrap conversions
-        while (operation is IConversionOperation conversion) {
-            operation = conversion.Operand;
-        }
-
-        return operation switch {
-            ILocalReferenceOperation local => local.Local.Name,
-            IParameterReferenceOperation param => param.Parameter.Name,
-            IPropertyReferenceOperation prop => prop.Property.Name,
-            IFieldReferenceOperation field => field.Field.Name,
-            IInvocationOperation inv => $"{inv.TargetMethod.Name}()",
-            _ => "collection"
-        };
-    }
+    private static string GetOperandDisplayName(IOperation operation) =>
+        OperationHelper.GetOperandName(operation, "collection");
 }
