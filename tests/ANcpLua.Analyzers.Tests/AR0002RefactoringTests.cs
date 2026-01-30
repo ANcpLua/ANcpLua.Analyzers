@@ -69,7 +69,8 @@ public sealed partial class Ar0002RefactoringTests
             expected: [("Test.cs", SingleLambdaExpected)],
             triggerFile: "Test.cs",
             triggerText: "x => x * 2",
-            refactoringTitle: "Make lambda static");
+            refactoringTitle: "Make lambda static",
+            cancellationToken: TestContext.Current.CancellationToken);
 
     [Fact]
     public Task MakeStaticInFile_ShouldFixAllLambdasInDocument() =>
@@ -78,7 +79,8 @@ public sealed partial class Ar0002RefactoringTests
             expected: [("Test.cs", MultipleLambdasExpected)],
             triggerFile: "Test.cs",
             triggerText: "x => x > 0",
-            refactoringTitle: "Make all lambdas static in file");
+            refactoringTitle: "Make all lambdas static in file",
+            cancellationToken: TestContext.Current.CancellationToken);
 
     [Fact]
     public Task MakeStaticInSolution_ShouldFixAllLambdasAcrossDocuments() =>
@@ -103,7 +105,8 @@ public sealed partial class Ar0002RefactoringTests
             ],
             triggerFile: "File1.cs",
             triggerText: "x => x * 2",
-            refactoringTitle: "Make all lambdas static in solution");
+            refactoringTitle: "Make all lambdas static in solution",
+            cancellationToken: TestContext.Current.CancellationToken);
 
     [Fact]
     public Task MakeStaticInProject_ShouldOnlyFixLambdasInCurrentProject() =>
@@ -129,7 +132,8 @@ public sealed partial class Ar0002RefactoringTests
             triggerProject: "Project1",
             triggerFile: "File1.cs",
             triggerText: "x => x * 2",
-            refactoringTitle: "Make all lambdas static in project");
+            refactoringTitle: "Make all lambdas static in project",
+            cancellationToken: TestContext.Current.CancellationToken);
 
     [Fact]
     public Task MakeStaticInSolution_ShouldFixAllLambdasAcrossMultipleProjects() =>
@@ -167,19 +171,22 @@ public sealed partial class Ar0002RefactoringTests
             triggerProject: "Project1",
             triggerFile: "File1.cs",
             triggerText: "x => x * 2",
-            refactoringTitle: "Make all lambdas static in solution");
+            refactoringTitle: "Make all lambdas static in solution",
+            cancellationToken: TestContext.Current.CancellationToken);
 
     [Fact]
     public Task ShouldNotOfferRefactoring_WhenLambdaCapturesVariable() =>
         VerifyNoRefactoringAsync(
             documents: [("Test.cs", CapturingLambdaSource)],
             triggerFile: "Test.cs",
-            triggerText: "x => x + captured");
+            triggerText: "x => x + captured",
+            cancellationToken: TestContext.Current.CancellationToken);
 
     [Fact]
     public Task ShouldNotOfferRefactoring_WhenLambdaIsAlreadyStatic() =>
         VerifyNoRefactoringAsync(
             documents: [("Test.cs", AlreadyStaticSource)],
             triggerFile: "Test.cs",
-            triggerText: "static x => x * 2");
+            triggerText: "static x => x * 2",
+            cancellationToken: TestContext.Current.CancellationToken);
 }
