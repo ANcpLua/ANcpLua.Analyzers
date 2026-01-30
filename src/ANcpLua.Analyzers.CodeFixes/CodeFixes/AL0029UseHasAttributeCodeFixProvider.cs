@@ -44,8 +44,8 @@ public sealed partial class Al0029UseHasAttributeCodeFixProvider : CodeFixProvid
         symbolExpr = null;
         attributeName = null;
 
-        // Pattern: symbol.GetAttributes().Any/FirstOrDefault/Where/Count(lambda)
-        if (invocation.Expression is not MemberAccessExpressionSyntax { Name.Identifier.Text: "Any" or "FirstOrDefault" or "Where" or "Count" } linqAccess) {
+        // Only fix Any() - other LINQ methods have different return types
+        if (invocation.Expression is not MemberAccessExpressionSyntax { Name.Identifier.Text: "Any" } linqAccess) {
             return false;
         }
 
