@@ -46,7 +46,7 @@
        ROSLYN.UTILITIES.TESTING (Analyzer/CodeFix/Generator test infrastructure)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Roslyn.Utilities.Testing">
-    <ANcpLuaRoslynUtilitiesTestingVersion>1.16.0</ANcpLuaRoslynUtilitiesTestingVersion>
+    <ANcpLuaRoslynUtilitiesTestingVersion>1.24.0</ANcpLuaRoslynUtilitiesTestingVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
