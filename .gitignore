@@ -491,3 +491,4 @@ docs/_site/
 # Local build outputs
 nupkgs/
 pp.txt
+.serena/

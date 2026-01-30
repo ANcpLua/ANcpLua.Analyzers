@@ -1,110 +1,111 @@
 # ANcpLua.Analyzers.CodeFixes - Code Fix Project
 
-This project contains all `CodeFixProvider` and `CodeRefactoringProvider` implementations.
+CodeFixProvider and CodeRefactoringProvider implementations.
 
-## Project Info
+## Target
 
-| Property    | Value           |
-|-------------|-----------------|
-| **Target**  | netstandard2.0  |
-| **SDK**     | ANcpLua.NET.Sdk |
-| **Version** | 1.10.7          |
-| **Roslyn**  | 5.0.0           |
+- **Framework:** netstandard2.0 (required for Roslyn analyzers)
+- **Roslyn:** 5.0.0
 
-## Structure
+## File Structure
 
 ```
 CodeFixes/
-  AL0002CodeFixProvider.cs
-  AL0004CodeFixProvider.cs
-  AL0005CodeFixProvider.cs
-  AL0008IXmlSerializableCodeFixProvider.cs
-  AL0010PartialTypeCodeFixProvider.cs
-  AL0011LockTypeCodeFixProvider.cs
-  AL0012DeprecatedAttributeCodeFixProvider.cs
-  AL0014CodeFixProvider.cs
-  AL0015NormalizeNullGuardStyleCodeFixProvider.cs
-  AL0016CombineDeclarationWithNullCheckCodeFixProvider.cs
-  AL0025StaticLambdaCodeFixProvider.cs
-  AL0026DateTimeNowCodeFixProvider.cs
-  AL0027UseSystemTextJsonCodeFixProvider.cs
-  AL0028UseIsEqualToCodeFixProvider.cs
-  AL0029UseHasAttributeCodeFixProvider.cs
-  AL0030UseTypeHierarchyCodeFixProvider.cs
-  AL0031UseOperationExtensionsCodeFixProvider.cs
-  AL0032UseOrEmptyCodeFixProvider.cs
-  AL0033UseToImmutableArrayOrEmptyCodeFixProvider.cs
-  AL0034UseWhereNotNullCodeFixProvider.cs
-  AL0035UseToDisplayStringExtensionsCodeFixProvider.cs
-  AL0036UseGuardNotNullCodeFixProvider.cs
-  AL0037UseTryParseExtensionsCodeFixProvider.cs
-  AL0038UseGetOrNullCodeFixProvider.cs
-  AL0039UseStringComparisonExtensionsCodeFixProvider.cs
-  AL0040UseAttributeExtensionsCodeFixProvider.cs
-  ALCodeFixProvider.cs           # Base class
+  AL00XXCodeFixProvider.cs      # One code fix per analyzer (when applicable)
+  ALCodeFixProvider.cs          # Generic base class with node type parameter
 Refactorings/
-  AR0001SnakeCaseToPascalCaseRefactoring.cs
-  AR0002MakeStaticLambdaRefactoring.cs
-CodeFixResources.resx            # Localized strings
+  AR0001*.cs                    # Code refactorings (not tied to diagnostics)
+  AR0002*.cs
+CodeFixResources.resx           # Localized code fix titles
 ```
 
-## Available Code Fixes
+## Code Fix Base Class Pattern
 
-| Rule   | Fix Description                               |
-|--------|-----------------------------------------------|
-| AL0002 | Simplify repeated negated pattern             |
-| AL0004 | Convert to pattern matching `is "..."`        |
-| AL0005 | Convert to `SequenceEqual`                    |
-| AL0008 | Make GetSchema return null                    |
-| AL0010 | Add `partial` modifier                        |
-| AL0011 | Convert to `Lock` type                        |
-| AL0012 | Replace deprecated OTel attribute             |
-| AL0014 | Convert to `is null`/`is 0` pattern           |
-| AL0015 | Normalize null-guard style                    |
-| AL0016 | Combine declaration with null-check           |
-| AL0025 | Add `static` to lambda                        |
-| AL0026 | Replace DateTime.Now with TimeProvider        |
-| AL0027 | Replace Newtonsoft.Json with System.Text.Json |
-| AL0028 | Replace with `IsEqualTo`                      |
-| AL0029 | Replace with `HasAttribute`                   |
-| AL0030 | Replace with `Implements`/`InheritsFrom`      |
-| AL0031 | Replace with operation extensions             |
-| AL0032 | Replace with `OrEmpty()` extension            |
-| AL0033 | Replace with `ToImmutableArrayOrEmpty()`      |
-| AL0034 | Replace with `WhereNotNull()` extension       |
-| AL0035 | Replace with display string extensions        |
-| AL0036 | Replace with `Guard.NotNull()`                |
-| AL0037 | Replace with TryParse extensions              |
-| AL0038 | Replace with `GetOrNull()` extension          |
-| AL0039 | Replace with StringComparison extensions      |
-| AL0040 | Replace with `GetConstructorArgument<T>()`    |
-
-## Refactorings (AR*)
-
-| Rule   | Description                                      |
-|--------|--------------------------------------------------|
-| AR0001 | Convert SCREAMING_SNAKE_CASE to PascalCase       |
-| AR0002 | Make lambda static (refactoring, not diagnostic) |
-
-## Base Class Pattern
+The base class handles boilerplate: finding the node, registering the fix, providing FixAll support.
 
 ```csharp
 [ExportCodeFixProvider(LanguageNames.CSharp)]
-[Shared]
-public sealed class Al00XXCodeFixProvider : AlCodeFixProvider {
-    public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.MyRule];
+[Shared]  // Required - MEF exports are shared instances
+public sealed class Al00XXCodeFixProvider : AlCodeFixProvider<ClassDeclarationSyntax> {
+    public override ImmutableArray<string> FixableDiagnosticIds =>
+        [DiagnosticIds.MyRule];
 
-    protected override string Title => CodeFixResources.AL00XX_Title;
+    protected override CodeAction? CreateCodeAction(
+        Document document,
+        ClassDeclarationSyntax syntax,  // Node type from generic parameter
+        SyntaxNode root,
+        Diagnostic diagnostic) {
 
-    public override async Task RegisterCodeFixesAsync(CodeFixContext context) {
-        // Implementation
+        return CodeAction.Create(
+            title: CodeFixResources.AL00XX_Title,
+            createChangedDocument: ct => FixAsync(document, syntax, root, ct),
+            equivalenceKey: DiagnosticIds.MyRule);  // Required for FixAll
+    }
+
+    private static Task<Document> FixAsync(
+        Document document,
+        ClassDeclarationSyntax syntax,
+        SyntaxNode root,
+        CancellationToken ct) {
+
+        var newSyntax = syntax.WithModifiers(/* ... */);
+        var newRoot = root.ReplaceNode(syntax, newSyntax);
+        return Task.FromResult(document.WithSyntaxRoot(newRoot));
     }
 }
 ```
 
+## Refactorings (AR*)
+
+Code refactorings are NOT tied to diagnostics - they appear in the lightbulb menu on user request.
+
+```csharp
+[ExportCodeRefactoringProvider(LanguageNames.CSharp)]
+[Shared]
+public sealed class Ar0001MyRefactoring : CodeRefactoringProvider {
+    public override async Task ComputeRefactoringsAsync(CodeRefactoringContext context) {
+        var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken);
+        var node = root?.FindNode(context.Span);
+
+        if (node is not IdentifierNameSyntax identifier) return;
+
+        context.RegisterRefactoring(CodeAction.Create(
+            title: "Convert to PascalCase",
+            createChangedDocument: ct => ConvertAsync(context.Document, identifier, ct),
+            equivalenceKey: "AR0001"));
+    }
+}
+```
+
+## Available Code Fixes
+
+| Diagnostic | Fix Description                           |
+|------------|-------------------------------------------|
+| AL0002     | Simplify repeated negated pattern         |
+| AL0004     | Convert to `is "constant"` pattern        |
+| AL0005     | Convert to `SequenceEqual`                |
+| AL0008     | Make GetSchema return null                |
+| AL0010     | Add `partial` modifier                    |
+| AL0011     | Convert to `Lock` type                    |
+| AL0012     | Replace deprecated OTel attribute         |
+| AL0014     | Convert to `is null`/`is 0` pattern       |
+| AL0015     | Normalize null-guard style                |
+| AL0016     | Combine declaration with null-check       |
+| AL0025     | Add `static` to lambda                    |
+| AL0026     | Replace with TimeProvider                 |
+| AL0027     | Replace Newtonsoft with System.Text.Json  |
+| AL0028-40  | Replace with Roslyn.Utilities extensions  |
+
+## Available Refactorings
+
+| ID     | Description                              |
+|--------|------------------------------------------|
+| AR0001 | Convert SCREAMING_SNAKE_CASE to PascalCase |
+| AR0002 | Make lambda static (refactoring variant) |
+
 ## Important Notes
 
-- Code fixes must be thread-safe (MEF exports are shared)
-- Use `[Shared]` attribute on all providers
-- Both Analyzers.dll and CodeFixes.dll are packaged in the nupkg
-- Reference `CodeFixResources.resx` for localized strings
+- **Thread safety:** Code fix providers are MEF singletons. All state must be local to methods.
+- **[Shared] attribute:** Required on all providers.
+- **equivalenceKey:** Required for FixAll to work correctly.
+- **Both DLLs packaged:** The nupkg includes both Analyzers.dll and CodeFixes.dll.

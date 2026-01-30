@@ -1,82 +1,112 @@
 # ANcpLua.Analyzers - Analyzer Project
 
-This project contains all `DiagnosticAnalyzer` implementations (AL0001-AL0035).
+DiagnosticAnalyzer implementations (AL0001-AL0044). See root CLAUDE.md for full diagnostic list.
 
-## Project Info
+## Target
 
-| Property    | Value           |
-|-------------|-----------------|
-| **Target**  | netstandard2.0  |
-| **SDK**     | ANcpLua.NET.Sdk |
-| **Version** | 1.9.0           |
-| **Roslyn**  | 5.0.0           |
+- **Framework:** netstandard2.0 (required for Roslyn analyzers)
+- **Roslyn:** 5.0.0
 
-## Structure
+## File Structure
 
 ```
 Analyzers/
-  AL0001*.cs - AL0035*.cs    # Individual analyzer implementations
+  AL0001*.cs              # One analyzer per file (or grouped like AL0004ToAL0005*.cs)
 Core/
-  ALAnalyzer.cs              # Base class + DiagnosticIds + DiagnosticCategories
-  DeprecatedOtelAttributes.cs
-  WellKnownTypes.cs
-Internal/
-  RoslynExtensions.cs        # Internal Roslyn helpers
-Resources.resx               # Localized strings
+  ALAnalyzer.cs           # Base class + DiagnosticIds + DiagnosticCategories + DiagnosticSeverities
+  WellKnownTypes.cs       # WellKnownType enum + WellKnownTypeCache
+  OperationHelper.cs      # UnwrapConversions(), GetOperandName()
+  DeprecatedOtelAttributes.cs  # OTel attribute mappings for AL0012
+Resources.resx            # Localized diagnostic strings (Title, MessageFormat, Description)
 ```
-
-## Analyzer Categories
-
-| Category          | Rules                  | Description                         |
-|-------------------|------------------------|-------------------------------------|
-| Design            | AL0001, AL0002, AL0006 | Code design issues                  |
-| Usage             | AL0004, AL0005         | API usage patterns                  |
-| Reliability       | AL0003                 | Runtime reliability                 |
-| Threading         | AL0011                 | Thread safety                       |
-| OpenTelemetry     | AL0012, AL0013         | OTel semantic conventions           |
-| Style             | AL0014, AL0015, AL0016 | Code style consistency              |
-| VersionManagement | AL0017, AL0018, AL0019 | CPM/Version.props                   |
-| ASP.NET Core      | AL0020-AL0024          | Form binding                        |
-| Performance       | AL0025                 | Static lambdas                      |
-| Banned APIs       | AL0026, AL0027         | DateTime.Now, Newtonsoft            |
-| Roslyn Utilities  | AL0028-AL0035          | ANcpLua.Roslyn.Utilities extensions |
 
 ## Adding a New Analyzer
 
 1. Create `Analyzers/AL00XXDescriptionAnalyzer.cs`
-2. Add diagnostic ID to `Core/ALAnalyzer.cs` in `DiagnosticIds`
-3. Add localized strings to `Resources.resx`
+2. Add diagnostic ID constant to `Core/ALAnalyzer.cs` in `DiagnosticIds` class
+3. Add localized strings to `Resources.resx`:
+   - `AL00XX_Title`
+   - `AL00XX_MessageFormat`
+   - `AL00XX_Description`
 4. Inherit from `AlAnalyzer` base class
-5. Add corresponding code fix in CodeFixes project (if applicable)
-6. Add tests in Tests project
+5. Add tests in `tests/ANcpLua.Analyzers.Tests/`
 
-## Base Class Pattern
+## Analyzer Base Class Pattern
 
 ```csharp
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al00XXMyAnalyzer : AlAnalyzer {
     private static readonly DiagnosticDescriptor Rule = new(
-        DiagnosticIds.MyRule,
-        Title, MessageFormat, DiagnosticCategories.Category,
-        DiagnosticSeverity.Warning, true, Description,
-        HelpLinkBase);
+        DiagnosticIds.MyRule,                    // From Core/ALAnalyzer.cs
+        new LocalizableResourceString(nameof(Resources.AL00XX_Title), Resources.ResourceManager, typeof(Resources)),
+        new LocalizableResourceString(nameof(Resources.AL00XX_MessageFormat), Resources.ResourceManager, typeof(Resources)),
+        DiagnosticCategories.Design,             // From Core/ALAnalyzer.cs
+        DiagnosticSeverity.Warning,
+        isEnabledByDefault: true,
+        description: new LocalizableResourceString(nameof(Resources.AL00XX_Description), Resources.ResourceManager, typeof(Resources)),
+        helpLinkUri: HelpLinkBase);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
-    protected override void RegisterActions(AnalysisContext context) =>
+    protected override void RegisterActions(AnalysisContext context) {
+        // Choose appropriate registration:
         context.RegisterSyntaxNodeAction(Analyze, SyntaxKind.Whatever);
+        // OR
+        context.RegisterOperationAction(Analyze, OperationKind.Whatever);
+        // OR
+        context.RegisterSymbolAction(Analyze, SymbolKind.Whatever);
+    }
+
+    private static void Analyze(SyntaxNodeAnalysisContext context) {
+        // Report diagnostic:
+        context.ReportDiagnostic(Diagnostic.Create(Rule, location, args));
+    }
 }
 ```
 
-## Severity Guidelines
+## Core Utilities
 
-| Severity | Use When                                         |
-|----------|--------------------------------------------------|
-| Error    | Bug that will cause runtime failure              |
-| Warning  | Likely bug or anti-pattern                       |
-| Info     | Style suggestion (IDE only, not in build output) |
+### WellKnownTypeCache
+
+Cache resolved types per compilation for efficient lookups:
+
+```csharp
+protected override void RegisterActions(AnalysisContext context) {
+    context.RegisterCompilationStartAction(compilationContext => {
+        var cache = WellKnownTypeCache.Create(compilationContext.Compilation);
+
+        compilationContext.RegisterOperationAction(ctx => {
+            if (cache.IsType(symbol, WellKnownType.IFormCollection)) { ... }
+            if (cache.HasAttribute(symbol, WellKnownType.FromFormAttribute)) { ... }
+        }, OperationKind.Parameter);
+    });
+}
+```
+
+### OperationHelper
+
+Utility for IOperation manipulation:
+
+```csharp
+// Unwrap implicit conversions to get actual operand
+var unwrapped = OperationHelper.UnwrapConversions(operation);
+
+// Get human-readable name for diagnostic messages
+var name = OperationHelper.GetOperandName(operation, fallback: "value");
+// Returns: local name, parameter name, property name, field name, or "MethodName()"
+```
+
+## Severity Constants
+
+Use `DiagnosticSeverities` for consistent severity naming:
+
+```csharp
+DiagnosticSeverities.Suggestion      // Warning - appears in build output
+DiagnosticSeverities.RequiredFix     // Error - fails build
+DiagnosticSeverities.HiddenByDefault // Info - IDE only, NOT in build output
+```
 
 ## Key Dependencies
 
-- Microsoft.CodeAnalysis.CSharp (5.0.0)
-- ANcpLua.Roslyn.Utilities.Sources (1.16.0) - compile-time source package
+- `Microsoft.CodeAnalysis.CSharp` (5.0.0) - Roslyn APIs
+- `ANcpLua.Roslyn.Utilities.Sources` - Compile-time helpers (IsEqualTo, HasAttribute, etc.)
