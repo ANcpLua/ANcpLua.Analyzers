@@ -62,12 +62,28 @@ public sealed partial class Al0003DontDivideByConstantZeroAnalyzer : AlAnalyzer 
             return;
         }
 
-        var rightConstant = operation.RightOperand.ConstantValue;
-        if (!rightConstant.HasValue || !IsZero(rightConstant.Value)) {
+        if (!IsZeroConstant(operation.RightOperand)) {
             return;
         }
 
         context.ReportDiagnostic(Rule, operation.Syntax.GetLocation());
+    }
+
+    private static bool IsZeroConstant(IOperation operation) {
+        // First check if the operation itself has a constant value (handles most types)
+        if (operation.ConstantValue.HasValue && IsZero(operation.ConstantValue.Value)) {
+            return true;
+        }
+
+        // For Int128/UInt128, Roslyn may not provide a ConstantValue on the conversion
+        // operation. Check if it's a conversion from a zero literal.
+        if (operation is IConversionOperation conversion &&
+            conversion.Type?.ToDisplayString() is "System.Int128" or "System.UInt128") {
+            var operand = OperationHelper.UnwrapConversions(conversion.Operand);
+            return operand?.ConstantValue.HasValue == true && IsZero(operand.ConstantValue.Value);
+        }
+
+        return false;
     }
 
     private static bool IsIntegerOrDecimalType(ITypeSymbol typeSymbol) {
@@ -92,11 +108,12 @@ public sealed partial class Al0003DontDivideByConstantZeroAnalyzer : AlAnalyzer 
             sbyte sb => sb is 0,
             short s => s is 0,
             ushort us => us is 0,
-
             decimal d => d is 0m,
-
             nint n => n is 0,
             nuint nu => nu is 0,
+            // Int128/UInt128 are .NET 7+ types, not available at compile time in netstandard2.0.
+            // Check via runtime type name and use ToString() for zero comparison.
+            { } v when v.GetType().FullName is "System.Int128" or "System.UInt128" => v.ToString() == "0",
             _ => false
         };
 }

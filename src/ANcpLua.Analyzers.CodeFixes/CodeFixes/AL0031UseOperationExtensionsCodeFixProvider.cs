@@ -1,4 +1,4 @@
-﻿using ANcpLua.Analyzers.Core;
+using ANcpLua.Analyzers.Core;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
@@ -26,9 +26,15 @@ public sealed partial class Al0031UseOperationExtensionsCodeFixProvider : AlCode
         Diagnostic diagnostic) {
         // Pattern 1: TargetMethod.Name == "name" → IsMethodNamed
         if (TryGetMethodNameComparison(binary, out var invocationExpr, out var methodName)) {
+            // Only offer fix if we can determine the containing type from the method name
+            var containingType = GetContainingTypeFromMethodName(methodName);
+            if (containingType is null) {
+                return null;
+            }
+
             return CodeAction.Create(
                 CodeFixResources.AL0031CodeFixTitle,
-                _ => ConvertToIsMethodNamed(document, binary, root, invocationExpr, methodName),
+                _ => ConvertToIsMethodNamed(document, binary, root, invocationExpr, containingType, methodName),
                 nameof(Al0031UseOperationExtensionsCodeFixProvider) + "_IsMethodNamed");
         }
 
@@ -42,6 +48,44 @@ public sealed partial class Al0031UseOperationExtensionsCodeFixProvider : AlCode
 
         return null;
     }
+
+    /// <summary>
+    ///     Attempts to determine the containing type name from the method name.
+    ///     Returns null if the containing type cannot be determined (code fix should not be offered).
+    /// </summary>
+    private static string? GetContainingTypeFromMethodName(string methodName) =>
+        // Map well-known method names to their containing types.
+        // Only offer code fix for methods where we can confidently determine the containing type.
+        methodName switch {
+            // Object methods
+            "ToString" or "GetHashCode" or "Equals" or "ReferenceEquals" or "GetType" => "Object",
+
+            // IDisposable
+            "Dispose" => "IDisposable",
+
+            // IAsyncDisposable
+            "DisposeAsync" => "IAsyncDisposable",
+
+            // Common collection methods - too ambiguous, don't offer fix
+            "Add" or "Remove" or "Clear" or "Contains" => null,
+
+            // Task methods
+            "ConfigureAwait" or "GetAwaiter" => "Task",
+            "Wait" or "WaitAll" or "WaitAny" or "WhenAll" or "WhenAny" => "Task",
+
+            // String methods
+            "IsNullOrEmpty" or "IsNullOrWhiteSpace" or "Format" or "Join" or "Concat" => "String",
+
+            // LINQ methods - these come from Enumerable static class
+            "Select" or "Where" or "OrderBy" or "OrderByDescending" or "GroupBy" or "First" or "FirstOrDefault"
+                or "Single" or "SingleOrDefault" or "Last" or "LastOrDefault" or "Any" or "All" or "Count"
+                or "ToList" or "ToArray" or "ToDictionary" or "Aggregate" or "Sum" or "Max" or "Min" or "Average"
+                or "Skip" or "Take" or "SkipWhile" or "TakeWhile" or "Distinct" or "Union" or "Intersect" or "Except"
+                or "Zip" or "SelectMany" or "Cast" or "OfType" => "Enumerable",
+
+            // Unknown method - cannot determine containing type, don't offer fix
+            _ => null
+        };
 
     private static bool TryGetMethodNameComparison(
         BinaryExpressionSyntax binary,
@@ -95,12 +139,11 @@ public sealed partial class Al0031UseOperationExtensionsCodeFixProvider : AlCode
         BinaryExpressionSyntax binary,
         SyntaxNode root,
         ExpressionSyntax invocationExpr,
+        string containingType,
         string methodName) {
         var isNegated = binary.IsKind(SyntaxKind.NotEqualsExpression);
 
         // Create: invocation.IsMethodNamed("ContainingType", "methodName")
-        // Note: Using empty string for containing type since we can't determine it from syntax.
-        // User should replace "" with the actual containing type name for stricter matching.
         var isMethodNamedCall = SyntaxFactory.InvocationExpression(
             SyntaxFactory.MemberAccessExpression(
                 SyntaxKind.SimpleMemberAccessExpression,
@@ -111,7 +154,7 @@ public sealed partial class Al0031UseOperationExtensionsCodeFixProvider : AlCode
                     SyntaxFactory.Argument(
                         SyntaxFactory.LiteralExpression(
                             SyntaxKind.StringLiteralExpression,
-                            SyntaxFactory.Literal(""))),
+                            SyntaxFactory.Literal(containingType))),
                     SyntaxFactory.Argument(
                         SyntaxFactory.LiteralExpression(
                             SyntaxKind.StringLiteralExpression,

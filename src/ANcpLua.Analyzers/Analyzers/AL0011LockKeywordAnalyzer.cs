@@ -42,12 +42,18 @@ public sealed partial class Al0011LockKeywordAnalyzer : AlAnalyzer {
     }
 
     private static void AnalyzeLockStatement(SyntaxNodeAnalysisContext context, INamedTypeSymbol? lockType) {
+        // If Lock type doesn't exist (.NET < 9), don't report - user can't act on it
+        if (lockType is null) {
+            return;
+        }
+
         var lockStatement = (LockStatementSyntax)context.Node;
 
         var lockExpressionType =
             context.SemanticModel.GetTypeInfo(lockStatement.Expression, context.CancellationToken).Type;
 
-        if (lockType is not null && lockExpressionType.IsEqualTo(lockType)) {
+        // Already using Lock type - no diagnostic needed
+        if (lockExpressionType.IsEqualTo(lockType)) {
             return;
         }
 

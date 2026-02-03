@@ -11,9 +11,9 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///         Other values are reserved for different failure conditions.
 ///     </para>
 ///     <para>
-///         This analyzer checks return statements and reports:
-///         - Warning if a literal return value is not 100
-///         - Info if the method ends without an explicit return 100
+///         This analyzer reports a warning only when a method has NO return statement
+///         returning 100. Methods with conditional failure returns (e.g., return 1 for errors)
+///         alongside a success return (return 100) are not flagged.
 ///     </para>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
@@ -31,21 +31,14 @@ public sealed partial class Al0042AotTestExitCode100Analyzer : AlAnalyzer {
     private static readonly LocalizableResourceString Description = new(
         nameof(Resources.AL0042AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly DiagnosticDescriptor WarningRule = new(
+    private static readonly DiagnosticDescriptor Rule = new(
         DiagnosticIds.AotTestExitCode100,
         Title, MessageFormat, DiagnosticCategories.AotTesting,
         DiagnosticSeverity.Warning, true, Description,
         HelpLinkBase);
 
-    private static readonly DiagnosticDescriptor InfoRule = new(
-        DiagnosticIds.AotTestExitCode100,
-        Title, MessageFormat, DiagnosticCategories.AotTesting,
-        DiagnosticSeverity.Info, true, Description,
-        HelpLinkBase);
-
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [WarningRule, InfoRule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
     /// <summary>Registers syntax or operation actions for analysis.</summary>
 
@@ -84,38 +77,55 @@ public sealed partial class Al0042AotTestExitCode100Analyzer : AlAnalyzer {
             // Method has no explicit return statements
             // For expression-bodied methods, check the expression
             if (methodDeclaration.ExpressionBody is { } expressionBody) {
-                CheckReturnValue(context, expressionBody.Expression, InfoRule);
+                CheckSingleReturnValue(context, expressionBody.Expression);
             } else {
                 // Block-bodied method with no return statements - implicit return
                 var location = methodDeclaration.Identifier.GetLocation();
                 context.ReportDiagnostic(
-                    InfoRule, location,
+                    Rule, location,
                     $"Method ends without explicit 'return {ExpectedExitCode};' statement");
             }
 
             return;
         }
 
+        // First pass: check if ANY return statement returns 100
+        var hasSuccessReturn = false;
         foreach (var returnStatement in returnStatements) {
             if (returnStatement.Expression is null) {
                 continue;
             }
 
-            CheckReturnValue(context, returnStatement.Expression, WarningRule);
+            if (IsExpectedExitCode(context, returnStatement.Expression)) {
+                hasSuccessReturn = true;
+                break;
+            }
         }
+
+        // If there's at least one return 100, don't report on failure returns (they're intentional)
+        if (hasSuccessReturn) {
+            return;
+        }
+
+        // No return 100 found - report on the method identifier
+        var methodLocation = methodDeclaration.Identifier.GetLocation();
+        context.ReportDiagnostic(
+            Rule, methodLocation,
+            $"Method has no 'return {ExpectedExitCode};' statement to indicate success");
     }
 
-    private static void CheckReturnValue(
-        SyntaxNodeAnalysisContext context,
-        CSharpSyntaxNode expression,
-        DiagnosticDescriptor rule) {
+    private static bool IsExpectedExitCode(SyntaxNodeAnalysisContext context, ExpressionSyntax expression) {
+        var constantValue = context.SemanticModel.GetConstantValue(expression, context.CancellationToken);
+        return constantValue is { HasValue: true, Value: int intValue } && intValue == ExpectedExitCode;
+    }
+
+    private static void CheckSingleReturnValue(SyntaxNodeAnalysisContext context, ExpressionSyntax expression) {
         var constantValue = context.SemanticModel.GetConstantValue(expression, context.CancellationToken);
 
         if (!constantValue.HasValue) {
             // Not a constant - could be a variable or method call
-            // Report info suggesting they should return 100
             context.ReportDiagnostic(
-                InfoRule, expression.GetLocation(),
+                Rule, expression.GetLocation(),
                 $"Consider returning {ExpectedExitCode} for success instead of a computed value");
             return;
         }
@@ -128,7 +138,7 @@ public sealed partial class Al0042AotTestExitCode100Analyzer : AlAnalyzer {
         // Return value is a literal but not 100
         var actualValue = constantValue.Value?.ToString() ?? "null";
         context.ReportDiagnostic(
-            rule, expression.GetLocation(),
+            Rule, expression.GetLocation(),
             $"Return value should be {ExpectedExitCode} for success, not {actualValue}");
     }
 

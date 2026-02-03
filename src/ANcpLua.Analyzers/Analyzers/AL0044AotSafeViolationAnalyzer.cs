@@ -58,8 +58,13 @@ public sealed partial class Al0044AotSafeViolationAnalyzer : AlAnalyzer {
             return;
         }
 
-        // Check if the calling method is marked [AotSafe]
-        if (!callingMethod.HasAttributeByShortName(AotSafeAttributeName)) {
+        // Check if the calling method or containing type is marked [AotSafe]
+        var hasAttribute = callingMethod.HasAttributeByShortName(AotSafeAttributeName);
+        if (!hasAttribute && callingMethod.ContainingType is { } containingType) {
+            hasAttribute = containingType.HasAttributeByShortName(AotSafeAttributeName);
+        }
+
+        if (!hasAttribute) {
             return;
         }
 

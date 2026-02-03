@@ -6,12 +6,11 @@ namespace ANcpLua.Analyzers.Tests;
 
 /// <summary>
 ///     Tests for AL0011: Avoid lock keyword on non-Lock types.
-///     Warns on ALL lock(object) usage. In .NET 9+, lock(Lock) is preferred.
+///     Only warns on lock(object) when System.Threading.Lock is available (.NET 9+).
 /// </summary>
 /// <remarks>
-///     Note: This analyzer warns on lock(object) regardless of target framework.
-///     On .NET 9+, it only suppresses the warning when locking on System.Threading.Lock.
-///     Tests use a polyfill to simulate the Lock type.
+///     When System.Threading.Lock type is not available (.NET &lt; 9), no diagnostic is reported
+///     because the user cannot act on the warning. Tests use a polyfill to simulate the Lock type.
 /// </remarks>
 public sealed partial class Al0011AnalyzerTests : AnalyzerTest<Al0011LockKeywordAnalyzer> {
     [Theory]
@@ -121,13 +120,17 @@ public sealed partial class Al0011AnalyzerTests : AnalyzerTest<Al0011LockKeyword
                 """)]
     public Task ShouldNotReportLockOnLockType(string source) => VerifyAsync(source);
 
+    /// <summary>
+    ///     When Lock type is not available (.NET &lt; 9), no diagnostic should be reported
+    ///     because the user cannot act on it (no Lock type to migrate to).
+    /// </summary>
     [Fact]
-    public Task ShouldStillReportWhenLockTypeNotAvailable() => VerifyAsync(
+    public Task ShouldNotReportWhenLockTypeNotAvailable() => VerifyAsync(
         """
         public class C {
             private readonly object _syncRoot = new();
             void M() {
-                {|AL0011:lock|} (_syncRoot) { }
+                lock (_syncRoot) { }
             }
         }
         """,

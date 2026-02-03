@@ -33,4 +33,13 @@ public sealed partial class Al0038AnalyzerTests : AnalyzerTest<Al0038UseGetOrNul
                 dict.ContainsKey(key) ? true : false;
         }
         """);
+
+    [Fact]
+    public Task ShouldNotReportWhenWhenTrueIsNotOutVar() => VerifyAsync("""
+        using System.Collections.Generic;
+        public class C {
+            string? M(Dictionary<string, string> dict, string key, string other) =>
+                dict.TryGetValue(key, out var v) ? other : null;
+        }
+        """);
 }

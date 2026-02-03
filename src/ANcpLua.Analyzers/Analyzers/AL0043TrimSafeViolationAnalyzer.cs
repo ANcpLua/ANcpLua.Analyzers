@@ -58,8 +58,13 @@ public sealed partial class Al0043TrimSafeViolationAnalyzer : AlAnalyzer {
             return;
         }
 
-        // Check if the calling method is marked [TrimSafe]
-        if (!callingMethod.HasAttributeByShortName(TrimSafeAttributeName)) {
+        // Check if the calling method or containing type is marked [TrimSafe]
+        var hasAttribute = callingMethod.HasAttributeByShortName(TrimSafeAttributeName);
+        if (!hasAttribute && callingMethod.ContainingType is { } containingType) {
+            hasAttribute = containingType.HasAttributeByShortName(TrimSafeAttributeName);
+        }
+
+        if (!hasAttribute) {
             return;
         }
 

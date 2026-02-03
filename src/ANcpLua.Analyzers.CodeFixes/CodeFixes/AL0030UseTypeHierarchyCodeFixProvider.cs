@@ -86,12 +86,31 @@ public sealed partial class Al0030UseTypeHierarchyCodeFixProvider : CodeFixProvi
             return false;
         }
 
-        // The type expression is what we're walking from - find it in an ancestor or prior statement
-        // For now, just use the current variable as a placeholder
-        typeExpr = currentVar;
+        var loopVarName = currentVar.Identifier.Text;
+
+        // Find the original declaration before the while loop: var current = type.BaseType;
+        if (whileLoop.Parent is BlockSyntax block) {
+            var whileIndex = block.Statements.IndexOf(whileLoop);
+            if (whileIndex > 0) {
+                var precedingStatement = block.Statements[whileIndex - 1];
+                if (precedingStatement is LocalDeclarationStatementSyntax localDecl) {
+                    foreach (var variable in localDecl.Declaration.Variables) {
+                        if (variable.Identifier.Text == loopVarName &&
+                            variable.Initializer?.Value is MemberAccessExpressionSyntax { Name.Identifier.Text: "BaseType" } initAccess) {
+                            // Found: var current = type.BaseType; -> extract "type"
+                            typeExpr = initAccess.Expression;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Fallback to the current variable if we couldn't find the original type
+        typeExpr ??= currentVar;
 
         // Find the comparison target
-        targetExpr = FindComparisonTarget(whileLoop.Statement, currentVar.Identifier.Text);
+        targetExpr = FindComparisonTarget(whileLoop.Statement, loopVarName);
 
         return targetExpr is not null;
     }

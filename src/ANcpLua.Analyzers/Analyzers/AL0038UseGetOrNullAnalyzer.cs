@@ -68,7 +68,7 @@ public sealed partial class Al0038UseGetOrNullAnalyzer : AlAnalyzer {
         }
 
         // Check if the pattern matches: TryGetValue(...) ? outVar : default/null
-        if (!IsTryGetValuePattern(conditional)) {
+        if (!IsTryGetValuePattern(conditional, invocation)) {
             return;
         }
 
@@ -99,11 +99,27 @@ public sealed partial class Al0038UseGetOrNullAnalyzer : AlAnalyzer {
             "System.Collections.Concurrent.ConcurrentDictionary<TKey, TValue>";
     }
 
-    private static bool IsTryGetValuePattern(IConditionalOperation conditional) {
+    private static bool IsTryGetValuePattern(IConditionalOperation conditional, IInvocationOperation invocation) {
         // The WhenTrue should reference the out variable
         var whenTrue = OperationHelper.UnwrapConversions(conditional.WhenTrue);
 
-        if (whenTrue is not ILocalReferenceOperation) {
+        if (whenTrue is not ILocalReferenceOperation localRef) {
+            return false;
+        }
+
+        // Get the out parameter's declared local (second argument is the out parameter)
+        if (invocation.Arguments.Length < 2) {
+            return false;
+        }
+
+        var outArg = invocation.Arguments[1];
+        if (outArg.Value is not IDeclarationExpressionOperation declExpr ||
+            declExpr.Expression is not ILocalReferenceOperation outLocal) {
+            return false;
+        }
+
+        // Verify WhenTrue references the same local as the out parameter
+        if (!SymbolEqualityComparer.Default.Equals(localRef.Local, outLocal.Local)) {
             return false;
         }
 
