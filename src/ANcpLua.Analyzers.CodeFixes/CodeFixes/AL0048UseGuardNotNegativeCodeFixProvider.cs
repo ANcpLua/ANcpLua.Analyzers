@@ -1,0 +1,84 @@
+using ANcpLua.Analyzers.Core;
+
+namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
+
+/// <summary>
+///     Code fix for AL0048: Converts if (x less than 0) throw to Guard.NotNegative(x).
+/// </summary>
+/// <remarks>
+///     <list type="bullet">
+///         <item><c>if (x &lt; 0) throw new ArgumentOutOfRangeException(nameof(x))</c> → <c>Guard.NotNegative(x)</c></item>
+///         <item><c>if (0 &gt; x) throw new ArgumentOutOfRangeException(nameof(x))</c> → <c>Guard.NotNegative(x)</c></item>
+///     </list>
+/// </remarks>
+[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0048UseGuardNotNegativeCodeFixProvider))]
+[Shared]
+public sealed partial class Al0048UseGuardNotNegativeCodeFixProvider
+    : AlCodeFixProvider<IfStatementSyntax> {
+    /// <summary>Gets the diagnostic IDs this code fix can fix.</summary>
+    public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.UseGuardNotNegative];
+
+    /// <summary>Creates the code action for this fix.</summary>
+    protected override CodeAction CreateCodeAction(
+        Document document,
+        IfStatementSyntax ifStatement,
+        SyntaxNode root,
+        Diagnostic diagnostic) =>
+        CodeAction.Create(
+            CodeFixResources.AL0048CodeFixTitle,
+            _ => ConvertToGuardNotNegative(document, ifStatement, root),
+            nameof(Al0048UseGuardNotNegativeCodeFixProvider));
+
+    private static Task<Document> ConvertToGuardNotNegative(
+        Document document,
+        IfStatementSyntax ifStatement,
+        SyntaxNode root) {
+        // Extract the operand from the condition
+        var operandExpression = ExtractOperand(ifStatement.Condition);
+
+        // Create: Guard.NotNegative(operand);
+        var guardInvocation = SyntaxFactory.ExpressionStatement(
+                SyntaxFactory.InvocationExpression(
+                        SyntaxFactory.MemberAccessExpression(
+                            SyntaxKind.SimpleMemberAccessExpression,
+                            SyntaxFactory.IdentifierName("Guard"),
+                            SyntaxFactory.IdentifierName("NotNegative")),
+                        SyntaxFactory.ArgumentList(
+                            SyntaxFactory.SingletonSeparatedList(
+                                SyntaxFactory.Argument(operandExpression.WithoutTrivia())))))
+            .WithTriviaFrom(ifStatement);
+
+        var newRoot = root.ReplaceNode(ifStatement, guardInvocation);
+        return Task.FromResult(document.WithSyntaxRoot(newRoot));
+    }
+
+    private static ExpressionSyntax ExtractOperand(ExpressionSyntax condition) {
+        // Unwrap parentheses
+        while (condition is ParenthesizedExpressionSyntax paren) {
+            condition = paren.Expression;
+        }
+
+        if (condition is not BinaryExpressionSyntax binary) {
+            // Fallback - shouldn't happen if analyzer is correct
+            return SyntaxFactory.IdentifierName("value");
+        }
+
+        // Handle x < 0 -> return x
+        // Handle 0 > x -> return x
+        return binary.Kind() switch {
+            SyntaxKind.LessThanExpression when IsZeroLiteral(binary.Right) => binary.Left,
+            SyntaxKind.GreaterThanExpression when IsZeroLiteral(binary.Left) => binary.Right,
+            _ => binary.Left // Fallback
+        };
+    }
+
+    private static bool IsZeroLiteral(ExpressionSyntax expression) {
+        // Unwrap parentheses
+        while (expression is ParenthesizedExpressionSyntax paren) {
+            expression = paren.Expression;
+        }
+
+        return expression is LiteralExpressionSyntax literal &&
+               literal.Token.ValueText == "0";
+    }
+}

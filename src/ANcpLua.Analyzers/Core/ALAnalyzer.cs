@@ -248,4 +248,25 @@ public static partial class DiagnosticIds {
 
     /// <summary>AL0044: [AotSafe] code must not call methods with [RequiresDynamicCode].</summary>
     public const string AotSafeViolation = "AL0044";
+
+    /// <summary>AL0045: Use Guard.NotNullOrEmpty instead of if (string.IsNullOrEmpty) throw.</summary>
+    public const string UseGuardNotNullOrEmpty = "AL0045";
+
+    /// <summary>AL0046: Use Guard.NotNullOrWhiteSpace instead of if (string.IsNullOrWhiteSpace) throw.</summary>
+    public const string UseGuardNotNullOrWhiteSpace = "AL0046";
+
+    /// <summary>AL0047: Use Guard.NotZero instead of if (x == 0) throw ArgumentOutOfRangeException.</summary>
+    public const string UseGuardNotZero = "AL0047";
+
+    /// <summary>AL0048: Use Guard.NotNegative instead of if (x &lt; 0) throw ArgumentOutOfRangeException.</summary>
+    public const string UseGuardNotNegative = "AL0048";
+
+    /// <summary>AL0049: Use Guard.Positive instead of if (x &lt;= 0) throw ArgumentOutOfRangeException.</summary>
+    public const string UseGuardPositive = "AL0049";
+
+    /// <summary>AL0050: Use Guard.NotEmpty instead of if (guid == Guid.Empty) throw.</summary>
+    public const string UseGuardNotEmptyGuid = "AL0050";
+
+    /// <summary>AL0051: Use Guard.DefinedEnum instead of if (!Enum.IsDefined) throw patterns.</summary>
+    public const string UseGuardDefinedEnum = "AL0051";
 }

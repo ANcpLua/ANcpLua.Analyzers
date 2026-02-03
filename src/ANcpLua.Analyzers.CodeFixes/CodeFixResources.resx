@@ -148,4 +148,25 @@
     <data name="AL0040CodeFixTitle" xml:space="preserve">
     <value>Use GetConstructorArgument extension</value>
   </data>
+    <data name="AL0045CodeFixTitle" xml:space="preserve">
+    <value>Use Guard.NotNullOrEmpty</value>
+  </data>
+    <data name="AL0046CodeFixTitle" xml:space="preserve">
+    <value>Use Guard.NotNullOrWhiteSpace</value>
+  </data>
+    <data name="AL0047CodeFixTitle" xml:space="preserve">
+    <value>Use Guard.NotZero</value>
+  </data>
+    <data name="AL0048CodeFixTitle" xml:space="preserve">
+    <value>Use Guard.NotNegative</value>
+  </data>
+    <data name="AL0049CodeFixTitle" xml:space="preserve">
+    <value>Use Guard.Positive</value>
+  </data>
+    <data name="AL0050CodeFixTitle" xml:space="preserve">
+    <value>Use Guard.NotEmpty</value>
+  </data>
+    <data name="AL0051CodeFixTitle" xml:space="preserve">
+    <value>Use Guard.DefinedEnum</value>
+  </data>
 </root>

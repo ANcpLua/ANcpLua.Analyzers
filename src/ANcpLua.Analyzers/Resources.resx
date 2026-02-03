@@ -474,4 +474,74 @@
     <data name="AL0044AnalyzerDescription" xml:space="preserve">
     <value>Code marked with [AotSafe] guarantees it will work correctly in AOT-compiled applications. Calling methods with [RequiresDynamicCode] violates this guarantee because those methods rely on runtime code generation which is not available in AOT scenarios.</value>
   </data>
+    <!-- AL0045: Use Guard.NotNullOrEmpty -->
+    <data name="AL0045AnalyzerTitle" xml:space="preserve">
+    <value>Use null-or-empty guard helper</value>
+  </data>
+    <data name="AL0045AnalyzerMessageFormat" xml:space="preserve">
+    <value>Use 'Guard.NotNullOrEmpty({0})' instead of if/throw pattern</value>
+  </data>
+    <data name="AL0045AnalyzerDescription" xml:space="preserve">
+    <value>Use Guard.NotNullOrEmpty() instead of verbose if (string.IsNullOrEmpty(...)) throw new ArgumentNullException/ArgumentException patterns.</value>
+  </data>
+    <!-- AL0046: Use Guard.NotNullOrWhiteSpace -->
+    <data name="AL0046AnalyzerTitle" xml:space="preserve">
+    <value>Use null-or-whitespace guard helper</value>
+  </data>
+    <data name="AL0046AnalyzerMessageFormat" xml:space="preserve">
+    <value>Use 'Guard.NotNullOrWhiteSpace({0})' instead of if/throw pattern</value>
+  </data>
+    <data name="AL0046AnalyzerDescription" xml:space="preserve">
+    <value>Use Guard.NotNullOrWhiteSpace() instead of verbose if (string.IsNullOrWhiteSpace(...)) throw new ArgumentNullException/ArgumentException patterns.</value>
+  </data>
+    <!-- AL0047: Use Guard.NotZero -->
+    <data name="AL0047AnalyzerTitle" xml:space="preserve">
+    <value>Use zero-guard helper</value>
+  </data>
+    <data name="AL0047AnalyzerMessageFormat" xml:space="preserve">
+    <value>Use 'Guard.NotZero({0})' instead of if/throw pattern</value>
+  </data>
+    <data name="AL0047AnalyzerDescription" xml:space="preserve">
+    <value>Use Guard.NotZero() instead of verbose if (x == 0) throw new ArgumentOutOfRangeException patterns.</value>
+  </data>
+    <!-- AL0048: Use Guard.NotNegative -->
+    <data name="AL0048AnalyzerTitle" xml:space="preserve">
+    <value>Use non-negative guard helper</value>
+  </data>
+    <data name="AL0048AnalyzerMessageFormat" xml:space="preserve">
+    <value>Use 'Guard.NotNegative({0})' instead of if/throw pattern</value>
+  </data>
+    <data name="AL0048AnalyzerDescription" xml:space="preserve">
+    <value>Use Guard.NotNegative() instead of verbose if (x &lt; 0) throw new ArgumentOutOfRangeException patterns.</value>
+  </data>
+    <!-- AL0049: Use Guard.Positive -->
+    <data name="AL0049AnalyzerTitle" xml:space="preserve">
+    <value>Use positive-guard helper</value>
+  </data>
+    <data name="AL0049AnalyzerMessageFormat" xml:space="preserve">
+    <value>Use 'Guard.Positive({0})' instead of if/throw pattern</value>
+  </data>
+    <data name="AL0049AnalyzerDescription" xml:space="preserve">
+    <value>Use Guard.Positive() instead of verbose if (x &lt;= 0) throw new ArgumentOutOfRangeException patterns.</value>
+  </data>
+    <!-- AL0050: Use Guard.NotEmpty for Guid -->
+    <data name="AL0050AnalyzerTitle" xml:space="preserve">
+    <value>Use empty-guid guard helper</value>
+  </data>
+    <data name="AL0050AnalyzerMessageFormat" xml:space="preserve">
+    <value>Use 'Guard.NotEmpty({0})' instead of if/throw pattern</value>
+  </data>
+    <data name="AL0050AnalyzerDescription" xml:space="preserve">
+    <value>Use Guard.NotEmpty() instead of verbose if (guid == Guid.Empty) throw new ArgumentException patterns.</value>
+  </data>
+    <!-- AL0051: Use Guard.DefinedEnum -->
+    <data name="AL0051AnalyzerTitle" xml:space="preserve">
+    <value>Use defined-enum guard helper</value>
+  </data>
+    <data name="AL0051AnalyzerMessageFormat" xml:space="preserve">
+    <value>Use 'Guard.DefinedEnum({0})' instead of if/throw pattern</value>
+  </data>
+    <data name="AL0051AnalyzerDescription" xml:space="preserve">
+    <value>Use Guard.DefinedEnum() instead of verbose if (!Enum.IsDefined) throw new ArgumentException/ArgumentOutOfRangeException patterns.</value>
+  </data>
 </root>
