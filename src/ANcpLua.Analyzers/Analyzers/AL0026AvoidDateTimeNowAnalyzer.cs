@@ -16,6 +16,9 @@ public sealed partial class Al0026AvoidDateTimeNowAnalyzer : AlAnalyzer {
     /// <summary>Metadata name for System.DateTimeOffset.</summary>
     private const string DateTimeOffsetMetadataName = "System.DateTimeOffset";
 
+    /// <summary>Property key for the source type (DateTime or DateTimeOffset).</summary>
+    public const string PropertyIsDateTimeOffset = "IsDateTimeOffset";
+
     private static readonly LocalizableResourceString Title = new(
         nameof(Resources.AL0026AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
 
@@ -93,7 +96,9 @@ public sealed partial class Al0026AvoidDateTimeNowAnalyzer : AlAnalyzer {
         }
 
         var typeName = isDateTime ? "DateTime" : "DateTimeOffset";
-        context.ReportDiagnostic(Rule, propertyRef.Syntax.GetLocation(), typeName, property.Name, replacement);
+        var properties = ImmutableDictionary.CreateBuilder<string, string?>();
+        properties.Add(PropertyIsDateTimeOffset, isDateTimeOffset.ToString());
+        context.ReportDiagnostic(Diagnostic.Create(Rule, propertyRef.Syntax.GetLocation(), properties.ToImmutable(), typeName, property.Name, replacement));
     }
 
     private static bool InheritsFromOrEquals(INamedTypeSymbol type, INamedTypeSymbol baseType) =>

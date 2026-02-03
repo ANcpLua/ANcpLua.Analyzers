@@ -32,7 +32,16 @@ public sealed partial class Al0004CodeFixProvider : AlCodeFixProvider<BinaryExpr
             _ => throw new InvalidOperationException("Unexpected syntax kind")
         };
 
-        var isPattern = SyntaxFactory.IsPatternExpression(binary.Left, pattern);
+        // For != comparisons, wrap pattern in "not" pattern
+        var isNotEquals = binary.IsKind(SyntaxKind.NotEqualsExpression);
+        if (isNotEquals) {
+            pattern = SyntaxFactory.UnaryPattern(
+                SyntaxFactory.Token(SyntaxKind.NotKeyword),
+                pattern);
+        }
+
+        var isPattern = SyntaxFactory.IsPatternExpression(binary.Left, pattern)
+            .WithTriviaFrom(binary);
         return Task.FromResult(document.WithSyntaxRoot(root.ReplaceNode(binary, isPattern)));
     }
 

@@ -29,8 +29,17 @@ public sealed partial class Al0005CodeFixProvider : AlCodeFixProvider<BinaryExpr
             sequenceEqual);
         var argument = SyntaxFactory.Argument(binary.Right);
         var argumentList = SyntaxFactory.ArgumentList(SyntaxFactory.SingletonSeparatedList(argument));
-        var invocation = SyntaxFactory.InvocationExpression(memberAccess, argumentList);
+        ExpressionSyntax invocation = SyntaxFactory.InvocationExpression(memberAccess, argumentList);
 
+        // For != comparisons, negate the result
+        var isNotEquals = binary.IsKind(SyntaxKind.NotEqualsExpression);
+        if (isNotEquals) {
+            invocation = SyntaxFactory.PrefixUnaryExpression(
+                SyntaxKind.LogicalNotExpression,
+                invocation);
+        }
+
+        invocation = invocation.WithTriviaFrom(binary);
         return Task.FromResult(document.WithSyntaxRoot(root.ReplaceNode(binary, invocation)));
     }
 }

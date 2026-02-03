@@ -110,7 +110,8 @@ public sealed partial class Al0035UseToDisplayStringExtensionsAnalyzer : AlAnaly
     }
 
     private static bool IsOrImplementsITypeSymbol(ITypeSymbol type, INamedTypeSymbol iTypeSymbol) =>
-        type.IsEqualTo(iTypeSymbol) || type.Implements(iTypeSymbol) || type.InheritsFrom(iTypeSymbol);
+        type.IsEqualTo(iTypeSymbol) || type.Implements(iTypeSymbol);
+        // Note: InheritsFrom is wrong for interface checks - interfaces are implemented, not inherited
 
     private static IOperation? GetFormatArgument(IInvocationOperation invocation) {
         // ToDisplayString has optional format parameter

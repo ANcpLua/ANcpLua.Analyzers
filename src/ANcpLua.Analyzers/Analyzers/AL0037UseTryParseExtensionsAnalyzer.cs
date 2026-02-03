@@ -129,16 +129,15 @@ public sealed partial class Al0037UseTryParseExtensionsAnalyzer : AlAnalyzer {
             return false;
         }
 
-        // The WhenFalse should be null, default, or a constant
+        // The WhenFalse should be null or default only (not other constants like 0)
+        // because the extension method returns null on parse failure, not 0
         var whenFalse = UnwrapConversions(conditional.WhenFalse);
 
         return whenFalse switch {
             IDefaultValueOperation => true,
-            ILiteralOperation {
-                ConstantValue: { HasValue: true, Value: null }
-            } => true,
+            ILiteralOperation { ConstantValue: { HasValue: true, Value: null } } => true,
             IConversionOperation { Operand: IDefaultValueOperation } => true,
-            ILiteralOperation => true, // Any constant (including 0, false, etc.)
+            // Do NOT match non-null literals like 0, false, etc. - semantic change
             _ => false
         };
     }

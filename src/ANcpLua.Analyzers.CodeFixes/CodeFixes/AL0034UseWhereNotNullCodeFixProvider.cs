@@ -40,13 +40,13 @@ public sealed partial class Al0034UseWhereNotNullCodeFixProvider
 
         var source = memberAccess.Expression;
 
-        // Create: source.WhereNotNull()
+        // Create: source.WhereNotNull() - preserve source trivia, apply invocation trivia to result
         var newExpression = SyntaxFactory.InvocationExpression(
                 SyntaxFactory.MemberAccessExpression(
                     SyntaxKind.SimpleMemberAccessExpression,
-                    source.WithoutTrivia(),
+                    source,
                     SyntaxFactory.IdentifierName("WhereNotNull")))
-            .WithTriviaFrom(invocation);
+            .WithTrailingTrivia(invocation.GetTrailingTrivia());
 
         var newRoot = root.ReplaceNode(invocation, newExpression);
         return Task.FromResult(document.WithSyntaxRoot(newRoot));
