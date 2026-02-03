@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using ANcpLua.Analyzers.Core;
 
 namespace ANcpLua.Analyzers.Analyzers;
@@ -94,14 +95,14 @@ public sealed partial class Al0053UnnecessaryAotUnsafeAnalyzer : AlAnalyzer {
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
         // Track methods marked with [AotUnsafe] and whether they have unsafe patterns
-        var methodUnsafePatterns = new Dictionary<IMethodSymbol, bool>(SymbolEqualityComparer.Default);
+        // Use ConcurrentDictionary because analyzer callbacks run concurrently
+        var methodUnsafePatterns = new ConcurrentDictionary<IMethodSymbol, bool>(SymbolEqualityComparer.Default);
 
         // Register all methods with [AotUnsafe] attribute first (to catch methods with no operations)
         context.RegisterSymbolAction(ctx => {
             var method = (IMethodSymbol)ctx.Symbol;
-            if (method.HasAttributeByShortName(AotUnsafeAttributeName) &&
-                !methodUnsafePatterns.ContainsKey(method)) {
-                methodUnsafePatterns[method] = false; // Assume safe until proven otherwise
+            if (method.HasAttributeByShortName(AotUnsafeAttributeName)) {
+                methodUnsafePatterns.TryAdd(method, false); // Assume safe until proven otherwise
             }
         }, SymbolKind.Method);
 
@@ -143,9 +144,7 @@ public sealed partial class Al0053UnnecessaryAotUnsafeAnalyzer : AlAnalyzer {
             }
 
             // Mark as not having unsafe patterns (yet)
-            if (!methodUnsafePatterns.ContainsKey(method)) {
-                methodUnsafePatterns[method] = false;
-            }
+            methodUnsafePatterns.TryAdd(method, false);
         }, OperationKind.Invocation);
 
         // Check object creation for Reflection.Emit types
