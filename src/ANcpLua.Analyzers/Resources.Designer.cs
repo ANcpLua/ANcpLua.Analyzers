@@ -910,5 +910,41 @@ namespace ANcpLua.Analyzers {
                 return ResourceManager.GetString("AL0051AnalyzerDescription", resourceCulture);
             }
         }
+
+        internal static string AL0052AnalyzerTitle {
+            get {
+                return ResourceManager.GetString("AL0052AnalyzerTitle", resourceCulture);
+            }
+        }
+
+        internal static string AL0052AnalyzerMessageFormat {
+            get {
+                return ResourceManager.GetString("AL0052AnalyzerMessageFormat", resourceCulture);
+            }
+        }
+
+        internal static string AL0052AnalyzerDescription {
+            get {
+                return ResourceManager.GetString("AL0052AnalyzerDescription", resourceCulture);
+            }
+        }
+
+        internal static string AL0053AnalyzerTitle {
+            get {
+                return ResourceManager.GetString("AL0053AnalyzerTitle", resourceCulture);
+            }
+        }
+
+        internal static string AL0053AnalyzerMessageFormat {
+            get {
+                return ResourceManager.GetString("AL0053AnalyzerMessageFormat", resourceCulture);
+            }
+        }
+
+        internal static string AL0053AnalyzerDescription {
+            get {
+                return ResourceManager.GetString("AL0053AnalyzerDescription", resourceCulture);
+            }
+        }
     }
 }

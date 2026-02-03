@@ -269,4 +269,15 @@ public static partial class DiagnosticIds {
 
     /// <summary>AL0051: Use Guard.DefinedEnum instead of if (!Enum.IsDefined) throw patterns.</summary>
     public const string UseGuardDefinedEnum = "AL0051";
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // AOT/TRIM UNSAFE DETECTION (AL0052-AL0053)
+    // These analyzers detect misuse of [AotUnsafe]/[TrimUnsafe] attributes.
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /// <summary>AL0052: [AotSafe] code must not call [AotUnsafe] code.</summary>
+    public const string AotSafeCallsAotUnsafe = "AL0052";
+
+    /// <summary>AL0053: [AotUnsafe] attribute applied to code that doesn't use AOT-incompatible patterns.</summary>
+    public const string UnnecessaryAotUnsafe = "AL0053";
 }
