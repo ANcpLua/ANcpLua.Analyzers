@@ -104,4 +104,25 @@ public sealed partial class Al0050AnalyzerTests : AnalyzerTest<Al0050UseGuardNot
             }
         }
         """);
+
+    [Fact]
+    public Task ShouldReportForArgumentNullException() => VerifyAsync("""
+        using System;
+        public class C {
+            void M(Guid id) {
+                [|if (id == Guid.Empty) throw new ArgumentNullException(nameof(id));|]
+            }
+        }
+        """);
+
+    [Fact]
+    public Task ShouldReportForMemberAccess() => VerifyAsync("""
+        using System;
+        public class C {
+            private Guid _id;
+            void M() {
+                [|if (_id == Guid.Empty) throw new ArgumentException("ID cannot be empty.");|]
+            }
+        }
+        """);
 }

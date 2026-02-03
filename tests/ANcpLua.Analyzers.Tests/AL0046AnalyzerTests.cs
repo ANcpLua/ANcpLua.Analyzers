@@ -91,4 +91,25 @@ public sealed partial class Al0046AnalyzerTests : AnalyzerTest<Al0046UseGuardNot
             }
         }
         """);
+
+    [Fact]
+    public Task ShouldReportForStringClassNameUppercase() => VerifyAsync("""
+        using System;
+        public class C {
+            void M(string? value) {
+                [|if (String.IsNullOrWhiteSpace(value)) throw new ArgumentNullException(nameof(value));|]
+            }
+        }
+        """);
+
+    [Fact]
+    public Task ShouldReportForMemberAccess() => VerifyAsync("""
+        using System;
+        public class C {
+            private string? _name;
+            void M() {
+                [|if (string.IsNullOrWhiteSpace(_name)) throw new ArgumentNullException(nameof(_name));|]
+            }
+        }
+        """);
 }

@@ -67,10 +67,10 @@ public sealed partial class Al0046UseGuardNotNullOrWhiteSpaceAnalyzer : AlAnalyz
             } memberAccess,
             ArgumentList.Arguments.Count: 1
         } invocation) {
-            // Check if it's called on string type
+            // Check if it's called on string type (lowercase keyword or uppercase class name)
             var expression = memberAccess.Expression;
-            if (expression is IdentifierNameSyntax { Identifier.Text: "string" }
-                or PredefinedTypeSyntax { Keyword.Text: "string" }) {
+            if (expression is IdentifierNameSyntax { Identifier.Text: "String" }
+                or PredefinedTypeSyntax { Keyword.RawKind: (int)SyntaxKind.StringKeyword }) {
                 var argument = invocation.ArgumentList.Arguments[0].Expression;
                 parameterName = GetExpressionName(argument);
                 return !string.IsNullOrEmpty(parameterName);
@@ -83,7 +83,8 @@ public sealed partial class Al0046UseGuardNotNullOrWhiteSpaceAnalyzer : AlAnalyz
     private static string GetExpressionName(ExpressionSyntax expression) =>
         expression switch {
             IdentifierNameSyntax identifier => identifier.Identifier.Text,
-            _ => ""
+            MemberAccessExpressionSyntax memberAccess => memberAccess.Name.Identifier.Text,
+            _ => "value"
         };
 
     private static ThrowStatementSyntax? TryGetThrowStatement(StatementSyntax statement) =>

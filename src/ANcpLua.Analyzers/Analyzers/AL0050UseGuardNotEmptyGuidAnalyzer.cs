@@ -126,6 +126,7 @@ public sealed partial class Al0050UseGuardNotEmptyGuidAnalyzer : AlAnalyzer {
 
         identifier = expression switch {
             IdentifierNameSyntax id => id.Identifier.Text,
+            MemberAccessExpressionSyntax { Name: IdentifierNameSyntax memberId } => memberId.Identifier.Text,
             _ => ""
         };
 
@@ -148,10 +149,11 @@ public sealed partial class Al0050UseGuardNotEmptyGuidAnalyzer : AlAnalyzer {
         if (typeSymbol is null) {
             // Fallback to string comparison
             var typeName = creation.Type.ToString();
-            return typeName is "ArgumentException" or "System.ArgumentException";
+            return typeName is "ArgumentException" or "System.ArgumentException"
+                or "ArgumentNullException" or "System.ArgumentNullException";
         }
 
         var displayName = typeSymbol.ToDisplayString();
-        return displayName == "System.ArgumentException";
+        return displayName is "System.ArgumentException" or "System.ArgumentNullException";
     }
 }
