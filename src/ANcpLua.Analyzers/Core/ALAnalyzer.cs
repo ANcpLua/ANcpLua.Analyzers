@@ -400,4 +400,83 @@ public static partial class DiagnosticIds {
 
     /// <summary>AL0075: High-cardinality tag on metrics (user.id, request.id, etc.).</summary>
     public const string HighCardinalityMetricTag = "AL0075";
+
+    /// <summary>AL0076: AddServiceDefaults called but AddOpenTelemetry missing.</summary>
+    public const string MissingOTelConfiguration = "AL0076";
+
+    /// <summary>AL0077: Duplicate instrumentation - method has both auto and manual tracing.</summary>
+    public const string DuplicateInstrumentation = "AL0077";
+
+    /// <summary>AL0078: ActivitySource name doesn't follow reverse-DNS naming convention.</summary>
+    public const string InvalidActivitySourceName = "AL0078";
+
+    /// <summary>AL0079: Complex async flow detected; manual span recommended.</summary>
+    public const string ManualSpanRecommended = "AL0079";
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // RESILIENCE (AL0080+)
+    // These analyzers enforce resilience best practices for HTTP clients.
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /// <summary>AL0080: HTTP client registered without resilience policies.</summary>
+    public const string MissingResilienceConfiguration = "AL0080";
+
+    /// <summary>AL0081: Service doesn't expose health check endpoint.</summary>
+    public const string MissingHealthChecks = "AL0081";
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // CONFIGURATION (AL0082+)
+    // These analyzers detect configuration anti-patterns.
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /// <summary>AL0082: Hardcoded connection string detected.</summary>
+    public const string ConsiderConnectionString = "AL0082";
+
+    /// <summary>AL0083: HTTP endpoint used where HTTPS is expected.</summary>
+    public const string InsecureEndpoint = "AL0083";
+
+    /// <summary>AL0084: Direct URL used instead of service discovery.</summary>
+    public const string MissingServiceDiscovery = "AL0084";
+
+    /// <summary>AL0085: Attribute value violates OTel semantic convention spec.</summary>
+    public const string InvalidAttributeValue = "AL0085";
+
+    /// <summary>AL0087: Prefer constant attribute over string literal for semantic convention names.</summary>
+    public const string PreferConstantAttribute = "AL0087";
+
+    /// <summary>AL0086: Attribute set with wrong type (e.g., string instead of int for token counts).</summary>
+    public const string IncorrectAttributeType = "AL0086";
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // SENSITIVE DATA DETECTION (AL0088)
+    // These analyzers detect potential PII or credentials in telemetry.
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /// <summary>AL0088: Potential PII or credential detected in span attribute.</summary>
+    public const string SensitiveDataInAttribute = "AL0088";
+
+    /// <summary>AL0089: OTEL_EXPORTER_OTLP_ENDPOINT not configured.</summary>
+    public const string MissingOtlpConfiguration = "AL0089";
+
+    /// <summary>AL0093: Missing resource attributes (service.name, service.version).</summary>
+    public const string MissingResourceAttributes = "AL0093";
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // OPENTELEMETRY EXPORT (AL0090+)
+    // These analyzers detect export configuration issues.
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /// <summary>AL0090: OTLP exporter doesn't have compression enabled.</summary>
+    public const string UncompressedExport = "AL0090";
+
+    /// <summary>AL0091: Single-span export configured instead of batch export.</summary>
+    public const string BatchExportDisabled = "AL0091";
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // SAMPLING (AL0092)
+    // These analyzers suggest telemetry sampling configuration.
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /// <summary>AL0092: High-volume service without sampling configured.</summary>
+    public const string ConsiderSampling = "AL0092";
 }

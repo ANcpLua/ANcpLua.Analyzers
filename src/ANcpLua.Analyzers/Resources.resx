@@ -784,4 +784,184 @@
     <data name="AL0075AnalyzerDescription" xml:space="preserve">
         <value>High-cardinality tags like user.id, request.id, or session.id create a unique time series for each distinct value. This can overwhelm metrics backends with memory and storage costs. Consider using these values as span attributes instead, or aggregate them into buckets.</value>
     </data>
+    <!-- AL0076: Missing OTel configuration -->
+    <data name="AL0076AnalyzerTitle" xml:space="preserve">
+        <value>Missing OpenTelemetry configuration</value>
+    </data>
+    <data name="AL0076AnalyzerMessageFormat" xml:space="preserve">
+        <value>AddServiceDefaults() is called but AddOpenTelemetry() is missing. Telemetry will not be exported without OpenTelemetry configuration.</value>
+    </data>
+    <data name="AL0076AnalyzerDescription" xml:space="preserve">
+        <value>When using AddServiceDefaults() or similar setup methods, ensure AddOpenTelemetry() is also called to configure telemetry export. Without OpenTelemetry configuration, traces, metrics, and logs will not be exported to observability backends.</value>
+    </data>
+    <!-- AL0077: Duplicate instrumentation -->
+    <data name="AL0077AnalyzerTitle" xml:space="preserve">
+        <value>Duplicate instrumentation detected</value>
+    </data>
+    <data name="AL0077AnalyzerMessageFormat" xml:space="preserve">
+        <value>Method '{0}' has both [Traced] attribute and manual Activity.StartActivity call. This creates duplicate nested spans.</value>
+    </data>
+    <data name="AL0077AnalyzerDescription" xml:space="preserve">
+        <value>When a method is instrumented by both auto-instrumentation (e.g., [Traced] attribute or interceptor) AND manual Activity.StartActivity spans, it creates duplicate nested spans that increase telemetry volume and can cause confusion in trace visualization. Choose one instrumentation approach per method.</value>
+    </data>
+    <!-- AL0078: Invalid ActivitySource name -->
+    <data name="AL0078AnalyzerTitle" xml:space="preserve">
+        <value>Invalid ActivitySource name</value>
+    </data>
+    <data name="AL0078AnalyzerMessageFormat" xml:space="preserve">
+        <value>ActivitySource name '{0}' does not follow reverse-DNS naming convention. Use format like 'company.product.component'.</value>
+    </data>
+    <data name="AL0078AnalyzerDescription" xml:space="preserve">
+        <value>ActivitySource names should follow the reverse-DNS naming convention (e.g., 'company.product.component'). Names must contain at least one dot, use only lowercase letters, digits, dots, and hyphens, and should not contain spaces. This ensures consistent identification across telemetry backends.</value>
+    </data>
+    <!-- AL0079: Manual span recommended for complex async flows -->
+    <data name="AL0079AnalyzerTitle" xml:space="preserve">
+        <value>Manual span recommended</value>
+    </data>
+    <data name="AL0079AnalyzerMessageFormat" xml:space="preserve">
+        <value>Method '{0}' has [Traced] but contains {1}; manual instrumentation may capture execution better</value>
+    </data>
+    <data name="AL0079AnalyzerDescription" xml:space="preserve">
+        <value>Complex async patterns like Task.WhenAll, Parallel.ForEach, multiple awaits, or ConfigureAwait(false) may not be fully captured by auto-instrumentation. Consider using manual Activity.StartActivity() to create explicit child spans for parallel operations, ensuring each branch of execution is properly traced.</value>
+    </data>
+    <!-- AL0080: Missing resilience configuration -->
+    <data name="AL0080AnalyzerTitle" xml:space="preserve">
+        <value>Missing resilience configuration</value>
+    </data>
+    <data name="AL0080AnalyzerMessageFormat" xml:space="preserve">
+        <value>HTTP client '{0}' registered without resilience policies. Consider adding AddStandardResilienceHandler() for retry, timeout, and circuit breaker.</value>
+    </data>
+    <data name="AL0080AnalyzerDescription" xml:space="preserve">
+        <value>HTTP clients should be configured with resilience policies to handle transient failures gracefully. Use AddStandardResilienceHandler() from Microsoft.Extensions.Http.Resilience or AddResilienceHandler() with custom Polly policies. This ensures automatic retries, timeouts, and circuit breakers for improved reliability.</value>
+    </data>
+    <!-- AL0081: Missing Health Checks -->
+    <data name="AL0081AnalyzerTitle" xml:space="preserve">
+        <value>Missing health checks</value>
+    </data>
+    <data name="AL0081AnalyzerMessageFormat" xml:space="preserve">
+        <value>Service doesn't expose health check endpoint. Add builder.Services.AddHealthChecks() for container orchestration.</value>
+    </data>
+    <data name="AL0081AnalyzerDescription" xml:space="preserve">
+        <value>Health checks are essential for container orchestration platforms (Kubernetes, Docker Swarm) to determine service availability. Add builder.Services.AddHealthChecks() and app.MapHealthChecks() to expose /health endpoints for liveness and readiness probes.</value>
+    </data>
+    <!-- AL0082: Consider connection string -->
+    <data name="AL0082AnalyzerTitle" xml:space="preserve">
+        <value>Consider using configuration for connection string</value>
+    </data>
+    <data name="AL0082AnalyzerMessageFormat" xml:space="preserve">
+        <value>Hardcoded connection string detected. Use builder.Configuration.GetConnectionString() instead for environment flexibility.</value>
+    </data>
+    <data name="AL0082AnalyzerDescription" xml:space="preserve">
+        <value>Connection strings should be loaded from configuration (appsettings.json, environment variables, or secrets) rather than hardcoded. This enables different connection strings per environment (dev/staging/production) and avoids committing sensitive credentials to source control.</value>
+    </data>
+    <!-- AL0083: Insecure endpoint -->
+    <data name="AL0083AnalyzerTitle" xml:space="preserve">
+        <value>Insecure endpoint</value>
+    </data>
+    <data name="AL0083AnalyzerMessageFormat" xml:space="preserve">
+        <value>HTTP endpoint '{0}' should use HTTPS for production security. Consider using https:// instead.</value>
+    </data>
+    <data name="AL0083AnalyzerDescription" xml:space="preserve">
+        <value>HTTP endpoints expose data in transit to interception and man-in-the-middle attacks. Use HTTPS (TLS) for all production endpoints to ensure data confidentiality and integrity. Localhost and 127.0.0.1 are excluded as they are typically used for local development only.</value>
+    </data>
+    <!-- AL0084: Missing service discovery -->
+    <data name="AL0084AnalyzerTitle" xml:space="preserve">
+        <value>Missing service discovery</value>
+    </data>
+    <data name="AL0084AnalyzerMessageFormat" xml:space="preserve">
+        <value>Direct URL '{0}' used instead of service discovery. Consider using service name resolution (e.g., 'http+https://servicename') for dynamic endpoint discovery.</value>
+    </data>
+    <data name="AL0084AnalyzerDescription" xml:space="preserve">
+        <value>Hardcoded URLs in HttpClient.BaseAddress or service client configuration reduce flexibility and complicate deployment across environments. When using .NET Aspire or service discovery libraries, use service names (e.g., 'http+https://apiservice') that resolve to actual endpoints at runtime. This enables automatic endpoint discovery, load balancing, and environment-specific configuration.</value>
+    </data>
+    <!-- AL0085: Invalid attribute value -->
+    <data name="AL0085AnalyzerTitle" xml:space="preserve">
+        <value>Invalid attribute value</value>
+    </data>
+    <data name="AL0085AnalyzerMessageFormat" xml:space="preserve">
+        <value>Attribute '{0}' has invalid value '{1}'. Expected: {2}</value>
+    </data>
+    <data name="AL0085AnalyzerDescription" xml:space="preserve">
+        <value>Attribute values must conform to the expected format defined by OpenTelemetry semantic conventions. For example, http.response.status_code must be an integer, gen_ai.system must be a known provider (openai, anthropic, etc.), and error.type should be an exception type or error code. Invalid values may cause issues with telemetry backends and dashboards.</value>
+    </data>
+    <!-- AL0086: Incorrect attribute type -->
+    <data name="AL0086AnalyzerTitle" xml:space="preserve">
+        <value>Incorrect attribute type</value>
+    </data>
+    <data name="AL0086AnalyzerMessageFormat" xml:space="preserve">
+        <value>Attribute '{0}' should be type '{1}' but '{2}' was provided</value>
+    </data>
+    <data name="AL0086AnalyzerDescription" xml:space="preserve">
+        <value>OpenTelemetry semantic conventions specify expected types for attributes. For example, gen_ai.usage.input_tokens should be an integer, not a string. Using incorrect types may cause issues with telemetry backends or dashboards that expect specific types for aggregation and visualization.</value>
+    </data>
+    <!-- AL0087: Prefer constant attribute -->
+    <data name="AL0087AnalyzerTitle" xml:space="preserve">
+        <value>Prefer constant attribute</value>
+    </data>
+    <data name="AL0087AnalyzerMessageFormat" xml:space="preserve">
+        <value>Use '{0}' instead of string literal "{1}" for attribute name</value>
+    </data>
+    <data name="AL0087AnalyzerDescription" xml:space="preserve">
+        <value>OpenTelemetry semantic convention attribute names should use constant fields from GenAiAttributes or SemanticConventions classes instead of string literals. Using constants prevents typos, enables IntelliSense, and ensures consistency with the latest semantic conventions.</value>
+    </data>
+    <!-- AL0088: Sensitive data in attribute -->
+    <data name="AL0088AnalyzerTitle" xml:space="preserve">
+        <value>Sensitive data in span attribute</value>
+    </data>
+    <data name="AL0088AnalyzerMessageFormat" xml:space="preserve">
+        <value>Attribute '{0}' may contain sensitive data (PII or credentials). Consider redacting or excluding this information.</value>
+    </data>
+    <data name="AL0088AnalyzerDescription" xml:space="preserve">
+        <value>Span attributes containing passwords, secrets, tokens, API keys, or PII (SSN, credit card numbers) can leak sensitive information to telemetry backends. Consider redacting sensitive values or excluding these attributes from telemetry. If the data is intentionally included, suppress this warning with a justification comment.</value>
+    </data>
+    <!-- AL0089: Missing OTLP configuration -->
+    <data name="AL0089AnalyzerTitle" xml:space="preserve">
+        <value>Missing OTLP configuration</value>
+    </data>
+    <data name="AL0089AnalyzerMessageFormat" xml:space="preserve">
+        <value>OTLP exporter configured without explicit endpoint. Set OTEL_EXPORTER_OTLP_ENDPOINT environment variable or pass endpoint in code.</value>
+    </data>
+    <data name="AL0089AnalyzerDescription" xml:space="preserve">
+        <value>When using UseOtlpExporter() or AddOtlpExporter() without an explicit endpoint configuration, telemetry will be sent to the default localhost endpoint (localhost:4317 for gRPC, localhost:4318 for HTTP) or fail to export if no collector is running. Configure OTEL_EXPORTER_OTLP_ENDPOINT environment variable or pass the endpoint explicitly in options to ensure reliable telemetry export.</value>
+    </data>
+    <!-- AL0090: Uncompressed export -->
+    <data name="AL0090AnalyzerTitle" xml:space="preserve">
+        <value>Uncompressed OTLP export</value>
+    </data>
+    <data name="AL0090AnalyzerMessageFormat" xml:space="preserve">
+        <value>OTLP exporter using HTTP protocol without compression. Enable gzip compression to reduce bandwidth usage.</value>
+    </data>
+    <data name="AL0090AnalyzerDescription" xml:space="preserve">
+        <value>OTLP HTTP protocol does not enable compression by default, unlike gRPC which uses compression automatically. For HTTP exports, especially with large payloads like gen_ai.content attributes, enabling gzip compression significantly reduces bandwidth usage and export latency. Configure ExportProcessorOptions or OtlpExporterOptions to enable compression.</value>
+    </data>
+    <!-- AL0092: Consider sampling -->
+    <data name="AL0092AnalyzerTitle" xml:space="preserve">
+        <value>Consider configuring sampling</value>
+    </data>
+    <data name="AL0092AnalyzerMessageFormat" xml:space="preserve">
+        <value>OpenTelemetry tracing configured without sampling. Consider using ParentBasedSampler or TraceIdRatioBasedSampler to reduce telemetry volume in production.</value>
+    </data>
+    <data name="AL0092AnalyzerDescription" xml:space="preserve">
+        <value>High-volume services can generate excessive telemetry data without sampling configuration. AlwaysOnSampler captures every span, which may overwhelm backends and increase costs. Consider using ParentBasedSampler (respects parent decisions) or TraceIdRatioBasedSampler (probabilistic) for production environments. Tail-based sampling at the collector level is also recommended for capturing important traces like errors.</value>
+    </data>
+    <!-- AL0093: Missing resource attributes -->
+    <data name="AL0093AnalyzerTitle" xml:space="preserve">
+        <value>Missing resource attributes</value>
+    </data>
+    <data name="AL0093AnalyzerMessageFormat" xml:space="preserve">
+        <value>OpenTelemetry resource is missing '{0}'. Add ResourceBuilder.CreateDefault().AddService() to configure service identification.</value>
+    </data>
+    <data name="AL0093AnalyzerDescription" xml:space="preserve">
+        <value>Resource attributes 'service.name' and 'service.version' are required for proper service identification in observability backends. These attributes enable grouping traces by service and tracking version-specific behavior. Use ResourceBuilder.CreateDefault().AddService(serviceName, serviceVersion) to set them.</value>
+    </data>
+    <!-- AL0091: Batch export disabled -->
+    <data name="AL0091AnalyzerTitle" xml:space="preserve">
+        <value>Batch export disabled</value>
+    </data>
+    <data name="AL0091AnalyzerMessageFormat" xml:space="preserve">
+        <value>SimpleSpanProcessor or SimpleActivityExportProcessor exports spans one at a time. Use BatchSpanProcessor or BatchActivityExportProcessor for better performance.</value>
+    </data>
+    <data name="AL0091AnalyzerDescription" xml:space="preserve">
+        <value>SimpleSpanProcessor and SimpleActivityExportProcessor export each span immediately as it completes, which incurs significant overhead. BatchSpanProcessor and BatchActivityExportProcessor collect spans and export them in batches, reducing network overhead and improving application performance. Use batch processors in production environments.</value>
+    </data>
 </root>
