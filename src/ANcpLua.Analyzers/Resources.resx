@@ -564,4 +564,74 @@
     <data name="AL0053AnalyzerDescription" xml:space="preserve">
     <value>The [AotUnsafe] attribute should only be applied to code that actually uses AOT-incompatible patterns such as reflection, dynamic code generation, or calls to methods with [RequiresDynamicCode]. Consider removing the attribute if the code is AOT-compatible.</value>
   </data>
+    <!-- AL0054: Diagnostic missing from docs -->
+    <data name="AL0054AnalyzerTitle" xml:space="preserve">
+    <value>Diagnostic missing from documentation</value>
+  </data>
+    <data name="AL0054AnalyzerMessageFormat" xml:space="preserve">
+    <value>{0}</value>
+  </data>
+    <data name="AL0054AnalyzerDescription" xml:space="preserve">
+    <value>Diagnostics defined in Descriptors.cs should be documented in diagnostics.md. Add documentation for this diagnostic rule.</value>
+  </data>
+    <!-- AL0055: Diagnostic missing from release notes -->
+    <data name="AL0055AnalyzerTitle" xml:space="preserve">
+    <value>Diagnostic missing from release notes</value>
+  </data>
+    <data name="AL0055AnalyzerMessageFormat" xml:space="preserve">
+    <value>{0}</value>
+  </data>
+    <data name="AL0055AnalyzerDescription" xml:space="preserve">
+    <value>Diagnostics defined in Descriptors.cs should be tracked in AnalyzerReleases.Shipped.md or AnalyzerReleases.Unshipped.md. Add a release note entry for this diagnostic rule.</value>
+  </data>
+    <!-- AL0056: Diagnostic documentation mismatch -->
+    <data name="AL0056AnalyzerTitle" xml:space="preserve">
+    <value>Diagnostic documentation mismatch</value>
+  </data>
+    <data name="AL0056AnalyzerMessageFormat" xml:space="preserve">
+    <value>{0}</value>
+  </data>
+    <data name="AL0056AnalyzerDescription" xml:space="preserve">
+    <value>Diagnostic title, severity, or category in documentation does not match Descriptors.cs. Keep documentation in sync with the source of truth.</value>
+  </data>
+    <!-- AL0057: Avoid async void -->
+    <data name="AL0057AnalyzerTitle" xml:space="preserve">
+    <value>Avoid async void methods</value>
+  </data>
+    <data name="AL0057AnalyzerMessageFormat" xml:space="preserve">
+    <value>Async void method '{0}' should return Task instead. Only event handlers should use async void.</value>
+  </data>
+    <data name="AL0057AnalyzerDescription" xml:space="preserve">
+    <value>Async void methods cannot be awaited, exceptions cannot be caught by the caller, and they complicate unit testing. Use async Task instead, unless the method is an event handler.</value>
+  </data>
+    <!-- AL0058: Avoid lock on this -->
+    <data name="AL0058AnalyzerTitle" xml:space="preserve">
+    <value>Avoid lock on 'this'</value>
+  </data>
+    <data name="AL0058AnalyzerMessageFormat" xml:space="preserve">
+    <value>Do not lock on 'this'. External code could also lock on this instance, causing potential deadlocks.</value>
+  </data>
+    <data name="AL0058AnalyzerDescription" xml:space="preserve">
+    <value>Locking on 'this' exposes the lock object to external code. Any code with a reference to this instance can lock on it, potentially causing deadlocks. Use a private readonly object field instead.</value>
+  </data>
+    <!-- AL0059: Avoid lock on typeof -->
+    <data name="AL0059AnalyzerTitle" xml:space="preserve">
+    <value>Avoid lock on typeof(T)</value>
+  </data>
+    <data name="AL0059AnalyzerMessageFormat" xml:space="preserve">
+    <value>Do not lock on 'typeof({0})'. Type objects are globally visible and external code could also lock on them.</value>
+  </data>
+    <data name="AL0059AnalyzerDescription" xml:space="preserve">
+    <value>Type objects obtained from typeof() are globally visible singletons. Any code can obtain the same Type object and lock on it, potentially causing deadlocks. Use a private static readonly object field instead.</value>
+  </data>
+    <!-- AL0060: Avoid lock on string -->
+    <data name="AL0060AnalyzerTitle" xml:space="preserve">
+    <value>Avoid lock on string</value>
+  </data>
+    <data name="AL0060AnalyzerMessageFormat" xml:space="preserve">
+    <value>Do not lock on a string. String literals are interned and shared across the entire application, causing potential deadlocks.</value>
+  </data>
+    <data name="AL0060AnalyzerDescription" xml:space="preserve">
+    <value>String literals are interned by the CLR, meaning identical strings across different assemblies share the same object reference. Locking on a string creates cross-assembly synchronization that is rarely intended and can cause deadlocks. Use a private readonly object field instead.</value>
+  </data>
 </root>

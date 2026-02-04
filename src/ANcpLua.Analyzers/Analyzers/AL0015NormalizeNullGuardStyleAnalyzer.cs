@@ -1,4 +1,5 @@
 ﻿using ANcpLua.Analyzers.Core;
+using ANcpLua.Roslyn.Utilities;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -52,7 +53,7 @@ public sealed partial class Al0015NormalizeNullGuardStyleAnalyzer : AlAnalyzer {
         var globalOptions = context.Options.AnalyzerConfigOptionsProvider.GlobalOptions;
         var isMultiTarget = globalOptions.TryGetValue("build_property.TargetFrameworks", out var tfms)
                             && !string.IsNullOrWhiteSpace(tfms)
-                            && tfms.Contains(';', StringComparison.Ordinal);
+                            && tfms.ContainsOrdinal(";");
 
         context.RegisterSyntaxNodeAction(
             ctx => AnalyzeIfStatement(ctx, hasThrowHelper, hasThrowIfNullBcl, isMultiTarget),

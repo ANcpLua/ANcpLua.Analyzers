@@ -1,4 +1,5 @@
 ﻿using ANcpLua.Analyzers.Core;
+using ANcpLua.Roslyn.Utilities;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -74,7 +75,7 @@ public sealed partial class Al0027AvoidNewtonsoftJsonAnalyzer : AlAnalyzer {
         // Check for exact namespace match or sub-namespace (with dot boundary)
         // This avoids false positives like "Newtonsoft.JsonX"
         return ns is not null &&
-               (string.Equals(ns, LegacyJsonNamespace, StringComparison.Ordinal) ||
-                ns.StartsWith(LegacyJsonNamespace + ".", StringComparison.Ordinal));
+               (ns.EqualsOrdinal(LegacyJsonNamespace) ||
+                ns.StartsWithOrdinal(LegacyJsonNamespace + "."));
     }
 }

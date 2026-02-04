@@ -1,4 +1,5 @@
 ﻿using ANcpLua.Analyzers.Core;
+using ANcpLua.Roslyn.Utilities;
 using Microsoft.CodeAnalysis.Text;
 using System.Xml.Linq;
 
@@ -74,11 +75,11 @@ public sealed partial class Al0018VersionPropsNotImportedAnalyzer : DiagnosticAn
 
         // Find Directory.Build.props and Directory.Packages.props in AdditionalFiles
         var directoryBuildPropsFiles = context.Options.AdditionalFiles
-            .Where(static f => f.Path.EndsWith(DirectoryBuildPropsFileName, StringComparison.OrdinalIgnoreCase))
+            .Where(static f => f.Path.EndsWithIgnoreCase(DirectoryBuildPropsFileName))
             .ToList();
 
         var directoryPackagesPropsFiles = context.Options.AdditionalFiles
-            .Where(static f => f.Path.EndsWith(DirectoryPackagesPropsFileName, StringComparison.OrdinalIgnoreCase))
+            .Where(static f => f.Path.EndsWithIgnoreCase(DirectoryPackagesPropsFileName))
             .ToList();
 
         // Skip if using CPM native mode (ManagePackageVersionsCentrally=true)
@@ -150,7 +151,7 @@ public sealed partial class Al0018VersionPropsNotImportedAnalyzer : DiagnosticAn
                 .Where(static e => e.Name.LocalName == "Import")
                 .Any(static import =>
                     import.Attribute("Project") is { Value: { } projectValue } &&
-                    projectValue.Contains(VersionPropsFileName, StringComparison.OrdinalIgnoreCase));
+                    projectValue.ContainsIgnoreCase(VersionPropsFileName));
         } catch (Exception) {
             return false;
         }
@@ -176,7 +177,7 @@ public sealed partial class Al0018VersionPropsNotImportedAnalyzer : DiagnosticAn
                 .Where(static e => e.Name.LocalName == "Import")
                 .Any(static import =>
                     import.Attribute("Project") is { Value: { } projectValue } &&
-                    projectValue.Contains(VersionPropsFileName, StringComparison.OrdinalIgnoreCase));
+                    projectValue.ContainsIgnoreCase(VersionPropsFileName));
 
             if (!hasVersionPropsImport) {
                 // Report diagnostic at the start of the file

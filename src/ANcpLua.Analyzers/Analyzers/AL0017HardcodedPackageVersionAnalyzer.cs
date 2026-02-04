@@ -1,4 +1,5 @@
 ﻿using ANcpLua.Analyzers.Core;
+using ANcpLua.Roslyn.Utilities;
 using Microsoft.CodeAnalysis.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -177,7 +178,7 @@ public sealed partial class Al0017HardcodedPackageVersionAnalyzer : DiagnosticAn
     private static void AnalyzeCompilation(CompilationAnalysisContext context) {
         // Find Directory.Packages.props in AdditionalFiles
         var propsFiles = context.Options.AdditionalFiles
-            .Where(static f => f.Path.EndsWith("Directory.Packages.props", StringComparison.OrdinalIgnoreCase))
+            .Where(static f => f.Path.EndsWithIgnoreCase("Directory.Packages.props"))
             .ToList();
 
         foreach (var propsFile in propsFiles) {

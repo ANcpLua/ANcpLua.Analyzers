@@ -1,4 +1,5 @@
 ﻿using ANcpLua.Analyzers.Core;
+using ANcpLua.Roslyn.Utilities;
 using Microsoft.CodeAnalysis.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -143,7 +144,7 @@ public sealed partial class Al0019UndefinedVersionVariableAnalyzer : DiagnosticA
     private static void AnalyzeCompilation(CompilationAnalysisContext context) {
         // Find Version.props to collect defined properties
         var versionPropsFile = context.Options.AdditionalFiles
-            .FirstOrDefault(static f => f.Path.EndsWith("Version.props", StringComparison.OrdinalIgnoreCase));
+            .FirstOrDefault(static f => f.Path.EndsWithIgnoreCase("Version.props"));
 
         var definedProperties = versionPropsFile is not null
             ? CollectDefinedProperties(versionPropsFile, context.CancellationToken)
@@ -151,7 +152,7 @@ public sealed partial class Al0019UndefinedVersionVariableAnalyzer : DiagnosticA
 
         // Find Directory.Packages.props to check for undefined variables
         var packagesPropsFiles = context.Options.AdditionalFiles
-            .Where(static f => f.Path.EndsWith("Directory.Packages.props", StringComparison.OrdinalIgnoreCase))
+            .Where(static f => f.Path.EndsWithIgnoreCase("Directory.Packages.props"))
             .ToList();
 
         foreach (var propsFile in packagesPropsFiles) {

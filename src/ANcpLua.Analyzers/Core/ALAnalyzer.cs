@@ -312,4 +312,35 @@ public static partial class DiagnosticIds {
 
     /// <summary>AL0053: [AotUnsafe] attribute applied to code that doesn't use AOT-incompatible patterns.</summary>
     public const string UnnecessaryAotUnsafe = "AL0053";
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // DIAGNOSTICS ALIGNMENT (AL0054-AL0056)
+    // These analyzers validate consistency between Descriptors.cs and documentation.
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /// <summary>AL0054: Diagnostic defined in Descriptors.cs is missing from diagnostics.md.</summary>
+    public const string DiagnosticMissingFromDocs = "AL0054";
+
+    /// <summary>AL0055: Diagnostic defined in Descriptors.cs is missing from AnalyzerReleases.*.md.</summary>
+    public const string DiagnosticMissingFromReleaseNotes = "AL0055";
+
+    /// <summary>AL0056: Diagnostic title/severity/category mismatch between Descriptors.cs and documentation.</summary>
+    public const string DiagnosticDocumentationMismatch = "AL0056";
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // THREADING (AL0057-AL0060)
+    // These analyzers detect common threading anti-patterns.
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /// <summary>AL0057: Avoid async void methods except for event handlers.</summary>
+    public const string AvoidAsyncVoid = "AL0057";
+
+    /// <summary>AL0058: Avoid lock on 'this' - external code can cause deadlocks.</summary>
+    public const string AvoidLockOnThis = "AL0058";
+
+    /// <summary>AL0059: Avoid lock on typeof(T) - type objects are globally visible.</summary>
+    public const string AvoidLockOnType = "AL0059";
+
+    /// <summary>AL0060: Avoid lock on string literal - interned strings are globally visible.</summary>
+    public const string AvoidLockOnString = "AL0060";
 }

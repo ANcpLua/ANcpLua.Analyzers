@@ -1,4 +1,5 @@
 ﻿using ANcpLua.Analyzers.Core;
+using ANcpLua.Roslyn.Utilities;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -46,8 +47,8 @@ public sealed partial class Al0034UseWhereNotNullAnalyzer : AlAnalyzer {
         // Use the full display string to check - it should contain "System.Linq.Enumerable"
         // Use IndexOf instead of Contains for netstandard2.0 compatibility
         var fullTypeName = containingType.ToDisplayString();
-        if (fullTypeName.IndexOf("System.Linq.Enumerable", StringComparison.Ordinal) < 0 &&
-            fullTypeName.IndexOf("Enumerable", StringComparison.Ordinal) < 0) {
+        if (!fullTypeName.ContainsOrdinal("System.Linq.Enumerable") &&
+            !fullTypeName.ContainsOrdinal("Enumerable")) {
             return;
         }
 

@@ -1,3 +1,5 @@
+using ANcpLua.Roslyn.Utilities;
+
 namespace ANcpLua.Analyzers.Core;
 
 /// <summary>
@@ -72,8 +74,10 @@ internal static partial class MappingRegistry {
     /// </summary>
     /// <param name="typeName">The fully-qualified type name or C# keyword alias.</param>
     /// <returns>The extension method name, or null if no mapping exists.</returns>
+#pragma warning disable AL0038 // TryGetValue pattern is cleaner here, Dictionary causes GetOrNull ambiguity
     public static string? GetTryParseExtension(string typeName) =>
         TryParseMappings.TryGetValue(typeName, out var ext) ? ext : null;
+#pragma warning restore AL0038
 
     /// <summary>
     ///     Checks if a string method has StringComparison extension equivalents.
@@ -88,6 +92,8 @@ internal static partial class MappingRegistry {
     /// </summary>
     /// <param name="comparisonValue">The StringComparison enum member name.</param>
     /// <returns>The suffix to append to the method name, or null if not supported.</returns>
+#pragma warning disable AL0038 // TryGetValue pattern is cleaner here, Dictionary causes GetOrNull ambiguity
     public static string? GetStringComparisonSuffix(string comparisonValue) =>
         StringComparisonSuffixes.TryGetValue(comparisonValue, out var suffix) ? suffix : null;
+#pragma warning restore AL0038
 }

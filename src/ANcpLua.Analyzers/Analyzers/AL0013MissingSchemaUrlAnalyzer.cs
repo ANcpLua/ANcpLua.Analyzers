@@ -1,4 +1,5 @@
 ﻿using ANcpLua.Analyzers.Core;
+using ANcpLua.Roslyn.Utilities;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -116,9 +117,9 @@ public sealed partial class Al0013MissingSchemaUrlAnalyzer : AlAnalyzer {
             switch (node) {
                 case LiteralExpressionSyntax literal: {
                     var value = literal.Token.ValueText;
-                    if (value.Contains("schema", StringComparison.OrdinalIgnoreCase) ||
-                        value.Contains("telemetry.schema_url", StringComparison.OrdinalIgnoreCase) ||
-                        value.Contains("opentelemetry.io/schemas", StringComparison.OrdinalIgnoreCase)) {
+                    if (value.ContainsIgnoreCase("schema") ||
+                        value.ContainsIgnoreCase("telemetry.schema_url") ||
+                        value.ContainsIgnoreCase("opentelemetry.io/schemas")) {
                         return true;
                     }
 
@@ -126,7 +127,7 @@ public sealed partial class Al0013MissingSchemaUrlAnalyzer : AlAnalyzer {
                 }
                 case InvocationExpressionSyntax nestedInvocation: {
                     var nestedMethod = GetMethodName(nestedInvocation);
-                    if (nestedMethod?.Contains("Schema", StringComparison.OrdinalIgnoreCase) == true) {
+                    if (nestedMethod?.ContainsIgnoreCase("Schema") == true) {
                         return true;
                     }
 

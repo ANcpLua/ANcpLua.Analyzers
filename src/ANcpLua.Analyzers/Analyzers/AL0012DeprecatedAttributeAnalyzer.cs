@@ -1,4 +1,5 @@
 ﻿using ANcpLua.Analyzers.Core;
+using ANcpLua.Roslyn.Utilities;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -43,7 +44,7 @@ public sealed partial class Al0012DeprecatedAttributeAnalyzer : AlAnalyzer {
     private static void AnalyzeStringLiteral(SyntaxNodeAnalysisContext context) {
         // Skip analysis of the analyzer's own assembly (contains mapping dictionary of deprecated names)
         var assemblyName = context.SemanticModel.Compilation.AssemblyName;
-        if (assemblyName is not null && assemblyName.StartsWith("ANcpLua.Analyzers", StringComparison.Ordinal)) {
+        if (assemblyName is not null && assemblyName.StartsWithOrdinal("ANcpLua.Analyzers")) {
             return;
         }
 
@@ -90,25 +91,22 @@ public sealed partial class Al0012DeprecatedAttributeAnalyzer : AlAnalyzer {
     private static bool IsTelemetryInvocation(SyntaxNode node) =>
         node is InvocationExpressionSyntax invocation &&
         GetMethodName(invocation) is { } methodName &&
-        DeprecatedOtelAttributes.AttributeKeyPatterns.Any(p =>
-            methodName.Contains(p, StringComparison.OrdinalIgnoreCase));
+        DeprecatedOtelAttributes.AttributeKeyPatterns.Any(methodName.ContainsIgnoreCase);
 
     private static bool IsTelemetryInitializer(SyntaxNode node) =>
         node is InitializerExpressionSyntax { Parent: ObjectCreationExpressionSyntax creation } &&
         IsTelemetryTypeName(creation.Type.ToString());
 
     private static bool IsTelemetryTypeName(string typeName) =>
-        typeName.Contains("Tag", StringComparison.Ordinal) ||
-        typeName.Contains("Attribute", StringComparison.Ordinal) ||
-        typeName.Contains("KeyValuePair", StringComparison.Ordinal);
+        typeName.ContainsOrdinal("Tag") ||
+        typeName.ContainsOrdinal("Attribute") ||
+        typeName.ContainsOrdinal("KeyValuePair");
 
-    private static bool IsLikelyTelemetryContainer(string identifier) {
-        var upperIdentifier = identifier.ToUpperInvariant();
-        return upperIdentifier.Contains("ATTRIBUTE", StringComparison.Ordinal) ||
-               upperIdentifier.Contains("TAG", StringComparison.Ordinal) ||
-               upperIdentifier.Contains("ATTR", StringComparison.Ordinal) ||
-               upperIdentifier == "ATTRS";
-    }
+    private static bool IsLikelyTelemetryContainer(string identifier) =>
+        identifier.ContainsIgnoreCase("ATTRIBUTE") ||
+        identifier.ContainsIgnoreCase("TAG") ||
+        identifier.ContainsIgnoreCase("ATTR") ||
+        identifier.EqualsIgnoreCase("ATTRS");
 
     private static string? GetMethodName(InvocationExpressionSyntax invocation) =>
         invocation.Expression switch {
