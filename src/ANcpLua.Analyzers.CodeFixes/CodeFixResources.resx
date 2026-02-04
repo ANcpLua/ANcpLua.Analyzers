@@ -169,4 +169,17 @@
     <data name="AL0051CodeFixTitle" xml:space="preserve">
     <value>Use Guard.DefinedEnum</value>
   </data>
+    <!-- AL0071-AL0074 Code Fix Titles -->
+    <data name="AL0071CodeFixTitle" xml:space="preserve">
+        <value>Make class 'partial static'</value>
+    </data>
+    <data name="AL0072CodeFixTitle" xml:space="preserve">
+        <value>Make method 'partial'</value>
+    </data>
+    <data name="AL0073CodeFixTitle" xml:space="preserve">
+        <value>Set ActivitySourceName to '{0}'</value>
+    </data>
+    <data name="AL0074CodeFixTitle" xml:space="preserve">
+        <value>Replace with '{0}'</value>
+    </data>
 </root>

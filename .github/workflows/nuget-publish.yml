@@ -37,8 +37,14 @@ jobs:
             echo "version=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
           fi
 
+      - name: Restore
+        # Restore WITHOUT Version override - SDK injects published analyzer (1.10.7)
+        # The Version prop would cause SDK to inject 1.11.0 which doesn't exist yet
+        run: dotnet restore ANcpLua.Analyzers.slnx
+
       - name: Build
-        run: dotnet build ANcpLua.Analyzers.slnx -c Release -p:Version=${{ steps.version.outputs.version }}
+        # Build WITH Version - sets assembly version but skips restore
+        run: dotnet build ANcpLua.Analyzers.slnx -c Release --no-restore -p:Version=${{ steps.version.outputs.version }}
 
       - name: Pack
         run: dotnet pack src/ANcpLua.Analyzers/ANcpLua.Analyzers.csproj -c Release -o artifacts --no-build -p:Version=${{ steps.version.outputs.version }} -p:PackageId=ANcpLua.Analyzers

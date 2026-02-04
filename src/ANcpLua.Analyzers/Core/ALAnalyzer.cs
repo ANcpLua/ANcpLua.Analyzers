@@ -100,6 +100,12 @@ public static partial class DiagnosticCategories {
     public const string Threading = "Threading";
     /// <summary>Category for OpenTelemetry diagnostics.</summary>
     public const string OpenTelemetry = "OpenTelemetry";
+    /// <summary>Category for Generative AI / LLM observability diagnostics.</summary>
+    public const string GenAI = "GenAI";
+    /// <summary>Category for metrics and measurement diagnostics.</summary>
+    public const string Metrics = "Metrics";
+    /// <summary>Category for configuration and setup diagnostics.</summary>
+    public const string Configuration = "Configuration";
     /// <summary>Category for code style diagnostics.</summary>
     public const string Style = "Style";
     /// <summary>Category for version management diagnostics.</summary>
@@ -343,4 +349,55 @@ public static partial class DiagnosticIds {
 
     /// <summary>AL0060: Avoid lock on string literal - interned strings are globally visible.</summary>
     public const string AvoidLockOnString = "AL0060";
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // OPENTELEMETRY/GENAI (AL0061-AL0075)
+    // These analyzers enforce OpenTelemetry and GenAI semantic convention compliance.
+    // Migrated from qyl.Analyzers QYL001-QYL015.
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /// <summary>AL0061: Activity/Span missing semantic convention attributes.</summary>
+    public const string ActivityMissingSemconv = "AL0061";
+
+    /// <summary>AL0062: Deprecated semantic convention attribute.</summary>
+    public const string DeprecatedSemconv = "AL0062";
+
+    /// <summary>AL0063: ActivitySource not registered with AddSource().</summary>
+    public const string UnregisteredActivitySource = "AL0063";
+
+    /// <summary>AL0064: GenAI span missing required attributes.</summary>
+    public const string GenAiMissingRequiredAttributes = "AL0064";
+
+    /// <summary>AL0065: Use gen_ai.client.token.usage histogram for token metrics.</summary>
+    public const string UseTokenUsageHistogram = "AL0065";
+
+    /// <summary>AL0066: GenAI operation name should follow semantic conventions.</summary>
+    public const string InvalidGenAiOperationName = "AL0066";
+
+    /// <summary>AL0067: Meter not registered with AddMeter().</summary>
+    public const string UnregisteredMeter = "AL0067";
+
+    /// <summary>AL0068: Metric instrument name should follow naming conventions.</summary>
+    public const string InvalidMetricName = "AL0068";
+
+    /// <summary>AL0069: ServiceDefaults configuration incomplete.</summary>
+    public const string IncompleteServiceDefaults = "AL0069";
+
+    /// <summary>AL0070: Collector endpoint should use OTLP protocol.</summary>
+    public const string NonOtlpCollectorEndpoint = "AL0070";
+
+    /// <summary>AL0071: [Meter] class must be partial static.</summary>
+    public const string MeterClassMustBePartialStatic = "AL0071";
+
+    /// <summary>AL0072: [Counter]/[Histogram] method must be partial.</summary>
+    public const string MetricMethodMustBePartial = "AL0072";
+
+    /// <summary>AL0073: [Traced] attribute must have non-empty ActivitySourceName.</summary>
+    public const string TracedActivitySourceNameEmpty = "AL0073";
+
+    /// <summary>AL0074: Deprecated GenAI semantic convention attribute.</summary>
+    public const string DeprecatedGenAiAttribute = "AL0074";
+
+    /// <summary>AL0075: High-cardinality tag on metrics (user.id, request.id, etc.).</summary>
+    public const string HighCardinalityMetricTag = "AL0075";
 }

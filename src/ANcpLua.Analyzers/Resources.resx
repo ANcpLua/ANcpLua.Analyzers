@@ -634,4 +634,154 @@
     <data name="AL0060AnalyzerDescription" xml:space="preserve">
     <value>String literals are interned by the CLR, meaning identical strings across different assemblies share the same object reference. Locking on a string creates cross-assembly synchronization that is rarely intended and can cause deadlocks. Use a private readonly object field instead.</value>
   </data>
+    <!-- AL0061: Activity/Span missing semantic convention attributes -->
+    <data name="AL0061AnalyzerTitle" xml:space="preserve">
+        <value>Activity/Span missing semantic convention attributes</value>
+    </data>
+    <data name="AL0061AnalyzerMessageFormat" xml:space="preserve">
+        <value>Activity '{0}' should have semantic convention attributes for '{1}' operations</value>
+    </data>
+    <data name="AL0061AnalyzerDescription" xml:space="preserve">
+        <value>OpenTelemetry Activities (Spans) should include semantic convention attributes appropriate for their operation type. This enables correlation, filtering, and analysis in observability backends.</value>
+    </data>
+    <!-- AL0062: Deprecated semantic convention -->
+    <data name="AL0062AnalyzerTitle" xml:space="preserve">
+        <value>Deprecated semantic convention</value>
+    </data>
+    <data name="AL0062AnalyzerMessageFormat" xml:space="preserve">
+        <value>Attribute '{0}' is deprecated since schema v{1}. Use '{2}' instead.</value>
+    </data>
+    <data name="AL0062AnalyzerDescription" xml:space="preserve">
+        <value>This attribute name has been deprecated in the OpenTelemetry semantic conventions. Using the newer attribute name ensures compatibility with modern observability tools.</value>
+    </data>
+    <!-- AL0063: Unregistered ActivitySource -->
+    <data name="AL0063AnalyzerTitle" xml:space="preserve">
+        <value>ActivitySource should be registered with AddSource()</value>
+    </data>
+    <data name="AL0063AnalyzerMessageFormat" xml:space="preserve">
+        <value>ActivitySource '{0}' is not registered with AddSource() in the tracing configuration</value>
+    </data>
+    <data name="AL0063AnalyzerDescription" xml:space="preserve">
+        <value>ActivitySources must be registered with AddSource() in the OpenTelemetry tracing configuration to be included in the trace pipeline. Unregistered sources will not emit spans.</value>
+    </data>
+    <!-- AL0064: GenAI span missing required attributes -->
+    <data name="AL0064AnalyzerTitle" xml:space="preserve">
+        <value>GenAI span missing required attributes</value>
+    </data>
+    <data name="AL0064AnalyzerMessageFormat" xml:space="preserve">
+        <value>GenAI Activity '{0}' is missing required attribute '{1}'</value>
+    </data>
+    <data name="AL0064AnalyzerDescription" xml:space="preserve">
+        <value>GenAI spans must include required semantic convention attributes (gen_ai.system, gen_ai.request.model, gen_ai.operation.name) to enable proper observability and correlation of LLM operations.</value>
+    </data>
+    <!-- AL0065: Incorrect token usage metric -->
+    <data name="AL0065AnalyzerTitle" xml:space="preserve">
+        <value>Use gen_ai.client.token.usage histogram for token metrics</value>
+    </data>
+    <data name="AL0065AnalyzerMessageFormat" xml:space="preserve">
+        <value>Token usage should be recorded using 'gen_ai.client.token.usage' histogram instead of '{0}'</value>
+    </data>
+    <data name="AL0065AnalyzerDescription" xml:space="preserve">
+        <value>GenAI token usage metrics should use the gen_ai.client.token.usage histogram instrument as defined by the semantic conventions. This ensures compatibility with standard GenAI observability dashboards.</value>
+    </data>
+    <!-- AL0066: Invalid GenAI operation name -->
+    <data name="AL0066AnalyzerTitle" xml:space="preserve">
+        <value>GenAI operation name should follow semantic conventions</value>
+    </data>
+    <data name="AL0066AnalyzerMessageFormat" xml:space="preserve">
+        <value>GenAI operation name '{0}' should be one of: chat, text_completion, embeddings</value>
+    </data>
+    <data name="AL0066AnalyzerDescription" xml:space="preserve">
+        <value>GenAI operation names should follow the semantic conventions: 'chat' for chat completions, 'text_completion' for text completions, and 'embeddings' for embedding generation.</value>
+    </data>
+    <!-- AL0067: Unregistered Meter -->
+    <data name="AL0067AnalyzerTitle" xml:space="preserve">
+        <value>Meter should be registered with AddMeter()</value>
+    </data>
+    <data name="AL0067AnalyzerMessageFormat" xml:space="preserve">
+        <value>Meter '{0}' is not registered with AddMeter() in the metrics configuration</value>
+    </data>
+    <data name="AL0067AnalyzerDescription" xml:space="preserve">
+        <value>Meters must be registered with AddMeter() in the OpenTelemetry metrics configuration to be included in the metrics pipeline. Unregistered meters will not export metrics.</value>
+    </data>
+    <!-- AL0068: Invalid metric name -->
+    <data name="AL0068AnalyzerTitle" xml:space="preserve">
+        <value>Metric instrument name should follow naming conventions</value>
+    </data>
+    <data name="AL0068AnalyzerMessageFormat" xml:space="preserve">
+        <value>Metric name '{0}' should follow the pattern: namespace.component.metric_name.unit</value>
+    </data>
+    <data name="AL0068AnalyzerDescription" xml:space="preserve">
+        <value>Metric instrument names should follow OpenTelemetry naming conventions using dot-separated namespaces and snake_case for individual words. Include the unit as a suffix when applicable.</value>
+    </data>
+    <!-- AL0069: Incomplete ServiceDefaults -->
+    <data name="AL0069AnalyzerTitle" xml:space="preserve">
+        <value>ServiceDefaults configuration incomplete</value>
+    </data>
+    <data name="AL0069AnalyzerMessageFormat" xml:space="preserve">
+        <value>ServiceDefaults configuration is missing '{0}'. Add {1} for complete observability setup.</value>
+    </data>
+    <data name="AL0069AnalyzerDescription" xml:space="preserve">
+        <value>Complete ServiceDefaults configuration should include tracing, metrics, and logging setup. Missing components may result in incomplete observability data.</value>
+    </data>
+    <!-- AL0070: Non-OTLP collector endpoint -->
+    <data name="AL0070AnalyzerTitle" xml:space="preserve">
+        <value>Collector endpoint should use OTLP protocol</value>
+    </data>
+    <data name="AL0070AnalyzerMessageFormat" xml:space="preserve">
+        <value>Collector endpoint '{0}' should use OTLP protocol (grpc:// or http://...v1/traces)</value>
+    </data>
+    <data name="AL0070AnalyzerDescription" xml:space="preserve">
+        <value>Collector endpoints should use the OTLP protocol for standardized telemetry export. OTLP provides better performance and broader compatibility than proprietary protocols.</value>
+    </data>
+    <!-- AL0071: [Meter] class must be partial static -->
+    <data name="AL0071AnalyzerTitle" xml:space="preserve">
+        <value>[Meter] class must be partial static</value>
+    </data>
+    <data name="AL0071AnalyzerMessageFormat" xml:space="preserve">
+        <value>Class '{0}' with [Meter] attribute must be declared as 'partial static' for source generator support</value>
+    </data>
+    <data name="AL0071AnalyzerDescription" xml:space="preserve">
+        <value>Classes decorated with [Meter] attribute must be declared as 'partial static' to allow the source generator to implement the metric recording methods. The generator creates static fields for Meter and instrument instances.</value>
+    </data>
+    <!-- AL0072: [Counter]/[Histogram] method must be partial -->
+    <data name="AL0072AnalyzerTitle" xml:space="preserve">
+        <value>Metric method must be partial</value>
+    </data>
+    <data name="AL0072AnalyzerMessageFormat" xml:space="preserve">
+        <value>Method '{0}' with [{1}] attribute must be declared as 'partial' for source generator support</value>
+    </data>
+    <data name="AL0072AnalyzerDescription" xml:space="preserve">
+        <value>Methods decorated with [Counter] or [Histogram] attributes must be declared as 'partial' to allow the source generator to implement the metric recording logic. The generator creates the method body that records values to the corresponding instrument.</value>
+    </data>
+    <!-- AL0073: [Traced] attribute must have non-empty ActivitySourceName -->
+    <data name="AL0073AnalyzerTitle" xml:space="preserve">
+        <value>[Traced] attribute requires non-empty ActivitySourceName</value>
+    </data>
+    <data name="AL0073AnalyzerMessageFormat" xml:space="preserve">
+        <value>[Traced] attribute on '{0}' has empty or null ActivitySourceName - provide a valid source name</value>
+    </data>
+    <data name="AL0073AnalyzerDescription" xml:space="preserve">
+        <value>The [Traced] attribute requires a non-empty ActivitySourceName to identify the source of spans. This name should match a registered ActivitySource in your application's tracing configuration.</value>
+    </data>
+    <!-- AL0074: Deprecated GenAI semantic convention attribute -->
+    <data name="AL0074AnalyzerTitle" xml:space="preserve">
+        <value>Deprecated GenAI semantic convention</value>
+    </data>
+    <data name="AL0074AnalyzerMessageFormat" xml:space="preserve">
+        <value>GenAI attribute '{0}' is deprecated. Use '{1}' instead.</value>
+    </data>
+    <data name="AL0074AnalyzerDescription" xml:space="preserve">
+        <value>Some GenAI semantic convention attributes have been renamed or deprecated. Using the current attribute names ensures compatibility with modern observability tools and dashboards that expect the latest conventions.</value>
+    </data>
+    <!-- AL0075: High-cardinality tag on metrics -->
+    <data name="AL0075AnalyzerTitle" xml:space="preserve">
+        <value>High-cardinality tag on metric</value>
+    </data>
+    <data name="AL0075AnalyzerMessageFormat" xml:space="preserve">
+        <value>Tag '{0}' on metric is high-cardinality and may cause memory issues in metrics backends</value>
+    </data>
+    <data name="AL0075AnalyzerDescription" xml:space="preserve">
+        <value>High-cardinality tags like user.id, request.id, or session.id create a unique time series for each distinct value. This can overwhelm metrics backends with memory and storage costs. Consider using these values as span attributes instead, or aggregate them into buckets.</value>
+    </data>
 </root>
