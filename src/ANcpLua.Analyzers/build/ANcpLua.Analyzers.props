@@ -1,0 +1,7 @@
+<Project>
+    <!-- Expose MSBuild properties to analyzers via AnalyzerConfigOptions -->
+    <ItemGroup>
+        <!-- CPM detection - allows AL0018 to detect ManagePackageVersionsCentrally without AdditionalFiles -->
+        <CompilerVisibleProperty Include="ManagePackageVersionsCentrally"/>
+    </ItemGroup>
+</Project>

@@ -65,6 +65,13 @@ public sealed partial class Al0018VersionPropsNotImportedAnalyzer : DiagnosticAn
     }
 
     private static void AnalyzeCompilation(CompilationAnalysisContext context) {
+        // Check for CPM via MSBuild property (exposed through AnalyzerConfigOptions)
+        // This is more reliable than checking AdditionalFiles since Directory.Packages.props
+        // is not typically added as an additional file
+        if (IsCpmEnabledViaMsBuildProperty(context)) {
+            return;
+        }
+
         // Find Directory.Build.props and Directory.Packages.props in AdditionalFiles
         var directoryBuildPropsFiles = context.Options.AdditionalFiles
             .Where(static f => f.Path.EndsWith(DirectoryBuildPropsFileName, StringComparison.OrdinalIgnoreCase))
@@ -88,6 +95,22 @@ public sealed partial class Al0018VersionPropsNotImportedAnalyzer : DiagnosticAn
         foreach (var propsFile in directoryBuildPropsFiles) {
             AnalyzePropsFile(context, propsFile, hasImportInPackagesProps);
         }
+    }
+
+    /// <summary>
+    ///     Checks if CPM is enabled via MSBuild property exposed through AnalyzerConfigOptions.
+    ///     This is more reliable than checking AdditionalFiles.
+    /// </summary>
+    private static bool IsCpmEnabledViaMsBuildProperty(CompilationAnalysisContext context) {
+        // Check global analyzer config options for build_property.ManagePackageVersionsCentrally
+        var globalOptions = context.Options.AnalyzerConfigOptionsProvider.GlobalOptions;
+
+        if (globalOptions.TryGetValue("build_property.ManagePackageVersionsCentrally", out var cpmValue) &&
+            string.Equals(cpmValue, "true", StringComparison.OrdinalIgnoreCase)) {
+            return true;
+        }
+
+        return false;
     }
 
     /// <summary>
