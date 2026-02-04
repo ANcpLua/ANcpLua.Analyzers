@@ -19,20 +19,10 @@ public sealed partial class Al0026AvoidDateTimeNowAnalyzer : AlAnalyzer {
     /// <summary>Property key for the source type (DateTime or DateTimeOffset).</summary>
     public const string PropertyIsDateTimeOffset = "IsDateTimeOffset";
 
-    private static readonly LocalizableResourceString Title = new(
-        nameof(Resources.AL0026AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString MessageFormat = new(
-        nameof(Resources.AL0026AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString Description = new(
-        nameof(Resources.AL0026AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly DiagnosticDescriptor Rule = new(
+    private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticIds.AvoidDateTimeNow,
-        Title, MessageFormat, DiagnosticCategories.Usage,
-        DiagnosticSeverity.Warning, true, Description,
-        HelpLinkBase);
+        DiagnosticCategories.Usage,
+        DiagnosticSeverity.Warning);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];

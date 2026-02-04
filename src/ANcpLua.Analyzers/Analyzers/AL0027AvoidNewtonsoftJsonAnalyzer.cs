@@ -15,20 +15,10 @@ public sealed partial class Al0027AvoidNewtonsoftJsonAnalyzer : AlAnalyzer {
     /// <summary>Modern JSON library namespace.</summary>
     private const string SystemTextJsonNamespace = "System.Text.Json";
 
-    private static readonly LocalizableResourceString Title = new(
-        nameof(Resources.AL0027AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString MessageFormat = new(
-        nameof(Resources.AL0027AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString Description = new(
-        nameof(Resources.AL0027AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly DiagnosticDescriptor Rule = new(
+    private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticIds.AvoidNewtonsoftJson,
-        Title, MessageFormat, DiagnosticCategories.Usage,
-        DiagnosticSeverity.Warning, true, Description,
-        HelpLinkBase);
+        DiagnosticCategories.Usage,
+        DiagnosticSeverity.Warning);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
