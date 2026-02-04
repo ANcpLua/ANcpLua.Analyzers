@@ -26,22 +26,10 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0003DontDivideByConstantZeroAnalyzer : AlAnalyzer {
-    /// <summary>AL0003: Don't divide by constant zero.</summary>
-    private const string DiagnosticId = DiagnosticIds.DontDivideByConstantZero;
-
-    private static readonly LocalizableResourceString Title = new(
-        nameof(Resources.AL0003AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString MessageFormat = new(
-        nameof(Resources.AL0003AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString Description = new(
-        nameof(Resources.AL0003AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly DiagnosticDescriptor Rule = new(
-        DiagnosticId, Title, MessageFormat, DiagnosticCategories.Reliability,
-        DiagnosticSeverity.Error, true, Description,
-        HelpLinkBase);
+    private static readonly DiagnosticDescriptor Rule = CreateRule(
+        DiagnosticIds.DontDivideByConstantZero,
+        DiagnosticCategories.Reliability,
+        DiagnosticSeverity.Error);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];

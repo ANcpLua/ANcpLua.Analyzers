@@ -26,20 +26,10 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0006FieldNameConflictWithPrimaryConstructorAnalyzer : AlAnalyzer {
-    private static readonly LocalizableResourceString Title = new(
-        nameof(Resources.AL0006AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString MessageFormat = new(
-        nameof(Resources.AL0006AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString Description = new(
-        nameof(Resources.AL0006AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly DiagnosticDescriptor Rule = new(
+    private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticIds.FieldNameConflictsWithPrimaryConstructorParameter,
-        Title, MessageFormat, DiagnosticCategories.Design,
-        DiagnosticSeverity.Warning, true, Description,
-        HelpLinkBase);
+        DiagnosticCategories.Design,
+        DiagnosticSeverity.Warning);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];

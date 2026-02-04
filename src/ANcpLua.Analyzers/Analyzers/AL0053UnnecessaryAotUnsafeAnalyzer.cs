@@ -28,21 +28,10 @@ public sealed partial class Al0053UnnecessaryAotUnsafeAnalyzer : AlAnalyzer {
     private const string AotUnsafeAttributeName = "AotUnsafe";
     private const string RequiresDynamicCodeAttributeName = "RequiresDynamicCode";
 
-    private static readonly LocalizableResourceString Title = new(
-        nameof(Resources.AL0053AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString MessageFormat = new(
-        nameof(Resources.AL0053AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString Description = new(
-        nameof(Resources.AL0053AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly DiagnosticDescriptor Rule = new(
+    private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticIds.UnnecessaryAotUnsafe,
-        Title, MessageFormat, DiagnosticCategories.AotTesting,
-        DiagnosticSeverities.Suggestion, true, Description,
-        HelpLinkBase,
-        WellKnownDiagnosticTags.CompilationEnd);
+        DiagnosticCategories.AotTesting,
+        DiagnosticSeverities.Suggestion);
 
     /// <summary>
     /// Reflection APIs that indicate AOT-incompatible code.

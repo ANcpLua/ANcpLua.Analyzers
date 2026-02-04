@@ -22,20 +22,10 @@ public sealed partial class Al0042AotTestExitCode100Analyzer : AlAnalyzer {
     private const string TrimTestAttributeName = "TrimTest";
     private const int ExpectedExitCode = 100;
 
-    private static readonly LocalizableResourceString Title = new(
-        nameof(Resources.AL0042AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString MessageFormat = new(
-        nameof(Resources.AL0042AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString Description = new(
-        nameof(Resources.AL0042AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly DiagnosticDescriptor Rule = new(
+    private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticIds.AotTestExitCode100,
-        Title, MessageFormat, DiagnosticCategories.AotTesting,
-        DiagnosticSeverity.Warning, true, Description,
-        HelpLinkBase);
+        DiagnosticCategories.AotTesting,
+        DiagnosticSeverity.Warning);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];

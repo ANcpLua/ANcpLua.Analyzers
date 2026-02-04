@@ -14,47 +14,12 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0037UseTryParseExtensionsAnalyzer : AlAnalyzer {
-    private static readonly LocalizableResourceString Title = new(
-        nameof(Resources.AL0037AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString MessageFormat = new(
-        nameof(Resources.AL0037AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString Description = new(
-        nameof(Resources.AL0037AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly DiagnosticDescriptor Rule = new(
+    private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticIds.UseTryParseExtensions,
-        Title, MessageFormat, DiagnosticCategories.RoslynUtilities,
-        DiagnosticSeverities.Suggestion, true, Description,
-        HelpLinkBase);
-
-    // Mapping from type name to extension method name
-    private static readonly Dictionary<string, string> TryParseMapping = new(StringComparer.Ordinal) {
-        ["System.Int32"] = "TryParseInt32",
-        ["int"] = "TryParseInt32",
-        ["System.Int64"] = "TryParseInt64",
-        ["long"] = "TryParseInt64",
-        ["System.Double"] = "TryParseDouble",
-        ["double"] = "TryParseDouble",
-        ["System.Decimal"] = "TryParseDecimal",
-        ["decimal"] = "TryParseDecimal",
-        ["System.Boolean"] = "TryParseBool",
-        ["bool"] = "TryParseBool",
-        ["System.Guid"] = "TryParseGuid",
-        ["System.DateTime"] = "TryParseDateTime",
-        ["System.DateTimeOffset"] = "TryParseDateTimeOffset",
-        ["System.TimeSpan"] = "TryParseTimeSpan",
-        ["System.Byte"] = "TryParseByte",
-        ["byte"] = "TryParseByte",
-        ["System.Int16"] = "TryParseInt16",
-        ["short"] = "TryParseInt16",
-        ["System.Single"] = "TryParseSingle",
-        ["float"] = "TryParseSingle"
-    };
+        DiagnosticCategories.RoslynUtilities,
+        DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
     /// <summary>Registers syntax or operation actions for analysis.</summary>
@@ -92,7 +57,7 @@ public sealed partial class Al0037UseTryParseExtensionsAnalyzer : AlAnalyzer {
         }
 
         var typeName = containingType.ToDisplayString();
-        if (!TryParseMapping.TryGetValue(typeName, out var extensionName)) {
+        if (MappingRegistry.GetTryParseExtension(typeName) is not { } extensionName) {
             return;
         }
 

@@ -25,20 +25,10 @@ public sealed partial class Al0030UseTypeHierarchyAnalyzer : AlAnalyzer {
     /// <summary>Metadata name for ITypeSymbol.</summary>
     private const string ITypeSymbolTypeName = "Microsoft.CodeAnalysis.ITypeSymbol";
 
-    private static readonly LocalizableResourceString Title = new(
-        nameof(Resources.AL0030AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString MessageFormat = new(
-        nameof(Resources.AL0030AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString Description = new(
-        nameof(Resources.AL0030AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly DiagnosticDescriptor Rule = new(
+    private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticIds.UseTypeHierarchyExtensions,
-        Title, MessageFormat, DiagnosticCategories.RoslynUtilities,
-        DiagnosticSeverity.Info, true, Description,
-        HelpLinkBase);
+        DiagnosticCategories.RoslynUtilities,
+        DiagnosticSeverity.Info);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];

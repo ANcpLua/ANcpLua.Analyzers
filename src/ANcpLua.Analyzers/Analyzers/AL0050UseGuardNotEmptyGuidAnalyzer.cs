@@ -13,20 +13,10 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0050UseGuardNotEmptyGuidAnalyzer : AlAnalyzer {
-    private static readonly LocalizableResourceString Title = new(
-        nameof(Resources.AL0050AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString MessageFormat = new(
-        nameof(Resources.AL0050AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString Description = new(
-        nameof(Resources.AL0050AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly DiagnosticDescriptor Rule = new(
+    private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticIds.UseGuardNotEmptyGuid,
-        Title, MessageFormat, DiagnosticCategories.RoslynUtilities,
-        DiagnosticSeverities.Suggestion, true, Description,
-        HelpLinkBase);
+        DiagnosticCategories.RoslynUtilities,
+        DiagnosticSeverities.Suggestion);
 
     /// <summary>Property key for the Guid identifier.</summary>
     public const string PropertyIdentifier = "Id";

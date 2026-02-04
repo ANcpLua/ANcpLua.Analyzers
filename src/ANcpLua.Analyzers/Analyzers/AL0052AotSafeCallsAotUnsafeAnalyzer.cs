@@ -22,20 +22,10 @@ public sealed partial class Al0052AotSafeCallsAotUnsafeAnalyzer : AlAnalyzer {
     private const string AotSafeAttributeName = "AotSafe";
     private const string AotUnsafeAttributeName = "AotUnsafe";
 
-    private static readonly LocalizableResourceString Title = new(
-        nameof(Resources.AL0052AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString MessageFormat = new(
-        nameof(Resources.AL0052AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString Description = new(
-        nameof(Resources.AL0052AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly DiagnosticDescriptor Rule = new(
+    private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticIds.AotSafeCallsAotUnsafe,
-        Title, MessageFormat, DiagnosticCategories.AotTesting,
-        DiagnosticSeverities.RequiredFix, true, Description,
-        HelpLinkBase);
+        DiagnosticCategories.AotTesting,
+        DiagnosticSeverities.RequiredFix);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];

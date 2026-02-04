@@ -26,20 +26,10 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0013MissingSchemaUrlAnalyzer : AlAnalyzer {
-    private static readonly LocalizableResourceString Title = new(
-        nameof(Resources.AL0013AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString MessageFormat = new(
-        nameof(Resources.AL0013AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString Description = new(
-        nameof(Resources.AL0013AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly DiagnosticDescriptor Rule = new(
+    private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticIds.MissingTelemetrySchemaUrl,
-        Title, MessageFormat, DiagnosticCategories.OpenTelemetry,
-        DiagnosticSeverity.Info, true, Description,
-        HelpLinkBase);
+        DiagnosticCategories.OpenTelemetry,
+        DiagnosticSeverity.Info);
 
     /// <summary>Set of method names that configure OTel resources.</summary>
     private static readonly HashSet<string> ResourceConfigMethods = [

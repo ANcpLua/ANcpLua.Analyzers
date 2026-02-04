@@ -19,23 +19,12 @@ namespace ANcpLua.Analyzers.Analyzers;
 public sealed partial class Al0031UseOperationExtensionsAnalyzer : AlAnalyzer {
     private const string IInvocationOperationTypeName = "Microsoft.CodeAnalysis.Operations.IInvocationOperation";
 
-    private static readonly LocalizableResourceString Title = new(
-        nameof(Resources.AL0031AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString MessageFormat = new(
-        nameof(Resources.AL0031AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString Description = new(
-        nameof(Resources.AL0031AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly DiagnosticDescriptor Rule = new(
+    private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticIds.UseOperationExtensions,
-        Title, MessageFormat, DiagnosticCategories.RoslynUtilities,
-        DiagnosticSeverity.Info, true, Description,
-        HelpLinkBase);
+        DiagnosticCategories.RoslynUtilities,
+        DiagnosticSeverity.Info);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
     /// <summary>Registers syntax or operation actions for analysis.</summary>

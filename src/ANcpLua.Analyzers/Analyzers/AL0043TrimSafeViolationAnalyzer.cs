@@ -21,23 +21,12 @@ public sealed partial class Al0043TrimSafeViolationAnalyzer : AlAnalyzer {
     private const string TrimSafeAttributeName = "TrimSafe";
     private const string RequiresUnreferencedCodeAttributeName = "RequiresUnreferencedCode";
 
-    private static readonly LocalizableResourceString Title = new(
-        nameof(Resources.AL0043AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString MessageFormat = new(
-        nameof(Resources.AL0043AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString Description = new(
-        nameof(Resources.AL0043AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly DiagnosticDescriptor Rule = new(
+    private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticIds.TrimSafeViolation,
-        Title, MessageFormat, DiagnosticCategories.AotTesting,
-        DiagnosticSeverity.Warning, true, Description,
-        HelpLinkBase);
+        DiagnosticCategories.AotTesting,
+        DiagnosticSeverity.Warning);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
     /// <summary>Registers syntax or operation actions for analysis.</summary>

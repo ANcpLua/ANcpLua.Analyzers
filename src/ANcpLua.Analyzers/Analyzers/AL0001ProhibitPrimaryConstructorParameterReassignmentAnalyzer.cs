@@ -25,22 +25,10 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0001ProhibitPrimaryConstructorParameterReassignmentAnalyzer : AlAnalyzer {
-    /// <summary>AL0001: Prohibit reassignment of primary constructor parameters.</summary>
-    private const string DiagnosticId = DiagnosticIds.ProhibitPrimaryConstructorParameterReassignment;
-
-    private static readonly LocalizableResourceString Title = new(
-        nameof(Resources.AL0001AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString MessageFormat = new(
-        nameof(Resources.AL0001AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString Description = new(
-        nameof(Resources.AL0001AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly DiagnosticDescriptor Rule = new(
-        DiagnosticId, Title, MessageFormat, DiagnosticCategories.Design,
-        DiagnosticSeverity.Error, true, Description,
-        HelpLinkBase);
+    private static readonly DiagnosticDescriptor Rule = CreateRule(
+        DiagnosticIds.ProhibitPrimaryConstructorParameterReassignment,
+        DiagnosticCategories.Design,
+        DiagnosticSeverity.Error);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];

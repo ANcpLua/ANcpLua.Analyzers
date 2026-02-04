@@ -11,20 +11,10 @@ public sealed partial class Al0011LockKeywordAnalyzer : AlAnalyzer {
     /// <summary>Metadata name for the System.Threading.Lock type (.NET 9+).</summary>
     private const string LockTypeMetadataName = "System.Threading.Lock";
 
-    private static readonly LocalizableResourceString Title = new(
-        nameof(Resources.AL0011AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString MessageFormat = new(
-        nameof(Resources.AL0011AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString Description = new(
-        nameof(Resources.AL0011AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly DiagnosticDescriptor Rule = new(
+    private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticIds.AvoidLockKeywordOnNonLockTypes,
-        Title, MessageFormat, DiagnosticCategories.Threading,
-        DiagnosticSeverity.Warning, true, Description,
-        HelpLinkBase);
+        DiagnosticCategories.Threading,
+        DiagnosticSeverity.Warning);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];

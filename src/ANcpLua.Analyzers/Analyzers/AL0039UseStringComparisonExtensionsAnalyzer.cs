@@ -15,43 +15,12 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0039UseStringComparisonExtensionsAnalyzer : AlAnalyzer {
-    private static readonly LocalizableResourceString Title = new(
-        nameof(Resources.AL0039AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString MessageFormat = new(
-        nameof(Resources.AL0039AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString Description = new(
-        nameof(Resources.AL0039AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly DiagnosticDescriptor Rule = new(
+    private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticIds.UseStringComparisonExtensions,
-        Title, MessageFormat, DiagnosticCategories.RoslynUtilities,
-        DiagnosticSeverities.Suggestion, true, Description,
-        HelpLinkBase);
-
-    // Methods that have StringComparison extension equivalents
-    // Note: LastIndexOf is NOT included - no extension exists for it
-    private static readonly HashSet<string> SupportedMethods = [
-        "Equals",
-        "StartsWith",
-        "EndsWith",
-        "Contains",
-        "IndexOf"
-    ];
-
-    // Mapping from StringComparison value to extension suffix
-    private static readonly Dictionary<string, string> ComparisonToSuffix = new(StringComparer.Ordinal) {
-        ["Ordinal"] = "Ordinal",
-        ["OrdinalIgnoreCase"] = "IgnoreCase",
-        ["CurrentCulture"] = "CurrentCulture",
-        ["CurrentCultureIgnoreCase"] = "CurrentCultureIgnoreCase",
-        ["InvariantCulture"] = "InvariantCulture",
-        ["InvariantCultureIgnoreCase"] = "InvariantCultureIgnoreCase"
-    };
+        DiagnosticCategories.RoslynUtilities,
+        DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
     /// <summary>Registers syntax or operation actions for analysis.</summary>
@@ -67,7 +36,7 @@ public sealed partial class Al0039UseStringComparisonExtensionsAnalyzer : AlAnal
         var method = invocation.TargetMethod;
 
         // Check if it's a supported string method
-        if (!SupportedMethods.Contains(method.Name)) {
+        if (!MappingRegistry.HasStringComparisonExtension(method.Name)) {
             return;
         }
 
@@ -90,9 +59,12 @@ public sealed partial class Al0039UseStringComparisonExtensionsAnalyzer : AlAnal
             return;
         }
 
-        // Get the StringComparison value
-        var comparisonValue = GetStringComparisonValue(comparisonArg);
-        if (comparisonValue is null || !ComparisonToSuffix.TryGetValue(comparisonValue, out var suffix)) {
+        // Get the StringComparison value and suffix
+        if (GetStringComparisonValue(comparisonArg) is not { } comparisonValue) {
+            return;
+        }
+
+        if (MappingRegistry.GetStringComparisonSuffix(comparisonValue) is not { } suffix) {
             return;
         }
 

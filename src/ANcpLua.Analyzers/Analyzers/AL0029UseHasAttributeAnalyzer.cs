@@ -20,20 +20,10 @@ public sealed partial class Al0029UseHasAttributeAnalyzer : AlAnalyzer {
     /// <summary>Metadata name for ISymbol.</summary>
     private const string ISymbolTypeName = "Microsoft.CodeAnalysis.ISymbol";
 
-    private static readonly LocalizableResourceString Title = new(
-        nameof(Resources.AL0029AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString MessageFormat = new(
-        nameof(Resources.AL0029AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString Description = new(
-        nameof(Resources.AL0029AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly DiagnosticDescriptor Rule = new(
+    private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticIds.UseHasAttribute,
-        Title, MessageFormat, DiagnosticCategories.RoslynUtilities,
-        DiagnosticSeverity.Info, true, Description,
-        HelpLinkBase);
+        DiagnosticCategories.RoslynUtilities,
+        DiagnosticSeverity.Info);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];

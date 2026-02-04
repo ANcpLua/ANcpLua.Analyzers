@@ -21,23 +21,12 @@ public sealed partial class Al0035UseToDisplayStringExtensionsAnalyzer : AlAnaly
     private const string ITypeSymbolTypeName = "Microsoft.CodeAnalysis.ITypeSymbol";
     private const string SymbolDisplayFormatTypeName = "Microsoft.CodeAnalysis.SymbolDisplayFormat";
 
-    private static readonly LocalizableResourceString Title = new(
-        nameof(Resources.AL0035AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString MessageFormat = new(
-        nameof(Resources.AL0035AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString Description = new(
-        nameof(Resources.AL0035AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly DiagnosticDescriptor Rule = new(
+    private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticIds.UseToDisplayStringExtensions,
-        Title, MessageFormat, DiagnosticCategories.RoslynUtilities,
-        DiagnosticSeverity.Info, true, Description,
-        HelpLinkBase);
+        DiagnosticCategories.RoslynUtilities,
+        DiagnosticSeverity.Info);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
     /// <summary>Registers syntax or operation actions for analysis.</summary>

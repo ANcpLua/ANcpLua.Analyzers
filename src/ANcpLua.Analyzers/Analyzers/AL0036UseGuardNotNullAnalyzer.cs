@@ -13,27 +13,15 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0036UseGuardNotNullAnalyzer : AlAnalyzer {
-    private static readonly LocalizableResourceString Title = new(
-        nameof(Resources.AL0036AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString MessageFormat = new(
-        nameof(Resources.AL0036AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString Description = new(
-        nameof(Resources.AL0036AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly DiagnosticDescriptor Rule = new(
+    private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticIds.UseGuardNotNull,
-        Title, MessageFormat, DiagnosticCategories.RoslynUtilities,
-        DiagnosticSeverities.Suggestion, true, Description,
-        HelpLinkBase);
+        DiagnosticCategories.RoslynUtilities,
+        DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
     /// <summary>Registers syntax or operation actions for analysis.</summary>
-
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterOperationAction(AnalyzeCoalesce, OperationKind.Coalesce);
 
@@ -48,42 +36,24 @@ public sealed partial class Al0036UseGuardNotNullAnalyzer : AlAnalyzer {
         }
 
         // Get the name of the left operand for the message
-        var operandName = GetOperandName(coalesce.Value);
+        var operandName = OperationHelper.GetOperandName(coalesce.Value, "value");
 
         context.ReportDiagnostic(Diagnostic.Create(Rule, coalesce.Syntax.GetLocation(), operandName));
     }
 
     private static bool IsArgumentNullExceptionThrow(IOperation? operation) {
-        if (operation is null) {
-            return false;
-        }
-
         // Unwrap conversions
         operation = OperationHelper.UnwrapConversions(operation);
 
         // Check for throw expression
-        if (operation is not IThrowOperation throwOp) {
+        if (operation is not IThrowOperation { Exception: { } exception }) {
             return false;
         }
 
-        // Get the exception being thrown
-        if (throwOp.Exception is not { } exception) {
-            return false;
-        }
-
-        // Unwrap conversions
+        // Unwrap conversions and check if creating an ArgumentNullException
         exception = OperationHelper.UnwrapConversions(exception);
 
-        // Check if it's creating an ArgumentNullException
-        if (exception is not IObjectCreationOperation { Type: { } exceptionType }) {
-            return false;
-        }
-
-        // Check if it's ArgumentNullException
-        var typeName = exceptionType.ToDisplayString();
-        return typeName is "System.ArgumentNullException" or "ArgumentNullException";
+        return exception is IObjectCreationOperation { Type: { } exceptionType }
+               && OperationHelper.IsArgumentNullException(exceptionType);
     }
-
-    private static string GetOperandName(IOperation operation) =>
-        OperationHelper.GetOperandName(operation, "value");
 }

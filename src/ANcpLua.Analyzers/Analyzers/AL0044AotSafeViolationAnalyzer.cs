@@ -21,23 +21,12 @@ public sealed partial class Al0044AotSafeViolationAnalyzer : AlAnalyzer {
     private const string AotSafeAttributeName = "AotSafe";
     private const string RequiresDynamicCodeAttributeName = "RequiresDynamicCode";
 
-    private static readonly LocalizableResourceString Title = new(
-        nameof(Resources.AL0044AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString MessageFormat = new(
-        nameof(Resources.AL0044AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly LocalizableResourceString Description = new(
-        nameof(Resources.AL0044AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
-
-    private static readonly DiagnosticDescriptor Rule = new(
+    private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticIds.AotSafeViolation,
-        Title, MessageFormat, DiagnosticCategories.AotTesting,
-        DiagnosticSeverity.Warning, true, Description,
-        HelpLinkBase);
+        DiagnosticCategories.AotTesting,
+        DiagnosticSeverity.Warning);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
     /// <summary>Registers syntax or operation actions for analysis.</summary>
