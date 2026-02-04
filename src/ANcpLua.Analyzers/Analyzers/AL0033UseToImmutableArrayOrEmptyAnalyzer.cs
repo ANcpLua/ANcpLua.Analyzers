@@ -49,7 +49,7 @@ public sealed partial class Al0033UseToImmutableArrayOrEmptyAnalyzer : AlAnalyze
         }
 
         // Unwrap conversions
-        operation = OperationHelper.UnwrapConversions(operation);
+        operation = operation.UnwrapAllConversions();
 
         switch (operation) {
             // Check for ImmutableArray<T>.Empty field access
@@ -86,7 +86,7 @@ public sealed partial class Al0033UseToImmutableArrayOrEmptyAnalyzer : AlAnalyze
         }
 
         // Unwrap conversions
-        operation = OperationHelper.UnwrapConversions(operation);
+        operation = operation.UnwrapAllConversions();
 
         // Check for null-conditional invocation: source?.ToImmutableArray()
         if (operation is IConditionalAccessOperation {
@@ -102,5 +102,5 @@ public sealed partial class Al0033UseToImmutableArrayOrEmptyAnalyzer : AlAnalyze
     }
 
     private static string GetOperandDisplayName(IOperation operation) =>
-        OperationHelper.GetOperandName(operation, "collection");
+        operation.GetOperandName("collection");
 }

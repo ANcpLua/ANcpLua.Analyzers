@@ -90,7 +90,7 @@ public sealed partial class Al0038UseGetOrNullAnalyzer : AlAnalyzer {
 
     private static bool IsTryGetValuePattern(IConditionalOperation conditional, IInvocationOperation invocation) {
         // The WhenTrue should reference the out variable
-        var whenTrue = OperationHelper.UnwrapConversions(conditional.WhenTrue);
+        var whenTrue = conditional.WhenTrue.UnwrapAllConversions();
 
         if (whenTrue is not ILocalReferenceOperation localRef) {
             return false;
@@ -113,7 +113,11 @@ public sealed partial class Al0038UseGetOrNullAnalyzer : AlAnalyzer {
         }
 
         // The WhenFalse should be null, default, or a constant
-        var whenFalse = OperationHelper.UnwrapConversions(conditional.WhenFalse);
+        if (conditional.WhenFalse is not { } whenFalseOp) {
+            return false;
+        }
+
+        var whenFalse = whenFalseOp.UnwrapAllConversions();
 
         return whenFalse switch {
             IDefaultValueOperation => true,
@@ -127,15 +131,15 @@ public sealed partial class Al0038UseGetOrNullAnalyzer : AlAnalyzer {
         IInvocationOperation invocation,
         IConditionalOperation conditional) {
         // Get dictionary name
-        var dictName = GetOperandName(invocation.Instance);
+        var dictName = invocation.Instance.GetOperandName("dict");
 
         // Get key name (first argument)
         var keyName = invocation.Arguments.Length > 0
-            ? GetOperandName(invocation.Arguments[0].Value)
+            ? invocation.Arguments[0].Value.GetOperandName("key")
             : "key";
 
         // Determine extension: GetOrNull if WhenFalse is null, GetOrDefault otherwise
-        var whenFalse = OperationHelper.UnwrapConversions(conditional.WhenFalse);
+        var whenFalse = conditional.WhenFalse?.UnwrapAllConversions();
         var extensionName = whenFalse switch {
             ILiteralOperation { ConstantValue.HasValue: true, ConstantValue.Value: null } => "GetOrNull",
             IDefaultValueOperation => "GetOrNull",
@@ -144,7 +148,4 @@ public sealed partial class Al0038UseGetOrNullAnalyzer : AlAnalyzer {
 
         return (dictName, keyName, extensionName);
     }
-
-    private static string GetOperandName(IOperation? operation) =>
-        OperationHelper.GetOperandName(operation, "dict");
 }

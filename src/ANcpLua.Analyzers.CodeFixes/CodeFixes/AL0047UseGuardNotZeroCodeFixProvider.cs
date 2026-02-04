@@ -41,7 +41,7 @@ public sealed partial class Al0047UseGuardNotZeroCodeFixProvider
 
     private static Task<Document> ConvertToGuardNotZero(
         Document document,
-        IfStatementSyntax ifStatement,
+        CSharpSyntaxNode ifStatement,
         SyntaxNode root,
         string identifier) {
         // Create: Guard.NotZero(identifier);

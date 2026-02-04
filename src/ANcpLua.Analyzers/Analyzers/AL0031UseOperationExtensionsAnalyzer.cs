@@ -1,5 +1,5 @@
 ﻿using ANcpLua.Analyzers.Core;
-using OperationExtensions = Microsoft.CodeAnalysis.Operations.OperationExtensions;
+using RoslynOperationExtensions = Microsoft.CodeAnalysis.Operations.OperationExtensions;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -74,7 +74,7 @@ public sealed partial class Al0031UseOperationExtensionsAnalyzer : AlAnalyzer {
 
         if (propSide is IPropertyReferenceOperation { Property.Name: "Name", Instance: { } rawInstance }) {
             // Unwrap conversions on the Instance to find the TargetMethod property access
-            var instance = UnwrapConversions(rawInstance);
+            var instance = rawInstance.UnwrapAllConversions();
             if (instance is IPropertyReferenceOperation { Property.Name: "TargetMethod" } &&
                 literalSide.ConstantValue is { HasValue: true, Value: string value }) {
                 methodName = value;
@@ -86,8 +86,8 @@ public sealed partial class Al0031UseOperationExtensionsAnalyzer : AlAnalyzer {
     }
 
     private static (IOperation? propSide, IOperation? literalSide) GetPropertyAndLiteralSides(IBinaryOperation binary) {
-        var left = UnwrapConversions(binary.LeftOperand);
-        var right = UnwrapConversions(binary.RightOperand);
+        var left = binary.LeftOperand.UnwrapAllConversions();
+        var right = binary.RightOperand.UnwrapAllConversions();
 
         if (left is IPropertyReferenceOperation && right.ConstantValue.HasValue) {
             return (left, right);
@@ -100,24 +100,16 @@ public sealed partial class Al0031UseOperationExtensionsAnalyzer : AlAnalyzer {
         return (null, null);
     }
 
-    private static IOperation UnwrapConversions(IOperation operation) {
-        while (operation is IConversionOperation conversion) {
-            operation = conversion.Operand;
-        }
-
-        return operation;
-    }
-
     private static bool IsConstantValueHasValueCheck(IBinaryOperation binary) {
         var hasHasValueCheck = false;
         var hasValueAccess = false;
 
-        foreach (var descendant in OperationExtensions.Descendants(binary)) {
+        foreach (var descendant in RoslynOperationExtensions.Descendants(binary)) {
             if (descendant is not IPropertyReferenceOperation propRef) {
                 continue;
             }
 
-            var instance = propRef.Instance is { } rawInstance ? UnwrapConversions(rawInstance) : null;
+            var instance = propRef.Instance?.UnwrapAllConversions();
 
             // Check for .HasValue on ConstantValue
             if (propRef.Property.Name == "HasValue" &&

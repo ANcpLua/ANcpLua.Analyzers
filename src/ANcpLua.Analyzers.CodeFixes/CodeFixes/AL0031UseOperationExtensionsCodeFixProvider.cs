@@ -136,7 +136,7 @@ public sealed partial class Al0031UseOperationExtensionsCodeFixProvider : AlCode
 
     private static Task<Document> ConvertToIsMethodNamed(
         Document document,
-        BinaryExpressionSyntax binary,
+        SyntaxNode binary,
         SyntaxNode root,
         ExpressionSyntax invocationExpr,
         string containingType,
@@ -299,7 +299,7 @@ public sealed partial class Al0031UseOperationExtensionsCodeFixProvider : AlCode
 
     private static Task<Document> ConvertToTryGetConstantValue(
         Document document,
-        BinaryExpressionSyntax binary,
+        SyntaxNode binary,
         SyntaxNode root,
         ExpressionSyntax operationExpr,
         string typeName,

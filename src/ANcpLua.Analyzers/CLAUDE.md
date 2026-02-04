@@ -15,7 +15,7 @@ Analyzers/
 Core/
   ALAnalyzer.cs           # Base class + DiagnosticIds + DiagnosticCategories + DiagnosticSeverities
   WellKnownTypes.cs       # WellKnownType enum + WellKnownTypeCache
-  OperationHelper.cs      # UnwrapConversions(), GetOperandName()
+  OperationHelper.cs      # IsArgumentNullException(), IsArgumentException(), etc.
   DeprecatedOtelAttributes.cs  # OTel attribute mappings for AL0012
 Resources.resx            # Localized diagnostic strings (Title, MessageFormat, Description)
 ```
@@ -85,14 +85,25 @@ protected override void RegisterActions(AnalysisContext context) {
 
 ### OperationHelper
 
-Utility for IOperation manipulation:
+Utility for checking argument exception types (domain-specific):
+
+```csharp
+OperationHelper.IsArgumentNullException(type)
+OperationHelper.IsArgumentException(type)
+OperationHelper.IsArgumentOutOfRangeException(type)
+OperationHelper.IsAnyArgumentException(type)
+```
+
+### IOperation Extensions (from ANcpLua.Roslyn.Utilities)
+
+For general IOperation utilities, use the extensions from ANcpLua.Roslyn.Utilities:
 
 ```csharp
 // Unwrap implicit conversions to get actual operand
-var unwrapped = OperationHelper.UnwrapConversions(operation);
+var unwrapped = operation.UnwrapAllConversions();
 
 // Get human-readable name for diagnostic messages
-var name = OperationHelper.GetOperandName(operation, fallback: "value");
+var name = operation.GetOperandName("fallback");
 // Returns: local name, parameter name, property name, field name, or "MethodName()"
 ```
 

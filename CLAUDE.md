@@ -26,7 +26,7 @@ src/
     Analyzers/AL00XX*.cs          # One file per diagnostic
     Core/ALAnalyzer.cs            # Base class + DiagnosticIds + DiagnosticCategories
     Core/WellKnownTypes.cs        # Type metadata cache
-    Core/OperationHelper.cs       # IOperation utilities
+    Core/OperationHelper.cs       # Argument exception type checks
   ANcpLua.Analyzers.CodeFixes/    # CodeFixProvider implementations
     CodeFixes/AL00XX*.cs          # One file per code fix
     CodeFixes/ALCodeFixProvider.cs # Base class
@@ -126,7 +126,7 @@ public sealed class Al0001Tests : AnalyzerTest<Al0001Analyzer> {
 |----------------------------|-----------------------------------------|
 | `Core/ALAnalyzer.cs`       | DiagnosticIds, DiagnosticCategories     |
 | `Core/WellKnownTypes.cs`   | Type metadata enum and cache            |
-| `Core/OperationHelper.cs`  | IOperation unwrapping and naming        |
+| `Core/OperationHelper.cs`  | Argument exception type checks          |
 | `Resources.resx`           | Localized diagnostic strings            |
 
 ## Banned Patterns

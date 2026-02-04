@@ -36,14 +36,23 @@ public sealed partial class Al0036UseGuardNotNullAnalyzer : AlAnalyzer {
         }
 
         // Get the name of the left operand for the message
-        var operandName = OperationHelper.GetOperandName(coalesce.Value, "value");
+        var operandName = coalesce.Value.GetOperandName("value");
 
         context.ReportDiagnostic(Diagnostic.Create(Rule, coalesce.Syntax.GetLocation(), operandName));
     }
 
     private static bool IsArgumentNullExceptionThrow(IOperation? operation) {
-        // Unwrap conversions
-        operation = OperationHelper.UnwrapConversions(operation);
+        // Unwrap conversions - use pattern match to handle nullable
+        if (operation is not IConversionOperation and not IThrowOperation) {
+            // Fast path: not a conversion or throw
+            if (operation is null) {
+                return false;
+            }
+        }
+
+        while (operation is IConversionOperation conversion) {
+            operation = conversion.Operand;
+        }
 
         // Check for throw expression
         if (operation is not IThrowOperation { Exception: { } exception }) {
@@ -51,9 +60,9 @@ public sealed partial class Al0036UseGuardNotNullAnalyzer : AlAnalyzer {
         }
 
         // Unwrap conversions and check if creating an ArgumentNullException
-        exception = OperationHelper.UnwrapConversions(exception);
+        var unwrappedException = exception.UnwrapAllConversions();
 
-        return exception is IObjectCreationOperation { Type: { } exceptionType }
+        return unwrappedException is IObjectCreationOperation { Type: { } exceptionType }
                && OperationHelper.IsArgumentNullException(exceptionType);
     }
 }
