@@ -13,7 +13,7 @@ internal static partial class MappingRegistry {
     ///     Supports both fully-qualified names (e.g., "System.Int32") and
     ///     C# keyword aliases (e.g., "int").
     /// </remarks>
-    private static readonly Dictionary<string, string> s_tryParseMappings =
+    private static readonly Dictionary<string, string> TryParseMappings =
         new(StringComparer.Ordinal) {
             ["System.Int32"] = "TryParseInt32",
             ["int"] = "TryParseInt32",
@@ -44,7 +44,7 @@ internal static partial class MappingRegistry {
     /// <remarks>
     ///     Note: LastIndexOf is NOT included - no extension exists for it.
     /// </remarks>
-    private static readonly HashSet<string> s_stringComparisonMethods =
+    private static readonly HashSet<string> StringComparisonMethods =
         new(StringComparer.Ordinal) {
             "Equals",
             "StartsWith",
@@ -57,7 +57,7 @@ internal static partial class MappingRegistry {
     ///     Maps StringComparison enum values to extension method suffixes.
     ///     Used by AL0039.
     /// </summary>
-    private static readonly Dictionary<string, string> s_stringComparisonSuffixes =
+    private static readonly Dictionary<string, string> StringComparisonSuffixes =
         new(StringComparer.Ordinal) {
             ["Ordinal"] = "Ordinal",
             ["OrdinalIgnoreCase"] = "IgnoreCase",
@@ -73,7 +73,7 @@ internal static partial class MappingRegistry {
     /// <param name="typeName">The fully-qualified type name or C# keyword alias.</param>
     /// <returns>The extension method name, or null if no mapping exists.</returns>
     public static string? GetTryParseExtension(string typeName) =>
-        s_tryParseMappings.TryGetValue(typeName, out var ext) ? ext : null;
+        TryParseMappings.TryGetValue(typeName, out var ext) ? ext : null;
 
     /// <summary>
     ///     Checks if a string method has StringComparison extension equivalents.
@@ -81,7 +81,7 @@ internal static partial class MappingRegistry {
     /// <param name="methodName">The string method name (e.g., "Equals", "Contains").</param>
     /// <returns>True if the method has extension equivalents.</returns>
     public static bool HasStringComparisonExtension(string methodName) =>
-        s_stringComparisonMethods.Contains(methodName);
+        StringComparisonMethods.Contains(methodName);
 
     /// <summary>
     ///     Gets the extension method suffix for a StringComparison value.
@@ -89,5 +89,5 @@ internal static partial class MappingRegistry {
     /// <param name="comparisonValue">The StringComparison enum member name.</param>
     /// <returns>The suffix to append to the method name, or null if not supported.</returns>
     public static string? GetStringComparisonSuffix(string comparisonValue) =>
-        s_stringComparisonSuffixes.TryGetValue(comparisonValue, out var suffix) ? suffix : null;
+        StringComparisonSuffixes.TryGetValue(comparisonValue, out var suffix) ? suffix : null;
 }
