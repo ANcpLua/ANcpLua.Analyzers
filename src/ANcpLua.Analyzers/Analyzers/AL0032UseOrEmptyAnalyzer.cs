@@ -59,7 +59,7 @@ public sealed partial class Al0032UseOrEmptyAnalyzer : AlAnalyzer {
         }
 
         // Unwrap conversions
-        operation = OperationHelper.UnwrapConversions(operation);
+        operation = operation.UnwrapAllConversions();
 
         switch (operation) {
             // Check for collection expression [] (empty)
@@ -124,5 +124,5 @@ public sealed partial class Al0032UseOrEmptyAnalyzer : AlAnalyzer {
     }
 
     private static string GetOperandDisplayName(IOperation operation) =>
-        OperationHelper.GetOperandName(operation, "collection");
+        operation.GetOperandName("collection");
 }

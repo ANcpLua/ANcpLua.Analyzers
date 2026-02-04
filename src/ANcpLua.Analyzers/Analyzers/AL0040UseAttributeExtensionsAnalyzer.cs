@@ -76,7 +76,7 @@ public sealed partial class Al0040UseAttributeExtensionsAnalyzer : AlAnalyzer {
 
         // Get the index
         var indexStr = GetIndexValue(arrayAccess);
-        var attrName = GetOperandName(arrayProp.Instance);
+        var attrName = arrayProp.Instance.GetOperandName("attr");
         var suggestion = $"{attrName}.GetConstructorArgument<T>({indexStr})";
 
         context.ReportDiagnostic(Diagnostic.Create(Rule, valueAccess.Syntax.GetLocation(), suggestion));
@@ -98,7 +98,7 @@ public sealed partial class Al0040UseAttributeExtensionsAnalyzer : AlAnalyzer {
         }
 
         var indexStr = arrayElementRef is IArrayElementReferenceOperation arr ? GetIndexValue(arr) : "0";
-        var attrName = GetOperandName(propRef.Instance);
+        var attrName = propRef.Instance.GetOperandName("attr");
         var suggestion = $"{attrName}.GetConstructorArgument<T>({indexStr})";
 
         context.ReportDiagnostic(Diagnostic.Create(Rule, arrayElementRef.Syntax.GetLocation(), suggestion));
@@ -121,23 +121,17 @@ public sealed partial class Al0040UseAttributeExtensionsAnalyzer : AlAnalyzer {
             return "0";
         }
 
-        var index = arrayAccess.Indices[0];
-
-        // Unwrap conversions
-        index = OperationHelper.UnwrapConversions(index);
+        var index = arrayAccess.Indices[0].UnwrapAllConversions();
 
         if (index is ILiteralOperation { ConstantValue.HasValue: true } literal) {
             return literal.ConstantValue.Value?.ToString() ?? "0";
         }
 
-        return GetOperandName(index);
+        return index.GetOperandName("0");
     }
 
     private static IOperation? GetParentOperation(IOperation operation) {
         // Walk up the operation tree
         return operation.Parent;
     }
-
-    private static string GetOperandName(IOperation? operation) =>
-        OperationHelper.GetOperandName(operation, "attr");
 }

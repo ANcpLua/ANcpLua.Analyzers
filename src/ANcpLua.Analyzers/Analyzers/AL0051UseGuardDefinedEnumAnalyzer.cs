@@ -66,7 +66,7 @@ public sealed partial class Al0051UseGuardDefinedEnumAnalyzer : AlAnalyzer {
         }
 
         // Get the operand of the negation
-        var operand = OperationHelper.UnwrapConversions(unary.Operand);
+        var operand = unary.Operand.UnwrapAllConversions();
 
         // Unwrap parentheses on the operand too
         while (operand is IParenthesizedOperation parenOp) {
@@ -93,10 +93,10 @@ public sealed partial class Al0051UseGuardDefinedEnumAnalyzer : AlAnalyzer {
 
         if (method.IsGenericMethod && invocation.Arguments.Length >= 1) {
             // Generic version: Enum.IsDefined<T>(value)
-            valueName = OperationHelper.GetOperandName(invocation.Arguments[0].Value, "value");
+            valueName = invocation.Arguments[0].Value.GetOperandName("value");
         } else if (!method.IsGenericMethod && invocation.Arguments.Length >= 2) {
             // Non-generic version: Enum.IsDefined(typeof(T), value)
-            valueName = OperationHelper.GetOperandName(invocation.Arguments[1].Value, "value");
+            valueName = invocation.Arguments[1].Value.GetOperandName("value");
         }
 
         return valueName is not null ? (true, valueName) : (false, null);
@@ -142,11 +142,8 @@ public sealed partial class Al0051UseGuardDefinedEnumAnalyzer : AlAnalyzer {
             return false;
         }
 
-        // Unwrap conversions
-        exception = OperationHelper.UnwrapConversions(exception);
-
-        // Check if it's creating an exception
-        if (exception is not IObjectCreationOperation { Type: { } exceptionType }) {
+        // Unwrap conversions and check if it's creating an exception
+        if (exception.UnwrapAllConversions() is not IObjectCreationOperation { Type: { } exceptionType }) {
             return false;
         }
 

@@ -73,14 +73,14 @@ public sealed partial class Al0048UseGuardNotNegativeAnalyzer : AlAnalyzer {
         // - x < 0  (OperatorKind.LessThan, left = x, right = 0)
         // - 0 > x  (OperatorKind.GreaterThan, left = 0, right = x)
 
-        var leftOperand = OperationHelper.UnwrapConversions(binary.LeftOperand);
-        var rightOperand = OperationHelper.UnwrapConversions(binary.RightOperand);
+        var leftOperand = binary.LeftOperand.UnwrapAllConversions();
+        var rightOperand = binary.RightOperand.UnwrapAllConversions();
 
         return binary.OperatorKind switch {
             BinaryOperatorKind.LessThan when IsZeroConstant(rightOperand) =>
-                (true, OperationHelper.GetOperandName(leftOperand, "value")),
+                (true, leftOperand.GetOperandName("value")),
             BinaryOperatorKind.GreaterThan when IsZeroConstant(leftOperand) =>
-                (true, OperationHelper.GetOperandName(rightOperand, "value")),
+                (true, rightOperand.GetOperandName("value")),
             _ => (false, null)
         };
     }
@@ -147,11 +147,8 @@ public sealed partial class Al0048UseGuardNotNegativeAnalyzer : AlAnalyzer {
             return false;
         }
 
-        // Unwrap conversions
-        exception = OperationHelper.UnwrapConversions(exception);
-
-        // Check if it's creating an ArgumentOutOfRangeException
-        if (exception is not IObjectCreationOperation { Type: { } exceptionType }) {
+        // Unwrap conversions and check if it's creating an ArgumentOutOfRangeException
+        if (exception.UnwrapAllConversions() is not IObjectCreationOperation { Type: { } exceptionType }) {
             return false;
         }
 

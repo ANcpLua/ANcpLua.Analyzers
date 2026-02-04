@@ -67,8 +67,8 @@ public sealed partial class Al0003DontDivideByConstantZeroAnalyzer : AlAnalyzer 
         // operation. Check if it's a conversion from a zero literal.
         if (operation is IConversionOperation conversion &&
             conversion.Type?.ToDisplayString() is "System.Int128" or "System.UInt128") {
-            var operand = OperationHelper.UnwrapConversions(conversion.Operand);
-            return operand?.ConstantValue.HasValue == true && IsZero(operand.ConstantValue.Value);
+            var operand = conversion.Operand.UnwrapAllConversions();
+            return operand.ConstantValue.HasValue && IsZero(operand.ConstantValue.Value);
         }
 
         return false;

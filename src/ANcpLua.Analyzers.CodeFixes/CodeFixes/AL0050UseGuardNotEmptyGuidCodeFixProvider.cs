@@ -39,7 +39,7 @@ public sealed partial class Al0050UseGuardNotEmptyGuidCodeFixProvider
 
     private static Task<Document> ConvertToGuardNotEmpty(
         Document document,
-        IfStatementSyntax ifStatement,
+        CSharpSyntaxNode ifStatement,
         string identifier,
         CancellationToken ct) {
         // Create: Guard.NotEmpty(identifier);

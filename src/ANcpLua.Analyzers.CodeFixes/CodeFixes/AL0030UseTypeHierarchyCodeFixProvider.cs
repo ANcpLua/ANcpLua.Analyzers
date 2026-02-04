@@ -26,26 +26,28 @@ public sealed partial class Al0030UseTypeHierarchyCodeFixProvider : CodeFixProvi
         var diagnosticSpan = diagnostic.Location.SourceSpan;
         var node = root.FindNode(diagnosticSpan);
 
-        // Handle foreach over AllInterfaces
-        if (node is ForEachStatementSyntax forEachStatement &&
-            TryExtractAllInterfacesInfo(forEachStatement, out var typeExpr, out var targetExpr)) {
-            context.RegisterCodeFix(
-                CodeAction.Create(
-                    CodeFixResources.AL0030ImplementsCodeFixTitle,
-                    _ => ConvertToImplements(context.Document, root, forEachStatement, typeExpr, targetExpr),
-                    nameof(Al0030UseTypeHierarchyCodeFixProvider) + "_Implements"),
-                diagnostic);
-        }
-
-        // Handle while loop over BaseType
-        if (node is WhileStatementSyntax whileStatement &&
-            TryExtractBaseTypeInfo(whileStatement, out var baseTypeExpr, out var baseTargetExpr)) {
-            context.RegisterCodeFix(
-                CodeAction.Create(
-                    CodeFixResources.AL0030InheritsFromCodeFixTitle,
-                    _ => ConvertToInheritsFrom(context.Document, root, whileStatement, baseTypeExpr, baseTargetExpr),
-                    nameof(Al0030UseTypeHierarchyCodeFixProvider) + "_InheritsFrom"),
-                diagnostic);
+        switch (node)
+        {
+            // Handle foreach over AllInterfaces
+            case ForEachStatementSyntax forEachStatement when
+                TryExtractAllInterfacesInfo(forEachStatement, out var typeExpr, out var targetExpr):
+                context.RegisterCodeFix(
+                    CodeAction.Create(
+                        CodeFixResources.AL0030ImplementsCodeFixTitle,
+                        _ => ConvertToImplements(context.Document, root, forEachStatement, typeExpr, targetExpr),
+                        nameof(Al0030UseTypeHierarchyCodeFixProvider) + "_Implements"),
+                    diagnostic);
+                break;
+            // Handle while loop over BaseType
+            case WhileStatementSyntax whileStatement when
+                TryExtractBaseTypeInfo(whileStatement, out var baseTypeExpr, out var baseTargetExpr):
+                context.RegisterCodeFix(
+                    CodeAction.Create(
+                        CodeFixResources.AL0030InheritsFromCodeFixTitle,
+                        _ => ConvertToInheritsFrom(context.Document, root, whileStatement, baseTypeExpr, baseTargetExpr),
+                        nameof(Al0030UseTypeHierarchyCodeFixProvider) + "_InheritsFrom"),
+                    diagnostic);
+                break;
         }
     }
 

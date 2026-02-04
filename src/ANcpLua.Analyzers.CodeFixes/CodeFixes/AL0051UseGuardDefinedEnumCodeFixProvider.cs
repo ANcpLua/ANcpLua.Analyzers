@@ -77,19 +77,14 @@ public sealed partial class Al0051UseGuardDefinedEnumCodeFixProvider
 
         var args = invocation.ArgumentList.Arguments;
 
-        // Generic version: Enum.IsDefined<T>(value) - 1 argument
-        // Non-generic version: Enum.IsDefined(typeof(T), value) - 2 arguments
-        if (args.Count == 1) {
-            // Generic version - first arg is the value
-            return args[0].Expression;
-        }
-
-        if (args.Count >= 2) {
-            // Non-generic version - second arg is the value
-            return args[1].Expression;
-        }
+        return args.Count switch {
+            // Generic version: Enum.IsDefined<T>(value) - 1 argument
+            // Non-generic version: Enum.IsDefined(typeof(T), value) - 2 arguments
+            1 => args[0].Expression,
+            >= 2 => args[1].Expression,
+            _ => SyntaxFactory.IdentifierName("value")
+        };
 
         // Fallback
-        return SyntaxFactory.IdentifierName("value");
     }
 }

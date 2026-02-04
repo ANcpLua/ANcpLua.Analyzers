@@ -87,7 +87,11 @@ public sealed partial class Al0037UseTryParseExtensionsAnalyzer : AlAnalyzer {
         }
 
         // The WhenTrue should reference the out variable
-        var whenTrue = UnwrapConversions(conditional.WhenTrue);
+        if (conditional.WhenTrue is not { } whenTrueOp) {
+            return false;
+        }
+
+        var whenTrue = whenTrueOp.UnwrapAllConversions();
 
         // Check if WhenTrue is referencing a local that was declared in the out argument
         if (whenTrue is not ILocalReferenceOperation) {
@@ -96,7 +100,11 @@ public sealed partial class Al0037UseTryParseExtensionsAnalyzer : AlAnalyzer {
 
         // The WhenFalse should be null or default only (not other constants like 0)
         // because the extension method returns null on parse failure, not 0
-        var whenFalse = UnwrapConversions(conditional.WhenFalse);
+        if (conditional.WhenFalse is not { } whenFalseOp) {
+            return false;
+        }
+
+        var whenFalse = whenFalseOp.UnwrapAllConversions();
 
         return whenFalse switch {
             IDefaultValueOperation => true,
@@ -107,32 +115,12 @@ public sealed partial class Al0037UseTryParseExtensionsAnalyzer : AlAnalyzer {
         };
     }
 
-    private static IOperation? UnwrapConversions(IOperation? operation) {
-        while (operation is IConversionOperation conversion) {
-            operation = conversion.Operand;
-        }
-
-        return operation;
-    }
-
     private static string GetStringArgumentName(IInvocationOperation invocation) {
         if (invocation.Arguments.Length is 0) {
             return "value";
         }
 
         var firstArg = invocation.Arguments[0].Value;
-
-        // Unwrap conversions
-        while (firstArg is IConversionOperation conversion) {
-            firstArg = conversion.Operand;
-        }
-
-        return firstArg switch {
-            ILocalReferenceOperation local => local.Local.Name,
-            IParameterReferenceOperation param => param.Parameter.Name,
-            IPropertyReferenceOperation prop => prop.Property.Name,
-            IFieldReferenceOperation field => field.Field.Name,
-            _ => "value"
-        };
+        return firstArg.UnwrapAllConversions().GetOperandName("value");
     }
 }

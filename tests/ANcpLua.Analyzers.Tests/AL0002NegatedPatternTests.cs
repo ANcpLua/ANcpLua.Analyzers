@@ -4,7 +4,7 @@ using ANcpLua.Roslyn.Utilities.Testing;
 
 namespace ANcpLua.Analyzers.Tests;
 
-public sealed partial class Al0002AnalyzerTests : AnalyzerTest<Al0002DontRepeatNegatedPatternAnalyzer> {
+public sealed partial class Al0002NegatedPatternTests : AnalyzerTest<Al0002DontRepeatNegatedPatternAnalyzer> {
     [Theory]
     [InlineData("[|not not|] null")]
     [InlineData("[|not not not|] null")]
@@ -12,7 +12,7 @@ public sealed partial class Al0002AnalyzerTests : AnalyzerTest<Al0002DontRepeatN
         VerifyAsync($"public class C {{ void M(object? o) {{ _ = o is {pattern}; }} }}");
 }
 
-public sealed partial class Al0002CodeFixTests : CodeFixTest<Al0002DontRepeatNegatedPatternAnalyzer, Al0002CodeFixProvider> {
+public sealed partial class Al0002NegatedPatternCodeFixTests : CodeFixTest<Al0002DontRepeatNegatedPatternAnalyzer, Al0002SimplifyNegatedPatternCodeFixProvider> {
     [Theory]
     [InlineData("""
                 public class TestClass

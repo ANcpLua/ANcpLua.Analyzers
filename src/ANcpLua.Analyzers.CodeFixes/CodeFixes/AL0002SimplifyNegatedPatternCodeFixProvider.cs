@@ -5,9 +5,9 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 /// <summary>
 ///     Code fix for AL0002: Simplifies repeated negated patterns.
 /// </summary>
-[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0002CodeFixProvider))]
+[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0002SimplifyNegatedPatternCodeFixProvider))]
 [Shared]
-public sealed partial class Al0002CodeFixProvider : AlCodeFixProvider<UnaryPatternSyntax> {
+public sealed partial class Al0002SimplifyNegatedPatternCodeFixProvider : AlCodeFixProvider<UnaryPatternSyntax> {
     public override ImmutableArray<string> FixableDiagnosticIds =>
         [DiagnosticIds.DontRepeatNegatedPattern];
 
