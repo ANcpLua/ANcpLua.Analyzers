@@ -7,7 +7,7 @@ namespace ANcpLua.Analyzers;
 /// <summary>
 /// Fluent builders for common syntax patterns in code fixes.
 /// </summary>
-internal static class SyntaxBuilders
+internal static partial class SyntaxBuilders
 {
     /// <summary>
     /// Builds an extension method invocation: receiver.MethodName(args)
@@ -22,7 +22,7 @@ internal static class SyntaxBuilders
             receiver,
             SyntaxFactory.IdentifierName(methodName));
 
-        var argList = arguments.Length == 0
+        var argList = arguments.Length is 0
             ? SyntaxFactory.ArgumentList()
             : SyntaxFactory.ArgumentList(
                 SyntaxFactory.SeparatedList(
@@ -44,7 +44,7 @@ internal static class SyntaxBuilders
             SyntaxFactory.IdentifierName(typeName),
             SyntaxFactory.IdentifierName(methodName));
 
-        var argList = arguments.Length == 0
+        var argList = arguments.Length is 0
             ? SyntaxFactory.ArgumentList()
             : SyntaxFactory.ArgumentList(
                 SyntaxFactory.SeparatedList(

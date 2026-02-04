@@ -1,4 +1,4 @@
-﻿using ANcpLua.Analyzers.Analyzers;
+﻿using ANcpLua.Analyzers.Core;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
@@ -9,7 +9,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 [Shared]
 public sealed partial class Al0002CodeFixProvider : AlCodeFixProvider<UnaryPatternSyntax> {
     public override ImmutableArray<string> FixableDiagnosticIds =>
-        [Al0002DontRepeatNegatedPatternAnalyzer.DiagnosticId];
+        [DiagnosticIds.DontRepeatNegatedPattern];
 
     protected override CodeAction? CreateCodeAction(Document document, UnaryPatternSyntax syntax, SyntaxNode root,
         Diagnostic diagnostic) {
