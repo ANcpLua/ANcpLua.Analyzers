@@ -3,5 +3,8 @@
     <ItemGroup>
         <!-- CPM detection - allows AL0018 to detect ManagePackageVersionsCentrally without AdditionalFiles -->
         <CompilerVisibleProperty Include="ManagePackageVersionsCentrally"/>
+        <!-- AOT telemetry detection - allows AL0096 to detect PublishAot + EventSourceSupport configuration -->
+        <CompilerVisibleProperty Include="PublishAot"/>
+        <CompilerVisibleProperty Include="EventSourceSupport"/>
     </ItemGroup>
 </Project>

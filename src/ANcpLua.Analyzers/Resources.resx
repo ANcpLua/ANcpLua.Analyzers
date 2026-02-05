@@ -964,4 +964,34 @@
     <data name="AL0091AnalyzerDescription" xml:space="preserve">
         <value>SimpleSpanProcessor and SimpleActivityExportProcessor export each span immediately as it completes, which incurs significant overhead. BatchSpanProcessor and BatchActivityExportProcessor collect spans and export them in batches, reducing network overhead and improving application performance. Use batch processors in production environments.</value>
     </data>
+    <!-- AL0094: Avoid dynamic keyword in AOT-published code -->
+    <data name="AL0094AnalyzerTitle" xml:space="preserve">
+        <value>Avoid 'dynamic' keyword in AOT-published code</value>
+    </data>
+    <data name="AL0094AnalyzerMessageFormat" xml:space="preserve">
+        <value>Usage of 'dynamic' is incompatible with Native AOT. The '{0}' operation requires System.Reflection.Emit which is not available at runtime.</value>
+    </data>
+    <data name="AL0094AnalyzerDescription" xml:space="preserve">
+        <value>The 'dynamic' keyword requires System.Reflection.Emit at runtime to generate call sites, which is not available in Native AOT. Replace with statically typed alternatives such as interfaces, generics, or pattern matching.</value>
+    </data>
+    <!-- AL0095: Avoid Expression.Compile() in AOT context -->
+    <data name="AL0095AnalyzerTitle" xml:space="preserve">
+        <value>Avoid Expression.Compile() in AOT context</value>
+    </data>
+    <data name="AL0095AnalyzerMessageFormat" xml:space="preserve">
+        <value>'{0}' falls back to interpreted mode in Native AOT, which is significantly slower. Consider using source generators or direct code instead.</value>
+    </data>
+    <data name="AL0095AnalyzerDescription" xml:space="preserve">
+        <value>Expression.Compile() and Expression.CompileToMethod() rely on System.Reflection.Emit to generate IL at runtime. In Native AOT, these fall back to an interpreted mode that is significantly slower. Consider using source generators, direct code, or compile-time expression evaluation instead.</value>
+    </data>
+    <!-- AL0096: Enable EventSourceSupport for AOT with telemetry -->
+    <data name="AL0096AnalyzerTitle" xml:space="preserve">
+        <value>Enable EventSourceSupport for AOT with telemetry</value>
+    </data>
+    <data name="AL0096AnalyzerMessageFormat" xml:space="preserve">
+        <value>PublishAot is enabled but EventSourceSupport is not set to true. EventPipe-based telemetry (OpenTelemetry, dotnet-trace, dotnet-counters) requires EventSourceSupport.</value>
+    </data>
+    <data name="AL0096AnalyzerDescription" xml:space="preserve">
+        <value>Native AOT trims EventSource/EventPipe infrastructure by default. If the application uses OpenTelemetry, dotnet-trace, dotnet-counters, or other EventPipe-based diagnostics, set EventSourceSupport to true in the project file to preserve this infrastructure.</value>
+    </data>
 </root>

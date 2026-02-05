@@ -479,4 +479,18 @@ public static partial class DiagnosticIds {
 
     /// <summary>AL0092: High-volume service without sampling configured.</summary>
     public const string ConsiderSampling = "AL0092";
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // AOT/TRIM GAPS (AL0094-AL0096)
+    // These analyzers detect AOT/Trim issues not covered by built-in IL2XXX/IL3XXX.
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /// <summary>AL0094: Avoid 'dynamic' keyword in AOT-published code.</summary>
+    public const string AvoidDynamicKeyword = "AL0094";
+
+    /// <summary>AL0095: Avoid Expression.Compile() in AOT context.</summary>
+    public const string AvoidExpressionCompile = "AL0095";
+
+    /// <summary>AL0096: Enable EventSourceSupport for AOT with telemetry.</summary>
+    public const string EnableEventSourceSupport = "AL0096";
 }
