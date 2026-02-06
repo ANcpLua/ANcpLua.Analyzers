@@ -493,4 +493,11 @@ public static partial class DiagnosticIds {
 
     /// <summary>AL0096: Enable EventSourceSupport for AOT with telemetry.</summary>
     public const string EnableEventSourceSupport = "AL0096";
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // AOT REFLECTION (AL0097-AL0100) — Reserved for ANcpLua.Analyzers.AotReflection
+    // These IDs are used by the AotReflection source generator package.
+    // Do NOT reuse: AL0097 (InvalidTarget), AL0098 (TypeMustBePartial),
+    //               AL0099 (IndexerNotSupported), AL0100 (GenericMethodNotSupported)
+    // ═══════════════════════════════════════════════════════════════════════════
 }
