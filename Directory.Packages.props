@@ -20,7 +20,8 @@
     <ItemGroup Label="Roslyn">
         <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="$(RoslynAnalyzersVersion)"/>
         <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="$(RoslynVersion)"/>
-        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="$(RoslynVersion)"/>
+        <!-- CSharp.Workspaces NOT centrally defined: central PackageVersion + transitive pinning
+             leaks Workspaces into analyzer projects causing RS1038. VersionOverride in consumers. -->
     </ItemGroup>
 
     <!-- Roslyn.Utilities -->

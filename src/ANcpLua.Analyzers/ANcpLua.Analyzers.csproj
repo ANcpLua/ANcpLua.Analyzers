@@ -50,6 +50,8 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all"/>
+        <!-- Block Workspaces from leaking via ANcpLua.Roslyn.Utilities transitive dep (RS1038) -->
+        <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" VersionOverride="$(RoslynVersion)" ExcludeAssets="all" PrivateAssets="all"/>
     </ItemGroup>
 
     <ItemGroup>
