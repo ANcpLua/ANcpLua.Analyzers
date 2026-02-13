@@ -27,8 +27,7 @@ public sealed partial class Al0031UseOperationExtensionsCodeFixProvider : AlCode
         // Pattern 1: TargetMethod.Name == "name" → IsMethodNamed
         if (TryGetMethodNameComparison(binary, out var invocationExpr, out var methodName)) {
             // Only offer fix if we can determine the containing type from the method name
-            var containingType = GetContainingTypeFromMethodName(methodName);
-            if (containingType is null) {
+            if (GetContainingTypeFromMethodName(methodName) is not { } containingType) {
                 return null;
             }
 

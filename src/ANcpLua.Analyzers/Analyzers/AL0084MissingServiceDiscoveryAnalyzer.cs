@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using ANcpLua.Analyzers.Core;
 
 namespace ANcpLua.Analyzers.Analyzers;
@@ -73,7 +74,7 @@ public sealed partial class Al0084MissingServiceDiscoveryAnalyzer : AlAnalyzer {
 
     private static void AnalyzeAssignment(
         OperationAnalysisContext context,
-        INamedTypeSymbol httpClientType,
+        ISymbol httpClientType,
         bool hasServiceDiscovery) {
         var assignment = (ISimpleAssignmentOperation)context.Operation;
 
@@ -99,7 +100,7 @@ public sealed partial class Al0084MissingServiceDiscoveryAnalyzer : AlAnalyzer {
 
     private static void AnalyzeObjectCreation(
         OperationAnalysisContext context,
-        INamedTypeSymbol uriType,
+        ISymbol uriType,
         bool hasServiceDiscovery) {
         var creation = (IObjectCreationOperation)context.Operation;
 
@@ -132,7 +133,7 @@ public sealed partial class Al0084MissingServiceDiscoveryAnalyzer : AlAnalyzer {
         }
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1055:URI-like return values should not be strings")]
+    [SuppressMessage("Design", "CA1055:URI-like return values should not be strings")]
     private static string? GetUrlFromOperation(IOperation? operation) {
         if (operation is null) {
             return null;
@@ -154,7 +155,7 @@ public sealed partial class Al0084MissingServiceDiscoveryAnalyzer : AlAnalyzer {
         return null;
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1054:URI-like parameters should not be strings")]
+    [SuppressMessage("Design", "CA1054:URI-like parameters should not be strings")]
     private static bool IsHardcodedUrl(string urlString) {
         // Check for URL patterns that indicate hardcoded addresses
         if (!urlString.StartsWithIgnoreCase("http://") &&
@@ -181,7 +182,7 @@ public sealed partial class Al0084MissingServiceDiscoveryAnalyzer : AlAnalyzer {
         return false;
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1054:URI-like parameters should not be strings")]
+    [SuppressMessage("Design", "CA1054:URI-like parameters should not be strings")]
     private static bool IsServiceDiscoveryUrl(string urlString) {
         // Service discovery URLs use the http+https:// or https+http:// scheme
         if (urlString.StartsWithIgnoreCase("http+https://") ||
@@ -215,7 +216,7 @@ public sealed partial class Al0084MissingServiceDiscoveryAnalyzer : AlAnalyzer {
         host.EqualsIgnoreCase("localhost") ||
         host.EqualsOrdinal("127.0.0.1");
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1054:URI-like parameters should not be strings")]
+    [SuppressMessage("Design", "CA1054:URI-like parameters should not be strings")]
     private static bool IsIpAddress(string urlString) {
         if (TryParseUri(urlString) is not { } uri) {
             return false;
@@ -231,8 +232,8 @@ public sealed partial class Al0084MissingServiceDiscoveryAnalyzer : AlAnalyzer {
         return false;
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1054:URI-like parameters should not be strings")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1055:URI-like return values should not be strings")]
+    [SuppressMessage("Design", "CA1054:URI-like parameters should not be strings")]
+    [SuppressMessage("Design", "CA1055:URI-like return values should not be strings")]
     private static Uri? TryParseUri(string urlString) {
         try {
             return new Uri(urlString);

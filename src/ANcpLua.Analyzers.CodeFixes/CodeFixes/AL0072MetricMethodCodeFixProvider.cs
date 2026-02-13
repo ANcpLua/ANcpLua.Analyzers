@@ -16,19 +16,16 @@ public sealed partial class Al0072MetricMethodCodeFixProvider : CodeFixProvider 
 
     /// <summary>Registers code fixes for the given context.</summary>
     public override async Task RegisterCodeFixesAsync(CodeFixContext context) {
-        var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
-        if (root is null) {
+        if (await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false) is not
+            { } root) {
             return;
         }
 
         var diagnostic = context.Diagnostics[0];
-        var diagnosticSpan = diagnostic.Location.SourceSpan;
 
         // Find the method declaration identified by the diagnostic
-        var node = root.FindToken(diagnosticSpan.Start).Parent;
-        var methodDeclaration = node?.AncestorsAndSelf().OfType<MethodDeclarationSyntax>().FirstOrDefault();
-
-        if (methodDeclaration is null) {
+        if (root.FindToken(diagnostic.Location.SourceSpan.Start).Parent?
+                .AncestorsAndSelf().OfType<MethodDeclarationSyntax>().FirstOrDefault() is not { } methodDeclaration) {
             return;
         }
 

@@ -117,20 +117,38 @@ public sealed partial class Al0061ActivityMissingSemconvAnalyzer : AlAnalyzer {
     private static HashSet<string> CollectSetTagCalls(IInvocationOperation startActivity) {
         var tags = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-        // Walk sibling operations looking for SetTag calls
-        if (startActivity.Parent is not { } parent) {
+        if (FindEnclosingBlock(startActivity) is not { } block) {
             return tags;
         }
 
-        foreach (var child in parent.ChildOperations) {
-            if (child is IInvocationOperation childInvocation &&
-                childInvocation.TargetMethod.Name == "SetTag" &&
-                childInvocation.Arguments.Length >= 1 &&
-                childInvocation.Arguments[0].Value.ConstantValue is { HasValue: true, Value: string tagName }) {
-                tags.Add(tagName);
+        CollectSetTagCallsRecursive(block, tags);
+        return tags;
+    }
+
+    private static IBlockOperation? FindEnclosingBlock(IOperation operation) {
+        var current = operation.Parent;
+        while (current is not null) {
+            if (current is IBlockOperation block) {
+                return block;
             }
+
+            current = current.Parent;
         }
 
-        return tags;
+        return null;
+    }
+
+    private static void CollectSetTagCallsRecursive(IOperation operation, HashSet<string> tags) {
+        if (operation is IInvocationOperation invocation &&
+            invocation.TargetMethod.Name == "SetTag" &&
+            invocation.Arguments.Length >= 1 &&
+            invocation.Arguments[0].Value.ConstantValue is { HasValue: true, Value: string tagName }) {
+            tags.Add(tagName);
+            return;
+        }
+
+        foreach (var child in operation.ChildOperations) {
+            CollectSetTagCallsRecursive(child, tags);
+        }
     }
 }

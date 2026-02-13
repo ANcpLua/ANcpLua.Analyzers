@@ -93,10 +93,10 @@ public sealed partial class Al0051UseGuardDefinedEnumAnalyzer : AlAnalyzer {
 
         if (method.IsGenericMethod && invocation.Arguments.Length >= 1) {
             // Generic version: Enum.IsDefined<T>(value)
-            valueName = invocation.Arguments[0].Value.GetOperandName("value");
+            valueName = invocation.Arguments[0].Value.GetOperandName();
         } else if (!method.IsGenericMethod && invocation.Arguments.Length >= 2) {
             // Non-generic version: Enum.IsDefined(typeof(T), value)
-            valueName = invocation.Arguments[1].Value.GetOperandName("value");
+            valueName = invocation.Arguments[1].Value.GetOperandName();
         }
 
         return valueName is not null ? (true, valueName) : (false, null);

@@ -121,6 +121,6 @@ public sealed partial class Al0037UseTryParseExtensionsAnalyzer : AlAnalyzer {
         }
 
         var firstArg = invocation.Arguments[0].Value;
-        return firstArg.UnwrapAllConversions().GetOperandName("value");
+        return firstArg.UnwrapAllConversions().GetOperandName();
     }
 }

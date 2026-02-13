@@ -78,9 +78,9 @@ public sealed partial class Al0048UseGuardNotNegativeAnalyzer : AlAnalyzer {
 
         return binary.OperatorKind switch {
             BinaryOperatorKind.LessThan when IsZeroConstant(rightOperand) =>
-                (true, leftOperand.GetOperandName("value")),
+                (true, leftOperand.GetOperandName()),
             BinaryOperatorKind.GreaterThan when IsZeroConstant(leftOperand) =>
-                (true, rightOperand.GetOperandName("value")),
+                (true, rightOperand.GetOperandName()),
             _ => (false, null)
         };
     }

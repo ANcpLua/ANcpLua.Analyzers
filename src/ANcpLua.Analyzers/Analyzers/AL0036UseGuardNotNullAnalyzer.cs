@@ -36,7 +36,7 @@ public sealed partial class Al0036UseGuardNotNullAnalyzer : AlAnalyzer {
         }
 
         // Get the name of the left operand for the message
-        var operandName = coalesce.Value.GetOperandName("value");
+        var operandName = coalesce.Value.GetOperandName();
 
         context.ReportDiagnostic(Diagnostic.Create(Rule, coalesce.Syntax.GetLocation(), operandName));
     }

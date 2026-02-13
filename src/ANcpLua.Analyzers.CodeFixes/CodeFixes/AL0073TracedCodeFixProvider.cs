@@ -23,25 +23,22 @@ public sealed partial class Al0073TracedCodeFixProvider : CodeFixProvider {
 
     /// <summary>Registers code fixes for the given context.</summary>
     public override async Task RegisterCodeFixesAsync(CodeFixContext context) {
-        var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
-        if (root is null) {
+        if (await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false) is not
+            { } root) {
             return;
         }
 
         var diagnostic = context.Diagnostics[0];
-        var diagnosticSpan = diagnostic.Location.SourceSpan;
 
         // Find the attribute syntax
-        var node = root.FindNode(diagnosticSpan);
-        var attributeSyntax = node.AncestorsAndSelf().OfType<AttributeSyntax>().FirstOrDefault();
-
-        if (attributeSyntax is null) {
+        if (root.FindNode(diagnostic.Location.SourceSpan)
+                .AncestorsAndSelf().OfType<AttributeSyntax>().FirstOrDefault() is not { } attributeSyntax) {
             return;
         }
 
         // Get semantic model to determine the containing type's name
-        var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken).ConfigureAwait(false);
-        if (semanticModel is null) {
+        if (await context.Document.GetSemanticModelAsync(context.CancellationToken).ConfigureAwait(false) is not
+            { } semanticModel) {
             return;
         }
 
@@ -61,16 +58,11 @@ public sealed partial class Al0073TracedCodeFixProvider : CodeFixProvider {
         SemanticModel semanticModel,
         CancellationToken cancellationToken) {
         // Find the containing type
-        var containingType = attribute.Ancestors()
-            .OfType<TypeDeclarationSyntax>()
-            .FirstOrDefault();
-
-        if (containingType is null) {
+        if (attribute.Ancestors().OfType<TypeDeclarationSyntax>().FirstOrDefault() is not { } containingType) {
             return "MyApp";
         }
 
-        var typeSymbol = semanticModel.GetDeclaredSymbol(containingType, cancellationToken);
-        if (typeSymbol is null) {
+        if (semanticModel.GetDeclaredSymbol(containingType, cancellationToken) is not { } typeSymbol) {
             return containingType.Identifier.Text;
         }
 
