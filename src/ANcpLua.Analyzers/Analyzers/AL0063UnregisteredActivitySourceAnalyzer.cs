@@ -86,8 +86,9 @@ public sealed partial class Al0063UnregisteredActivitySourceAnalyzer : AlAnalyze
             }
 
             // Wildcard: "OpenAI.*" matches "OpenAI.Chat", "OpenAI.Embeddings", etc.
-            if (pattern.EndsWithOrdinal(".*") &&
-                sourceName.StartsWithOrdinal(pattern.Substring(0, pattern.Length - 2))) {
+            if (pattern.Length > 2 &&
+                pattern.EndsWithOrdinal(".*") &&
+                sourceName.AsSpan().StartsWith(pattern.AsSpan(0, pattern.Length - 2), StringComparison.Ordinal)) {
                 return true;
             }
         }

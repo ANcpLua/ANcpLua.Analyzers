@@ -239,6 +239,73 @@ public sealed partial class Al0063UnregisteredActivitySourceTests : AnalyzerTest
             }
             """);
 
+    [Fact]
+    public Task ShouldReport_WhenBareWildcardPattern() =>
+        VerifyAsync($$"""
+            {{ActivitySourceAndTracerSetup}}
+
+            public class Config {
+                public void Setup(OpenTelemetry.Trace.TracerProviderBuilder tracing) {
+                    tracing.AddSource(".*");
+                }
+            }
+
+            public class C {
+                private static readonly System.Diagnostics.ActivitySource Source =
+                    new System.Diagnostics.ActivitySource([|"my.service"|]);
+            }
+            """);
+
+    [Fact]
+    public Task ShouldNotReport_WhenActivitySourceNameIsNonConstant() =>
+        VerifyAsync($$"""
+            {{ActivitySourceAndTracerSetup}}
+
+            public class C {
+                private static string GetName() => "my.service";
+                private static readonly System.Diagnostics.ActivitySource Source =
+                    new System.Diagnostics.ActivitySource(GetName());
+            }
+            """);
+
+    [Fact]
+    public Task ShouldReport_WhenForeachOverInstanceField() =>
+        VerifyAsync($$"""
+            {{ActivitySourceAndTracerSetup}}
+
+            public class Config {
+                private readonly string[] Sources = new[] { "my.service" };
+
+                public void Setup(OpenTelemetry.Trace.TracerProviderBuilder tracing) {
+                    foreach (var source in Sources)
+                        tracing.AddSource(source);
+                }
+            }
+
+            public class C {
+                private static readonly System.Diagnostics.ActivitySource Source =
+                    new System.Diagnostics.ActivitySource([|"my.service"|]);
+            }
+            """);
+
+    [Fact]
+    public Task ShouldNotReport_DuplicateRegistrations() =>
+        VerifyAsync($$"""
+            {{ActivitySourceAndTracerSetup}}
+
+            public class Config {
+                public void Setup(OpenTelemetry.Trace.TracerProviderBuilder tracing) {
+                    tracing.AddSource("my.service");
+                    tracing.AddSource("my.service");
+                }
+            }
+
+            public class C {
+                private static readonly System.Diagnostics.ActivitySource Source =
+                    new System.Diagnostics.ActivitySource("my.service");
+            }
+            """);
+
     // ── Foreach-over-array resolution ─────────────────────────────────
 
     [Fact]
