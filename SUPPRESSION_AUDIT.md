@@ -227,8 +227,57 @@ private static ExpressionStatementSyntax CreateThrowHelperStatement(string ident
 | AR0001SnakeCaseToPascalCaseRefactoring.cs | 4 | CA1308 | Error | Architectural | KEEP |
 | DeprecatedOtelAttributes.cs | 4 | AL0012 | Error | Architectural | KEEP |
 | AL0015NormalizeNullGuardStyleCodeFixProvider.cs | 3 | ReSharper All | N/A | Architectural | KEEP (optimizable) |
+| AL0063UnregisteredActivitySourceAnalyzer.cs | 128 | RS1030 | Warning | Architectural | KEEP |
 | Directory.Build.props | 27 | 7 rules | Various | Project-level | KEEP (track AL0026) |
 | ANcpLua.Analyzers.csproj | 33 | 6 rules | Various | Project-level | KEEP (all required) |
+| ANcpLua.Analyzers.CodeFixes.csproj | 25 | MSB3277 | Error | Dependency | KEEP (review on next Utils bump) |
+
+---
+
+#### 4.6 `#pragma warning disable RS1030` in AL0063UnregisteredActivitySourceAnalyzer.cs
+
+**File:** `/Users/ancplua/ANcpLua.Analyzers/src/ANcpLua.Analyzers/Analyzers/AL0063UnregisteredActivitySourceAnalyzer.cs`
+
+**Line:** 128
+
+**Suppression:**
+```csharp
+#pragma warning disable RS1030 // Do not invoke Compilation.GetSemanticModel() method within a diagnostic analyzer
+```
+
+**Why It Exists:**
+- **Purpose:** AL0063 uses cross-compilation analysis to resolve constant values from `static readonly` field initializers referenced in `foreach` loops.
+- **Context:** When `AddSource()` is called inside a `foreach` loop over a static array field, the analyzer must resolve the field's initializer elements to extract the registered source names. The field may be declared in a different syntax tree, requiring `Compilation.GetSemanticModel()`.
+- **No alternative:** `GetConstantValue()` requires a `SemanticModel` for the tree containing the field declaration. There is no way to resolve compile-time constants across syntax trees without this API.
+
+**Can Fix Locally?** NO
+- The cross-tree semantic model access is fundamental to the foreach-over-array resolution feature.
+
+**Verdict:** KEEP SUPPRESSION - Required for cross-file constant resolution in the foreach pattern.
+
+---
+
+#### 4.7 `MSB3277` in ANcpLua.Analyzers.CodeFixes.csproj
+
+**File:** `/Users/ancplua/ANcpLua.Analyzers/src/ANcpLua.Analyzers.CodeFixes/ANcpLua.Analyzers.CodeFixes.csproj`
+
+**Line:** 25
+
+**Suppression:**
+```xml
+<NoWarn>$(NoWarn);...;MSB3277</NoWarn>
+```
+
+**Why It Exists:**
+- **Purpose:** Suppress assembly version conflict between `System.Threading.Tasks.Extensions` 4.2.0.1 (from NuGet polyfill 4.5.4) and 4.2.1.0 (from `ANcpLua.Roslyn.Utilities` DLL compiled on .NET SDK 10.0.103+).
+- **Context:** The Roslyn.Utilities DLL's netstandard2.0 target references assembly version 4.2.1.0 (from the newer .NET runtime), but no NuGet package provides this version. The latest NuGet package (4.5.4) provides 4.2.0.1.
+- **Safety:** Analyzer DLLs are loaded by the Roslyn compiler host, which handles assembly version unification at runtime.
+
+**Can Fix Locally?** NO - No NuGet package exists with assembly version 4.2.1.0.
+
+**Removal Guidance:** Review on each Roslyn.Utilities version bump. If a future version resolves the conflict (e.g., by dropping the transitive dependency), remove this suppression.
+
+**Verdict:** KEEP SUPPRESSION - Safe for analyzer host loading. Review on next Utils bump.
 
 ---
 
