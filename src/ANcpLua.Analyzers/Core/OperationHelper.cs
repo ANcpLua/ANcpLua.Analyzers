@@ -1,3 +1,5 @@
+using Microsoft.CodeAnalysis;
+
 namespace ANcpLua.Analyzers.Core;
 
 /// <summary>

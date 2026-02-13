@@ -1,5 +1,13 @@
 using ANcpLua.Analyzers.Core;
 using ANcpLua.Roslyn.Utilities;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
+using System.Threading;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -117,7 +125,7 @@ public sealed partial class Al0090UncompressedExportAnalyzer : AlAnalyzer {
 
         // Check for options object pattern: AddOtlpExporter(options)
         foreach (var arg in invocation.ArgumentList.Arguments) {
-            if (context.SemanticModel.GetTypeInfo(arg.Expression, context.CancellationToken).Type is not { } argType) {
+            if (ModelExtensions.GetTypeInfo(context.SemanticModel, arg.Expression, context.CancellationToken).Type is not { } argType) {
                 continue;
             }
 
@@ -181,7 +189,7 @@ public sealed partial class Al0090UncompressedExportAnalyzer : AlAnalyzer {
 
                 // Also check via semantic model if available
                 if (httpProtobufType is not null) {
-                    var symbol = semanticModel.GetSymbolInfo(memberAccess, cancellationToken).Symbol;
+                    var symbol = ModelExtensions.GetSymbolInfo(semanticModel, memberAccess, cancellationToken).Symbol;
                     if (symbol is IFieldSymbol fieldSymbol &&
                         fieldSymbol.ContainingType.IsEqualTo(httpProtobufType) &&
                         fieldSymbol.Name.EqualsOrdinal("HttpProtobuf")) {

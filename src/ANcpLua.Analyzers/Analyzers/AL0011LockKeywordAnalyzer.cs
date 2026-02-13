@@ -1,4 +1,10 @@
 ﻿using ANcpLua.Analyzers.Core;
+using ANcpLua.Roslyn.Utilities;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
+using System.Collections.Immutable;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -40,7 +46,7 @@ public sealed partial class Al0011LockKeywordAnalyzer : AlAnalyzer {
         var lockStatement = (LockStatementSyntax)context.Node;
 
         var lockExpressionType =
-            context.SemanticModel.GetTypeInfo(lockStatement.Expression, context.CancellationToken).Type;
+            ModelExtensions.GetTypeInfo(context.SemanticModel, lockStatement.Expression, context.CancellationToken).Type;
 
         // Already using Lock type - no diagnostic needed
         if (lockExpressionType.IsEqualTo(lockType)) {

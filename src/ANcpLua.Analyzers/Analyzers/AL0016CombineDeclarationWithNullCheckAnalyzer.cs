@@ -1,4 +1,12 @@
 ﻿using ANcpLua.Analyzers.Core;
+using ANcpLua.Roslyn.Utilities;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.Operations;
+using System.Collections.Immutable;
+using System.Linq;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -65,7 +73,7 @@ public sealed partial class Al0016CombineDeclarationWithNullCheckAnalyzer : AlAn
 
         var variableName = variable.Identifier.Text;
 
-        if (context.SemanticModel.GetDeclaredSymbol(variable) is not ILocalSymbol symbol ||
+        if (ModelExtensions.GetDeclaredSymbol(context.SemanticModel, variable) is not ILocalSymbol symbol ||
             !symbol.Type.IsReferenceType) {
             return;
         }

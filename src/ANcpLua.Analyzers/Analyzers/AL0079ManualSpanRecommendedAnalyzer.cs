@@ -1,4 +1,11 @@
 using ANcpLua.Analyzers.Core;
+using ANcpLua.Roslyn.Utilities;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
+using System.Collections.Immutable;
+using System.Threading;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -56,7 +63,7 @@ public sealed partial class Al0079ManualSpanRecommendedAnalyzer : AlAnalyzer {
         }
 
         // Get method symbol to check for [Traced] attribute
-        if (context.SemanticModel.GetDeclaredSymbol(method, context.CancellationToken) is not { } methodSymbol) {
+        if (ModelExtensions.GetDeclaredSymbol(context.SemanticModel, method, context.CancellationToken) is not { } methodSymbol) {
             return;
         }
 
@@ -144,7 +151,7 @@ public sealed partial class Al0079ManualSpanRecommendedAnalyzer : AlAnalyzer {
         }
 
         public override void VisitInvocationExpression(InvocationExpressionSyntax node) {
-            if (semanticModel.GetSymbolInfo(node, cancellationToken).Symbol is IMethodSymbol methodSymbol) {
+            if (ModelExtensions.GetSymbolInfo(semanticModel, node, cancellationToken).Symbol is IMethodSymbol methodSymbol) {
                 var containingTypeName = methodSymbol.ContainingType?.ToDisplayString();
                 var methodName = methodSymbol.Name;
 

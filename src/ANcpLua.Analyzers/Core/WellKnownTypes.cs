@@ -1,4 +1,8 @@
-﻿namespace ANcpLua.Analyzers.Core;
+﻿using ANcpLua.Roslyn.Utilities;
+using Microsoft.CodeAnalysis;
+using Microsoft.Shared.Diagnostics;
+
+namespace ANcpLua.Analyzers.Core;
 
 /// <summary>
 ///     Well-known types used by analyzers.

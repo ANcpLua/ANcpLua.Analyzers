@@ -1,5 +1,12 @@
 ﻿using ANcpLua.Analyzers.Core;
 using ANcpLua.Roslyn.Utilities;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
+using System;
+using System.Collections.Immutable;
+using System.Linq;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -174,7 +181,7 @@ public sealed partial class Al0015NormalizeNullGuardStyleAnalyzer : AlAnalyzer {
             return false;
         }
 
-        var typeSymbol = model.GetTypeInfo(creation.Type).Type;
+        var typeSymbol = ModelExtensions.GetTypeInfo(model, creation.Type).Type;
         var isArgumentNullException = typeSymbol is not null
             ? typeSymbol.ToDisplayString() == "System.ArgumentNullException"
             : creation.Type.ToString() is "ArgumentNullException" or "System.ArgumentNullException";

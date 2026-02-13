@@ -1,4 +1,7 @@
-﻿namespace ANcpLua.Analyzers.Core;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Diagnostics;
+
+namespace ANcpLua.Analyzers.Core;
 
 /// <summary>
 ///     Base class for all ANcpLua analyzers.

@@ -1,4 +1,9 @@
 using ANcpLua.Analyzers.Core;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
+using System.Collections.Immutable;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -118,7 +123,7 @@ public sealed partial class Al0049UseGuardPositiveAnalyzer : AlAnalyzer {
             return false;
         }
 
-        var typeSymbol = model.GetTypeInfo(creation.Type).Type;
+        var typeSymbol = ModelExtensions.GetTypeInfo(model, creation.Type).Type;
         var isArgumentOutOfRangeException = typeSymbol is not null
             ? typeSymbol.ToDisplayString() == "System.ArgumentOutOfRangeException"
             : creation.Type.ToString() is "ArgumentOutOfRangeException" or "System.ArgumentOutOfRangeException";

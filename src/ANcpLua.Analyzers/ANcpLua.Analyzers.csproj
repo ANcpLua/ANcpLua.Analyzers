@@ -63,6 +63,11 @@
         <None Include="build/ANcpLua.Analyzers.props" Pack="true" PackagePath="build/"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />
+      <AdditionalFiles Include="AnalyzerReleases.Unshipped.md" />
+    </ItemGroup>
+
     <!-- CRITICAL: Pack ALL analyzer assemblies including dependencies (netstandard2.0 only) -->
     <PropertyGroup>
         <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToPackage</TargetsForTfmSpecificContentInPackage>

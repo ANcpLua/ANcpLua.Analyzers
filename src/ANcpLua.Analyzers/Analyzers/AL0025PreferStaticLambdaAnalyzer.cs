@@ -1,4 +1,11 @@
 ﻿using ANcpLua.Analyzers.Core;
+using ANcpLua.Roslyn.Utilities;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
+using System.Collections.Immutable;
+using System.Linq;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -47,7 +54,7 @@ public sealed partial class Al0025PreferStaticLambdaAnalyzer : AlAnalyzer {
         }
 
         // Use data flow analysis to check for captured variables
-        var dataFlow = semanticModel.AnalyzeDataFlow(lambda);
+        var dataFlow = ModelExtensions.AnalyzeDataFlow(semanticModel, lambda);
         if (dataFlow is null || !dataFlow.Succeeded) {
             return false;
         }
@@ -82,7 +89,7 @@ public sealed partial class Al0025PreferStaticLambdaAnalyzer : AlAnalyzer {
 
         // Check for implicit 'this' through instance member access
         foreach (var identifier in lambda.DescendantNodes().OfType<IdentifierNameSyntax>()) {
-            if (semanticModel.GetSymbolInfo(identifier).Symbol is not { } symbol) {
+            if (ModelExtensions.GetSymbolInfo(semanticModel, identifier).Symbol is not { } symbol) {
                 continue;
             }
 

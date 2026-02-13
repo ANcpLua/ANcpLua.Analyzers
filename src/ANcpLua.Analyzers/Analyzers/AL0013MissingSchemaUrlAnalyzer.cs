@@ -1,5 +1,13 @@
 ﻿using ANcpLua.Analyzers.Core;
 using ANcpLua.Roslyn.Utilities;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
+using System.Threading;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -103,7 +111,7 @@ public sealed partial class Al0013MissingSchemaUrlAnalyzer : AlAnalyzer {
             return false;
         }
 
-        if (semanticModel.GetTypeInfo(memberAccess.Expression, cancellationToken).Type is not { } receiverType) {
+        if (ModelExtensions.GetTypeInfo(semanticModel, memberAccess.Expression, cancellationToken).Type is not { } receiverType) {
             return false;
         }
 

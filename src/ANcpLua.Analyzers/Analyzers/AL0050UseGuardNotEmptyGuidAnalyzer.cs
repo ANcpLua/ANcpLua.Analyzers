@@ -1,4 +1,9 @@
 using ANcpLua.Analyzers.Core;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
+using System.Collections.Immutable;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -88,7 +93,7 @@ public sealed partial class Al0050UseGuardNotEmptyGuidAnalyzer : AlAnalyzer {
         if (expression is MemberAccessExpressionSyntax {
                 Name.Identifier.Text: "Empty"
             } memberAccess) {
-            var typeInfo = model.GetTypeInfo(memberAccess.Expression);
+            var typeInfo = ModelExtensions.GetTypeInfo(model, memberAccess.Expression);
             if (typeInfo.Type?.ToDisplayString() == "System.Guid") {
                 return true;
             }
@@ -109,7 +114,7 @@ public sealed partial class Al0050UseGuardNotEmptyGuidAnalyzer : AlAnalyzer {
         identifier = "";
 
         // Check that it's a Guid type
-        var typeInfo = model.GetTypeInfo(expression);
+        var typeInfo = ModelExtensions.GetTypeInfo(model, expression);
         if (typeInfo.Type?.ToDisplayString() != "System.Guid") {
             return false;
         }
@@ -135,7 +140,7 @@ public sealed partial class Al0050UseGuardNotEmptyGuidAnalyzer : AlAnalyzer {
             return false;
         }
 
-        var typeSymbol = model.GetTypeInfo(creation.Type).Type;
+        var typeSymbol = ModelExtensions.GetTypeInfo(model, creation.Type).Type;
         if (typeSymbol is null) {
             // Fallback to string comparison
             var typeName = creation.Type.ToString();
