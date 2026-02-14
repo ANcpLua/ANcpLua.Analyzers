@@ -90,13 +90,13 @@ public sealed partial class Al0084MissingServiceDiscoveryAnalyzer : AlAnalyzer {
         }
 
         // Get the URL being assigned
-        if (GetUrlFromOperation(assignment.Value) is not { } urlString) {
+        if (GetUrlFromOperation(assignment.Value) is not { } url) {
             return;
         }
 
         // Check if this looks like a hardcoded URL
-        if (IsHardcodedUrl(urlString) && !IsServiceDiscoveryUrl(urlString)) {
-            context.ReportDiagnostic(Diagnostic.Create(Rule, assignment.Syntax.GetLocation(), urlString));
+        if (IsHardcodedUrl(url) && !IsServiceDiscoveryUrl(url.OriginalString)) {
+            context.ReportDiagnostic(Diagnostic.Create(Rule, assignment.Syntax.GetLocation(), url.OriginalString));
         }
     }
 
@@ -125,18 +125,17 @@ public sealed partial class Al0084MissingServiceDiscoveryAnalyzer : AlAnalyzer {
             return;
         }
 
-        if (GetUrlFromOperation(creation.Arguments[0].Value) is not { } urlString) {
+        if (GetUrlFromOperation(creation.Arguments[0].Value) is not { } url) {
             return;
         }
 
         // Check if this looks like a hardcoded URL
-        if (IsHardcodedUrl(urlString) && !IsServiceDiscoveryUrl(urlString)) {
-            context.ReportDiagnostic(Diagnostic.Create(Rule, creation.Syntax.GetLocation(), urlString));
+        if (IsHardcodedUrl(url) && !IsServiceDiscoveryUrl(url.OriginalString)) {
+            context.ReportDiagnostic(Diagnostic.Create(Rule, creation.Syntax.GetLocation(), url.OriginalString));
         }
     }
 
-    [SuppressMessage("Design", "CA1055:URI-like return values should not be strings")]
-    private static string? GetUrlFromOperation(IOperation? operation) {
+    private static Uri? GetUrlFromOperation(IOperation? operation) {
         if (operation is null) {
             return null;
         }
@@ -146,7 +145,7 @@ public sealed partial class Al0084MissingServiceDiscoveryAnalyzer : AlAnalyzer {
 
         // Check for constant string
         if (unwrapped.ConstantValue is { HasValue: true, Value: string urlString }) {
-            return urlString;
+            return TryParseUri(urlString);
         }
 
         // Check for Uri constructor with string
@@ -157,27 +156,27 @@ public sealed partial class Al0084MissingServiceDiscoveryAnalyzer : AlAnalyzer {
         return null;
     }
 
-    [SuppressMessage("Design", "CA1054:URI-like parameters should not be strings")]
-    private static bool IsHardcodedUrl(string urlString) {
-        // Check for URL patterns that indicate hardcoded addresses
-        if (!urlString.StartsWithIgnoreCase("http://") &&
-            !urlString.StartsWithIgnoreCase("https://")) {
+    private static bool IsHardcodedUrl(Uri uri) {
+        if (!uri.Scheme.EqualsIgnoreCase("http") && !uri.Scheme.EqualsIgnoreCase("https")) {
             return false;
         }
 
-        // URLs with port numbers or IP addresses are likely hardcoded
-        if (urlString.ContainsIgnoreCase(":50") || // Common dev ports like :5000, :5001
-            urlString.ContainsIgnoreCase(":80") ||
-            urlString.ContainsIgnoreCase(":443") ||
-            urlString.ContainsIgnoreCase("localhost") ||
-            urlString.ContainsOrdinal("127.0.0.1") ||
-            IsIpAddress(urlString)) {
+        var host = uri.Host;
+
+        if (IsLocalhost(host)) {
             return true;
         }
 
-        // URLs with specific hostnames (not service names) are hardcoded
-        // Service discovery URLs typically use simple names without dots
-        if (TryParseUri(urlString) is { } uri && uri.Host.ContainsOrdinal(".")) {
+        var hostParts = host.Split('.');
+        if (hostParts.Length is 4 && hostParts.All(static p => byte.TryParse(p, out _))) {
+            return true;
+        }
+
+        if (!uri.IsDefaultPort) {
+            return true;
+        }
+
+        if (host.ContainsOrdinal(".")) {
             return true;
         }
 
@@ -217,22 +216,6 @@ public sealed partial class Al0084MissingServiceDiscoveryAnalyzer : AlAnalyzer {
     private static bool IsLocalhost(string host) =>
         host.EqualsIgnoreCase("localhost") ||
         host.EqualsOrdinal("127.0.0.1");
-
-    [SuppressMessage("Design", "CA1054:URI-like parameters should not be strings")]
-    private static bool IsIpAddress(string urlString) {
-        if (TryParseUri(urlString) is not { } uri) {
-            return false;
-        }
-
-        // Simple check for IP address pattern in host
-        var host = uri.Host;
-        var parts = host.Split('.');
-        if (parts.Length is 4 && parts.All(static p => byte.TryParse(p, out _))) {
-            return true;
-        }
-
-        return false;
-    }
 
     [SuppressMessage("Design", "CA1054:URI-like parameters should not be strings")]
     [SuppressMessage("Design", "CA1055:URI-like return values should not be strings")]
