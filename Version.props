@@ -105,9 +105,9 @@
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="MTP Extensions">
     <MTPExtensionsVersion>2.1.0</MTPExtensionsVersion>
-    <CodeCoverageVersion>18.1.0</CodeCoverageVersion>
+    <CodeCoverageVersion>18.4.1</CodeCoverageVersion>
     <TestSdkVersion>18.0.1</TestSdkVersion>
-    <DiagnosticsTestingVersion>10.0.0</DiagnosticsTestingVersion>
+    <DiagnosticsTestingVersion>10.3.0</DiagnosticsTestingVersion>
     <GitHubActionsLoggerMTPVersion>3.0.1</GitHubActionsLoggerMTPVersion>
     <GitHubActionsLoggerVSTestVersion>2.4.1</GitHubActionsLoggerVSTestVersion>
   </PropertyGroup>
@@ -116,9 +116,9 @@
        ANALYZERS (SDK-injected)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Analyzers">
-    <ANcpLuaAnalyzersVersion>1.16.0</ANcpLuaAnalyzersVersion>
+    <ANcpLuaAnalyzersVersion>1.19.1</ANcpLuaAnalyzersVersion>
     <SbomTargetsVersion>4.1.5</SbomTargetsVersion>
-    <BannedApiAnalyzersVersion>3.3.4</BannedApiAnalyzersVersion>
+    <BannedApiAnalyzersVersion>4.14.0</BannedApiAnalyzersVersion>
     <JonSkeetAnalyzersVersion>1.0.0-beta.6</JonSkeetAnalyzersVersion>
   </PropertyGroup>
 
@@ -134,7 +134,7 @@
 
   <!-- ═══════════════════════════════════════════════════════════════════════
        OPENTELEMETRY
-       Used by: Consumer web projects
+       Used by: Web projects (qyl ServiceDefaults)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="OpenTelemetry">
     <OpenTelemetryVersion>1.15.0</OpenTelemetryVersion>
@@ -159,17 +159,7 @@
   <PropertyGroup Label="OpenAPI">
     <MicrosoftOpenApiVersion>2.0.0</MicrosoftOpenApiVersion>
     <MicrosoftOpenApiReadersVersion>2.0.0-preview.13</MicrosoftOpenApiReadersVersion>
-    <YamlDotNetVersion>16.3.1</YamlDotNetVersion>
-  </PropertyGroup>
-
-  <!-- ═══════════════════════════════════════════════════════════════════════
-      LEGACY POLYFILLS (netstandard2.0 support)
-      Used by: SDK (LegacySupport)
-      ═══════════════════════════════════════════════════════════════════════ -->
-  <PropertyGroup Label="Legacy Polyfills">
-    <BclAsyncInterfacesVersion>6.0.0</BclAsyncInterfacesVersion>
-    <TasksExtensionsVersion>4.5.4</TasksExtensionsVersion>
-    <BclHashCodeVersion>6.0.0</BclHashCodeVersion>
+    <YamlDotNetVersion>16.3.0</YamlDotNetVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
