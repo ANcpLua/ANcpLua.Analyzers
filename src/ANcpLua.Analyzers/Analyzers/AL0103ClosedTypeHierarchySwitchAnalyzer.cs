@@ -185,8 +185,7 @@ public sealed partial class Al0103ClosedTypeHierarchySwitchAnalyzer : AlAnalyzer
         }
 
         foreach (var argument in invocation.Arguments) {
-            if (argument.Parameter is { IsThis: true } &&
-                argument.Value.Type is INamedTypeSymbol thisType) {
+            if (argument is { Parameter: { IsThis: true }, Value.Type: INamedTypeSymbol thisType }) {
                 return thisType;
             }
         }
@@ -260,14 +259,14 @@ public sealed partial class Al0103ClosedTypeHierarchySwitchAnalyzer : AlAnalyzer
                 : StringComparer.Ordinal.Compare(left.GetFullyQualifiedName(), right.GetFullyQualifiedName());
         });
 
-        return sealedDescendants.ToImmutableArray();
+        return [..sealedDescendants];
     }
 
     static Dictionary<string, List<INamedTypeSymbol>> BuildDerivedTypeMap(IEnumerable<INamedTypeSymbol> allTypes) {
         var map = new Dictionary<string, List<INamedTypeSymbol>>(StringComparer.Ordinal);
 
         foreach (var type in allTypes) {
-            if (type.BaseType is not INamedTypeSymbol baseType) {
+            if (type.BaseType is not { } baseType) {
                 continue;
             }
 
@@ -340,7 +339,8 @@ public sealed partial class Al0103ClosedTypeHierarchySwitchAnalyzer : AlAnalyzer
                         continue;
                     }
 
-                    if (TryGetHandledMatchType(argument.Parameter?.Type, out var handledType)) {
+                    if (TryGetHandledMatchType(argument.Parameter?.Type, out var handledType) &&
+                        handledType is not null) {
                         AddType(handledType, types);
                     }
                 }
@@ -351,8 +351,8 @@ public sealed partial class Al0103ClosedTypeHierarchySwitchAnalyzer : AlAnalyzer
         return [..types];
     }
 
-    static bool TryGetHandledMatchType(ITypeSymbol? delegateType, out INamedTypeSymbol handledType) {
-        handledType = null!;
+    static bool TryGetHandledMatchType(ITypeSymbol? delegateType, out INamedTypeSymbol? handledType) {
+        handledType = null;
 
         if (delegateType is not INamedTypeSymbol namedDelegate ||
             namedDelegate.DelegateInvokeMethod is not { Parameters.Length: > 0 } invokeMethod ||
@@ -392,7 +392,7 @@ public sealed partial class Al0103ClosedTypeHierarchySwitchAnalyzer : AlAnalyzer
         types.Add(type);
     }
 
-    static bool ContainsType(IEnumerable<INamedTypeSymbol> types, INamedTypeSymbol expected) {
+    static bool ContainsType(IEnumerable<INamedTypeSymbol> types, ISymbol expected) {
         foreach (var type in types) {
             if (AreEquivalentForCoverage(type, expected)) {
                 return true;
@@ -402,13 +402,13 @@ public sealed partial class Al0103ClosedTypeHierarchySwitchAnalyzer : AlAnalyzer
         return false;
     }
 
-    static bool AreEquivalentForCoverage(INamedTypeSymbol left, INamedTypeSymbol right) =>
+    static bool AreEquivalentForCoverage(ISymbol left, ISymbol right) =>
         left.IsEqualTo(right) ||
         left.OriginalDefinition.IsEqualTo(right.OriginalDefinition);
 
     static bool HasSubtypeSpecificHandler(
         IEnumerable<INamedTypeSymbol> handledTypes,
-        INamedTypeSymbol rootType) {
+        ITypeSymbol rootType) {
         foreach (var handledType in handledTypes) {
             if (!handledType.IsEqualTo(rootType) &&
                 handledType.InheritsFrom(rootType)) {
