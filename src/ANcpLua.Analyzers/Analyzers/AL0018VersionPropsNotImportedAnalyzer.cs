@@ -1,4 +1,3 @@
-﻿using ANcpLua.Analyzers.Core;
 using Microsoft.CodeAnalysis.Text;
 using System.Xml.Linq;
 

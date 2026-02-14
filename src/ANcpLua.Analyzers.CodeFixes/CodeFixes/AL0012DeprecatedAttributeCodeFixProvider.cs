@@ -1,5 +1,4 @@
 ﻿using ANcpLua.Analyzers.Analyzers;
-using ANcpLua.Analyzers.Core;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 

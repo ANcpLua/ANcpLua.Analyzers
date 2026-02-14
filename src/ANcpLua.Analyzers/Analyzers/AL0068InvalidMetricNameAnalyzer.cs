@@ -1,5 +1,4 @@
 using System.Text.RegularExpressions;
-using ANcpLua.Analyzers.Core;
 
 namespace ANcpLua.Analyzers.Analyzers;
 

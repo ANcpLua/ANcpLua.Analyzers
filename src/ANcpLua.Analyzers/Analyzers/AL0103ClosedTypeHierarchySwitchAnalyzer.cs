@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using ANcpLua.Analyzers.Core;
 using ANcpLua.Roslyn.Utilities.Matching;
 
 namespace ANcpLua.Analyzers.Analyzers;

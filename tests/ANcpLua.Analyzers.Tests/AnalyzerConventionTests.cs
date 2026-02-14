@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using ANcpLua.Analyzers.Core;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace ANcpLua.Analyzers.Tests;

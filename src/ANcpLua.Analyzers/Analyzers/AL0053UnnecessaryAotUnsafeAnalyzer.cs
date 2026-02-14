@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using ANcpLua.Analyzers.Core;
 
 namespace ANcpLua.Analyzers.Analyzers;
 

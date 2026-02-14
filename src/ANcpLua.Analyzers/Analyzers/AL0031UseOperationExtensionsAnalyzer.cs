@@ -1,4 +1,3 @@
-﻿using ANcpLua.Analyzers.Core;
 using RoslynOperationExtensions = Microsoft.CodeAnalysis.Operations.OperationExtensions;
 
 namespace ANcpLua.Analyzers.Analyzers;
