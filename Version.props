@@ -36,28 +36,28 @@
        ROSLYN.UTILITIES (Runtime package)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Roslyn.Utilities">
-    <ANcpLuaRoslynUtilitiesVersion>1.38.1</ANcpLuaRoslynUtilitiesVersion>
+    <ANcpLuaRoslynUtilitiesVersion>1.38.2</ANcpLuaRoslynUtilitiesVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
        ROSLYN.UTILITIES.SOURCES (Source-only package for generators)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Roslyn.Utilities.Sources">
-    <ANcpLuaRoslynUtilitiesSourcesVersion>1.38.1</ANcpLuaRoslynUtilitiesSourcesVersion>
+    <ANcpLuaRoslynUtilitiesSourcesVersion>1.38.2</ANcpLuaRoslynUtilitiesSourcesVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
        ROSLYN.UTILITIES.POLYFILLS (Source-only polyfills for netstandard2.0)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Roslyn.Utilities.Polyfills">
-    <ANcpLuaRoslynUtilitiesPolyfillsVersion>1.38.1</ANcpLuaRoslynUtilitiesPolyfillsVersion>
+    <ANcpLuaRoslynUtilitiesPolyfillsVersion>1.38.2</ANcpLuaRoslynUtilitiesPolyfillsVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
        ROSLYN.UTILITIES.TESTING (Analyzer/CodeFix/Generator test infrastructure)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Roslyn.Utilities.Testing">
-    <ANcpLuaRoslynUtilitiesTestingVersion>1.38.1</ANcpLuaRoslynUtilitiesTestingVersion>
+    <ANcpLuaRoslynUtilitiesTestingVersion>1.38.2</ANcpLuaRoslynUtilitiesTestingVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
