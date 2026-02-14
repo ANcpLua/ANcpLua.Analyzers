@@ -1,4 +1,4 @@
-﻿using ANcpLua.Analyzers.Core;
+﻿using ANcpLua.Analyzers.Analyzers;
 using Microsoft.CodeAnalysis.Editing;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
@@ -10,7 +10,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 [Shared]
 public sealed partial class Al0016CombineDeclarationWithNullCheckCodeFixProvider
     : AlCodeFixProvider<LocalDeclarationStatementSyntax> {
-    public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.CombineDeclarationWithNullCheck];
+    public override ImmutableArray<string> FixableDiagnosticIds => [Al0016CombineDeclarationWithNullCheckAnalyzer.DiagnosticId];
 
     protected override CodeAction? CreateCodeAction(Document document,
         LocalDeclarationStatementSyntax declaration,

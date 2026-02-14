@@ -16,8 +16,11 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0025PreferStaticLambdaAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0025.</summary>
+    public const string DiagnosticId = "AL0025";
+
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.PreferStaticLambda,
+        DiagnosticId,
         DiagnosticCategories.Usage,
         DiagnosticSeverity.Warning);
 

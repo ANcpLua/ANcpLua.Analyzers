@@ -30,10 +30,13 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0073TracedActivitySourceNameAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0073.</summary>
+    public const string DiagnosticId = "AL0073";
+
     private const string TracedAttributeFullName = "qyl.ServiceDefaults.Instrumentation.TracedAttribute";
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.TracedActivitySourceNameEmpty,
+        DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverities.RequiredFix);
 

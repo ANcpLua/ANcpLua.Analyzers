@@ -18,8 +18,11 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0010PartialTypeAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0010.</summary>
+    public const string DiagnosticId = "AL0010";
+
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.TypeShouldBePartial,
+        DiagnosticId,
         DiagnosticCategories.Design,
         DiagnosticSeverity.Info,
         isEnabledByDefault: false);

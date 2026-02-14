@@ -17,10 +17,13 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0067UnregisteredMeterAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0067.</summary>
+    public const string DiagnosticId = "AL0067";
+
     private const string MeterTypeName = "System.Diagnostics.Metrics.Meter";
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.UnregisteredMeter,
+        DiagnosticId,
         DiagnosticCategories.Metrics,
         DiagnosticSeverities.Suggestion);
 

@@ -28,10 +28,13 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0063UnregisteredActivitySourceAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0063.</summary>
+    public const string DiagnosticId = "AL0063";
+
     private const string ActivitySourceTypeName = "System.Diagnostics.ActivitySource";
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.UnregisteredActivitySource,
+        DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverities.Suggestion);
 

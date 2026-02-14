@@ -18,8 +18,11 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0036UseGuardNotNullAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0036.</summary>
+    public const string DiagnosticId = "AL0036";
+
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.UseGuardNotNull,
+        DiagnosticId,
         DiagnosticCategories.RoslynUtilities,
         DiagnosticSeverities.Suggestion);
 

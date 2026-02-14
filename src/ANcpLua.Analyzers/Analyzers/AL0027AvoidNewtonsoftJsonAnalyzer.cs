@@ -20,8 +20,11 @@ public sealed partial class Al0027AvoidNewtonsoftJsonAnalyzer : AlAnalyzer {
     /// <summary>Modern JSON library namespace.</summary>
     private const string SystemTextJsonNamespace = "System.Text.Json";
 
+    /// <summary>The diagnostic identifier for AL0027.</summary>
+    public const string DiagnosticId = "AL0027";
+
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.AvoidNewtonsoftJson,
+        DiagnosticId,
         DiagnosticCategories.Usage,
         DiagnosticSeverity.Warning);
 

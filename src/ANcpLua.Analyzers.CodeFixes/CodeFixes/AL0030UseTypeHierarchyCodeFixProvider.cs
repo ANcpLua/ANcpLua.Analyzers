@@ -1,4 +1,4 @@
-﻿using ANcpLua.Analyzers.Core;
+﻿using ANcpLua.Analyzers.Analyzers;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
@@ -13,7 +13,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0030UseTypeHierarchyCodeFixProvider))]
 [Shared]
 public sealed partial class Al0030UseTypeHierarchyCodeFixProvider : CodeFixProvider {
-    public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.UseTypeHierarchyExtensions];
+    public override ImmutableArray<string> FixableDiagnosticIds => [Al0030UseTypeHierarchyAnalyzer.DiagnosticId];
 
     public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 

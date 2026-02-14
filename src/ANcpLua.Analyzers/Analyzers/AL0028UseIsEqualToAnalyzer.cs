@@ -15,13 +15,16 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0028UseIsEqualToAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0028.</summary>
+    public const string DiagnosticId = "AL0028";
+
     /// <summary>Metadata name for SymbolEqualityComparer.</summary>
     private const string SymbolEqualityComparerTypeName = "Microsoft.CodeAnalysis.SymbolEqualityComparer";
     /// <summary>Metadata name for ISymbol.</summary>
     private const string ISymbolTypeName = "Microsoft.CodeAnalysis.ISymbol";
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.UseIsEqualTo,
+        DiagnosticId,
         DiagnosticCategories.RoslynUtilities,
         DiagnosticSeverity.Info);
 

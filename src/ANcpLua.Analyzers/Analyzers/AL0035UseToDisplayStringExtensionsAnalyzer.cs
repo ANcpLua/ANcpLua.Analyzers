@@ -23,11 +23,14 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0035UseToDisplayStringExtensionsAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0035.</summary>
+    public const string DiagnosticId = "AL0035";
+
     private const string ITypeSymbolTypeName = "Microsoft.CodeAnalysis.ITypeSymbol";
     private const string SymbolDisplayFormatTypeName = "Microsoft.CodeAnalysis.SymbolDisplayFormat";
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.UseToDisplayStringExtensions,
+        DiagnosticId,
         DiagnosticCategories.RoslynUtilities,
         DiagnosticSeverity.Info);
 

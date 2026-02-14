@@ -1,4 +1,4 @@
-﻿using ANcpLua.Analyzers.Core;
+﻿using ANcpLua.Analyzers.Analyzers;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
@@ -12,7 +12,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0029UseHasAttributeCodeFixProvider))]
 [Shared]
 public sealed partial class Al0029UseHasAttributeCodeFixProvider : CodeFixProvider {
-    public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.UseHasAttribute];
+    public override ImmutableArray<string> FixableDiagnosticIds => [Al0029UseHasAttributeAnalyzer.DiagnosticId];
 
     public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 

@@ -22,11 +22,14 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0029UseHasAttributeAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0029.</summary>
+    public const string DiagnosticId = "AL0029";
+
     /// <summary>Metadata name for ISymbol.</summary>
     private const string ISymbolTypeName = "Microsoft.CodeAnalysis.ISymbol";
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.UseHasAttribute,
+        DiagnosticId,
         DiagnosticCategories.RoslynUtilities,
         DiagnosticSeverity.Info);
 

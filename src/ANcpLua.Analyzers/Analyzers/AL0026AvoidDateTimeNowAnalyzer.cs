@@ -24,8 +24,11 @@ public sealed partial class Al0026AvoidDateTimeNowAnalyzer : AlAnalyzer {
     /// <summary>Property key for the source type (DateTime or DateTimeOffset).</summary>
     public const string PropertyIsDateTimeOffset = "IsDateTimeOffset";
 
+    /// <summary>The diagnostic identifier for AL0026.</summary>
+    public const string DiagnosticId = "AL0026";
+
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.AvoidDateTimeNow,
+        DiagnosticId,
         DiagnosticCategories.Usage,
         DiagnosticSeverity.Warning);
 

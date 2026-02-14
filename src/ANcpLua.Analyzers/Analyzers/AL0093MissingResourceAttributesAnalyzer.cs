@@ -30,6 +30,9 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0093MissingResourceAttributesAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0093.</summary>
+    public const string DiagnosticId = "AL0093";
+
     private static readonly string[] OTelSetupMethods = [
         "AddOpenTelemetry",
         "UseOpenTelemetry",
@@ -44,7 +47,7 @@ public sealed partial class Al0093MissingResourceAttributesAnalyzer : AlAnalyzer
     ];
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.MissingResourceAttributes,
+        DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverities.Suggestion);
 

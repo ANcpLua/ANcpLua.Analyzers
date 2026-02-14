@@ -86,8 +86,11 @@ public sealed partial class Al0085InvalidAttributeValueAnalyzer : AlAnalyzer {
             "one of: http, https, ftp, ws, wss")
     };
 
+    /// <summary>The diagnostic identifier for AL0085.</summary>
+    public const string DiagnosticId = "AL0085";
+
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.InvalidAttributeValue,
+        DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverities.RequiredFix);
 

@@ -20,8 +20,11 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0039UseStringComparisonExtensionsAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0039.</summary>
+    public const string DiagnosticId = "AL0039";
+
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.UseStringComparisonExtensions,
+        DiagnosticId,
         DiagnosticCategories.RoslynUtilities,
         DiagnosticSeverities.Suggestion);
 

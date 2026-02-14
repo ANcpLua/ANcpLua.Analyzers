@@ -22,10 +22,13 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0031UseOperationExtensionsAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0031.</summary>
+    public const string DiagnosticId = "AL0031";
+
     private const string IInvocationOperationTypeName = "Microsoft.CodeAnalysis.Operations.IInvocationOperation";
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.UseOperationExtensions,
+        DiagnosticId,
         DiagnosticCategories.RoslynUtilities,
         DiagnosticSeverity.Info);
 

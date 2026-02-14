@@ -23,8 +23,11 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0094AvoidDynamicKeywordAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0094.</summary>
+    public const string DiagnosticId = "AL0094";
+
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.AvoidDynamicKeyword,
+        DiagnosticId,
         DiagnosticCategories.AotTesting,
         DiagnosticSeverities.Suggestion);
 

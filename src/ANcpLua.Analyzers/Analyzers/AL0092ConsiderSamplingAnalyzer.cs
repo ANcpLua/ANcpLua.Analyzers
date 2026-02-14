@@ -34,6 +34,9 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0092ConsiderSamplingAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0092.</summary>
+    public const string DiagnosticId = "AL0092";
+
     /// <summary>Array of known OTel tracer builder type names.</summary>
     private static readonly string[] TracerBuilderTypeNames = [
         "OpenTelemetry.Trace.TracerProviderBuilder",
@@ -54,7 +57,7 @@ public sealed partial class Al0092ConsiderSamplingAnalyzer : AlAnalyzer {
     ];
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.ConsiderSampling,
+        DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverities.HiddenByDefault);
 

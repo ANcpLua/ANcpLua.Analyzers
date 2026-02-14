@@ -1,5 +1,6 @@
 ﻿using ANcpLua.Analyzers.Core;
 using ANcpLua.Roslyn.Utilities;
+using ANcpLua.Roslyn.Utilities.Contexts;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -35,8 +36,11 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0012DeprecatedAttributeAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0012.</summary>
+    public const string DiagnosticId = "AL0012";
+
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.DeprecatedSemanticConventionAttribute,
+        DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverity.Warning);
 

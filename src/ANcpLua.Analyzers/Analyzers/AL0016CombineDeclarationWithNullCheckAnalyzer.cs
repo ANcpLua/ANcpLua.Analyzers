@@ -36,7 +36,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0016CombineDeclarationWithNullCheckAnalyzer : AlAnalyzer {
     /// <summary>AL0016: Combine declaration with subsequent null-check.</summary>
-    public const string DiagnosticId = DiagnosticIds.CombineDeclarationWithNullCheck;
+    public const string DiagnosticId = "AL0016";
 
     private static readonly DiagnosticDescriptor Rule = new(
         DiagnosticId,

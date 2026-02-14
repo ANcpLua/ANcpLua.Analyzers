@@ -1,4 +1,4 @@
-using ANcpLua.Analyzers.Core;
+using ANcpLua.Analyzers.Analyzers;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
@@ -10,7 +10,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 public sealed partial class Al0074DeprecatedGenAiCodeFixProvider
     : AlCodeFixProvider<LiteralExpressionSyntax> {
     /// <summary>Gets the diagnostic IDs this provider can fix.</summary>
-    public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.DeprecatedGenAiAttribute];
+    public override ImmutableArray<string> FixableDiagnosticIds => [Al0074DeprecatedGenAiAttributeAnalyzer.DiagnosticId];
 
     /// <summary>Creates the code action for this fix.</summary>
     protected override CodeAction? CreateCodeAction(

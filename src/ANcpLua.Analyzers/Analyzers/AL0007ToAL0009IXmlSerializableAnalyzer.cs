@@ -41,6 +41,13 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0007ToAl0009IXmlSerializableAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0007.</summary>
+    public const string DiagnosticIdAL0007 = "AL0007";
+    /// <summary>The diagnostic identifier for AL0008.</summary>
+    public const string DiagnosticIdAL0008 = "AL0008";
+    /// <summary>The diagnostic identifier for AL0009.</summary>
+    public const string DiagnosticIdAL0009 = "AL0009";
+
     private static readonly LocalizableResourceString TitleAl0007 = new(
         nameof(Resources.AL0007AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
 
@@ -69,19 +76,19 @@ public sealed partial class Al0007ToAl0009IXmlSerializableAnalyzer : AlAnalyzer 
         nameof(Resources.AL0009AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
 
     private static readonly DiagnosticDescriptor RuleAl0007 = new(
-        DiagnosticIds.GetSchemaShouldBeExplicitlyImplemented,
+        DiagnosticIdAL0007,
         TitleAl0007, MessageFormatAl0007, DiagnosticCategories.Usage,
         DiagnosticSeverity.Error, true, DescriptionAl0007,
         HelpLinkBase);
 
     private static readonly DiagnosticDescriptor RuleAl0008 = new(
-        DiagnosticIds.GetSchemaMustReturnNull,
+        DiagnosticIdAL0008,
         TitleAl0008, MessageFormatAl0008, DiagnosticCategories.Usage,
         DiagnosticSeverity.Error, true, DescriptionAl0008,
         HelpLinkBase);
 
     private static readonly DiagnosticDescriptor RuleAl0009 = new(
-        DiagnosticIds.DontCallGetSchema,
+        DiagnosticIdAL0009,
         TitleAl0009, MessageFormatAl0009, DiagnosticCategories.Usage,
         DiagnosticSeverity.Error, true, DescriptionAl0009,
         HelpLinkBase);

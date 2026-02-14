@@ -1,4 +1,4 @@
-﻿using ANcpLua.Analyzers.Core;
+﻿using ANcpLua.Analyzers.Analyzers;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
@@ -12,7 +12,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0027UseSystemTextJsonCodeFixProvider))]
 [Shared]
 public sealed partial class Al0027UseSystemTextJsonCodeFixProvider : CodeFixProvider {
-    public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.AvoidNewtonsoftJson];
+    public override ImmutableArray<string> FixableDiagnosticIds => [Al0027AvoidNewtonsoftJsonAnalyzer.DiagnosticId];
 
     public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 

@@ -25,12 +25,15 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0042AotTestExitCode100Analyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0042.</summary>
+    public const string DiagnosticId = "AL0042";
+
     private const string AotTestAttributeName = "AotTest";
     private const string TrimTestAttributeName = "TrimTest";
     private const int ExpectedExitCode = 100;
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.AotTestExitCode100,
+        DiagnosticId,
         DiagnosticCategories.AotTesting,
         DiagnosticSeverity.Warning);
 

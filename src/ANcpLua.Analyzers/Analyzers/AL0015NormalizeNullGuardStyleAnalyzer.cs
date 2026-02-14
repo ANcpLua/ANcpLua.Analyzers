@@ -18,7 +18,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0015NormalizeNullGuardStyleAnalyzer : AlAnalyzer {
     /// <summary>AL0015: Normalize null-guard style.</summary>
-    private const string DiagnosticId = DiagnosticIds.NormalizeNullGuardStyle;
+    public const string DiagnosticId = "AL0015";
 
     /// <summary>Property key for the parameter identifier.</summary>
     public const string PropertyIdentifier = "Id";

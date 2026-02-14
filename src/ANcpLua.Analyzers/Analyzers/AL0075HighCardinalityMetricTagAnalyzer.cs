@@ -88,8 +88,11 @@ public sealed partial class Al0075HighCardinalityMetricTagAnalyzer : AlAnalyzer 
         "guid"
     ];
 
+    /// <summary>The diagnostic identifier for AL0075.</summary>
+    public const string DiagnosticId = "AL0075";
+
     private static readonly DiagnosticDescriptor HighCardinalityMetricTagRule = CreateRule(
-        DiagnosticIds.HighCardinalityMetricTag,
+        DiagnosticId,
         DiagnosticCategories.Metrics,
         DiagnosticSeverities.Suggestion);
 

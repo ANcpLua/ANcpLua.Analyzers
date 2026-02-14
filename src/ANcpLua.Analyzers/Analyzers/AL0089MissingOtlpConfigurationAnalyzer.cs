@@ -36,13 +36,16 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0089MissingOtlpConfigurationAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0089.</summary>
+    public const string DiagnosticId = "AL0089";
+
     private static readonly string[] OtlpExporterMethods = [
         "UseOtlpExporter",
         "AddOtlpExporter"
     ];
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.MissingOtlpConfiguration,
+        DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverities.Suggestion);
 

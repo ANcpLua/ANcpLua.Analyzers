@@ -20,6 +20,9 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0061ActivityMissingSemconvAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0061.</summary>
+    public const string DiagnosticId = "AL0061";
+
     // Operation types and their expected semantic convention prefixes
     private static readonly Dictionary<string, string[]> OperationTypePrefixes = new(StringComparer.OrdinalIgnoreCase) {
         ["http"] = ["http.", "url.", "server.", "client."],
@@ -31,7 +34,7 @@ public sealed partial class Al0061ActivityMissingSemconvAnalyzer : AlAnalyzer {
     };
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.ActivityMissingSemconv,
+        DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverities.Suggestion);
 

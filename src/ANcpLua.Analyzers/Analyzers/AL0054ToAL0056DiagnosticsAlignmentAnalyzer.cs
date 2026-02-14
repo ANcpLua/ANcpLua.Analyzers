@@ -41,6 +41,13 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0054ToAl0056DiagnosticsAlignmentAnalyzer : DiagnosticAnalyzer {
+    /// <summary>The diagnostic identifier for AL0054.</summary>
+    public const string DiagnosticIdAL0054 = "AL0054";
+    /// <summary>The diagnostic identifier for AL0055.</summary>
+    public const string DiagnosticIdAL0055 = "AL0055";
+    /// <summary>The diagnostic identifier for AL0056.</summary>
+    public const string DiagnosticIdAL0056 = "AL0056";
+
     private const string DescriptorsFileName = "Descriptors.cs";
     private const string DiagnosticsMdFileName = "diagnostics.md";
     private const string ShippedFileName = "AnalyzerReleases.Shipped.md";
@@ -59,7 +66,7 @@ public sealed partial class Al0054ToAl0056DiagnosticsAlignmentAnalyzer : Diagnos
         RegexOptions.Compiled);
 
     private static readonly DiagnosticDescriptor RuleMissingDocs = new(
-        DiagnosticIds.DiagnosticMissingFromDocs,
+        DiagnosticIdAL0054,
         "Diagnostic missing from documentation",
         "{0}",
         DiagnosticCategories.VersionManagement,
@@ -70,7 +77,7 @@ public sealed partial class Al0054ToAl0056DiagnosticsAlignmentAnalyzer : Diagnos
         WellKnownDiagnosticTags.CompilationEnd);
 
     private static readonly DiagnosticDescriptor RuleMissingRelease = new(
-        DiagnosticIds.DiagnosticMissingFromReleaseNotes,
+        DiagnosticIdAL0055,
         "Diagnostic missing from release notes",
         "{0}",
         DiagnosticCategories.VersionManagement,
@@ -81,7 +88,7 @@ public sealed partial class Al0054ToAl0056DiagnosticsAlignmentAnalyzer : Diagnos
         WellKnownDiagnosticTags.CompilationEnd);
 
     private static readonly DiagnosticDescriptor RuleMismatch = new(
-        DiagnosticIds.DiagnosticDocumentationMismatch,
+        DiagnosticIdAL0056,
         "Diagnostic documentation mismatch",
         "{0}",
         DiagnosticCategories.VersionManagement,

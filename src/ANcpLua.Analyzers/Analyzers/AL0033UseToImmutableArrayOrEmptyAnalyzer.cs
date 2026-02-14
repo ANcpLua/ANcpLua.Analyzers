@@ -16,8 +16,11 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0033UseToImmutableArrayOrEmptyAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0033.</summary>
+    public const string DiagnosticId = "AL0033";
+
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.UseToImmutableArrayOrEmpty,
+        DiagnosticId,
         DiagnosticCategories.RoslynUtilities,
         DiagnosticSeverity.Info);
 

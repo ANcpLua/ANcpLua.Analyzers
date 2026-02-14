@@ -1,4 +1,4 @@
-﻿using ANcpLua.Analyzers.Core;
+﻿using ANcpLua.Analyzers.Analyzers;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
@@ -9,7 +9,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 [Shared]
 public sealed partial class Al0010PartialTypeCodeFixProvider : CodeFixProvider {
     public override ImmutableArray<string> FixableDiagnosticIds =>
-        [DiagnosticIds.TypeShouldBePartial];
+        [Al0010PartialTypeAnalyzer.DiagnosticId];
 
     public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 

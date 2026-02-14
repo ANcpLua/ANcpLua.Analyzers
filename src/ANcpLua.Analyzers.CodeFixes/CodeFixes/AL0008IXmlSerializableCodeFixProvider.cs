@@ -1,4 +1,4 @@
-﻿using ANcpLua.Analyzers.Core;
+﻿using ANcpLua.Analyzers.Analyzers;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
@@ -9,7 +9,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 [Shared]
 public sealed partial class Al0008IXmlSerializableCodeFixProvider : CodeFixProvider {
     public override ImmutableArray<string> FixableDiagnosticIds =>
-        [DiagnosticIds.GetSchemaMustReturnNull];
+        [Al0007ToAl0009IXmlSerializableAnalyzer.DiagnosticIdAL0008];
 
     public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
@@ -20,7 +20,7 @@ public sealed partial class Al0008IXmlSerializableCodeFixProvider : CodeFixProvi
         }
 
         foreach (var diagnostic in context.Diagnostics) {
-            if (diagnostic.Id != DiagnosticIds.GetSchemaMustReturnNull) {
+            if (diagnostic.Id != Al0007ToAl0009IXmlSerializableAnalyzer.DiagnosticIdAL0008) {
                 continue;
             }
 

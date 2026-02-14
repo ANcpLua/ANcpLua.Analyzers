@@ -14,11 +14,14 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0011LockKeywordAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0011.</summary>
+    public const string DiagnosticId = "AL0011";
+
     /// <summary>Metadata name for the System.Threading.Lock type (.NET 9+).</summary>
     private const string LockTypeMetadataName = "System.Threading.Lock";
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.AvoidLockKeywordOnNonLockTypes,
+        DiagnosticId,
         DiagnosticCategories.Threading,
         DiagnosticSeverity.Warning);
 

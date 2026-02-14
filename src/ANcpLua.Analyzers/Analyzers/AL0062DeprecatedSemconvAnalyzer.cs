@@ -19,6 +19,9 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0062DeprecatedSemconvAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0062.</summary>
+    public const string DiagnosticId = "AL0062";
+
     // Map of deprecated attribute names to their replacements and deprecation version
     private static readonly Dictionary<string, (string Replacement, string Version)> DeprecatedAttributes =
         new(StringComparer.OrdinalIgnoreCase) {
@@ -46,7 +49,7 @@ public sealed partial class Al0062DeprecatedSemconvAnalyzer : AlAnalyzer {
         };
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.DeprecatedSemconv,
+        DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverities.Suggestion);
 

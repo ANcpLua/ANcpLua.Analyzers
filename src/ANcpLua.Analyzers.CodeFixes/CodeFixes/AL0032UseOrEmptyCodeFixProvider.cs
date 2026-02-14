@@ -1,4 +1,4 @@
-using ANcpLua.Analyzers.Core;
+using ANcpLua.Analyzers.Analyzers;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
@@ -17,7 +17,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 public sealed partial class Al0032UseOrEmptyCodeFixProvider
     : AlCodeFixProvider<BinaryExpressionSyntax> {
     /// <summary>Gets the diagnostic IDs this code fix can fix.</summary>
-    public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.UseOrEmpty];
+    public override ImmutableArray<string> FixableDiagnosticIds => [Al0032UseOrEmptyAnalyzer.DiagnosticId];
 
     /// <summary>Creates the code action for this fix.</summary>
     protected override CodeAction CreateCodeAction(

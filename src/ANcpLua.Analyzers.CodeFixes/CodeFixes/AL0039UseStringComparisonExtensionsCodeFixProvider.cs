@@ -1,4 +1,4 @@
-using ANcpLua.Analyzers.Core;
+using ANcpLua.Analyzers.Analyzers;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
@@ -28,7 +28,7 @@ public sealed partial class Al0039UseStringComparisonExtensionsCodeFixProvider
     };
 
     /// <summary>Gets the diagnostic IDs this code fix can fix.</summary>
-    public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.UseStringComparisonExtensions];
+    public override ImmutableArray<string> FixableDiagnosticIds => [Al0039UseStringComparisonExtensionsAnalyzer.DiagnosticId];
 
     /// <summary>Creates the code action for this fix.</summary>
     protected override CodeAction CreateCodeAction(

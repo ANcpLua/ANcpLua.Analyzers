@@ -39,8 +39,11 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0087PreferConstantAttributeAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0087.</summary>
+    public const string DiagnosticId = "AL0087";
+
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.PreferConstantAttribute,
+        DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverities.HiddenByDefault);
 

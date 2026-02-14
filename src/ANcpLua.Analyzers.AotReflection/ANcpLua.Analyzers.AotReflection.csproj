@@ -16,9 +16,10 @@
         <!-- Suppress warnings:
              RS1035: Banned symbols from shared Roslyn.Utilities sources (Guard.cs uses File/Directory)
              RS1025/RS1026/RS1041: Analyzer registration patterns - intentional design
+             RS0030: Banned APIs - polyfill source (TimeProvider) must reference the API it replaces
              CS1591: XML docs - generator internals
              CA1308: ToLowerInvariant - intentional for C# code generation (true/false literals) -->
-        <NoWarn>$(NoWarn);RS1035;RS1025;RS1026;RS1041;CS1591;CA1308</NoWarn>
+        <NoWarn>$(NoWarn);RS1035;RS1025;RS1026;RS1041;RS0030;CS1591;CA1308</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>

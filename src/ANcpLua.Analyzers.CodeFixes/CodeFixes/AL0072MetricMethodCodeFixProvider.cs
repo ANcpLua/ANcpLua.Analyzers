@@ -1,4 +1,4 @@
-using ANcpLua.Analyzers.Core;
+using ANcpLua.Analyzers.Analyzers;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
@@ -9,7 +9,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 [Shared]
 public sealed partial class Al0072MetricMethodCodeFixProvider : CodeFixProvider {
     /// <summary>Gets the diagnostic IDs this provider can fix.</summary>
-    public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.MetricMethodMustBePartial];
+    public override ImmutableArray<string> FixableDiagnosticIds => [Al0072MetricMethodMustBePartialAnalyzer.DiagnosticId];
 
     /// <summary>Gets the FixAll provider for batch fixing.</summary>
     public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;

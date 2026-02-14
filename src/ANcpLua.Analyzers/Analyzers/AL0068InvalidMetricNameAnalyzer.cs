@@ -31,8 +31,11 @@ public sealed partial class Al0068InvalidMetricNameAnalyzer : AlAnalyzer {
         @"^[a-z][a-z0-9_.]*\.[a-z][a-z0-9_.]*$",
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
+    /// <summary>The diagnostic identifier for AL0068.</summary>
+    public const string DiagnosticId = "AL0068";
+
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.InvalidMetricName,
+        DiagnosticId,
         DiagnosticCategories.Metrics,
         DiagnosticSeverities.Suggestion);
 

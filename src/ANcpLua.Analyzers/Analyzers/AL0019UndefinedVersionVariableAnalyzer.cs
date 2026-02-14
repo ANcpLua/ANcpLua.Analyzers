@@ -40,7 +40,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0019UndefinedVersionVariableAnalyzer : DiagnosticAnalyzer {
     /// <summary>AL0019: Undefined version variable.</summary>
-    public const string DiagnosticId = DiagnosticIds.UndefinedVersionVariable;
+    public const string DiagnosticId = "AL0019";
 
     /// <summary>Property key for the undefined variable name.</summary>
     private const string VariableNameKey = "VariableName";

@@ -35,8 +35,11 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0013MissingSchemaUrlAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0013.</summary>
+    public const string DiagnosticId = "AL0013";
+
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.MissingTelemetrySchemaUrl,
+        DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverity.Info);
 

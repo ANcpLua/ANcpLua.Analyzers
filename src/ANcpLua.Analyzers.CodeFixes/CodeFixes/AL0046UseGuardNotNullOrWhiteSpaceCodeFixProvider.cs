@@ -1,4 +1,4 @@
-using ANcpLua.Analyzers.Core;
+using ANcpLua.Analyzers.Analyzers;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
@@ -16,7 +16,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 public sealed partial class Al0046UseGuardNotNullOrWhiteSpaceCodeFixProvider
     : AlCodeFixProvider<IfStatementSyntax> {
     /// <summary>Gets the diagnostic IDs this code fix can fix.</summary>
-    public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.UseGuardNotNullOrWhiteSpace];
+    public override ImmutableArray<string> FixableDiagnosticIds => [Al0046UseGuardNotNullOrWhiteSpaceAnalyzer.DiagnosticId];
 
     /// <summary>Creates the code action for this fix.</summary>
     protected override CodeAction CreateCodeAction(

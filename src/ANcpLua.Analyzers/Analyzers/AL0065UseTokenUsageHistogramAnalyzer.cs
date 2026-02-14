@@ -28,8 +28,11 @@ public sealed partial class Al0065UseTokenUsageHistogramAnalyzer : AlAnalyzer {
         "token", "input_token", "output_token", "prompt_token", "completion_token"
     ];
 
+    /// <summary>The diagnostic identifier for AL0065.</summary>
+    public const string DiagnosticId = "AL0065";
+
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.UseTokenUsageHistogram,
+        DiagnosticId,
         DiagnosticCategories.GenAI,
         DiagnosticSeverities.Suggestion);
 

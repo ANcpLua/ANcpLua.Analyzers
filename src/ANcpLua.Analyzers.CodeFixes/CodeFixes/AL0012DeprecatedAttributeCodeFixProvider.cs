@@ -1,4 +1,6 @@
-﻿using ANcpLua.Analyzers.Core;
+﻿using ANcpLua.Analyzers.Analyzers;
+using ANcpLua.Analyzers.Core;
+using ANcpLua.Roslyn.Utilities.Contexts;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
@@ -14,7 +16,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 [Shared]
 public sealed partial class Al0012DeprecatedAttributeCodeFixProvider : CodeFixProvider {
     public override ImmutableArray<string> FixableDiagnosticIds =>
-        [DiagnosticIds.DeprecatedSemanticConventionAttribute];
+        [Al0012DeprecatedAttributeAnalyzer.DiagnosticId];
 
     public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 

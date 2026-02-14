@@ -24,6 +24,9 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0064GenAiMissingRequiredAttributesAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0064.</summary>
+    public const string DiagnosticId = "AL0064";
+
     private static readonly string[] RequiredGenAiAttributes = [
         "gen_ai.provider.name",
         "gen_ai.request.model",
@@ -31,7 +34,7 @@ public sealed partial class Al0064GenAiMissingRequiredAttributesAnalyzer : AlAna
     ];
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.GenAiMissingRequiredAttributes,
+        DiagnosticId,
         DiagnosticCategories.GenAI,
         DiagnosticSeverities.Suggestion);
 

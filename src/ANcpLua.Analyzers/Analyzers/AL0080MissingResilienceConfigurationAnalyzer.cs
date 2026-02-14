@@ -29,8 +29,11 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0080MissingResilienceConfigurationAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0080.</summary>
+    public const string DiagnosticId = "AL0080";
+
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.MissingResilienceConfiguration,
+        DiagnosticId,
         DiagnosticCategories.AspNetCore,
         DiagnosticSeverity.Warning);
 

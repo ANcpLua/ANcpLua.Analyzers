@@ -32,20 +32,31 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0020ToAl0024FormBindingAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0020.</summary>
+    public const string DiagnosticIdAL0020 = "AL0020";
+    /// <summary>The diagnostic identifier for AL0021.</summary>
+    public const string DiagnosticIdAL0021 = "AL0021";
+    /// <summary>The diagnostic identifier for AL0022.</summary>
+    public const string DiagnosticIdAL0022 = "AL0022";
+    /// <summary>The diagnostic identifier for AL0023.</summary>
+    public const string DiagnosticIdAL0023 = "AL0023";
+    /// <summary>The diagnostic identifier for AL0024.</summary>
+    public const string DiagnosticIdAL0024 = "AL0024";
+
     private static readonly DiagnosticDescriptor RuleAl0020 = CreateRule(
-        DiagnosticIds.FormCollectionRequiresExplicitAttribute, "AL0020");
+        DiagnosticIdAL0020, "AL0020");
 
     private static readonly DiagnosticDescriptor RuleAl0021 = CreateRule(
-        DiagnosticIds.MultipleStructuredFormSources, "AL0021");
+        DiagnosticIdAL0021, "AL0021");
 
     private static readonly DiagnosticDescriptor RuleAl0022 = CreateRule(
-        DiagnosticIds.MixedFormCollectionAndDto, "AL0022");
+        DiagnosticIdAL0022, "AL0022");
 
     private static readonly DiagnosticDescriptor RuleAl0023 = CreateRule(
-        DiagnosticIds.UnsupportedFormType, "AL0023");
+        DiagnosticIdAL0023, "AL0023");
 
     private static readonly DiagnosticDescriptor RuleAl0024 = CreateRule(
-        DiagnosticIds.FormAndBodyConflict, "AL0024");
+        DiagnosticIdAL0024, "AL0024");
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics (AL0020-AL0024).</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
@@ -68,11 +79,12 @@ public sealed partial class Al0020ToAl0024FormBindingAnalyzer : AlAnalyzer {
         context.RegisterCompilationStartAction(OnCompilationStart);
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
-        var cache = WellKnownTypeCache.Create(context.Compilation);
+        var cache = new TypeCache<WellKnownType>(
+            type => context.Compilation.GetTypeByMetadataName(WellKnownTypeNames.GetName(type)));
         context.RegisterSymbolAction(ctx => AnalyzeMethod(ctx, cache), SymbolKind.Method);
     }
 
-    private static void AnalyzeMethod(SymbolAnalysisContext context, WellKnownTypeCache cache) {
+    private static void AnalyzeMethod(SymbolAnalysisContext context, TypeCache<WellKnownType> cache) {
         if (context.Symbol is not IMethodSymbol { Parameters.IsEmpty: false } method) {
             return;
         }
@@ -89,9 +101,9 @@ public sealed partial class Al0020ToAl0024FormBindingAnalyzer : AlAnalyzer {
         foreach (var param in method.Parameters) {
             var hasFromFormAttr = cache.HasAttribute(param, WellKnownType.FromFormAttribute);
             var hasFromBodyAttr = cache.HasAttribute(param, WellKnownType.FromBodyAttribute);
-            var isFormCollection = cache.IsType(param.Type, WellKnownType.IFormCollection);
-            var isFormFile = cache.IsType(param.Type, WellKnownType.IFormFile);
-            var isFormFileCollection = cache.IsType(param.Type, WellKnownType.IFormFileCollection);
+            var isFormCollection = cache.IsTypeDefinition(param.Type, WellKnownType.IFormCollection);
+            var isFormFile = cache.IsTypeDefinition(param.Type, WellKnownType.IFormFile);
+            var isFormFileCollection = cache.IsTypeDefinition(param.Type, WellKnownType.IFormFileCollection);
 
             if (hasFromBodyAttr) {
                 hasFromBody = true;
@@ -167,6 +179,42 @@ public sealed partial class Al0020ToAl0024FormBindingAnalyzer : AlAnalyzer {
                    SpecialType.System_Char or SpecialType.System_String or SpecialType.System_DateTime
                || type.ToDisplayString() is "System.Guid" or "System.TimeSpan" or "System.DateTimeOffset"
                    or "System.DateOnly" or "System.TimeOnly" or "System.Uri";
+    }
+
+    private enum WellKnownType {
+        FromFormAttribute,
+        FromBodyAttribute,
+        IFormFile,
+        IFormFileCollection,
+        IFormCollection,
+        SystemGuid,
+        TimeSpan,
+        DateTimeOffset,
+        DateOnly,
+        TimeOnly,
+        Uri,
+        AttributeData,
+        TypedConstant
+    }
+
+    private static partial class WellKnownTypeNames {
+        private static readonly string[] Names = [
+            "Microsoft.AspNetCore.Mvc.FromFormAttribute",
+            "Microsoft.AspNetCore.Mvc.FromBodyAttribute",
+            "Microsoft.AspNetCore.Http.IFormFile",
+            "Microsoft.AspNetCore.Http.IFormFileCollection",
+            "Microsoft.AspNetCore.Http.IFormCollection",
+            "System.Guid",
+            "System.TimeSpan",
+            "System.DateTimeOffset",
+            "System.DateOnly",
+            "System.TimeOnly",
+            "System.Uri",
+            "Microsoft.CodeAnalysis.AttributeData",
+            "Microsoft.CodeAnalysis.TypedConstant"
+        ];
+
+        public static string GetName(WellKnownType type) => Names[(int)type];
     }
 
     private static string? GetUnsupportedFormTypeReason(ITypeSymbol type) {

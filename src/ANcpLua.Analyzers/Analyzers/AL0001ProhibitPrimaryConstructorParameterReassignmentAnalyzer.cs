@@ -32,8 +32,11 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0001ProhibitPrimaryConstructorParameterReassignmentAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0001.</summary>
+    public const string DiagnosticId = "AL0001";
+
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.ProhibitPrimaryConstructorParameterReassignment,
+        DiagnosticId,
         DiagnosticCategories.Design,
         DiagnosticSeverity.Error);
 

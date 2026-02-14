@@ -32,8 +32,11 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0003DontDivideByConstantZeroAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0003.</summary>
+    public const string DiagnosticId = "AL0003";
+
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.DontDivideByConstantZero,
+        DiagnosticId,
         DiagnosticCategories.Reliability,
         DiagnosticSeverity.Error);
 

@@ -42,9 +42,9 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0004ToAl0005SpanComparisonAnalyzer : AlAnalyzer {
     /// <summary>AL0004: Use pattern matching when comparing Span and a constant.</summary>
-    public const string DiagnosticIdAl0004 = DiagnosticIds.UsePatternMatchingForSpanConstantComparison;
+    public const string DiagnosticIdAl0004 = "AL0004";
     /// <summary>AL0005: Use SequenceEqual when comparing Span and a non-constant.</summary>
-    public const string DiagnosticIdAl0005 = DiagnosticIds.UseSequenceEqualForSpanNonConstantComparison;
+    public const string DiagnosticIdAl0005 = "AL0005";
 
     private static readonly LocalizableResourceString TitleAl0004 = new(
         nameof(Resources.AL0004AnalyzerTitle), Resources.ResourceManager, typeof(Resources));

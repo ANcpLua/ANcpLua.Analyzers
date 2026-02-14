@@ -38,23 +38,32 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0057ToAl0060ThreadingAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0057.</summary>
+    public const string DiagnosticIdAL0057 = "AL0057";
+    /// <summary>The diagnostic identifier for AL0058.</summary>
+    public const string DiagnosticIdAL0058 = "AL0058";
+    /// <summary>The diagnostic identifier for AL0059.</summary>
+    public const string DiagnosticIdAL0059 = "AL0059";
+    /// <summary>The diagnostic identifier for AL0060.</summary>
+    public const string DiagnosticIdAL0060 = "AL0060";
+
     private static readonly DiagnosticDescriptor AsyncVoidRule = CreateRule(
-        DiagnosticIds.AvoidAsyncVoid,
+        DiagnosticIdAL0057,
         DiagnosticCategories.Threading,
         DiagnosticSeverity.Warning);
 
     private static readonly DiagnosticDescriptor LockOnThisRule = CreateRule(
-        DiagnosticIds.AvoidLockOnThis,
+        DiagnosticIdAL0058,
         DiagnosticCategories.Threading,
         DiagnosticSeverity.Warning);
 
     private static readonly DiagnosticDescriptor LockOnTypeRule = CreateRule(
-        DiagnosticIds.AvoidLockOnType,
+        DiagnosticIdAL0059,
         DiagnosticCategories.Threading,
         DiagnosticSeverity.Warning);
 
     private static readonly DiagnosticDescriptor LockOnStringRule = CreateRule(
-        DiagnosticIds.AvoidLockOnString,
+        DiagnosticIdAL0060,
         DiagnosticCategories.Threading,
         DiagnosticSeverity.Warning);
 

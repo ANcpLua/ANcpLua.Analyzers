@@ -47,6 +47,13 @@
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
+       ROSLYN.UTILITIES.POLYFILLS (Source-only polyfills for netstandard2.0)
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <PropertyGroup Label="Roslyn.Utilities.Polyfills">
+    <ANcpLuaRoslynUtilitiesPolyfillsVersion>1.38.2</ANcpLuaRoslynUtilitiesPolyfillsVersion>
+  </PropertyGroup>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
        ROSLYN.UTILITIES.TESTING (Analyzer/CodeFix/Generator test infrastructure)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Roslyn.Utilities.Testing">

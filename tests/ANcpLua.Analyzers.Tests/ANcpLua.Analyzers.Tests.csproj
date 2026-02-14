@@ -6,7 +6,7 @@
         <IsTestProject>true</IsTestProject>
 
         <!-- Suppress SDK stricter rules for test project -->
-        <NoWarn>$(NoWarn);RS0030;IDE0028;IDE0055;IDE1006;CA1707</NoWarn>
+        <NoWarn>$(NoWarn);RS0030;IDE0028;IDE0055;IDE1006;CA1707;CA1859;AL0039</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>

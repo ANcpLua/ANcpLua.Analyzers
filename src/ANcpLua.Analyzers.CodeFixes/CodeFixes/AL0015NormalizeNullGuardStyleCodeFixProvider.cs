@@ -1,5 +1,4 @@
 ﻿using ANcpLua.Analyzers.Analyzers;
-using ANcpLua.Analyzers.Core;
 // ReSharper disable All
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
@@ -11,7 +10,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0015NormalizeNullGuardStyleCodeFixProvider))]
 [Shared]
 public sealed partial class Al0015NormalizeNullGuardStyleCodeFixProvider : AlCodeFixProvider<IfStatementSyntax> {
-    public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.NormalizeNullGuardStyle];
+    public override ImmutableArray<string> FixableDiagnosticIds => [Al0015NormalizeNullGuardStyleAnalyzer.DiagnosticId];
 
     protected override CodeAction? CreateCodeAction(Document document,
         IfStatementSyntax ifStatement,

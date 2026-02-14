@@ -1,4 +1,4 @@
-﻿using ANcpLua.Analyzers.Core;
+﻿using ANcpLua.Analyzers.Analyzers;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
@@ -11,7 +11,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0028UseIsEqualToCodeFixProvider))]
 [Shared]
 public sealed partial class Al0028UseIsEqualToCodeFixProvider : AlCodeFixProvider<InvocationExpressionSyntax> {
-    public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.UseIsEqualTo];
+    public override ImmutableArray<string> FixableDiagnosticIds => [Al0028UseIsEqualToAnalyzer.DiagnosticId];
 
     protected override CodeAction CreateCodeAction(
         Document document,

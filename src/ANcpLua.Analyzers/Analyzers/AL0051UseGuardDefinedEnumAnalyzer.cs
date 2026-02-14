@@ -20,8 +20,11 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0051UseGuardDefinedEnumAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0051.</summary>
+    public const string DiagnosticId = "AL0051";
+
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.UseGuardDefinedEnum,
+        DiagnosticId,
         DiagnosticCategories.RoslynUtilities,
         DiagnosticSeverities.Suggestion);
 

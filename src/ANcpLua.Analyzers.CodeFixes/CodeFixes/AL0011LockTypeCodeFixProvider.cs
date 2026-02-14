@@ -1,4 +1,4 @@
-﻿using ANcpLua.Analyzers.Core;
+﻿using ANcpLua.Analyzers.Analyzers;
 using Microsoft.CodeAnalysis.Editing;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
@@ -12,7 +12,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 public sealed partial class Al0011LockTypeCodeFixProvider : CodeFixProvider {
     private const string LockTypeMetadataName = "System.Threading.Lock";
 
-    public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.AvoidLockKeywordOnNonLockTypes];
+    public override ImmutableArray<string> FixableDiagnosticIds => [Al0011LockKeywordAnalyzer.DiagnosticId];
 
     public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 

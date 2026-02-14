@@ -29,7 +29,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0014PreferPatternMatchingAnalyzer : AlAnalyzer {
     /// <summary>AL0014: Prefer pattern matching for null and zero comparisons.</summary>
-    public const string DiagnosticId = DiagnosticIds.PreferPatternMatchingForNullAndZero;
+    public const string DiagnosticId = "AL0014";
 
     /// <summary>Property key indicating whether this is a null check.</summary>
     private const string PropertyIsNullCheck = "IsNullCheck";

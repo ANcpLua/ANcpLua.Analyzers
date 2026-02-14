@@ -32,8 +32,11 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0002DontRepeatNegatedPatternAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0002.</summary>
+    public const string DiagnosticId = "AL0002";
+
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.DontRepeatNegatedPattern,
+        DiagnosticId,
         DiagnosticCategories.Design,
         DiagnosticSeverity.Warning);
 

@@ -1,5 +1,4 @@
 ﻿using ANcpLua.Analyzers.Analyzers;
-using ANcpLua.Analyzers.Core;
 using Microsoft.CodeAnalysis.Editing;
 
 namespace ANcpLua.Analyzers.CodeFixes.Refactorings;
@@ -34,7 +33,7 @@ public sealed partial class Ar0002MakeStaticLambdaRefactoring : CodeRefactoringP
 
         // Skip if AL0025 diagnostic is active (code fix handles it)
         var diagnostics = semanticModel.GetDiagnostics(lambda.Span, context.CancellationToken);
-        if (diagnostics.Any(static d => d.Id == DiagnosticIds.PreferStaticLambda)) {
+        if (diagnostics.Any(static d => d.Id == Al0025PreferStaticLambdaAnalyzer.DiagnosticId)) {
             return;
         }
 

@@ -23,10 +23,13 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0095AvoidExpressionCompileAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0095.</summary>
+    public const string DiagnosticId = "AL0095";
+
     private const string LambdaExpressionTypeName = "System.Linq.Expressions.LambdaExpression";
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.AvoidExpressionCompile,
+        DiagnosticId,
         DiagnosticCategories.AotTesting,
         DiagnosticSeverities.Suggestion);
 

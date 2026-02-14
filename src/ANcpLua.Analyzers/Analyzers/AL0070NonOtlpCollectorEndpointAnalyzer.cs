@@ -35,8 +35,11 @@ public sealed partial class Al0070NonOtlpCollectorEndpointAnalyzer : AlAnalyzer 
         "Endpoint", "CollectorEndpoint", "OtlpEndpoint", "ExporterEndpoint"
     ];
 
+    /// <summary>The diagnostic identifier for AL0070.</summary>
+    public const string DiagnosticId = "AL0070";
+
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.NonOtlpCollectorEndpoint,
+        DiagnosticId,
         DiagnosticCategories.Configuration,
         DiagnosticSeverities.Suggestion);
 

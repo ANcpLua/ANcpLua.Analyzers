@@ -23,11 +23,14 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0096EnableEventSourceSupportAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0096.</summary>
+    public const string DiagnosticId = "AL0096";
+
     private const string PublishAotProperty = "build_property.PublishAot";
     private const string EventSourceSupportProperty = "build_property.EventSourceSupport";
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.EnableEventSourceSupport,
+        DiagnosticId,
         DiagnosticCategories.Configuration,
         DiagnosticSeverities.Suggestion);
 

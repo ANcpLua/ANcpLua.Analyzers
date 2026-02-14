@@ -1,4 +1,4 @@
-﻿using ANcpLua.Analyzers.Core;
+﻿using ANcpLua.Analyzers.Analyzers;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
@@ -12,7 +12,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0026DateTimeNowCodeFixProvider))]
 [Shared]
 public sealed partial class Al0026DateTimeNowCodeFixProvider : AlCodeFixProvider<MemberAccessExpressionSyntax> {
-    public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.AvoidDateTimeNow];
+    public override ImmutableArray<string> FixableDiagnosticIds => [Al0026AvoidDateTimeNowAnalyzer.DiagnosticId];
 
     protected override CodeAction CreateCodeAction(
         Document document,

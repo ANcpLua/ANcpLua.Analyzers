@@ -34,10 +34,13 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0071MeterClassMustBePartialStaticAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0071.</summary>
+    public const string DiagnosticId = "AL0071";
+
     private const string MeterAttributeFullName = "qyl.ServiceDefaults.Instrumentation.MeterAttribute";
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.MeterClassMustBePartialStatic,
+        DiagnosticId,
         DiagnosticCategories.Metrics,
         DiagnosticSeverities.RequiredFix);
 

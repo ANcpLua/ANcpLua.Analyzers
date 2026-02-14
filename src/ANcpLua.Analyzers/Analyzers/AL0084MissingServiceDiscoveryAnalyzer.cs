@@ -32,8 +32,11 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0084MissingServiceDiscoveryAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0084.</summary>
+    public const string DiagnosticId = "AL0084";
+
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.MissingServiceDiscovery,
+        DiagnosticId,
         DiagnosticCategories.AspNetCore,
         DiagnosticSeverities.Suggestion);
 

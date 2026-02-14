@@ -48,8 +48,11 @@ public sealed partial class Al0082ConsiderConnectionStringAnalyzer : AlAnalyzer 
         "OracleConnection"
     ];
 
+    /// <summary>The diagnostic identifier for AL0082.</summary>
+    public const string DiagnosticId = "AL0082";
+
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.ConsiderConnectionString,
+        DiagnosticId,
         DiagnosticCategories.Configuration,
         DiagnosticSeverities.HiddenByDefault);
 

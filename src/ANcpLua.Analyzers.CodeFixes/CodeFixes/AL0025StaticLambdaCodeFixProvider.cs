@@ -1,4 +1,4 @@
-﻿using ANcpLua.Analyzers.Core;
+﻿using ANcpLua.Analyzers.Analyzers;
 using Microsoft.CodeAnalysis.Editing;
 using Microsoft.CodeAnalysis.Text;
 
@@ -11,7 +11,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0025StaticLambdaCodeFixProvider))]
 [Shared]
 public sealed partial class Al0025StaticLambdaCodeFixProvider : CodeFixProvider {
-    public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.PreferStaticLambda];
+    public override ImmutableArray<string> FixableDiagnosticIds => [Al0025PreferStaticLambdaAnalyzer.DiagnosticId];
 
     public override FixAllProvider GetFixAllProvider() => Al0025FixAllProvider.Instance;
 

@@ -48,8 +48,11 @@ public sealed partial class Al0076MissingOTelConfigurationAnalyzer : AlAnalyzer 
         "UseOpenTelemetry"
     ];
 
+    /// <summary>The diagnostic identifier for AL0076.</summary>
+    public const string DiagnosticId = "AL0076";
+
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.MissingOTelConfiguration,
+        DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverities.Suggestion);
 

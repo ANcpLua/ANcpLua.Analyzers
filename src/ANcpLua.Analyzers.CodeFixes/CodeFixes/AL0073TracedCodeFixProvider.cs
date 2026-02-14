@@ -1,4 +1,4 @@
-using ANcpLua.Analyzers.Core;
+using ANcpLua.Analyzers.Analyzers;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
@@ -16,7 +16,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 [Shared]
 public sealed partial class Al0073TracedCodeFixProvider : CodeFixProvider {
     /// <summary>Gets the diagnostic IDs this provider can fix.</summary>
-    public override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.TracedActivitySourceNameEmpty];
+    public override ImmutableArray<string> FixableDiagnosticIds => [Al0073TracedActivitySourceNameAnalyzer.DiagnosticId];
 
     /// <summary>Gets the FixAll provider for batch fixing.</summary>
     public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;

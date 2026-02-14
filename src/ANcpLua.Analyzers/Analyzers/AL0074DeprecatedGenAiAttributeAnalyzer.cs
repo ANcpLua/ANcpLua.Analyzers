@@ -62,8 +62,11 @@ public sealed partial class Al0074DeprecatedGenAiAttributeAnalyzer : AlAnalyzer 
     };
 #pragma warning restore AL0074
 
+    /// <summary>The diagnostic identifier for AL0074.</summary>
+    public const string DiagnosticId = "AL0074";
+
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticIds.DeprecatedGenAiAttribute,
+        DiagnosticId,
         DiagnosticCategories.GenAI,
         DiagnosticSeverities.Suggestion);
 

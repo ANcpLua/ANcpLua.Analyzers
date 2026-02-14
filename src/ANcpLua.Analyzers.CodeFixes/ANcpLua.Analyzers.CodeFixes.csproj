@@ -35,6 +35,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="ANcpLua.Roslyn.Utilities" PrivateAssets="all"/>
         <!-- Source-only polyfills for netstandard2.0 (IsExternalInit, etc.) -->
         <PackageReference Include="ANcpLua.Roslyn.Utilities.Polyfills" PrivateAssets="all"/>
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" PrivateAssets="all"/>
