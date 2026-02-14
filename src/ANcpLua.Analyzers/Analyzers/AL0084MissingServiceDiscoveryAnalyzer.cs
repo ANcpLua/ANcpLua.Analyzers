@@ -95,7 +95,7 @@ public sealed partial class Al0084MissingServiceDiscoveryAnalyzer : AlAnalyzer {
         }
 
         // Check if this looks like a hardcoded URL
-        if (IsHardcodedUrl(url) && !IsServiceDiscoveryUrl(url.OriginalString)) {
+        if (IsHardcodedUrl(url) && !IsServiceDiscoveryUrl(url)) {
             context.ReportDiagnostic(Diagnostic.Create(Rule, assignment.Syntax.GetLocation(), url.OriginalString));
         }
     }
@@ -130,7 +130,7 @@ public sealed partial class Al0084MissingServiceDiscoveryAnalyzer : AlAnalyzer {
         }
 
         // Check if this looks like a hardcoded URL
-        if (IsHardcodedUrl(url) && !IsServiceDiscoveryUrl(url.OriginalString)) {
+        if (IsHardcodedUrl(url) && !IsServiceDiscoveryUrl(url)) {
             context.ReportDiagnostic(Diagnostic.Create(Rule, creation.Syntax.GetLocation(), url.OriginalString));
         }
     }
@@ -183,18 +183,17 @@ public sealed partial class Al0084MissingServiceDiscoveryAnalyzer : AlAnalyzer {
         return false;
     }
 
-    [SuppressMessage("Design", "CA1054:URI-like parameters should not be strings")]
-    private static bool IsServiceDiscoveryUrl(string urlString) {
+    private static bool IsServiceDiscoveryUrl(Uri uri) {
+        var scheme = uri.Scheme;
         // Service discovery URLs use the http+https:// or https+http:// scheme
-        if (urlString.StartsWithIgnoreCase("http+https://") ||
-            urlString.StartsWithIgnoreCase("https+http://")) {
+        if (scheme.EqualsIgnoreCase("http+https") ||
+            scheme.EqualsIgnoreCase("https+http")) {
             return true;
         }
 
         // URLs without dots in hostname might be service names
         // But if they have an explicit non-default port, they're likely hardcoded
-        if (TryParseUri(urlString) is { } uri &&
-            !uri.Host.ContainsOrdinal(".") &&
+        if (!uri.Host.ContainsOrdinal(".") &&
             !IsLocalhost(uri.Host) &&
             !HasExplicitPort(uri)) {
             return true;
@@ -217,11 +216,9 @@ public sealed partial class Al0084MissingServiceDiscoveryAnalyzer : AlAnalyzer {
         host.EqualsIgnoreCase("localhost") ||
         host.EqualsOrdinal("127.0.0.1");
 
-    [SuppressMessage("Design", "CA1054:URI-like parameters should not be strings")]
-    [SuppressMessage("Design", "CA1055:URI-like return values should not be strings")]
-    private static Uri? TryParseUri(string urlString) {
+    private static Uri? TryParseUri(string value) {
         try {
-            return new Uri(urlString);
+            return new Uri(value);
         } catch {
             return null;
         }
