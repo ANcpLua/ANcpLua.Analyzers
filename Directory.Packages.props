@@ -26,6 +26,7 @@
     <!-- Roslyn.Utilities -->
     <ItemGroup Label="Roslyn.Utilities">
         <PackageVersion Include="ANcpLua.Roslyn.Utilities" Version="$(ANcpLuaRoslynUtilitiesVersion)"/>
+        <PackageVersion Include="ANcpLua.Roslyn.Utilities.Polyfills" Version="$(ANcpLuaRoslynUtilitiesPolyfillsVersion)"/>
         <PackageVersion Include="ANcpLua.Roslyn.Utilities.Testing" Version="$(ANcpLuaRoslynUtilitiesTestingVersion)"/>
     </ItemGroup>
 
