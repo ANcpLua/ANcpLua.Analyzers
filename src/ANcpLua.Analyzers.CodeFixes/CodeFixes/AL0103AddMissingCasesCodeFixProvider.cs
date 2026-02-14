@@ -27,12 +27,12 @@ public sealed partial class Al0103AddMissingCasesCodeFixProvider : AlCodeFixProv
         return syntax switch {
             SwitchExpressionSyntax switchExpr => CodeAction.Create(
                 CodeFixResources.AL0103CodeFixTitle,
-                _ => FixSwitchExpression(document, root, switchExpr, raw),
+                _ => FixSwitchExpression(document, root, switchExpr, raw!),
                 nameof(CodeFixResources.AL0103CodeFixTitle)),
 
             SwitchStatementSyntax switchStmt => CodeAction.Create(
                 CodeFixResources.AL0103CodeFixTitle,
-                _ => FixSwitchStatement(document, root, switchStmt, raw),
+                _ => FixSwitchStatement(document, root, switchStmt, raw!),
                 nameof(CodeFixResources.AL0103CodeFixTitle)),
 
             _ => null
