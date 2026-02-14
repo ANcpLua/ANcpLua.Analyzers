@@ -80,38 +80,48 @@ public sealed partial class Al0049UseGuardPositiveAnalyzer : AlAnalyzer {
         return false;
     }
 
-    private static bool IsZeroLiteral(ExpressionSyntax expression) =>
-        expression switch {
-            LiteralExpressionSyntax lit when lit.IsKind(SyntaxKind.NumericLiteralExpression)
-                => lit.Token.Value is 0 or 0L or 0.0 or 0.0f or 0m or (short)0 or (byte)0,
-            PrefixUnaryExpressionSyntax { Operand: LiteralExpressionSyntax innerLit } prefix
-                when prefix.IsKind(SyntaxKind.UnaryMinusExpression)
-                     && innerLit.IsKind(SyntaxKind.NumericLiteralExpression)
-                => innerLit.Token.Value is 0 or 0L or 0.0 or 0.0f or 0m,
-            _ => false
-        };
+    private static bool IsZeroLiteral(ExpressionSyntax expression) {
+        if (expression is LiteralExpressionSyntax lit &&
+            lit.IsKind(SyntaxKind.NumericLiteralExpression)) {
+            return lit.Token.Value is 0 or 0L or 0.0 or 0.0f or 0m or (short)0 or (byte)0;
+        }
+
+        if (expression is PrefixUnaryExpressionSyntax { Operand: LiteralExpressionSyntax innerLit } prefix &&
+            prefix.IsKind(SyntaxKind.UnaryMinusExpression) &&
+            innerLit.IsKind(SyntaxKind.NumericLiteralExpression)) {
+            return innerLit.Token.Value is 0 or 0L or 0.0 or 0.0f or 0m;
+        }
+
+        return false;
+    }
 
     private static bool TryGetIdentifier(ExpressionSyntax expression, out string identifier) {
         identifier = "";
 
-        switch (expression) {
-            case IdentifierNameSyntax id:
-                identifier = id.Identifier.Text;
-                return true;
-            case MemberAccessExpressionSyntax { Name: IdentifierNameSyntax memberId }:
-                identifier = memberId.Identifier.Text;
-                return true;
-            default:
-                return false;
+        if (expression is IdentifierNameSyntax id) {
+            identifier = id.Identifier.Text;
+            return true;
         }
+
+        if (expression is MemberAccessExpressionSyntax { Name: IdentifierNameSyntax memberId }) {
+            identifier = memberId.Identifier.Text;
+            return true;
+        }
+
+        return false;
     }
 
-    private static ThrowStatementSyntax? TryGetThrowStatement(StatementSyntax statement) =>
-        statement switch {
-            ThrowStatementSyntax t => t,
-            BlockSyntax { Statements: [ThrowStatementSyntax t] } => t,
-            _ => null
-        };
+    private static ThrowStatementSyntax? TryGetThrowStatement(StatementSyntax statement) {
+        if (statement is ThrowStatementSyntax throwStatement) {
+            return throwStatement;
+        }
+
+        if (statement is BlockSyntax { Statements: [ThrowStatementSyntax blockThrowStatement] }) {
+            return blockThrowStatement;
+        }
+
+        return null;
+    }
 
     private static bool IsArgumentOutOfRangeExceptionThrow(
         ThrowStatementSyntax throwStmt,

@@ -263,19 +263,27 @@ public sealed partial class Al0054ToAl0056DiagnosticsAlignmentAnalyzer : Diagnos
     }
 
     private static bool IsDiagnosticDescriptorType(TypeSyntax type) {
-        return type switch {
-            IdentifierNameSyntax { Identifier.Text: "DiagnosticDescriptor" } => true,
-            QualifiedNameSyntax { Right.Identifier.Text: "DiagnosticDescriptor" } => true,
-            _ => false
-        };
+        if (type is IdentifierNameSyntax { Identifier.Text: "DiagnosticDescriptor" }) {
+            return true;
+        }
+
+        if (type is QualifiedNameSyntax { Right.Identifier.Text: "DiagnosticDescriptor" }) {
+            return true;
+        }
+
+        return false;
     }
 
     private static ArgumentListSyntax? GetArgumentList(ExpressionSyntax? expression) {
-        return expression switch {
-            ObjectCreationExpressionSyntax creation => creation.ArgumentList,
-            ImplicitObjectCreationExpressionSyntax implicitCreation => implicitCreation.ArgumentList,
-            _ => null
-        };
+        if (expression is ObjectCreationExpressionSyntax creation) {
+            return creation.ArgumentList;
+        }
+
+        if (expression is ImplicitObjectCreationExpressionSyntax implicitCreation) {
+            return implicitCreation.ArgumentList;
+        }
+
+        return null;
     }
 
     private static string? GetStringLiteral(ExpressionSyntax expression) {
@@ -303,11 +311,12 @@ public sealed partial class Al0054ToAl0056DiagnosticsAlignmentAnalyzer : Diagnos
     }
 
     private static string? ResolveSeverity(ExpressionSyntax expression) {
-        var name = expression switch {
-            MemberAccessExpressionSyntax member => member.Name.Identifier.Text,
-            IdentifierNameSyntax identifier => identifier.Identifier.Text,
-            _ => null
-        };
+        string? name = null;
+        if (expression is MemberAccessExpressionSyntax member) {
+            name = member.Name.Identifier.Text;
+        } else if (expression is IdentifierNameSyntax identifier) {
+            name = identifier.Identifier.Text;
+        }
 
         return name switch {
             "Error" => "Error",
