@@ -35,6 +35,8 @@ public sealed partial class Al0074DeprecatedGenAiAttributeAnalyzer : AlAnalyzer 
     /// <summary>
     ///     Mapping of deprecated GenAI attribute names to their replacements.
     /// </summary>
+
+#pragma warning disable AL0074 // These strings are the deprecated names we detect — not telemetry usage
     private static readonly Dictionary<string, string> DeprecatedAttributes = new(StringComparer.Ordinal) {
         // Old token counting attributes (pre-1.27.0 style)
         ["gen_ai.prompt.tokens"] = "gen_ai.usage.input_tokens",
@@ -58,6 +60,7 @@ public sealed partial class Al0074DeprecatedGenAiAttributeAnalyzer : AlAnalyzer 
         ["gen_ai.request.prompt"] = "gen_ai.prompt",
         ["gen_ai.response.completion"] = "gen_ai.completion"
     };
+#pragma warning restore AL0074
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticIds.DeprecatedGenAiAttribute,

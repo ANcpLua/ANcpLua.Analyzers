@@ -503,4 +503,10 @@ public static partial class DiagnosticIds {
     // Do NOT reuse: AL0097 (InvalidTarget), AL0098 (TypeMustBePartial),
     //               AL0099 (IndexerNotSupported), AL0100 (GenericMethodNotSupported)
     // ═══════════════════════════════════════════════════════════════════════════
+
+    /// <summary>AL0101: Avoid Activator.CreateInstance in AOT-published code.</summary>
+    public const string AvoidActivatorCreateInstance = "AL0101";
+
+    /// <summary>AL0102: Avoid Type.GetType with dynamic name in AOT-published code.</summary>
+    public const string AvoidTypeGetTypeWithDynamicName = "AL0102";
 }

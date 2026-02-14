@@ -140,26 +140,19 @@ public sealed partial class Al0088SensitiveDataInAttributeAnalyzer : AlAnalyzer 
     private static bool IsLikelyAttributeName(LiteralExpressionSyntax literal) {
         var parent = literal.Parent;
 
-        // Check if it's the first argument in a method invocation (likely the attribute name)
-        if (parent is ArgumentSyntax argument) {
+        switch (parent)
+        {
+            // Check if it's the first argument in a method invocation (likely the attribute name)
             // Check if argument is in a regular ArgumentList (method calls)
-            if (argument.Parent is ArgumentListSyntax argumentList &&
-                argumentList.Arguments.FirstOrDefault() == argument) {
-                return true;
-            }
-
+            case ArgumentSyntax { Parent: ArgumentListSyntax argumentList } argument when argumentList.Arguments.FirstOrDefault() == argument:
             // Check if argument is in a BracketedArgumentList (dictionary/indexer access)
-            if (argument.Parent is BracketedArgumentListSyntax) {
+            case ArgumentSyntax { Parent: BracketedArgumentListSyntax }:
+            // Check if it's used in an object initializer as a key
+            case AssignmentExpressionSyntax { Parent: InitializerExpressionSyntax }:
                 return true;
-            }
+            default:
+                return false;
         }
-
-        // Check if it's used in an object initializer as a key
-        if (parent is AssignmentExpressionSyntax { Parent: InitializerExpressionSyntax }) {
-            return true;
-        }
-
-        return false;
     }
 
     private static bool IsInTelemetryContext(SyntaxNode node) {

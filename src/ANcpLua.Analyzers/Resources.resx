@@ -994,4 +994,24 @@
     <data name="AL0096AnalyzerDescription" xml:space="preserve">
         <value>Native AOT trims EventSource/EventPipe infrastructure by default. If the application uses OpenTelemetry, dotnet-trace, dotnet-counters, or other EventPipe-based diagnostics, set EventSourceSupport to true in the project file to preserve this infrastructure.</value>
     </data>
+    <!-- AL0101: Avoid Activator.CreateInstance in AOT context -->
+    <data name="AL0101AnalyzerTitle" xml:space="preserve">
+        <value>Activator.CreateInstance is not AOT-safe</value>
+    </data>
+    <data name="AL0101AnalyzerMessageFormat" xml:space="preserve">
+        <value>Activator.CreateInstance&lt;{0}&gt;() uses reflection and is not compatible with NativeAOT. Use explicit construction or factory methods.</value>
+    </data>
+    <data name="AL0101AnalyzerDescription" xml:space="preserve">
+        <value>Activator.CreateInstance uses reflection to create instances at runtime. In Native AOT, this requires the target type's constructor to be preserved. Use explicit construction, factory patterns, or annotate with [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructors)].</value>
+    </data>
+    <!-- AL0102: Avoid Type.GetType with dynamic name in AOT context -->
+    <data name="AL0102AnalyzerTitle" xml:space="preserve">
+        <value>Type.GetType with dynamic name is not AOT-safe</value>
+    </data>
+    <data name="AL0102AnalyzerMessageFormat" xml:space="preserve">
+        <value>Type.GetType with {0} prevents the trimmer from statically analyzing which types to preserve. Use typeof() or a string literal.</value>
+    </data>
+    <data name="AL0102AnalyzerDescription" xml:space="preserve">
+        <value>Type.GetType(string) with a dynamic type name or case-insensitive search prevents the trimmer from statically analyzing which types to preserve. Use typeof() for compile-time type references. For string literals without case-insensitive search, the trimmer can analyze the call statically.</value>
+    </data>
 </root>

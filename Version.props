@@ -36,21 +36,21 @@
        ROSLYN.UTILITIES (Runtime package)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Roslyn.Utilities">
-    <ANcpLuaRoslynUtilitiesVersion>1.34.0</ANcpLuaRoslynUtilitiesVersion>
+    <ANcpLuaRoslynUtilitiesVersion>1.38.1</ANcpLuaRoslynUtilitiesVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
        ROSLYN.UTILITIES.SOURCES (Source-only package for generators)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Roslyn.Utilities.Sources">
-    <ANcpLuaRoslynUtilitiesSourcesVersion>1.34.0</ANcpLuaRoslynUtilitiesSourcesVersion>
+    <ANcpLuaRoslynUtilitiesSourcesVersion>1.38.1</ANcpLuaRoslynUtilitiesSourcesVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
        ROSLYN.UTILITIES.TESTING (Analyzer/CodeFix/Generator test infrastructure)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Roslyn.Utilities.Testing">
-    <ANcpLuaRoslynUtilitiesTestingVersion>1.34.0</ANcpLuaRoslynUtilitiesTestingVersion>
+    <ANcpLuaRoslynUtilitiesTestingVersion>1.38.1</ANcpLuaRoslynUtilitiesTestingVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
@@ -97,7 +97,7 @@
        Used by: SDK (auto-injected for TUnit, NUnit MTP, MSTest MTP)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="MTP Extensions">
-    <MTPExtensionsVersion>2.0.2</MTPExtensionsVersion>
+    <MTPExtensionsVersion>2.1.0</MTPExtensionsVersion>
     <CodeCoverageVersion>18.1.0</CodeCoverageVersion>
     <TestSdkVersion>18.0.1</TestSdkVersion>
     <DiagnosticsTestingVersion>10.0.0</DiagnosticsTestingVersion>
@@ -152,7 +152,7 @@
   <PropertyGroup Label="OpenAPI">
     <MicrosoftOpenApiVersion>2.0.0</MicrosoftOpenApiVersion>
     <MicrosoftOpenApiReadersVersion>2.0.0-preview.13</MicrosoftOpenApiReadersVersion>
-    <YamlDotNetVersion>16.3.0</YamlDotNetVersion>
+    <YamlDotNetVersion>16.3.1</YamlDotNetVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════

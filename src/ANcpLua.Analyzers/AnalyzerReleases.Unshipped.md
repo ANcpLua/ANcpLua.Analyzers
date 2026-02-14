@@ -101,3 +101,5 @@ AL0093 | OpenTelemetry | Warning | Al0093MissingResourceAttributesAnalyzer
 AL0094 | AOT Testing | Warning | Al0094AvoidDynamicKeywordAnalyzer
 AL0095 | AOT Testing | Warning | Al0095AvoidExpressionCompileAnalyzer
 AL0096 | Configuration | Warning | Al0096EnableEventSourceSupportAnalyzer
+AL0101 | AOT Testing | Warning | Al0101AvoidActivatorCreateInstanceAnalyzer
+AL0102 | AOT Testing | Warning | Al0102AvoidTypeGetTypeAnalyzer
