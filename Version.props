@@ -159,7 +159,7 @@
   <PropertyGroup Label="OpenAPI">
     <MicrosoftOpenApiVersion>2.0.0</MicrosoftOpenApiVersion>
     <MicrosoftOpenApiReadersVersion>2.0.0-preview.13</MicrosoftOpenApiReadersVersion>
-    <YamlDotNetVersion>16.3.1</YamlDotNetVersion>
+    <YamlDotNetVersion>16.3.0</YamlDotNetVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
