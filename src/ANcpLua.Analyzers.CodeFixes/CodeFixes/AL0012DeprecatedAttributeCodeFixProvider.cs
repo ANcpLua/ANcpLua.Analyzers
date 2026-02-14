@@ -1,6 +1,5 @@
 ﻿using ANcpLua.Analyzers.Analyzers;
 using ANcpLua.Analyzers.Core;
-using ANcpLua.Roslyn.Utilities.Contexts;
 
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 

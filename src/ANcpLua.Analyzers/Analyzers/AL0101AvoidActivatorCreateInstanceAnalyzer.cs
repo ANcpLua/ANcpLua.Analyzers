@@ -1,8 +1,5 @@
 using ANcpLua.Analyzers.Core;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.CodeAnalysis.Operations;
-using System.Collections.Immutable;
+using ANcpLua.Roslyn.Utilities.Matching;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -26,6 +23,7 @@ public sealed partial class Al0101AvoidActivatorCreateInstanceAnalyzer : AlAnaly
     public const string DiagnosticId = "AL0101";
 
     private const string ActivatorTypeName = "System.Activator";
+    private static readonly InvocationMatcher CreateInstanceInvocation = Invoke.Method("CreateInstance");
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticId,
@@ -51,34 +49,33 @@ public sealed partial class Al0101AvoidActivatorCreateInstanceAnalyzer : AlAnaly
     }
 
     private static void AnalyzeInvocation(OperationAnalysisContext context, INamedTypeSymbol activatorType) {
-        var invocation = (IInvocationOperation)context.Operation;
+        if (context.Operation is not IInvocationOperation invocation ||
+            !CreateInstanceInvocation.Matches(invocation)) {
+            return;
+        }
+
         var targetMethod = invocation.TargetMethod;
-
-        // Check if the method is CreateInstance on System.Activator
-        if (targetMethod.Name is not "CreateInstance") {
+        if (!targetMethod.ContainingType.IsEqualTo(activatorType)) {
             return;
         }
 
-        if (!SymbolEqualityComparer.Default.Equals(targetMethod.ContainingType, activatorType)) {
-            return;
-        }
+        context.ReportDiagnostic(Diagnostic.Create(
+            Rule,
+            invocation.Syntax.GetLocation(),
+            GetTargetTypeName(invocation)));
+    }
 
-        // Extract type argument for diagnostic message
-        string typeName;
+    private static string GetTargetTypeName(IInvocationOperation invocation) {
+        var targetMethod = invocation.TargetMethod;
         if (targetMethod.IsGenericMethod && targetMethod.TypeArguments.Length > 0) {
-            // Generic overload: Activator.CreateInstance<T>()
-            typeName = targetMethod.TypeArguments[0].ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
-        }
-        else if (invocation.Arguments.Length > 0
-                 && invocation.Arguments[0].Value is ITypeOfOperation typeOfOp) {
-            // Non-generic overload with typeof: Activator.CreateInstance(typeof(T))
-            typeName = typeOfOp.TypeOperand.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
-        }
-        else {
-            // Dynamic type argument - report with generic message
-            typeName = "T";
+            return targetMethod.TypeArguments[0].ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
         }
 
-        context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.Syntax.GetLocation(), typeName));
+        if (invocation.Arguments.Length > 0 &&
+            invocation.Arguments[0].Value is ITypeOfOperation typeOfOperation) {
+            return typeOfOperation.TypeOperand.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+        }
+
+        return "T";
     }
 }

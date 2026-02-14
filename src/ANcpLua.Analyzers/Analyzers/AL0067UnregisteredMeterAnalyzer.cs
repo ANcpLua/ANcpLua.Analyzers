@@ -1,8 +1,4 @@
 using ANcpLua.Analyzers.Core;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.CodeAnalysis.Operations;
-using System.Collections.Immutable;
 
 namespace ANcpLua.Analyzers.Analyzers;
 

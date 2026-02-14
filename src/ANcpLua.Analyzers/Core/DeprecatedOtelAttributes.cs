@@ -1,9 +1,6 @@
 ﻿// This file contains deprecated attribute names as dictionary keys - they're needed
 // for the analyzer to detect these deprecated attributes in user code.
 
-using System;
-using System.Collections.Generic;
-
 #pragma warning disable AL0012 // Deprecated semantic convention attribute (intentional - this IS the lookup table)
 
 namespace ANcpLua.Analyzers.Core;

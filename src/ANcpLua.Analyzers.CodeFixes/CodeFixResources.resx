@@ -182,4 +182,8 @@
     <data name="AL0074CodeFixTitle" xml:space="preserve">
         <value>Replace with '{0}'</value>
     </data>
+    <!-- AL0103 Code Fix Title (ClosedTypeHierarchySwitchAnalyzer) -->
+    <data name="AL0103CodeFixTitle" xml:space="preserve">
+        <value>Add missing cases</value>
+    </data>
 </root>

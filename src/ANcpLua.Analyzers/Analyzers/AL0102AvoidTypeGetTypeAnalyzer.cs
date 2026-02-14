@@ -1,8 +1,5 @@
 using ANcpLua.Analyzers.Core;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.CodeAnalysis.Operations;
-using System.Collections.Immutable;
+using ANcpLua.Roslyn.Utilities.Matching;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -25,6 +22,7 @@ public sealed partial class Al0102AvoidTypeGetTypeAnalyzer : AlAnalyzer {
     public const string DiagnosticId = "AL0102";
 
     private const string TypeTypeName = "System.Type";
+    private static readonly InvocationMatcher GetTypeInvocation = Invoke.Method("GetType");
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticId,
@@ -50,61 +48,50 @@ public sealed partial class Al0102AvoidTypeGetTypeAnalyzer : AlAnalyzer {
     }
 
     private static void AnalyzeInvocation(OperationAnalysisContext context, INamedTypeSymbol typeType) {
-        var invocation = (IInvocationOperation)context.Operation;
+        if (context.Operation is not IInvocationOperation invocation ||
+            !GetTypeInvocation.Matches(invocation)) {
+            return;
+        }
+
         var targetMethod = invocation.TargetMethod;
-
-        // Check if the method is GetType on System.Type
-        if (targetMethod.Name is not "GetType") {
+        if (!targetMethod.ContainingType.IsEqualTo(typeType)) {
             return;
         }
 
-        if (!SymbolEqualityComparer.Default.Equals(targetMethod.ContainingType, typeType)) {
+        // Only analyze overloads whose type-name argument is a string.
+        if (GetArgumentValue(invocation, "typeName") is not { } typeNameArgument ||
+            typeNameArgument.Type?.SpecialType is not SpecialType.System_String) {
             return;
         }
 
-        // Must have at least one parameter (the type name string)
-        if (targetMethod.Parameters.Length is 0) {
-            return;
-        }
-
-        // First parameter must be string
-        if (targetMethod.Parameters[0].Type.SpecialType != SpecialType.System_String) {
-            return;
-        }
-
-        // Check if first argument is a literal string
-        var firstArgument = invocation.Arguments[0].Value;
-        var isLiteral = firstArgument.ConstantValue.HasValue && firstArgument.ConstantValue.Value is string;
-
-        // Check the ignoreCase parameter (3rd parameter if present)
-        var hasIgnoreCase = false;
-        var ignoreCaseIsTrue = false;
-
-        if (targetMethod.Parameters.Length >= 3 && invocation.Arguments.Length >= 3) {
-            // Third parameter is ignoreCase (bool)
-            var ignoreCaseArg = invocation.Arguments[2].Value;
-            hasIgnoreCase = true;
-
-            // Check if it's a literal true or any non-false-literal
-            if (ignoreCaseArg.ConstantValue.HasValue) {
-                if (ignoreCaseArg.ConstantValue.Value is true) {
-                    ignoreCaseIsTrue = true;
-                }
-            }
-            else {
-                // Non-literal ignoreCase - could be true at runtime
-                ignoreCaseIsTrue = true;
-            }
-        }
+        var isLiteralTypeName = typeNameArgument.ConstantValue is { HasValue: true, Value: string };
+        var ignoreCaseArgument = GetArgumentValue(invocation, "ignoreCase");
 
         // Report if:
         // 1. Type name is not a literal, OR
         // 2. ignoreCase is true or non-literal
-        if (!isLiteral) {
+        if (!isLiteralTypeName) {
             context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.Syntax.GetLocation(), "a dynamic type name"));
         }
-        else if (hasIgnoreCase && ignoreCaseIsTrue) {
+        else if (ignoreCaseArgument is not null && IsPotentiallyTrue(ignoreCaseArgument)) {
             context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.Syntax.GetLocation(), "case-insensitive search"));
         }
+    }
+
+    private static IOperation? GetArgumentValue(IInvocationOperation invocation, string parameterName) {
+        foreach (var argument in invocation.Arguments)
+            if (argument.Parameter?.Name == parameterName)
+                return argument.Value;
+
+        return null;
+    }
+
+    private static bool IsPotentiallyTrue(IOperation operation) {
+        var constantValue = operation.ConstantValue;
+        if (!constantValue.HasValue) {
+            return true;
+        }
+
+        return constantValue.Value is true;
     }
 }

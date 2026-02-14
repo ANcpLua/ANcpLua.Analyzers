@@ -1,7 +1,3 @@
-using ANcpLua.Roslyn.Utilities;
-using System;
-using System.Collections.Generic;
-
 namespace ANcpLua.Analyzers.Core;
 
 /// <summary>

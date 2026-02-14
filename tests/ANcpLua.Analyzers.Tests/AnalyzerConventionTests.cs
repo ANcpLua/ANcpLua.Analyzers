@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using ANcpLua.Analyzers.Core;
-using AwesomeAssertions;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace ANcpLua.Analyzers.Tests;
@@ -10,7 +9,7 @@ namespace ANcpLua.Analyzers.Tests;
 ///     Catches naming violations, missing help links, and other convention issues at build time.
 /// </summary>
 public sealed partial class AnalyzerConventionTests {
-    private static IReadOnlyList<(Type Type, DiagnosticAnalyzer Instance)> GetAllAnalyzers() =>
+    private static IEnumerable<(Type Type, DiagnosticAnalyzer Instance)> GetAllAnalyzers() =>
         typeof(AlAnalyzer).Assembly.GetTypes()
             .Where(static t => typeof(DiagnosticAnalyzer).IsAssignableFrom(t) && !t.IsAbstract)
             .Select(static t => (t, (DiagnosticAnalyzer)Activator.CreateInstance(t)!))

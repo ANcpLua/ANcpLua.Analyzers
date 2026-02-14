@@ -1,15 +1,5 @@
 ﻿using ANcpLua.Analyzers.Core;
-using ANcpLua.Roslyn.Utilities;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.CodeAnalysis.Operations;
 using Microsoft.CodeAnalysis.Text;
-using System;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Threading;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
