@@ -157,6 +157,7 @@ public sealed partial class Al0103ClosedTypeHierarchySwitchAnalyzer : AlAnalyzer
     }
 
     static bool IsSupportedHierarchyRoot(INamedTypeSymbol type) =>
+        type.Locations.Any(static location => location.IsInSource) &&
         type is {
             TypeKind: TypeKind.Class,
             IsAbstract: true,

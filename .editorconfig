@@ -1012,6 +1012,9 @@ dotnet_diagnostic.s3903.severity = none
 
 ## Errors (all rules enforced during internal development) ##
 
+# AL0103 currently over-reports on Roslyn syntax tree hierarchies while dogfooding.
+dotnet_diagnostic.AL0103.severity = suggestion
+
 # AL0001: Prohibit reassignment of primary constructor params
 dotnet_diagnostic.AL0001.severity = error
 

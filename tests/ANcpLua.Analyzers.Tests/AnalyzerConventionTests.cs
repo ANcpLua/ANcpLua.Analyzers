@@ -8,11 +8,13 @@ namespace ANcpLua.Analyzers.Tests;
 ///     Catches naming violations, missing help links, and other convention issues at build time.
 /// </summary>
 public sealed partial class AnalyzerConventionTests {
+#pragma warning disable AL0101 // Convention tests instantiate analyzers via reflection by design.
     private static IEnumerable<(Type Type, DiagnosticAnalyzer Instance)> GetAllAnalyzers() =>
         typeof(AlAnalyzer).Assembly.GetTypes()
             .Where(static t => typeof(DiagnosticAnalyzer).IsAssignableFrom(t) && !t.IsAbstract)
             .Select(static t => (t, (DiagnosticAnalyzer)Activator.CreateInstance(t)!))
             .ToList();
+#pragma warning restore AL0101
 
     [Fact]
     public void AllAnalyzersFollowNamingConvention() {
