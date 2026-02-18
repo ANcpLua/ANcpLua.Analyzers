@@ -994,6 +994,36 @@
     <data name="AL0096AnalyzerDescription" xml:space="preserve">
         <value>Native AOT trims EventSource/EventPipe infrastructure by default. If the application uses OpenTelemetry, dotnet-trace, dotnet-counters, or other EventPipe-based diagnostics, set EventSourceSupport to true in the project file to preserve this infrastructure.</value>
     </data>
+    <!-- AL0104: Prefer await using for IAsyncDisposable -->
+    <data name="AL0104AnalyzerTitle" xml:space="preserve">
+        <value>Prefer 'await using' for IAsyncDisposable</value>
+    </data>
+    <data name="AL0104AnalyzerMessageFormat" xml:space="preserve">
+        <value>'{0}' implements IAsyncDisposable. Use 'await using' instead of 'using' to ensure DisposeAsync() is called.</value>
+    </data>
+    <data name="AL0104AnalyzerDescription" xml:space="preserve">
+        <value>Types implementing IAsyncDisposable should be disposed with 'await using' in async methods. Using 'using' calls the synchronous Dispose() method instead of DisposeAsync(), which may skip async cleanup such as flushing buffers, closing network connections, or finalizing telemetry export.</value>
+    </data>
+    <!-- AL0105: Avoid blocking calls in async methods -->
+    <data name="AL0105AnalyzerTitle" xml:space="preserve">
+        <value>Avoid blocking calls in async methods</value>
+    </data>
+    <data name="AL0105AnalyzerMessageFormat" xml:space="preserve">
+        <value>'{0}' blocks the calling thread inside an async method. Use 'await' instead to avoid potential deadlocks.</value>
+    </data>
+    <data name="AL0105AnalyzerDescription" xml:space="preserve">
+        <value>Calling .Result, .Wait(), or .GetAwaiter().GetResult() on a Task inside an async method blocks the thread pool thread and can cause deadlocks when a SynchronizationContext is present (ASP.NET, WPF). Use 'await' instead to asynchronously wait for the result.</value>
+    </data>
+    <!-- AL0106: Avoid Task.Run in ASP.NET Core request handlers -->
+    <data name="AL0106AnalyzerTitle" xml:space="preserve">
+        <value>Avoid Task.Run in ASP.NET Core request handlers</value>
+    </data>
+    <data name="AL0106AnalyzerMessageFormat" xml:space="preserve">
+        <value>Task.Run adds unnecessary overhead in ASP.NET Core handlers. Request handling already runs on thread pool threads.</value>
+    </data>
+    <data name="AL0106AnalyzerDescription" xml:space="preserve">
+        <value>ASP.NET Core request handling already runs on thread pool threads. Using Task.Run to offload work to another thread pool thread adds scheduling overhead and context switching without benefit. For CPU-bound work that genuinely needs to not block the request, consider using a background service or suppress this diagnostic with a justification.</value>
+    </data>
     <!-- AL0101: Avoid Activator.CreateInstance in AOT context -->
     <data name="AL0101AnalyzerTitle" xml:space="preserve">
         <value>Activator.CreateInstance is not AOT-safe</value>

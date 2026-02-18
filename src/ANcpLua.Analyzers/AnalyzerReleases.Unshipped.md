@@ -104,3 +104,6 @@ AL0096 | Configuration | Warning | Al0096EnableEventSourceSupportAnalyzer
 AL0101 | AOT Testing | Warning | Al0101AvoidActivatorCreateInstanceAnalyzer
 AL0102 | AOT Testing | Warning | Al0102AvoidTypeGetTypeAnalyzer
 AL0103 | Design | Warning | Al0103ClosedTypeHierarchySwitchAnalyzer
+AL0104 | Reliability | Warning | Al0104PreferAwaitUsingAnalyzer
+AL0105 | Threading | Warning | Al0105AvoidBlockingCallsInAsyncAnalyzer
+AL0106 | ASP.NET Core | Warning | Al0106AvoidTaskRunInAspNetCoreAnalyzer
