@@ -18,6 +18,7 @@
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
         <NeutralLanguage>en</NeutralLanguage>
         <PackageReadmeFile>README.md</PackageReadmeFile>
+        <Description>102 Roslyn diagnostics for modern C# — async pitfalls, OpenTelemetry conventions, AOT safety, ASP.NET Core patterns, and more. Includes 38 automatic code fixes.</Description>
 
         <!-- Analyzers don't have debug symbols - disable snupkg generation -->
         <IncludeSymbols>false</IncludeSymbols>
