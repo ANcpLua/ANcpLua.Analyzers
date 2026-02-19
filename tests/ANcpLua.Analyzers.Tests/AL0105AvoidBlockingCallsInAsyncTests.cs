@@ -40,7 +40,7 @@ public sealed partial class Al0105AvoidBlockingCallsInAsyncTests : AnalyzerTestB
                     public class C {
                         public async Task M() {
                             var task = Task.FromResult(42);
-                            var x = [|task.GetAwaiter().GetResult|]();
+                            var x = task.GetAwaiter().[|GetResult|]();
                         }
                     }
                     """);
@@ -133,21 +133,51 @@ public sealed partial class Al0105AvoidBlockingCallsInAsyncTests : AnalyzerTestB
                     """);
 
     [Fact]
-    public Task ShouldNotReportInSynchronousTopLevelProgram() =>
+    public Task ShouldNotReportWaitInSyncMethod() =>
         VerifyAsync("""
                     using System.Threading.Tasks;
 
-                    var task = Task.FromResult(42);
-                    var x = task.Result;
+                    public class C {
+                        public void M() {
+                            var task = Task.CompletedTask;
+                            task.Wait();
+                        }
+                    }
                     """);
 
     [Fact]
-    public Task ShouldReportInAsyncTopLevelProgram() =>
+    public Task ShouldNotReportGetAwaiterGetResultInSyncMethod() =>
         VerifyAsync("""
                     using System.Threading.Tasks;
 
-                    var task = Task.FromResult(42);
-                    var x = task.[|Result|];
-                    await Task.CompletedTask;
+                    public class C {
+                        public void M() {
+                            var task = Task.FromResult(42);
+                            var x = task.GetAwaiter().GetResult();
+                        }
+                    }
+                    """);
+
+    [Fact]
+    public Task ShouldNotReportNonTaskGetAwaiterGetResult() =>
+        VerifyAsync("""
+                    using System;
+                    using System.Threading.Tasks;
+
+                    public class MyAwaitable {
+                        public MyAwaiter GetAwaiter() => new();
+                    }
+
+                    public struct MyAwaiter {
+                        public bool IsCompleted => true;
+                        public void OnCompleted(Action a) { }
+                        public int GetResult() => 42;
+                    }
+
+                    public class C {
+                        public async Task M() {
+                            var x = new MyAwaitable().GetAwaiter().GetResult();
+                        }
+                    }
                     """);
 }

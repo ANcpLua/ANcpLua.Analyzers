@@ -68,14 +68,62 @@ public sealed partial class Al0032UseOrEmptyTests : AnalyzerTest<Al0032UseOrEmpt
                     """);
 
     [Fact]
-    public Task ShouldReportWithArrayType() =>
+    public Task ShouldNotReportArrayTypeEvenWhenReturnIsIEnumerable() =>
         VerifyAsync("""
                     using System;
                     using System.Collections.Generic;
 
                     public class C {
                         IEnumerable<string> M(string[]? array) {
-                            return [|array ?? Array.Empty<string>()|];
+                            return array ?? Array.Empty<string>();
+                        }
+                    }
+                    """);
+
+    [Fact]
+    public Task ShouldNotReportDictionaryCoalesce() =>
+        VerifyAsync("""
+                    using System.Collections.Generic;
+
+                    public class C {
+                        Dictionary<string, object?> M(Dictionary<string, object?>? dict) {
+                            return dict ?? [];
+                        }
+                    }
+                    """);
+
+    [Fact]
+    public Task ShouldNotReportListCoalesce() =>
+        VerifyAsync("""
+                    using System.Collections.Generic;
+
+                    public class C {
+                        List<int> M(List<int>? list) {
+                            return list ?? [];
+                        }
+                    }
+                    """);
+
+    [Fact]
+    public Task ShouldNotReportArrayCoalesce() =>
+        VerifyAsync("""
+                    using System;
+
+                    public class C {
+                        string[] M(string[]? arr) {
+                            return arr ?? [];
+                        }
+                    }
+                    """);
+
+    [Fact]
+    public Task ShouldNotReportIListCoalesce() =>
+        VerifyAsync("""
+                    using System.Collections.Generic;
+
+                    public class C {
+                        IList<string> M(IList<string>? items) {
+                            return items ?? [];
                         }
                     }
                     """);

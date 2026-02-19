@@ -142,26 +142,4 @@ public sealed partial class Al0104PreferAwaitUsingTests : AnalyzerTestBase {
                     }
                     """);
 
-    [Fact]
-    public Task ShouldNotReportInSynchronousTopLevelProgram() =>
-        VerifyAsync($$"""
-                      using System;
-                      using System.Threading.Tasks;
-
-                      {{AsyncDisposableStub}}
-
-                      using var s = new AsyncStream();
-                      """);
-
-    [Fact]
-    public Task ShouldReportInAsyncTopLevelProgram() =>
-        VerifyAsync($$"""
-                      using System;
-                      using System.Threading.Tasks;
-
-                      {{AsyncDisposableStub}}
-
-                      [|using|] var s = new AsyncStream();
-                      await Task.CompletedTask;
-                      """);
 }

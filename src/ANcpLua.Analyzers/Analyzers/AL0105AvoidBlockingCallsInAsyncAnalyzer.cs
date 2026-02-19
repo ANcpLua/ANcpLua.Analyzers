@@ -132,7 +132,7 @@ public sealed partial class Al0105AvoidBlockingCallsInAsyncAnalyzer : AlAnalyzer
                 var typeInfo = context.SemanticModel.GetTypeInfo(innerMember.Expression, context.CancellationToken);
                 if (typeInfo.Type is { } expressionType &&
                     IsTaskLike(expressionType, taskType, taskOfTType, valueTaskType, valueTaskOfTType)) {
-                    context.ReportDiagnostic(Rule, memberAccess.GetLocation(), ".GetAwaiter().GetResult()");
+                    context.ReportDiagnostic(Rule, memberAccess.Name.GetLocation(), ".GetAwaiter().GetResult()");
                 }
 
                 break;

@@ -39,14 +39,16 @@ public sealed partial class Al0032UseOrEmptyAnalyzer : AlAnalyzer {
             return;
         }
 
-        // Check if the left side is an IEnumerable<T> type (excluding strings)
-        var leftType = coalesce.Value.Type;
-        if (leftType is null || leftType.SpecialType == SpecialType.System_String) {
+        // Check the coalesce result type — this is the type the ?? expression evaluates to.
+        // OrEmpty() returns IEnumerable<T>, so only fire when the result type IS IEnumerable<T>.
+        // If the result is a concrete type (Dictionary, List, string[], IList, etc.),
+        // .OrEmpty() would lose that type information.
+        var resultType = coalesce.Type;
+        if (resultType is null || resultType.SpecialType == SpecialType.System_String) {
             return;
         }
 
-        // Must be IEnumerable<T> or implement it (check via display string to avoid compilation lookup issues)
-        if (!IsEnumerableType(leftType)) {
+        if (!IsEnumerableType(resultType)) {
             return;
         }
 
@@ -108,21 +110,11 @@ public sealed partial class Al0032UseOrEmptyAnalyzer : AlAnalyzer {
     }
 
     private static bool IsEnumerableType(ITypeSymbol type) {
-        // Direct match - check if it IS IEnumerable<T>
-        var displayName = type.OriginalDefinition.ToDisplayString();
-        if (displayName == "System.Collections.Generic.IEnumerable<T>") {
-            return true;
-        }
-
-        // Implements IEnumerable<T> - check interfaces via display string
-        foreach (var iface in type.AllInterfaces) {
-            var ifaceDisplayName = iface.OriginalDefinition.ToDisplayString();
-            if (ifaceDisplayName == "System.Collections.Generic.IEnumerable<T>") {
-                return true;
-            }
-        }
-
-        return false;
+        // Only match IEnumerable<T> itself — not concrete types that implement it.
+        // OrEmpty() returns IEnumerable<T>, so replacing `dict ?? []` with `dict.OrEmpty()`
+        // would lose the concrete type (Dictionary, List, string[], IList, etc.).
+        return type is INamedTypeSymbol { IsGenericType: true } named
+               && named.OriginalDefinition.ToDisplayString() == "System.Collections.Generic.IEnumerable<T>";
     }
 
     private static string GetOperandDisplayName(IOperation operation) =>
