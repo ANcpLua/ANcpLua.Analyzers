@@ -16,7 +16,7 @@ dotnet add package ANcpLua.Analyzers
 
 ## What you get
 
-- **99 diagnostics** spanning design, reliability, performance, OpenTelemetry, ASP.NET Core, AOT, and version management.
+- **102 diagnostics** spanning design, reliability, performance, OpenTelemetry, ASP.NET Core, AOT, and version management.
 - **38 automatic code fixes** for high-confidence transformations.
 - **CI-friendly enforcement** through `.editorconfig` severity configuration.
 
@@ -27,16 +27,16 @@ dotnet add package ANcpLua.Analyzers
 | Roslyn Utilities | 20 |
 | OpenTelemetry | 19 |
 | AOT Testing | 10 |
-| ASP.NET Core | 8 |
+| ASP.NET Core | 9 |
 | Usage | 8 |
 | VersionManagement | 6 |
 | Configuration | 5 |
 | Design | 5 |
 | Metrics | 5 |
-| Threading | 5 |
+| Threading | 6 |
 | GenAI | 4 |
 | Style | 3 |
-| Reliability | 1 |
+| Reliability | 2 |
 
 ## Full rule catalog
 
@@ -141,6 +141,9 @@ dotnet add package ANcpLua.Analyzers
 | [AL0101](https://ancplua.mintlify.app/analyzers/rules/AL0101) | AOT Testing | Warning | `Al0101AvoidActivatorCreateInstanceAnalyzer` |
 | [AL0102](https://ancplua.mintlify.app/analyzers/rules/AL0102) | AOT Testing | Warning | `Al0102AvoidTypeGetTypeAnalyzer` |
 | [AL0103](https://ancplua.mintlify.app/analyzers/rules/AL0103) | Design | Warning | `Al0103ClosedTypeHierarchySwitchAnalyzer` |
+| [AL0104](https://ancplua.mintlify.app/analyzers/rules/AL0104) | Reliability | Warning | `Al0104PreferAwaitUsingAnalyzer` |
+| [AL0105](https://ancplua.mintlify.app/analyzers/rules/AL0105) | Threading | Warning | `Al0105AvoidBlockingCallsInAsyncAnalyzer` |
+| [AL0106](https://ancplua.mintlify.app/analyzers/rules/AL0106) | ASP.NET Core | Warning | `Al0106AvoidTaskRunInAspNetCoreAnalyzer` |
 
 **Legend:** `Error` = build error, `Warning` = build warning, `Info` = IDE suggestion, `Disabled` = off by default.
 
