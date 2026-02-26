@@ -65,10 +65,9 @@
         <None Include="build/ANcpLua.Analyzers.props" Pack="true" PackagePath="build/"/>
     </ItemGroup>
 
-    <ItemGroup>
-      <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />
-      <AdditionalFiles Include="AnalyzerReleases.Unshipped.md" />
-    </ItemGroup>
+    <!-- AnalyzerReleases files are auto-added as AdditionalFiles by Microsoft.CodeAnalysis.Analyzers
+         when they exist in the project directory (line 335-340 of its .targets file).
+         Do NOT add them here — it causes duplicates in Rider's "Show All Files" view. -->
 
     <!-- CRITICAL: Pack ALL analyzer assemblies including dependencies (netstandard2.0 only) -->
     <PropertyGroup>
