@@ -43,7 +43,7 @@
        ROSLYN.UTILITIES.SOURCES (Source-only package for generators)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Roslyn.Utilities.Sources">
-    <ANcpLuaRoslynUtilitiesSourcesVersion>1.39.0</ANcpLuaRoslynUtilitiesSourcesVersion>
+    <ANcpLuaRoslynUtilitiesSourcesVersion>1.40.0</ANcpLuaRoslynUtilitiesSourcesVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
@@ -82,11 +82,11 @@
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Meziantou">
     <MeziantouFrameworkVersion>5.0.12</MeziantouFrameworkVersion>
-    <MeziantouFullPathVersion>1.1.15</MeziantouFullPathVersion>
-    <MeziantouTemporaryDirectoryVersion>1.0.33</MeziantouTemporaryDirectoryVersion>
+    <MeziantouFullPathVersion>1.1.16</MeziantouFullPathVersion>
+    <MeziantouTemporaryDirectoryVersion>1.0.35</MeziantouTemporaryDirectoryVersion>
     <MeziantouThreadingVersion>2.0.4</MeziantouThreadingVersion>
     <MeziantouDependencyScanningVersion>2.0.7</MeziantouDependencyScanningVersion>
-    <MeziantouAnalyzerVersion>2.0.301</MeziantouAnalyzerVersion>
+    <MeziantouAnalyzerVersion>3.0.17</MeziantouAnalyzerVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
@@ -95,7 +95,7 @@
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Testing">
     <XunitV3Version>3.2.2</XunitV3Version>
-    <AwesomeAssertionsVersion>9.3.0</AwesomeAssertionsVersion>
+    <AwesomeAssertionsVersion>9.4.0</AwesomeAssertionsVersion>
     <AwesomeAssertionsAnalyzersVersion>9.0.8</AwesomeAssertionsAnalyzersVersion>
   </PropertyGroup>
 
@@ -106,7 +106,7 @@
   <PropertyGroup Label="MTP Extensions">
     <MTPExtensionsVersion>2.1.0</MTPExtensionsVersion>
     <CodeCoverageVersion>18.4.1</CodeCoverageVersion>
-    <TestSdkVersion>18.0.1</TestSdkVersion>
+    <TestSdkVersion>18.3.0</TestSdkVersion>
     <DiagnosticsTestingVersion>10.3.0</DiagnosticsTestingVersion>
     <GitHubActionsLoggerMTPVersion>3.0.1</GitHubActionsLoggerMTPVersion>
     <GitHubActionsLoggerVSTestVersion>2.4.1</GitHubActionsLoggerVSTestVersion>
@@ -116,7 +116,7 @@
        ANALYZERS (SDK-injected)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Analyzers">
-    <ANcpLuaAnalyzersVersion>1.19.1</ANcpLuaAnalyzersVersion>
+    <ANcpLuaAnalyzersVersion>1.19.4</ANcpLuaAnalyzersVersion>
     <SbomTargetsVersion>4.1.5</SbomTargetsVersion>
     <BannedApiAnalyzersVersion>4.14.0</BannedApiAnalyzersVersion>
     <JonSkeetAnalyzersVersion>1.0.0-beta.6</JonSkeetAnalyzersVersion>
@@ -154,10 +154,10 @@
   <!-- ═══════════════════════════════════════════════════════════════════════
        OPENAPI / YAML
        Used by: SDK (OpenAPI tooling)
-       Note: OpenApi.Readers 2.0.0 stable doesn't exist, using preview
+       Note: OpenApi.Readers stable 2.0+ doesn't exist, still on preview
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="OpenAPI">
-    <MicrosoftOpenApiVersion>2.0.0</MicrosoftOpenApiVersion>
+    <MicrosoftOpenApiVersion>3.3.1</MicrosoftOpenApiVersion>
     <MicrosoftOpenApiReadersVersion>2.0.0-preview.13</MicrosoftOpenApiReadersVersion>
     <YamlDotNetVersion>16.3.0</YamlDotNetVersion>
   </PropertyGroup>
