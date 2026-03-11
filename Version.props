@@ -28,8 +28,8 @@
        Used by: SDK, Roslyn.Utilities, Analyzers
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Roslyn">
-    <RoslynVersion>5.0.0</RoslynVersion>
-    <RoslynAnalyzersVersion>3.11.0</RoslynAnalyzersVersion>
+    <RoslynVersion>5.3.0</RoslynVersion>
+    <RoslynAnalyzersVersion>5.3.0</RoslynAnalyzersVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
@@ -81,12 +81,12 @@
        Used by: SDK, Roslyn.Utilities
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Meziantou">
-    <MeziantouFrameworkVersion>5.0.12</MeziantouFrameworkVersion>
+    <MeziantouFrameworkVersion>5.0.13</MeziantouFrameworkVersion>
     <MeziantouFullPathVersion>1.1.16</MeziantouFullPathVersion>
     <MeziantouTemporaryDirectoryVersion>1.0.35</MeziantouTemporaryDirectoryVersion>
     <MeziantouThreadingVersion>2.0.4</MeziantouThreadingVersion>
     <MeziantouDependencyScanningVersion>2.0.7</MeziantouDependencyScanningVersion>
-    <MeziantouAnalyzerVersion>3.0.17</MeziantouAnalyzerVersion>
+    <MeziantouAnalyzerVersion>3.0.22</MeziantouAnalyzerVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
@@ -107,7 +107,7 @@
     <MTPExtensionsVersion>2.1.0</MTPExtensionsVersion>
     <CodeCoverageVersion>18.4.1</CodeCoverageVersion>
     <TestSdkVersion>18.3.0</TestSdkVersion>
-    <DiagnosticsTestingVersion>10.3.0</DiagnosticsTestingVersion>
+    <DiagnosticsTestingVersion>10.4.0</DiagnosticsTestingVersion>
     <GitHubActionsLoggerMTPVersion>3.0.1</GitHubActionsLoggerMTPVersion>
     <GitHubActionsLoggerVSTestVersion>2.4.1</GitHubActionsLoggerVSTestVersion>
   </PropertyGroup>
@@ -127,9 +127,9 @@
        Used by: Web projects
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Microsoft.Extensions">
-    <MicrosoftExtensionsVersion>10.3.0</MicrosoftExtensionsVersion>
-    <AspNetCoreVersion>10.0.3</AspNetCoreVersion>
-    <MicrosoftBclAsyncInterfacesVersion>10.0.3</MicrosoftBclAsyncInterfacesVersion>
+    <MicrosoftExtensionsVersion>10.4.0</MicrosoftExtensionsVersion>
+    <AspNetCoreVersion>10.0.4</AspNetCoreVersion>
+    <MicrosoftBclAsyncInterfacesVersion>10.0.4</MicrosoftBclAsyncInterfacesVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
