@@ -19,7 +19,7 @@
     <ANcpSdkPackageVersion>999.9.9</ANcpSdkPackageVersion>
   </PropertyGroup>
   <PropertyGroup Label=".NET SDK">
-    <DotNetSdkVersion>10.0.103</DotNetSdkVersion>
+    <DotNetSdkVersion>10.0.200</DotNetSdkVersion>
     <DotNetSdkRollForward>latestMinor</DotNetSdkRollForward>
   </PropertyGroup>
 
@@ -147,7 +147,7 @@
   <PropertyGroup Label="Build Tools">
     <NuGetVersion>7.3.0</NuGetVersion>
     <MSBuildStructuredLoggerVersion>2.3.113</MSBuildStructuredLoggerVersion>
-    <MicrosoftSourceLinkVersion>10.0.103</MicrosoftSourceLinkVersion>
+    <MicrosoftSourceLinkVersion>10.0.200</MicrosoftSourceLinkVersion>
     <MicrosoftDeploymentDotNetReleasesVersion>1.0.1</MicrosoftDeploymentDotNetReleasesVersion>
   </PropertyGroup>
 
