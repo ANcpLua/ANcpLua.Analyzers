@@ -26,7 +26,7 @@ public sealed partial class Al0079ManualSpanRecommendedAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0079.</summary>
     public const string DiagnosticId = "AL0079";
 
-    private const string TracedAttributeFullName = "qyl.ServiceDefaults.Instrumentation.TracedAttribute";
+    private const string TracedAttributeFullName = "Qyl.Instrumentation.Instrumentation.TracedAttribute";
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticId,

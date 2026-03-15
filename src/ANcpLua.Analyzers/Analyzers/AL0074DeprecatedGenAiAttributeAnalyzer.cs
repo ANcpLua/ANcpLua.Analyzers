@@ -135,11 +135,11 @@ public sealed partial class Al0074DeprecatedGenAiAttributeAnalyzer : AlAnalyzer 
     }
 
     private static bool IsLikelyTelemetryContainer(string? identifier) {
-        if (string.IsNullOrEmpty(identifier)) {
+        if (identifier is null or { Length: 0 }) {
             return false;
         }
 
-        var upper = identifier!.ToUpperInvariant();
+        var upper = identifier.ToUpperInvariant();
         return upper.ContainsOrdinal("TAG") ||
                upper.ContainsOrdinal("ATTR") ||
                upper.ContainsOrdinal("PROPERTY") ||
@@ -149,13 +149,13 @@ public sealed partial class Al0074DeprecatedGenAiAttributeAnalyzer : AlAnalyzer 
     }
 
     private static bool IsLikelyTelemetryMethod(string? methodName) {
-        if (string.IsNullOrEmpty(methodName)) {
+        if (methodName is null or { Length: 0 }) {
             return false;
         }
 
         // More precise matching to reduce false positives
         // Match exact method names or those with Tag/Attribute suffixes
-        var name = methodName!;
+        var name = methodName;
         return name switch {
             // Exact matches for common telemetry methods
             "SetTag" or "AddTag" or "SetAttribute" or "AddAttribute" => true,

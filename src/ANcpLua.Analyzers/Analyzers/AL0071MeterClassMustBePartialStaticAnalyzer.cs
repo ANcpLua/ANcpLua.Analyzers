@@ -30,7 +30,7 @@ public sealed partial class Al0071MeterClassMustBePartialStaticAnalyzer : AlAnal
     /// <summary>The diagnostic identifier for AL0071.</summary>
     public const string DiagnosticId = "AL0071";
 
-    private const string MeterAttributeFullName = "qyl.ServiceDefaults.Instrumentation.MeterAttribute";
+    private const string MeterAttributeFullName = "Qyl.Instrumentation.Instrumentation.MeterAttribute";
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticId,

@@ -16,8 +16,8 @@ dotnet add package ANcpLua.Analyzers
 
 ## What you get
 
-- **102 diagnostics** spanning design, reliability, performance, OpenTelemetry, ASP.NET Core, AOT, and version management.
-- **38 automatic code fixes** for high-confidence transformations.
+- **106 diagnostics** spanning design, reliability, performance, OpenTelemetry, ASP.NET Core, AOT, and version management.
+- **42 automatic code fixes** for high-confidence transformations.
 - **CI-friendly enforcement** through `.editorconfig` severity configuration.
 
 ## Rule coverage by category
@@ -25,7 +25,7 @@ dotnet add package ANcpLua.Analyzers
 | Category | Rules |
 |:---------|------:|
 | Roslyn Utilities | 20 |
-| OpenTelemetry | 19 |
+| OpenTelemetry | 23 |
 | AOT Testing | 10 |
 | ASP.NET Core | 9 |
 | Usage | 8 |
@@ -144,6 +144,10 @@ dotnet add package ANcpLua.Analyzers
 | [AL0104](https://ancplua.mintlify.app/analyzers/rules/AL0104) | Reliability | Warning | `Al0104PreferAwaitUsingAnalyzer` |
 | [AL0105](https://ancplua.mintlify.app/analyzers/rules/AL0105) | Threading | Warning | `Al0105AvoidBlockingCallsInAsyncAnalyzer` |
 | [AL0106](https://ancplua.mintlify.app/analyzers/rules/AL0106) | ASP.NET Core | Warning | `Al0106AvoidTaskRunInAspNetCoreAnalyzer` |
+| [AL0107](https://ancplua.mintlify.app/analyzers/rules/AL0107) | OpenTelemetry | Warning | `Al0107OrphanedTracedTagAnalyzer` |
+| [AL0108](https://ancplua.mintlify.app/analyzers/rules/AL0108) | OpenTelemetry | Info | `Al0108RedundantNoTraceAnalyzer` |
+| [AL0109](https://ancplua.mintlify.app/analyzers/rules/AL0109) | OpenTelemetry | Warning | `Al0109NonInterceptableTracedAnalyzer` |
+| [AL0110](https://ancplua.mintlify.app/analyzers/rules/AL0110) | OpenTelemetry | Error | `Al0110TracedTagOnOutRefParameterAnalyzer` |
 
 **Legend:** `Error` = build error, `Warning` = build warning, `Info` = IDE suggestion, `Disabled` = off by default.
 
@@ -151,7 +155,7 @@ dotnet add package ANcpLua.Analyzers
 
 Automatic fixes are currently available for:
 
-AL0002, AL0004, AL0005, AL0008, AL0010, AL0011, AL0012, AL0014, AL0015, AL0016, AL0025, AL0026, AL0027, AL0028, AL0029, AL0030, AL0031, AL0032, AL0033, AL0034, AL0035, AL0036, AL0037, AL0038, AL0039, AL0040, AL0045, AL0046, AL0047, AL0048, AL0049, AL0050, AL0051, AL0071, AL0072, AL0073, AL0074, AL0103
+AL0002, AL0004, AL0005, AL0008, AL0010, AL0011, AL0012, AL0014, AL0015, AL0016, AL0025, AL0026, AL0027, AL0028, AL0029, AL0030, AL0031, AL0032, AL0033, AL0034, AL0035, AL0036, AL0037, AL0038, AL0039, AL0040, AL0045, AL0046, AL0047, AL0048, AL0049, AL0050, AL0051, AL0071, AL0072, AL0073, AL0074, AL0103, AL0107, AL0108, AL0109, AL0110
 
 ## Configuration
 

@@ -16,7 +16,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0065UseTokenUsageHistogramAnalyzer : AlAnalyzer {
     private const string CorrectMetricName = "gen_ai.client.token.usage";
-    private const string HistogramAttributeFullName = "qyl.ServiceDefaults.Instrumentation.HistogramAttribute";
+    private const string HistogramAttributeFullName = "Qyl.Instrumentation.Instrumentation.HistogramAttribute";
 
     private static readonly string[] TokenRelatedPatterns = [
         "token", "input_token", "output_token", "prompt_token", "completion_token"

@@ -17,8 +17,8 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0068InvalidMetricNameAnalyzer : AlAnalyzer {
-    private const string CounterAttributeFullName = "qyl.ServiceDefaults.Instrumentation.CounterAttribute";
-    private const string HistogramAttributeFullName = "qyl.ServiceDefaults.Instrumentation.HistogramAttribute";
+    private const string CounterAttributeFullName = "Qyl.Instrumentation.Instrumentation.CounterAttribute";
+    private const string HistogramAttributeFullName = "Qyl.Instrumentation.Instrumentation.HistogramAttribute";
 
     // Pattern: lowercase letters, numbers, dots, and underscores only
     // Should have at least one dot (namespace separator)

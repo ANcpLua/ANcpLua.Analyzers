@@ -107,3 +107,7 @@ AL0103 | Design | Warning | Al0103ClosedTypeHierarchySwitchAnalyzer
 AL0104 | Reliability | Warning | Al0104PreferAwaitUsingAnalyzer
 AL0105 | Threading | Warning | Al0105AvoidBlockingCallsInAsyncAnalyzer
 AL0106 | ASP.NET Core | Warning | Al0106AvoidTaskRunInAspNetCoreAnalyzer
+AL0107 | OpenTelemetry | Warning | Al0107OrphanedTracedTagAnalyzer
+AL0108 | OpenTelemetry | Info | Al0108RedundantNoTraceAnalyzer
+AL0109 | OpenTelemetry | Warning | Al0109NonInterceptableTracedAnalyzer
+AL0110 | OpenTelemetry | Error | Al0110TracedTagOnOutRefParameterAnalyzer

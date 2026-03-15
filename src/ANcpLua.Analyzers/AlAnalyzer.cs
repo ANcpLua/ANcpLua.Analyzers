@@ -1,6 +1,4 @@
-﻿using ANcpLua.Roslyn.Utilities.Analyzers;
-
-namespace ANcpLua.Analyzers;
+﻿namespace ANcpLua.Analyzers;
 
 /// <summary>
 ///     Base class for all ANcpLua analyzers.
@@ -41,4 +39,3 @@ public abstract partial class AlAnalyzer : DiagnosticAnalyzerBase {
             HelpLinkBase);
     }
 }
-

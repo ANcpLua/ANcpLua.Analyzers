@@ -1,0 +1,102 @@
+
+namespace ANcpLua.Analyzers.Analyzers;
+
+/// <summary>
+///     AL0108: Detects [NoTrace] on a method whose declaring type has no class-level [Traced].
+/// </summary>
+/// <remarks>
+///     <para>
+///         The [NoTrace] attribute is used to opt a method out of class-level [Traced]
+///         auto-instrumentation. When the declaring type (including base types) does not
+///         have [Traced], the [NoTrace] attribute has no effect:
+///         <list type="bullet">
+///             <item>There is no class-level tracing to opt out of</item>
+///             <item>The attribute becomes misleading dead metadata</item>
+///             <item>It may confuse developers about the instrumentation scope</item>
+///         </list>
+///     </para>
+///     <para>
+///         Example of problematic code:
+///         <code>
+///         public class OrderService {
+///             // No [Traced] on class
+///             [NoTrace]  // Redundant!
+///             public void HelperMethod() { }
+///         }
+///         </code>
+///     </para>
+/// </remarks>
+[DiagnosticAnalyzer(LanguageNames.CSharp)]
+public sealed partial class Al0108RedundantNoTraceAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0108.</summary>
+    public const string DiagnosticId = "AL0108";
+
+    private const string TracedAttributeFullName = "Qyl.Instrumentation.Instrumentation.TracedAttribute";
+    private const string NoTraceAttributeFullName = "Qyl.Instrumentation.Instrumentation.NoTraceAttribute";
+
+    private static readonly DiagnosticDescriptor Rule = CreateRule(
+        DiagnosticId,
+        DiagnosticCategories.OpenTelemetry,
+        DiagnosticSeverities.HiddenByDefault);
+
+    /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+
+    /// <summary>Registers symbol actions to analyze methods for redundant [NoTrace].</summary>
+    protected override void RegisterActions(AnalysisContext context) {
+        context.RegisterCompilationStartAction(compilationContext => {
+            var tracedType = compilationContext.Compilation.GetTypeByMetadataName(TracedAttributeFullName);
+            var noTraceType = compilationContext.Compilation.GetTypeByMetadataName(NoTraceAttributeFullName);
+
+            if (tracedType is null || noTraceType is null) {
+                return;
+            }
+
+            compilationContext.RegisterSymbolAction(
+                ctx => AnalyzeMethod(ctx, tracedType, noTraceType),
+                SymbolKind.Method);
+        });
+    }
+
+    private static void AnalyzeMethod(
+        SymbolAnalysisContext context,
+        INamedTypeSymbol tracedType,
+        INamedTypeSymbol noTraceType) {
+        var method = (IMethodSymbol)context.Symbol;
+
+        // Only report if method has [NoTrace]
+        if (!HasAttribute(method, noTraceType)) {
+            return;
+        }
+
+        // Report only when the declaring type does NOT have class-level [Traced]
+        if (!HasTracedOnType(method.ContainingType, tracedType)) {
+            context.ReportDiagnostic(Diagnostic.Create(
+                Rule,
+                method.Locations.FirstOrDefault() ?? Location.None,
+                method.Name));
+        }
+    }
+
+    private static bool HasAttribute(ISymbol symbol, INamedTypeSymbol attributeType) {
+        foreach (var attribute in symbol.GetAttributes()) {
+            if (SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, attributeType)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool HasTracedOnType(INamedTypeSymbol? type, INamedTypeSymbol tracedType) {
+        while (type is not null) {
+            if (HasAttribute(type, tracedType)) {
+                return true;
+            }
+
+            type = type.BaseType;
+        }
+
+        return false;
+    }
+}

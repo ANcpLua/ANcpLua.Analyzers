@@ -1044,4 +1044,44 @@
     <data name="AL0102AnalyzerDescription" xml:space="preserve">
         <value>Type.GetType(string) with a dynamic type name or case-insensitive search prevents the trimmer from statically analyzing which types to preserve. Use typeof() for compile-time type references. For string literals without case-insensitive search, the trimmer can analyze the call statically.</value>
     </data>
+    <!-- AL0107: Orphaned [TracedTag] -->
+    <data name="AL0107AnalyzerTitle" xml:space="preserve">
+        <value>Orphaned [TracedTag]</value>
+    </data>
+    <data name="AL0107AnalyzerMessageFormat" xml:space="preserve">
+        <value>[TracedTag] on '{0}' has no effect because neither the method nor its declaring type has [Traced]</value>
+    </data>
+    <data name="AL0107AnalyzerDescription" xml:space="preserve">
+        <value>The [TracedTag] attribute is only meaningful when used on parameters of methods that participate in tracing via [Traced]. When neither the method nor its declaring type has [Traced], the tag will be silently ignored and becomes dead metadata.</value>
+    </data>
+    <!-- AL0108: Redundant [NoTrace] -->
+    <data name="AL0108AnalyzerTitle" xml:space="preserve">
+        <value>Redundant [NoTrace]</value>
+    </data>
+    <data name="AL0108AnalyzerMessageFormat" xml:space="preserve">
+        <value>[NoTrace] on '{0}' has no effect because the declaring type has no class-level [Traced]</value>
+    </data>
+    <data name="AL0108AnalyzerDescription" xml:space="preserve">
+        <value>The [NoTrace] attribute is used to opt a method out of class-level [Traced] auto-instrumentation. When the declaring type does not have [Traced], the [NoTrace] attribute has no effect and should be removed to avoid confusion.</value>
+    </data>
+    <!-- AL0109: Non-interceptable [Traced] -->
+    <data name="AL0109AnalyzerTitle" xml:space="preserve">
+        <value>Non-interceptable [Traced]</value>
+    </data>
+    <data name="AL0109AnalyzerMessageFormat" xml:space="preserve">
+        <value>[Traced] on '{0}' will be ignored because abstract, extern, and partial methods cannot be intercepted</value>
+    </data>
+    <data name="AL0109AnalyzerDescription" xml:space="preserve">
+        <value>The [Traced] attribute triggers compile-time interception to create spans. Abstract, extern, and partial definition methods cannot be intercepted by the source generator, so [Traced] will be silently ignored.</value>
+    </data>
+    <!-- AL0110: [TracedTag] on out/ref parameter -->
+    <data name="AL0110AnalyzerTitle" xml:space="preserve">
+        <value>[TracedTag] on out/ref parameter</value>
+    </data>
+    <data name="AL0110AnalyzerMessageFormat" xml:space="preserve">
+        <value>[TracedTag] on '{0}' is not supported for out or ref parameters</value>
+    </data>
+    <data name="AL0110AnalyzerDescription" xml:space="preserve">
+        <value>The [TracedTag] attribute records parameter values as span attributes at the start of method execution. Parameters with out or ref modifiers are not supported because out parameters have no value at method entry and ref parameters may be mutated during execution.</value>
+    </data>
 </root>

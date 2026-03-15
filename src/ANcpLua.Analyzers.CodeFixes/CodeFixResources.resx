@@ -186,4 +186,17 @@
     <data name="AL0103CodeFixTitle" xml:space="preserve">
         <value>Add missing cases</value>
     </data>
+    <!-- AL0107-AL0110 Code Fix Titles -->
+    <data name="AL0107CodeFixTitle" xml:space="preserve">
+        <value>Remove [TracedTag] attribute</value>
+    </data>
+    <data name="AL0108CodeFixTitle" xml:space="preserve">
+        <value>Remove [NoTrace] attribute</value>
+    </data>
+    <data name="AL0109CodeFixTitle" xml:space="preserve">
+        <value>Remove [Traced] attribute</value>
+    </data>
+    <data name="AL0110CodeFixTitle" xml:space="preserve">
+        <value>Remove [TracedTag] attribute</value>
+    </data>
 </root>

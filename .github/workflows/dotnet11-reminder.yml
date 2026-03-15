@@ -1,0 +1,26 @@
+name: .NET 11 GA Reminder
+
+on:
+  schedule:
+    - cron: "17 9 1 12 *"
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: "Remove .NET 11 SDK ignore rule from dependabot.yml",
+              body: [
+                ".NET 11 should be GA now.",
+                "",
+                "- [ ] Remove the `ignore` block for `dotnet-sdk >=11.0.0-0` from `.github/dependabot.yml`",
+                "- [ ] Delete this workflow (`.github/workflows/dotnet11-reminder.yml`)",
+              ].join("\n"),
+            });

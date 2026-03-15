@@ -29,8 +29,8 @@ public sealed partial class Al0072MetricMethodMustBePartialAnalyzer : AlAnalyzer
     /// <summary>The diagnostic identifier for AL0072.</summary>
     public const string DiagnosticId = "AL0072";
 
-    private const string CounterAttributeFullName = "qyl.ServiceDefaults.Instrumentation.CounterAttribute";
-    private const string HistogramAttributeFullName = "qyl.ServiceDefaults.Instrumentation.HistogramAttribute";
+    private const string CounterAttributeFullName = "Qyl.Instrumentation.Instrumentation.CounterAttribute";
+    private const string HistogramAttributeFullName = "Qyl.Instrumentation.Instrumentation.HistogramAttribute";
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticId,

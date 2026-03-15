@@ -26,9 +26,9 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0075HighCardinalityMetricTagAnalyzer : AlAnalyzer {
-    private const string TagAttributeFullName = "qyl.ServiceDefaults.Instrumentation.TagAttribute";
-    private const string CounterAttributeFullName = "qyl.ServiceDefaults.Instrumentation.CounterAttribute";
-    private const string HistogramAttributeFullName = "qyl.ServiceDefaults.Instrumentation.HistogramAttribute";
+    private const string TagAttributeFullName = "Qyl.Instrumentation.Instrumentation.TagAttribute";
+    private const string CounterAttributeFullName = "Qyl.Instrumentation.Instrumentation.CounterAttribute";
+    private const string HistogramAttributeFullName = "Qyl.Instrumentation.Instrumentation.HistogramAttribute";
 
     /// <summary>
     ///     Known high-cardinality tag patterns that should be avoided on metrics.

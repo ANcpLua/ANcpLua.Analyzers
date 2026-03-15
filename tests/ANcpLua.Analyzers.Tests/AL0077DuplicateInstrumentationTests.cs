@@ -8,7 +8,7 @@ namespace ANcpLua.Analyzers.Tests;
 /// </summary>
 public sealed partial class Al0077DuplicateInstrumentationTests : AnalyzerTest<Al0077DuplicateInstrumentationAnalyzer> {
     private const string Stubs = """
-                                 namespace qyl.ServiceDefaults.Instrumentation {
+                                 namespace Qyl.Instrumentation.Instrumentation {
                                      [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Method)]
                                      public class TracedAttribute : System.Attribute {
                                          public TracedAttribute() { }
@@ -46,7 +46,7 @@ public sealed partial class Al0077DuplicateInstrumentationTests : AnalyzerTest<A
                       public class OrderService {
                           private static readonly System.Diagnostics.ActivitySource Source = new("MyApp");
 
-                          {|AL0077:[qyl.ServiceDefaults.Instrumentation.Traced("MyApp")]
+                          {|AL0077:[Qyl.Instrumentation.Instrumentation.Traced("MyApp")]
                           public void ProcessOrder() {
                               using var activity = Source.StartActivity("ProcessOrder");
                           }|}
@@ -58,7 +58,7 @@ public sealed partial class Al0077DuplicateInstrumentationTests : AnalyzerTest<A
         VerifyAsync($$"""
                       {{Stubs}}
 
-                      [qyl.ServiceDefaults.Instrumentation.Traced("MyApp")]
+                      [Qyl.Instrumentation.Instrumentation.Traced("MyApp")]
                       public class OrderService {
                           private static readonly System.Diagnostics.ActivitySource Source = new("MyApp");
 
@@ -74,7 +74,7 @@ public sealed partial class Al0077DuplicateInstrumentationTests : AnalyzerTest<A
                       {{Stubs}}
 
                       public class OrderService {
-                          [qyl.ServiceDefaults.Instrumentation.Traced("MyApp")]
+                          [Qyl.Instrumentation.Instrumentation.Traced("MyApp")]
                           public void ProcessOrder() {
                               // No manual Activity.StartActivity call
                           }
@@ -115,7 +115,7 @@ public sealed partial class Al0077DuplicateInstrumentationTests : AnalyzerTest<A
                       public class OrderService {
                           private static readonly System.Diagnostics.ActivitySource Source = new("MyApp");
 
-                          {|AL0077:[qyl.ServiceDefaults.Instrumentation.Traced("MyApp")]
+                          {|AL0077:[Qyl.Instrumentation.Instrumentation.Traced("MyApp")]
                           public void ProcessOrder() {
                               using var activity = Source.StartActivity("ProcessOrder", System.Diagnostics.ActivityKind.Server);
                           }|}
@@ -130,7 +130,7 @@ public sealed partial class Al0077DuplicateInstrumentationTests : AnalyzerTest<A
                       public class OrderService {
                           private static readonly System.Diagnostics.ActivitySource Source = new("MyApp");
 
-                          [qyl.ServiceDefaults.Instrumentation.Traced("MyApp")]
+                          [Qyl.Instrumentation.Instrumentation.Traced("MyApp")]
                           public void ProcessOrder() {
                               // No StartActivity here
                           }

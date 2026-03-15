@@ -6,6 +6,12 @@
 # dotenv files
 .env
 
+# MCP config (contains tokens)
+.mcp.json
+
+# Eight Gates session artifacts
+.eight-gates/
+
 # User-specific files
 *.rsuser
 *.suo

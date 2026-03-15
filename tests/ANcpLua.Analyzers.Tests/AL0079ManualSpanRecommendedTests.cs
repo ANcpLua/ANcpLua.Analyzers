@@ -8,7 +8,7 @@ namespace ANcpLua.Analyzers.Tests;
 /// </summary>
 public sealed partial class Al0079ManualSpanRecommendedTests : AnalyzerTest<Al0079ManualSpanRecommendedAnalyzer> {
     private const string TracedAttributeDefinition = """
-        namespace qyl.ServiceDefaults.Instrumentation {
+        namespace Qyl.Instrumentation.Instrumentation {
             [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Method)]
             public class TracedAttribute : System.Attribute {
                 public TracedAttribute(string activitySourceName = "") { }
@@ -21,7 +21,7 @@ public sealed partial class Al0079ManualSpanRecommendedTests : AnalyzerTest<Al00
     public Task ShouldReportTaskWhenAll() => VerifyAsync(
         $$"""
         using System.Threading.Tasks;
-        using qyl.ServiceDefaults.Instrumentation;
+        using Qyl.Instrumentation.Instrumentation;
 
         {{TracedAttributeDefinition}}
 
@@ -39,7 +39,7 @@ public sealed partial class Al0079ManualSpanRecommendedTests : AnalyzerTest<Al00
     public Task ShouldReportTaskWhenAny() => VerifyAsync(
         $$"""
         using System.Threading.Tasks;
-        using qyl.ServiceDefaults.Instrumentation;
+        using Qyl.Instrumentation.Instrumentation;
 
         {{TracedAttributeDefinition}}
 
@@ -58,7 +58,7 @@ public sealed partial class Al0079ManualSpanRecommendedTests : AnalyzerTest<Al00
         $$"""
         using System.Collections.Generic;
         using System.Threading.Tasks;
-        using qyl.ServiceDefaults.Instrumentation;
+        using Qyl.Instrumentation.Instrumentation;
 
         {{TracedAttributeDefinition}}
 
@@ -76,7 +76,7 @@ public sealed partial class Al0079ManualSpanRecommendedTests : AnalyzerTest<Al00
     public Task ShouldReportConfigureAwaitFalse() => VerifyAsync(
         $$"""
         using System.Threading.Tasks;
-        using qyl.ServiceDefaults.Instrumentation;
+        using Qyl.Instrumentation.Instrumentation;
 
         {{TracedAttributeDefinition}}
 
@@ -92,7 +92,7 @@ public sealed partial class Al0079ManualSpanRecommendedTests : AnalyzerTest<Al00
     public Task ShouldReportMultipleAwaits() => VerifyAsync(
         $$"""
         using System.Threading.Tasks;
-        using qyl.ServiceDefaults.Instrumentation;
+        using Qyl.Instrumentation.Instrumentation;
 
         {{TracedAttributeDefinition}}
 
@@ -110,7 +110,7 @@ public sealed partial class Al0079ManualSpanRecommendedTests : AnalyzerTest<Al00
     public Task ShouldNotReportSimpleAsyncMethod() => VerifyAsync(
         $$"""
         using System.Threading.Tasks;
-        using qyl.ServiceDefaults.Instrumentation;
+        using Qyl.Instrumentation.Instrumentation;
 
         {{TracedAttributeDefinition}}
 
@@ -126,7 +126,7 @@ public sealed partial class Al0079ManualSpanRecommendedTests : AnalyzerTest<Al00
     public Task ShouldNotReportTwoAwaits() => VerifyAsync(
         $$"""
         using System.Threading.Tasks;
-        using qyl.ServiceDefaults.Instrumentation;
+        using Qyl.Instrumentation.Instrumentation;
 
         {{TracedAttributeDefinition}}
 
@@ -143,7 +143,7 @@ public sealed partial class Al0079ManualSpanRecommendedTests : AnalyzerTest<Al00
     public Task ShouldNotReportWithoutTracedAttribute() => VerifyAsync(
         $$"""
         using System.Threading.Tasks;
-        using qyl.ServiceDefaults.Instrumentation;
+        using Qyl.Instrumentation.Instrumentation;
 
         {{TracedAttributeDefinition}}
 
@@ -160,7 +160,7 @@ public sealed partial class Al0079ManualSpanRecommendedTests : AnalyzerTest<Al00
     public Task ShouldNotReportSyncMethod() => VerifyAsync(
         $$"""
         using System.Threading.Tasks;
-        using qyl.ServiceDefaults.Instrumentation;
+        using Qyl.Instrumentation.Instrumentation;
 
         {{TracedAttributeDefinition}}
 
@@ -176,7 +176,7 @@ public sealed partial class Al0079ManualSpanRecommendedTests : AnalyzerTest<Al00
     public Task ShouldNotReportConfigureAwaitTrue() => VerifyAsync(
         $$"""
         using System.Threading.Tasks;
-        using qyl.ServiceDefaults.Instrumentation;
+        using Qyl.Instrumentation.Instrumentation;
 
         {{TracedAttributeDefinition}}
 
@@ -193,7 +193,7 @@ public sealed partial class Al0079ManualSpanRecommendedTests : AnalyzerTest<Al00
         $$"""
         using System;
         using System.Threading.Tasks;
-        using qyl.ServiceDefaults.Instrumentation;
+        using Qyl.Instrumentation.Instrumentation;
 
         {{TracedAttributeDefinition}}
 
@@ -217,7 +217,7 @@ public sealed partial class Al0079ManualSpanRecommendedTests : AnalyzerTest<Al00
     public Task ShouldReportMethodWithTracedAttribute() => VerifyAsync(
         $$"""
         using System.Threading.Tasks;
-        using qyl.ServiceDefaults.Instrumentation;
+        using Qyl.Instrumentation.Instrumentation;
 
         {{TracedAttributeDefinition}}
 
