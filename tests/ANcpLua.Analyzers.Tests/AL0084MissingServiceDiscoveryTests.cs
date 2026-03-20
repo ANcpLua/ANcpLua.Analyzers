@@ -46,7 +46,7 @@ public sealed partial class Al0084MissingServiceDiscoveryTests {
                       """);
 
     [Theory]
-    [InlineData("http://api.example.com")]
+    [InlineData("http://api.mycompany.com")]
     [InlineData("https://service.internal.company.com")]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1054:URI-like parameters should not be strings")]
     public Task ShouldReport_HardcodedDomainUrls(string urlString) =>
