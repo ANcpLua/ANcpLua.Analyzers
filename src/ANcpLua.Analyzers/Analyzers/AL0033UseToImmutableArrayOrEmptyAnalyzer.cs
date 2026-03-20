@@ -31,6 +31,11 @@ public sealed partial class Al0033UseToImmutableArrayOrEmptyAnalyzer : AlAnalyze
             return;
         }
 
+        // Only fire when ToImmutableArrayOrEmpty() is actually available in the compilation.
+        if (!HasToImmutableArrayOrEmptyExtension(context.Compilation)) {
+            return;
+        }
+
         // Check if the right side is ImmutableArray<T>.Empty
         if (!IsImmutableArrayEmpty(coalesce.WhenNull)) {
             return;
@@ -98,6 +103,43 @@ public sealed partial class Al0033UseToImmutableArrayOrEmptyAnalyzer : AlAnalyze
         } conditionalAccess) {
             sourceName = GetOperandDisplayName(conditionalAccess.Operation);
             return true;
+        }
+
+        return false;
+    }
+
+    private static bool HasToImmutableArrayOrEmptyExtension(Compilation compilation) {
+        foreach (var reference in compilation.References) {
+            if (compilation.GetAssemblyOrModuleSymbol(reference) is IAssemblySymbol assembly
+                && HasMethodInAssembly(assembly)) {
+                return true;
+            }
+        }
+
+        return HasMethodInAssembly(compilation.Assembly);
+    }
+
+    private static bool HasMethodInAssembly(IAssemblySymbol assembly) {
+        var stack = new Stack<INamespaceSymbol>();
+        stack.Push(assembly.GlobalNamespace);
+
+        while (stack.Count > 0) {
+            var ns = stack.Pop();
+            foreach (var type in ns.GetTypeMembers()) {
+                if (!type.IsStatic || !type.MightContainExtensionMethods) {
+                    continue;
+                }
+
+                foreach (var member in type.GetMembers("ToImmutableArrayOrEmpty")) {
+                    if (member is IMethodSymbol { IsExtensionMethod: true, Parameters.Length: 1 }) {
+                        return true;
+                    }
+                }
+            }
+
+            foreach (var child in ns.GetNamespaceMembers()) {
+                stack.Push(child);
+            }
         }
 
         return false;

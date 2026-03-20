@@ -2,6 +2,13 @@
 
 All notable changes to ANcpLua.Analyzers will be documented in this file.
 
+## [1.19.5] - 2026-03-20
+
+### Fixed
+
+- AL0032: Only fire when `OrEmpty()` extension method is available in the compilation
+- AL0033: Only fire when `ToImmutableArrayOrEmpty()` extension method is available in the compilation
+
 ## [Unreleased]
 
 ### Added

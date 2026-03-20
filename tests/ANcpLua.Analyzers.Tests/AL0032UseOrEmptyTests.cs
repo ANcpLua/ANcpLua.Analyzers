@@ -7,6 +7,19 @@ namespace ANcpLua.Analyzers.Tests;
 ///     Tests for AL0032: Use OrEmpty() instead of null-coalescing with empty collections.
 /// </summary>
 public sealed partial class Al0032UseOrEmptyTests : AnalyzerTest<Al0032UseOrEmptyAnalyzer> {
+    // Stub appended to ShouldReport tests so the analyzer detects OrEmpty() in the compilation
+    private const string OrEmptyStub = """
+
+                                       public static class EnumerableExtensions {
+                                           public static System.Collections.Generic.IEnumerable<T> OrEmpty<T>(
+                                               this System.Collections.Generic.IEnumerable<T>? source)
+                                           {
+                                               if (source is null) return System.Array.Empty<T>();
+                                               return source;
+                                           }
+                                       }
+                                       """;
+
     [Fact]
     public Task ShouldReportArrayEmpty() =>
         VerifyAsync("""
@@ -18,7 +31,7 @@ public sealed partial class Al0032UseOrEmptyTests : AnalyzerTest<Al0032UseOrEmpt
                             return [|items ?? Array.Empty<string>()|];
                         }
                     }
-                    """);
+                    """ + OrEmptyStub);
 
     [Fact]
     public Task ShouldReportEnumerableEmpty() =>
@@ -31,7 +44,7 @@ public sealed partial class Al0032UseOrEmptyTests : AnalyzerTest<Al0032UseOrEmpt
                             return [|numbers ?? Enumerable.Empty<int>()|];
                         }
                     }
-                    """);
+                    """ + OrEmptyStub);
 
     [Fact]
     public Task ShouldReportCollectionExpression() =>
@@ -43,7 +56,7 @@ public sealed partial class Al0032UseOrEmptyTests : AnalyzerTest<Al0032UseOrEmpt
                             return [|objects ?? []|];
                         }
                     }
-                    """);
+                    """ + OrEmptyStub);
 
     [Fact]
     public Task ShouldNotReportStringCoalesce() =>

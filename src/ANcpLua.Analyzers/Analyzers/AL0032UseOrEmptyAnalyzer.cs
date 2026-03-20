@@ -34,6 +34,12 @@ public sealed partial class Al0032UseOrEmptyAnalyzer : AlAnalyzer {
             return;
         }
 
+        // Only fire when OrEmpty() is actually available in the compilation.
+        // Without the utilities package, the suggested fix wouldn't compile.
+        if (!HasOrEmptyExtension(context.Compilation)) {
+            return;
+        }
+
         // Check if the right side is an empty collection pattern
         if (!IsEmptyCollectionExpression(coalesce.WhenNull)) {
             return;
@@ -115,6 +121,46 @@ public sealed partial class Al0032UseOrEmptyAnalyzer : AlAnalyzer {
         // would lose the concrete type (Dictionary, List, string[], IList, etc.).
         return type is INamedTypeSymbol { IsGenericType: true } named
                && named.OriginalDefinition.ToDisplayString() == "System.Collections.Generic.IEnumerable<T>";
+    }
+
+    private static bool HasOrEmptyExtension(Compilation compilation) {
+        foreach (var reference in compilation.References) {
+            if (compilation.GetAssemblyOrModuleSymbol(reference) is IAssemblySymbol assembly
+                && HasOrEmptyInAssembly(assembly)) {
+                return true;
+            }
+        }
+
+        // Also check the compilation's own assembly (extension defined in the same project)
+        return HasOrEmptyInAssembly(compilation.Assembly);
+    }
+
+    private static bool HasOrEmptyInAssembly(IAssemblySymbol assembly) {
+        var stack = new Stack<INamespaceSymbol>();
+        stack.Push(assembly.GlobalNamespace);
+
+        while (stack.Count > 0) {
+            var ns = stack.Pop();
+            foreach (var type in ns.GetTypeMembers()) {
+                if (!type.IsStatic || !type.MightContainExtensionMethods) {
+                    continue;
+                }
+
+                foreach (var member in type.GetMembers("OrEmpty")) {
+                    if (member is IMethodSymbol { IsExtensionMethod: true, Parameters.Length: 1 } method
+                        && method.Parameters[0].Type.OriginalDefinition.ToDisplayString()
+                            == "System.Collections.Generic.IEnumerable<T>") {
+                        return true;
+                    }
+                }
+            }
+
+            foreach (var child in ns.GetNamespaceMembers()) {
+                stack.Push(child);
+            }
+        }
+
+        return false;
     }
 
     private static string GetOperandDisplayName(IOperation operation) =>
