@@ -46,6 +46,11 @@ public sealed partial class Al0081MissingHealthChecksAnalyzer : AlAnalyzer {
             return;
         }
 
+        // Skip test methods — test code creates WebApplication for endpoint registration verification, not production hosting
+        if (IsInsideTestMethod(invocation)) {
+            return;
+        }
+
         // Find the containing method (likely Main or configuration method)
         if (invocation.Ancestors().OfType<MethodDeclarationSyntax>().FirstOrDefault() is not { } containingMethod) {
             // Also check for top-level statements (no method, but compilation unit)
@@ -96,4 +101,29 @@ public sealed partial class Al0081MissingHealthChecksAnalyzer : AlAnalyzer {
             },
             _ => null
         };
+
+    private static bool IsInsideTestMethod(SyntaxNode node) {
+        foreach (var ancestor in node.Ancestors()) {
+            if (ancestor is not MethodDeclarationSyntax method) {
+                continue;
+            }
+
+            foreach (var attrList in method.AttributeLists) {
+                foreach (var attr in attrList.Attributes) {
+                    var name = attr.Name switch {
+                        IdentifierNameSyntax id => id.Identifier.Text,
+                        QualifiedNameSyntax qualified => qualified.Right.Identifier.Text,
+                        _ => null
+                    };
+
+                    if (name is "Test" or "TestMethod" or "Fact" or "Theory"
+                        or "TestAttribute" or "TestMethodAttribute" or "FactAttribute" or "TheoryAttribute") {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
 }

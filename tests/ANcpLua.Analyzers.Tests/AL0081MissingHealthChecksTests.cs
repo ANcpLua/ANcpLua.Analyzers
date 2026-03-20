@@ -113,4 +113,24 @@ public sealed partial class Al0081MissingHealthChecksTests {
                 }
             }
             """);
+
+    [Theory]
+    [InlineData("Test")]
+    [InlineData("Fact")]
+    [InlineData("Theory")]
+    [InlineData("TestMethod")]
+    public Task ShouldNotReportInsideTestMethod(string attribute) =>
+        VerifyAsync(
+            $$"""
+            namespace TestFramework {
+                public class {{attribute}}Attribute : System.Attribute { }
+            }
+            public class MyTests {
+                [TestFramework.{{attribute}}]
+                public void EndpointTest() {
+                    var builder = WebApplication.CreateBuilder();
+                    var app = builder.Build();
+                }
+            }
+            """);
 }

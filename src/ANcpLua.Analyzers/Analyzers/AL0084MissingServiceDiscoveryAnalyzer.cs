@@ -36,6 +36,13 @@ public sealed partial class Al0084MissingServiceDiscoveryAnalyzer : AlAnalyzer {
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
     /// <summary>Registers operation actions to analyze URL assignments.</summary>
+    private static readonly ImmutableArray<string> TestAttributeNames =
+    [
+        "TestFixtureAttribute", // NUnit
+        "TestClassAttribute",   // MSTest
+    ];
+
+    /// <summary>Registers compilation start actions to analyze service discovery configuration.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterCompilationStartAction(compilationContext => {
             var httpClientType = compilationContext.Compilation.GetTypeByMetadataName("System.Net.Http.HttpClient");
@@ -49,12 +56,16 @@ public sealed partial class Al0084MissingServiceDiscoveryAnalyzer : AlAnalyzer {
             // Check if service discovery is configured (AddServiceDiscovery called)
             var hasServiceDiscovery = HasServiceDiscoveryConfigured(compilationContext.Compilation);
 
-            compilationContext.RegisterOperationAction(ctx =>
-                AnalyzeAssignment(ctx, httpClientType, hasServiceDiscovery),
+            compilationContext.RegisterOperationAction(ctx => {
+                    if (!IsInTestClass(ctx.ContainingSymbol))
+                        AnalyzeAssignment(ctx, httpClientType, hasServiceDiscovery);
+                },
                 OperationKind.SimpleAssignment);
 
-            compilationContext.RegisterOperationAction(ctx =>
-                AnalyzeObjectCreation(ctx, uriType, hasServiceDiscovery),
+            compilationContext.RegisterOperationAction(ctx => {
+                    if (!IsInTestClass(ctx.ContainingSymbol))
+                        AnalyzeObjectCreation(ctx, uriType, hasServiceDiscovery);
+                },
                 OperationKind.ObjectCreation);
         });
 
@@ -221,6 +232,21 @@ public sealed partial class Al0084MissingServiceDiscoveryAnalyzer : AlAnalyzer {
         } catch {
             return null;
         }
+    }
+
+    private static bool IsInTestClass(ISymbol? containingSymbol) {
+        var type = containingSymbol as INamedTypeSymbol ?? containingSymbol?.ContainingType;
+        while (type is not null) {
+            foreach (var name in TestAttributeNames) {
+                if (type.HasAttributeByShortName(name)) {
+                    return true;
+                }
+            }
+
+            type = type.ContainingType;
+        }
+
+        return false;
     }
 
     private static bool IsHttpClientRelated(IOperation operation, out bool isDirectBaseAddressAssignment) {
