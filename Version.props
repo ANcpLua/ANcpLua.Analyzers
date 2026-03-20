@@ -116,7 +116,10 @@
        ANALYZERS (SDK-injected)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Analyzers">
-    <ANcpLuaAnalyzersVersion>1.20.2</ANcpLuaAnalyzersVersion>
+    <!-- IMPORTANT: Must be the last PUBLISHED version on nuget.org.
+         The publish workflow sets the new version via -p:Version at build/pack time.
+         Bumping this ahead of publishing causes NU1102 (SDK injects this as a PackageReference). -->
+    <ANcpLuaAnalyzersVersion>1.20.1</ANcpLuaAnalyzersVersion>
     <SbomTargetsVersion>4.1.5</SbomTargetsVersion>
     <BannedApiAnalyzersVersion>4.14.0</BannedApiAnalyzersVersion>
     <JonSkeetAnalyzersVersion>1.0.0-beta.6</JonSkeetAnalyzersVersion>
