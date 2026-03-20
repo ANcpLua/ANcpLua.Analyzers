@@ -2,7 +2,7 @@
 
 All notable changes to ANcpLua.Analyzers will be documented in this file.
 
-## [1.19.5] - 2026-03-20
+## [1.20.1] - 2026-03-20
 
 ### Fixed
 
