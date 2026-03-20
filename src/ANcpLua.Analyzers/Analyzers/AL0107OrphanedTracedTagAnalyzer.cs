@@ -63,43 +63,25 @@ public sealed partial class Al0107OrphanedTracedTagAnalyzer : AlAnalyzer {
         INamedTypeSymbol tracedTagType) {
         var method = (IMethodSymbol)context.Symbol;
 
-        var methodHasTraced = HasAttribute(method, tracedType);
-        var classHasTraced = HasTracedOnType(method.ContainingType, tracedType);
-
-        // If either the method or class has [Traced], tags are not orphaned
-        if (methodHasTraced || classHasTraced) {
+        if (method.HasAttribute(tracedType) || HasTracedOnType(method.ContainingType, tracedType)) {
             return;
         }
 
         foreach (var param in method.Parameters) {
-            if (!HasAttribute(param, tracedTagType)) {
-                continue;
-            }
-
-            context.ReportDiagnostic(Diagnostic.Create(
-                Rule,
-                param.Locations.FirstOrDefault() ?? Location.None,
-                param.Name));
-        }
-    }
-
-    private static bool HasAttribute(ISymbol symbol, INamedTypeSymbol attributeType) {
-        foreach (var attribute in symbol.GetAttributes()) {
-            if (SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, attributeType)) {
-                return true;
+            if (param.HasAttribute(tracedTagType)) {
+                context.ReportDiagnostic(Diagnostic.Create(
+                    Rule,
+                    param.Locations.FirstOrDefault() ?? Location.None,
+                    param.Name));
             }
         }
-
-        return false;
     }
 
     private static bool HasTracedOnType(INamedTypeSymbol? type, INamedTypeSymbol tracedType) {
-        while (type is not null) {
-            if (HasAttribute(type, tracedType)) {
+        for (var current = type; current is not null; current = current.BaseType) {
+            if (current.HasAttribute(tracedType)) {
                 return true;
             }
-
-            type = type.BaseType;
         }
 
         return false;

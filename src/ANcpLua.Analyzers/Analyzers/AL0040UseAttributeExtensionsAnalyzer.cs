@@ -34,27 +34,22 @@ public sealed partial class Al0040UseAttributeExtensionsAnalyzer : AlAnalyzer {
             return;
         }
 
-        // Check for .Value access on TypedConstant
-        if (propRef.Property.Name == "Value" && IsTypedConstantType(propRef.Instance?.Type)) {
-            // Check if this is from ConstructorArguments[i] or NamedArguments access
-            if (propRef.Instance is IPropertyReferenceOperation innerProp) {
-                // ConstructorArguments[i].Value pattern - check parent
-                if (innerProp.Instance is IArrayElementReferenceOperation arrayAccess) {
-                    AnalyzeConstructorArgumentsAccess(context, propRef, arrayAccess);
+        switch (propRef.Property.Name) {
+            case "Value" when IsTypedConstantType(propRef.Instance?.Type):
+                switch (propRef.Instance) {
+                    case IPropertyReferenceOperation { Instance: IArrayElementReferenceOperation arrayAccess }:
+                        AnalyzeConstructorArgumentsAccess(context, propRef, arrayAccess);
+                        break;
+                    case IArrayElementReferenceOperation directArrayAccess:
+                        AnalyzeConstructorArgumentsAccess(context, propRef, directArrayAccess);
+                        break;
                 }
-            } else if (propRef.Instance is IArrayElementReferenceOperation directArrayAccess) {
-                // Direct array access pattern
-                AnalyzeConstructorArgumentsAccess(context, propRef, directArrayAccess);
-            }
-        }
 
-        // Check for ConstructorArguments[i] pattern (without .Value)
-        if (propRef.Property.Name == "ConstructorArguments") {
-            var parent = GetParentOperation(context.Operation);
-            if (parent is IArrayElementReferenceOperation) {
-                // This is the ConstructorArguments property being indexed
+                break;
+
+            case "ConstructorArguments" when context.Operation.Parent is IArrayElementReferenceOperation parent:
                 AnalyzeConstructorArgumentsIndexing(context, propRef, parent);
-            }
+                break;
         }
     }
 
@@ -62,21 +57,14 @@ public sealed partial class Al0040UseAttributeExtensionsAnalyzer : AlAnalyzer {
         OperationAnalysisContext context,
         IOperation valueAccess,
         IArrayElementReferenceOperation arrayAccess) {
-        // Check if the array is ConstructorArguments
-        if (arrayAccess.ArrayReference is not IPropertyReferenceOperation arrayProp) {
+        if (arrayAccess.ArrayReference is not IPropertyReferenceOperation { Property.Name: "ConstructorArguments" } arrayProp) {
             return;
         }
 
-        if (arrayProp.Property.Name != "ConstructorArguments") {
-            return;
-        }
-
-        // Check if receiver is AttributeData
         if (!IsAttributeDataType(arrayProp.Instance?.Type)) {
             return;
         }
 
-        // Get the index
         var indexStr = GetIndexValue(arrayAccess);
         var attrName = arrayProp.Instance.GetOperandName("attr");
         var suggestion = $"{attrName}.GetConstructorArgument<T>({indexStr})";
@@ -92,10 +80,7 @@ public sealed partial class Al0040UseAttributeExtensionsAnalyzer : AlAnalyzer {
             return;
         }
 
-        // Only suggest if the result is being used directly (not accessing .Value)
-        var parent = GetParentOperation(arrayElementRef);
-        if (parent is IPropertyReferenceOperation parentProp && parentProp.Property.Name == "Value") {
-            // Will be handled by the other pattern
+        if (arrayElementRef.Parent is IPropertyReferenceOperation { Property.Name: "Value" }) {
             return;
         }
 
@@ -132,8 +117,4 @@ public sealed partial class Al0040UseAttributeExtensionsAnalyzer : AlAnalyzer {
         return index.GetOperandName("0");
     }
 
-    private static IOperation? GetParentOperation(IOperation operation) {
-        // Walk up the operation tree
-        return operation.Parent;
-    }
 }

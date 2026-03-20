@@ -31,11 +31,11 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0054ToAl0056DiagnosticsAlignmentAnalyzer : DiagnosticAnalyzer {
     /// <summary>The diagnostic identifier for AL0054.</summary>
-    public const string DiagnosticIdAL0054 = "AL0054";
+    public const string DiagnosticIdAl0054 = "AL0054";
     /// <summary>The diagnostic identifier for AL0055.</summary>
-    public const string DiagnosticIdAL0055 = "AL0055";
+    public const string DiagnosticIdAl0055 = "AL0055";
     /// <summary>The diagnostic identifier for AL0056.</summary>
-    public const string DiagnosticIdAL0056 = "AL0056";
+    public const string DiagnosticIdAl0056 = "AL0056";
 
     private const string DescriptorsFileName = "Descriptors.cs";
     private const string DiagnosticsMdFileName = "diagnostics.md";
@@ -55,36 +55,36 @@ public sealed partial class Al0054ToAl0056DiagnosticsAlignmentAnalyzer : Diagnos
         RegexOptions.Compiled);
 
     private static readonly DiagnosticDescriptor RuleMissingDocs = new(
-        DiagnosticIdAL0054,
+        DiagnosticIdAl0054,
         "Diagnostic missing from documentation",
         "{0}",
         DiagnosticCategories.VersionManagement,
         DiagnosticSeverity.Warning,
         true,
         "Diagnostics defined in Descriptors.cs should be documented in diagnostics.md.",
-        AlAnalyzer.HelpLinkBase,
+        AlAnalyzer.HelpLink(DiagnosticIdAl0054),
         WellKnownDiagnosticTags.CompilationEnd);
 
     private static readonly DiagnosticDescriptor RuleMissingRelease = new(
-        DiagnosticIdAL0055,
+        DiagnosticIdAl0055,
         "Diagnostic missing from release notes",
         "{0}",
         DiagnosticCategories.VersionManagement,
         DiagnosticSeverity.Warning,
         true,
         "Diagnostics defined in Descriptors.cs should be tracked in AnalyzerReleases.*.md.",
-        AlAnalyzer.HelpLinkBase,
+        AlAnalyzer.HelpLink(DiagnosticIdAl0055),
         WellKnownDiagnosticTags.CompilationEnd);
 
     private static readonly DiagnosticDescriptor RuleMismatch = new(
-        DiagnosticIdAL0056,
+        DiagnosticIdAl0056,
         "Diagnostic documentation mismatch",
         "{0}",
         DiagnosticCategories.VersionManagement,
         DiagnosticSeverity.Warning,
         true,
         "Diagnostic metadata should be consistent between Descriptors.cs and documentation.",
-        AlAnalyzer.HelpLinkBase,
+        AlAnalyzer.HelpLink(DiagnosticIdAl0056),
         WellKnownDiagnosticTags.CompilationEnd);
 
     /// <inheritdoc />
@@ -104,7 +104,6 @@ public sealed partial class Al0054ToAl0056DiagnosticsAlignmentAnalyzer : Diagnos
         var shippedFile = FindFile(context.Options.AdditionalFiles, ShippedFileName);
         var unshippedFile = FindFile(context.Options.AdditionalFiles, UnshippedFileName);
 
-        // Need at least Descriptors.cs and one documentation file
         if (descriptorsFile is null) {
             return;
         }
@@ -121,7 +120,6 @@ public sealed partial class Al0054ToAl0056DiagnosticsAlignmentAnalyzer : Diagnos
         var releases = ParseReleases(shippedFile, unshippedFile, context.CancellationToken);
 
         foreach (var descriptor in descriptors.Values) {
-            // Check docs
             if (docsFile is not null) {
                 if (!docs.TryGetValue(descriptor.Id, out var docInfo)) {
                     ReportDiagnostic(context, RuleMissingDocs, descriptorsFile,
@@ -138,7 +136,6 @@ public sealed partial class Al0054ToAl0056DiagnosticsAlignmentAnalyzer : Diagnos
                 }
             }
 
-            // Check release notes
             if (shippedFile is not null || unshippedFile is not null) {
                 if (!releases.TryGetValue(descriptor.Id, out var releaseInfo)) {
                     ReportDiagnostic(context, RuleMissingRelease, descriptorsFile,
@@ -156,7 +153,6 @@ public sealed partial class Al0054ToAl0056DiagnosticsAlignmentAnalyzer : Diagnos
             }
         }
 
-        // Check for orphaned docs/release entries
         foreach (var docId in docs.Keys) {
             if (!descriptors.ContainsKey(docId)) {
                 ReportDiagnostic(context, RuleMismatch, docsFile!,
@@ -172,14 +168,8 @@ public sealed partial class Al0054ToAl0056DiagnosticsAlignmentAnalyzer : Diagnos
         }
     }
 
-    private static AdditionalText? FindFile(ImmutableArray<AdditionalText> files, string fileName) {
-        foreach (var file in files) {
-            if (file.Path.EndsWithIgnoreCase(fileName)) {
-                return file;
-            }
-        }
-        return null;
-    }
+    private static AdditionalText? FindFile(ImmutableArray<AdditionalText> files, string fileName) =>
+        files.FirstOrDefault(file => file.Path.EndsWithIgnoreCase(fileName));
 
     private static void ReportDiagnostic(
         CompilationAnalysisContext context,
@@ -262,67 +252,42 @@ public sealed partial class Al0054ToAl0056DiagnosticsAlignmentAnalyzer : Diagnos
         return constants;
     }
 
-    private static bool IsDiagnosticDescriptorType(TypeSyntax type) {
-        if (type is IdentifierNameSyntax { Identifier.Text: "DiagnosticDescriptor" }) {
-            return true;
-        }
+    private static bool IsDiagnosticDescriptorType(TypeSyntax type) =>
+        type is IdentifierNameSyntax { Identifier.Text: "DiagnosticDescriptor" }
+            or QualifiedNameSyntax { Right.Identifier.Text: "DiagnosticDescriptor" };
 
-        if (type is QualifiedNameSyntax { Right.Identifier.Text: "DiagnosticDescriptor" }) {
-            return true;
-        }
+    private static ArgumentListSyntax? GetArgumentList(ExpressionSyntax? expression) =>
+        expression switch {
+            ObjectCreationExpressionSyntax creation => creation.ArgumentList,
+            ImplicitObjectCreationExpressionSyntax implicitCreation => implicitCreation.ArgumentList,
+            _ => null
+        };
 
-        return false;
-    }
-
-    private static ArgumentListSyntax? GetArgumentList(ExpressionSyntax? expression) {
-        if (expression is ObjectCreationExpressionSyntax creation) {
-            return creation.ArgumentList;
-        }
-
-        if (expression is ImplicitObjectCreationExpressionSyntax implicitCreation) {
-            return implicitCreation.ArgumentList;
-        }
-
-        return null;
-    }
-
-    private static string? GetStringLiteral(ExpressionSyntax expression) {
-        return expression is LiteralExpressionSyntax literal && literal.IsKind(SyntaxKind.StringLiteralExpression)
+    private static string? GetStringLiteral(ExpressionSyntax expression) =>
+        expression is LiteralExpressionSyntax literal && literal.IsKind(SyntaxKind.StringLiteralExpression)
             ? literal.Token.ValueText
             : null;
-    }
 
-    private static string? ResolveString(ExpressionSyntax expression, Dictionary<string, string> constants) {
-        if (expression is LiteralExpressionSyntax literal && literal.IsKind(SyntaxKind.StringLiteralExpression)) {
-            return literal.Token.ValueText;
-        }
-
-        if (expression is IdentifierNameSyntax identifier &&
-            constants.TryGetValue(identifier.Identifier.Text, out var value)) {
-            return value;
-        }
-
-        if (expression is MemberAccessExpressionSyntax member &&
-            constants.TryGetValue(member.Name.Identifier.Text, out var memberValue)) {
-            return memberValue;
-        }
-
-        return null;
-    }
+    private static string? ResolveString(ExpressionSyntax expression, Dictionary<string, string> constants) =>
+        expression switch {
+            LiteralExpressionSyntax literal when literal.IsKind(SyntaxKind.StringLiteralExpression) => literal.Token
+                .ValueText,
+            IdentifierNameSyntax identifier when constants.TryGetValue(identifier.Identifier.Text, out var value) =>
+                value,
+            MemberAccessExpressionSyntax member when constants.TryGetValue(member.Name.Identifier.Text,
+                out var memberValue) => memberValue,
+            _ => null
+        };
 
     private static string? ResolveSeverity(ExpressionSyntax expression) {
-        string? name = null;
-        if (expression is MemberAccessExpressionSyntax member) {
-            name = member.Name.Identifier.Text;
-        } else if (expression is IdentifierNameSyntax identifier) {
-            name = identifier.Identifier.Text;
-        }
+        string? name = expression switch {
+            MemberAccessExpressionSyntax member => member.Name.Identifier.Text,
+            IdentifierNameSyntax identifier => identifier.Identifier.Text,
+            _ => null
+        };
 
         return name switch {
-            "Error" => "Error",
-            "Warning" => "Warning",
-            "Info" => "Info",
-            "Hidden" => "Hidden",
+            "Error" or "Warning" or "Info" or "Hidden" => name,
             _ => null
         };
     }
@@ -442,13 +407,11 @@ public sealed partial class Al0054ToAl0056DiagnosticsAlignmentAnalyzer : Diagnos
     }
 
     private static string NormalizeSeverity(string value) {
-        return value.Trim() switch {
-            "Error" => "Error",
-            "Warning" => "Warning",
-            "Info" => "Info",
-            "Hidden" => "Hidden",
+        var trimmed = value.Trim();
+        return trimmed switch {
+            "Error" or "Warning" or "Info" or "Hidden" => trimmed,
             "Suggestion" => "Warning",
-            _ => value.Trim()
+            _ => trimmed
         };
     }
 

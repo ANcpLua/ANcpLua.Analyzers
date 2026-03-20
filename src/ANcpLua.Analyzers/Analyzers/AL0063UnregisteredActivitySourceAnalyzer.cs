@@ -36,37 +36,48 @@ public sealed partial class Al0063UnregisteredActivitySourceAnalyzer : AlAnalyze
         context.RegisterCompilationStartAction(OnCompilationStart);
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
-        var compilation = context.Compilation;
+        if (context.Compilation.GetTypeByMetadataName(ActivitySourceTypeName) is not { } activitySourceSymbol) {
+            return;
+        }
+
+        var tracerProviderBuilderType = context.Compilation.GetTypeByMetadataName("OpenTelemetry.Trace.TracerProviderBuilder");
+
         var registeredSources = new ConcurrentBag<string>();
         var activitySourceCreations = new ConcurrentBag<(Location Location, string Name)>();
+        var fieldSourceNames = new ConcurrentDictionary<IFieldSymbol, ImmutableArray<string>>(SymbolEqualityComparer.Default);
 
-        // Collect AddSource() calls with constant string arguments
+        // Pre-index static readonly string[] fields once, using the already-provided ctx.SemanticModel
+        context.RegisterSyntaxNodeAction(
+            ctx => CollectStaticReadonlyFieldConstants(ctx, fieldSourceNames),
+            SyntaxKind.VariableDeclarator);
+
         context.RegisterOperationAction(ctx => {
-            if (ctx.Operation is not IInvocationOperation invocation) return;
-            if (invocation.TargetMethod.Name != "AddSource") return;
-            if (invocation.Arguments.Length is 0) return;
+            var invocation = (IInvocationOperation)ctx.Operation;
+            if (!invocation.IsMethodNamed(tracerProviderBuilderType, "AddSource") || invocation.Arguments.Length is 0) {
+                return;
+            }
 
-            if (invocation.Arguments[0].Value.ConstantValue is { HasValue: true, Value: string name }) {
+            var argumentValue = invocation.Arguments[0].Value;
+
+            if (argumentValue.ConstantValue is { HasValue: true, Value: string name }) {
                 registeredSources.Add(name);
             } else {
-                ResolveFromForeachCollection(invocation.Arguments[0].Value, compilation, registeredSources);
+                ResolveFromForeachCollection(argumentValue, fieldSourceNames, registeredSources);
             }
         }, OperationKind.Invocation);
 
-        // Collect new ActivitySource(...) creations with constant string arguments
         context.RegisterOperationAction(ctx => {
             var creation = (IObjectCreationOperation)ctx.Operation;
-            if (creation.Type?.ToDisplayString() != ActivitySourceTypeName) return;
-            if (creation.Arguments.Length is 0) return;
+            if (!creation.Type.IsEqualTo(activitySourceSymbol) || creation.Arguments.Length is 0) {
+                return;
+            }
 
             if (creation.Arguments[0].Value.ConstantValue is { HasValue: true, Value: string name }) {
                 activitySourceCreations.Add((creation.Arguments[0].Value.Syntax.GetLocation(), name));
             }
         }, OperationKind.ObjectCreation);
 
-        // At compilation end, report only unregistered sources
         context.RegisterCompilationEndAction(endCtx => {
-            // Snapshot the registered sources for matching
             var registered = registeredSources.ToArray();
 
             foreach (var (location, sourceName) in activitySourceCreations) {
@@ -77,10 +88,38 @@ public sealed partial class Al0063UnregisteredActivitySourceAnalyzer : AlAnalyze
         });
     }
 
-    /// <summary>
-    ///     Checks whether a source name matches any registered AddSource() call,
-    ///     including wildcard patterns like "OpenAI.*".
-    /// </summary>
+    private static void CollectStaticReadonlyFieldConstants(
+        SyntaxNodeAnalysisContext context,
+        ConcurrentDictionary<IFieldSymbol, ImmutableArray<string>> fieldSourceNames) {
+        var declarator = (VariableDeclaratorSyntax)context.Node;
+
+        if (declarator.Initializer?.Value is not { } initializerValue) {
+            return;
+        }
+
+        if (context.SemanticModel.GetDeclaredSymbol(declarator, context.CancellationToken)
+            is not IFieldSymbol { IsStatic: true, IsReadOnly: true } field) {
+            return;
+        }
+
+        if (GetInitializerElements(initializerValue) is not { } elements) {
+            return;
+        }
+
+        var builder = ImmutableArray.CreateBuilder<string>();
+
+        foreach (var expr in elements) {
+            if (context.SemanticModel.GetConstantValue(expr, context.CancellationToken)
+                is { HasValue: true, Value: string name }) {
+                builder.Add(name);
+            }
+        }
+
+        if (builder.Count > 0) {
+            fieldSourceNames.TryAdd(field, builder.ToImmutable());
+        }
+    }
+
     private static bool IsRegistered(string sourceName, ReadOnlySpan<string> registered) {
         foreach (var pattern in registered) {
             if (string.Equals(pattern, sourceName, StringComparison.Ordinal)) {
@@ -98,51 +137,31 @@ public sealed partial class Al0063UnregisteredActivitySourceAnalyzer : AlAnalyze
         return false;
     }
 
-    /// <summary>
-    ///     Resolves registered source names from a foreach-over-array pattern:
-    ///     <c>foreach (var s in SomeStaticReadonlyArray) tracing.AddSource(s);</c>
-    /// </summary>
     private static void ResolveFromForeachCollection(
-        IOperation argumentValue, Compilation compilation, ConcurrentBag<string> registeredSources) {
-        // Walk up to find enclosing foreach loop
+        IOperation argumentValue,
+        ConcurrentDictionary<IFieldSymbol, ImmutableArray<string>> fieldSourceNames,
+        ConcurrentBag<string> registeredSources) {
         var current = argumentValue.Parent;
         while (current is not null and not IForEachLoopOperation) {
             current = current.Parent;
         }
 
-        if (current is not IForEachLoopOperation foreachLoop) return;
-
-        // Unwrap conversion wrappers on the collection
-        var collection = foreachLoop.Collection;
-        while (collection is IConversionOperation conversion) {
-            collection = conversion.Operand;
+        if (current is not IForEachLoopOperation foreachLoop) {
+            return;
         }
 
-        // Must be a reference to a static readonly field
-        if (collection is not IFieldReferenceOperation { Field: { IsStatic: true, IsReadOnly: true } field }) return;
+        var collection = foreachLoop.Collection.UnwrapAllConversions();
 
-        // Resolve field declaration syntax to extract initializer elements
-        if (field.DeclaringSyntaxReferences.FirstOrDefault() is not { } syntaxRef) return;
+        if (collection is not IFieldReferenceOperation { Field: var field }) {
+            return;
+        }
 
-        var fieldSyntax = syntaxRef.GetSyntax();
+        if (!fieldSourceNames.TryGetValue(field, out var names)) {
+            return;
+        }
 
-        // RS1030: Cross-tree analysis requires GetSemanticModel — no alternative for resolving
-        // constant values from field initializers declared in a different syntax tree.
-#pragma warning disable RS1030
-        var model = compilation.GetSemanticModel(fieldSyntax.SyntaxTree);
-#pragma warning restore RS1030
-
-        // Find the initializer — walk from VariableDeclarator to its EqualsValueClause
-        if (fieldSyntax is not VariableDeclaratorSyntax { Initializer.Value: { } initializerValue }) return;
-
-        // Extract elements from collection expression [...] or array initializer new[] { ... }
-        if (GetInitializerElements(initializerValue) is not { } elements) return;
-
-        foreach (var expr in elements) {
-            var constant = model.GetConstantValue(expr);
-            if (constant is { HasValue: true, Value: string name }) {
-                registeredSources.Add(name);
-            }
+        foreach (var name in names.AsSpan()) {
+            registeredSources.Add(name);
         }
     }
 

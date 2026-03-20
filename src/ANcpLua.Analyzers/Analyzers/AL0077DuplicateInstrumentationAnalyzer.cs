@@ -62,32 +62,26 @@ public sealed partial class Al0077DuplicateInstrumentationAnalyzer : AlAnalyzer 
             return;
         }
 
-        // Check if method has [Traced] attribute
-        if (!HasTracedAttribute(method, tracedAttributeType)) {
-            // Also check if the containing type has [Traced] attribute
-            if (method.ContainingType is null || !HasTracedAttribute(method.ContainingType, tracedAttributeType)) {
-                return;
-            }
+        // [Traced] on the method itself, or inherited from the containing type
+        if (!HasTracedAttribute(method, tracedAttributeType)
+            && (method.ContainingType is null || !HasTracedAttribute(method.ContainingType, tracedAttributeType))) {
+            return;
         }
 
-        // Look for Activity.StartActivity calls in the method body
         foreach (var operationBlock in context.OperationBlocks) {
             if (ContainsStartActivityCall(operationBlock)) {
                 var location = method.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax(context.CancellationToken).GetLocation()
                                ?? Location.None;
 
-                context.ReportDiagnostic(Diagnostic.Create(
-                    Rule,
-                    location,
-                    method.Name));
-                return; // Only report once per method
+                context.ReportDiagnostic(Diagnostic.Create(Rule, location, method.Name));
+                return;
             }
         }
     }
 
     private static bool HasTracedAttribute(ISymbol symbol, INamedTypeSymbol tracedAttributeType) {
         foreach (var attribute in symbol.GetAttributes()) {
-            if (SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, tracedAttributeType)) {
+            if (attribute.AttributeClass.IsEqualTo(tracedAttributeType)) {
                 return true;
             }
         }
@@ -106,13 +100,6 @@ public sealed partial class Al0077DuplicateInstrumentationAnalyzer : AlAnalyzer 
         return false;
     }
 
-    private static bool IsStartActivityMethod(IMethodSymbol method) {
-        // Check for ActivitySource.StartActivity
-        if (method.Name == "StartActivity" &&
-            method.ContainingType is { Name: "ActivitySource" }) {
-            return true;
-        }
-
-        return false;
-    }
+    private static bool IsStartActivityMethod(IMethodSymbol method) =>
+        method is { Name: "StartActivity", ContainingType.Name: "ActivitySource" };
 }

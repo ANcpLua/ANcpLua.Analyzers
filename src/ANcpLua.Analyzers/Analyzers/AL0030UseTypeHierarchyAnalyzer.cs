@@ -22,10 +22,12 @@ public sealed partial class Al0030UseTypeHierarchyAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0030.</summary>
     public const string DiagnosticId = "AL0030";
 
-    /// <summary>Metadata name for SymbolEqualityComparer.</summary>
-    private const string SymbolEqualityComparerTypeName = "Microsoft.CodeAnalysis.SymbolEqualityComparer";
-    /// <summary>Metadata name for ITypeSymbol.</summary>
-    private const string ITypeSymbolTypeName = "Microsoft.CodeAnalysis.ITypeSymbol";
+    private enum KnownType { ITypeSymbol, SymbolEqualityComparer }
+
+    private static readonly string[] KnownTypeNames = [
+        "Microsoft.CodeAnalysis.ITypeSymbol",
+        "Microsoft.CodeAnalysis.SymbolEqualityComparer"
+    ];
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticId,
@@ -40,23 +42,23 @@ public sealed partial class Al0030UseTypeHierarchyAnalyzer : AlAnalyzer {
         context.RegisterCompilationStartAction(OnCompilationStart);
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
-        if (context.Compilation.GetTypeByMetadataName(ITypeSymbolTypeName) is null) {
+        var cache = new TypeCache<KnownType>(type => context.Compilation.GetTypeByMetadataName(KnownTypeNames[(int)type]));
+
+        if (cache.Get(KnownType.ITypeSymbol) is null) {
             return;
         }
 
-        var symbolEqualityComparerType = context.Compilation.GetTypeByMetadataName(SymbolEqualityComparerTypeName);
-
         context.RegisterOperationAction(
-            ctx => AnalyzeLoop(ctx, symbolEqualityComparerType),
+            ctx => AnalyzeLoop(ctx, cache),
             OperationKind.Loop);
     }
 
-    private static void AnalyzeLoop(OperationAnalysisContext context, INamedTypeSymbol? symbolEqualityComparerType) {
+    private static void AnalyzeLoop(OperationAnalysisContext context, TypeCache<KnownType> cache) {
         if (context.Operation is IForEachLoopOperation forEachLoop) {
             var collectionName = forEachLoop.Collection.GetCollectionSourceName();
 
             if (collectionName is "AllInterfaces" &&
-                ContainsSymbolEqualityComparison(forEachLoop.Body, symbolEqualityComparerType)) {
+                ContainsSymbolEqualityComparison(forEachLoop.Body, cache)) {
                 context.ReportDiagnostic(Rule, forEachLoop.Syntax.GetLocation(),
                     "type.Implements(interfaceType)", "foreach over AllInterfaces");
                 return;
@@ -64,41 +66,39 @@ public sealed partial class Al0030UseTypeHierarchyAnalyzer : AlAnalyzer {
         }
 
         if (context.Operation is IWhileLoopOperation whileLoop &&
-            IsBaseTypeWalkingLoop(whileLoop, symbolEqualityComparerType)) {
+            IsBaseTypeWalkingLoop(whileLoop, cache)) {
             context.ReportDiagnostic(Rule, whileLoop.Syntax.GetLocation(),
                 "type.InheritsFrom(baseType)", "while loop walking BaseType");
         }
     }
 
-    private static bool ContainsSymbolEqualityComparison(IOperation? body, INamedTypeSymbol? symbolEqualityComparerType) {
+    private static bool ContainsSymbolEqualityComparison(IOperation? body, TypeCache<KnownType> cache) {
         if (body is null) {
             return false;
         }
 
         foreach (var descendant in MsOperationExtensions.Descendants(body)) {
-            if (descendant is IInvocationOperation invocation) {
-                // Check for SymbolEqualityComparer.Default.Equals(a, b)
-                if (symbolEqualityComparerType is not null &&
-                    IsSymbolEqualityComparerEquals(invocation, symbolEqualityComparerType)) {
-                    return true;
-                }
+            if (descendant is not IInvocationOperation invocation) {
+                continue;
+            }
 
-                // Also check for a.IsEqualTo(b) pattern (from ANcpLua.Roslyn.Utilities)
-                // Extension method signature: IsEqualTo(this ISymbol?, ISymbol?) has 2 parameters
-                if (invocation.TargetMethod is {
-                    Name: "IsEqualTo",
-                    IsExtensionMethod: true,
-                    Parameters.Length: 2
-                }) {
-                    return true;
-                }
+            if (IsSymbolEqualityComparerEquals(invocation, cache)) {
+                return true;
+            }
+
+            if (invocation.TargetMethod is {
+                Name: "IsEqualTo",
+                IsExtensionMethod: true,
+                Parameters.Length: 2
+            }) {
+                return true;
             }
         }
 
         return false;
     }
 
-    private static bool IsBaseTypeWalkingLoop(IWhileLoopOperation whileLoop, INamedTypeSymbol? symbolEqualityComparerType) {
+    private static bool IsBaseTypeWalkingLoop(IWhileLoopOperation whileLoop, TypeCache<KnownType> cache) {
         var hasBaseTypeAccess = false;
         var hasBaseTypeAssignment = false;
         var hasEqualityCheck = false;
@@ -114,14 +114,10 @@ public sealed partial class Al0030UseTypeHierarchyAnalyzer : AlAnalyzer {
                     hasBaseTypeAssignment = true;
                     break;
                 case IInvocationOperation invocation: {
-                    // Check for SymbolEqualityComparer.Default.Equals(a, b)
-                    if (symbolEqualityComparerType is not null &&
-                        IsSymbolEqualityComparerEquals(invocation, symbolEqualityComparerType)) {
+                    if (IsSymbolEqualityComparerEquals(invocation, cache)) {
                         hasEqualityCheck = true;
                     }
 
-                    // Also check for a.IsEqualTo(b) pattern (from ANcpLua.Roslyn.Utilities)
-                    // Extension method signature: IsEqualTo(this ISymbol?, ISymbol?) has 2 parameters
                     if (invocation.TargetMethod is {
                         Name: "IsEqualTo",
                         IsExtensionMethod: true,
@@ -138,12 +134,12 @@ public sealed partial class Al0030UseTypeHierarchyAnalyzer : AlAnalyzer {
         return hasBaseTypeAccess && hasBaseTypeAssignment && hasEqualityCheck;
     }
 
-    private static bool IsSymbolEqualityComparerEquals(IInvocationOperation invocation, INamedTypeSymbol symbolEqualityComparerType) {
+    private static bool IsSymbolEqualityComparerEquals(IInvocationOperation invocation, TypeCache<KnownType> cache) {
         var method = invocation.TargetMethod;
         if (method.Name != "Equals" || method.Parameters.Length != 2) {
             return false;
         }
 
-        return method.ContainingType.IsEqualTo(symbolEqualityComparerType);
+        return cache.IsType(method.ContainingType, KnownType.SymbolEqualityComparer);
     }
 }

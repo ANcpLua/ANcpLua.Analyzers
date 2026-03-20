@@ -52,34 +52,26 @@ public sealed partial class Al0079ManualSpanRecommendedAnalyzer : AlAnalyzer {
     private static void AnalyzeMethod(SyntaxNodeAnalysisContext context, INamedTypeSymbol tracedAttributeType) {
         var method = (MethodDeclarationSyntax)context.Node;
 
-        // Must be async method
         if (!method.Modifiers.Any(SyntaxKind.AsyncKeyword)) {
             return;
         }
 
-        // Get method symbol to check for [Traced] attribute
-        if (ModelExtensions.GetDeclaredSymbol(context.SemanticModel, method, context.CancellationToken) is not { } methodSymbol) {
+        if (ModelExtensions.GetDeclaredSymbol(context.SemanticModel, method, context.CancellationToken) is not { } methodSymbol
+            || (!HasTracedAttribute(methodSymbol, tracedAttributeType)
+                && !HasTracedAttribute(methodSymbol.ContainingType, tracedAttributeType))) {
             return;
         }
 
-        // Check if method or containing type has [Traced] attribute
-        if (!HasTracedAttribute(methodSymbol, tracedAttributeType) &&
-            !HasTracedAttribute(methodSymbol.ContainingType, tracedAttributeType)) {
-            return;
-        }
-
-        // Analyze method body for complex async patterns
         var complexPatterns = DetectComplexPatterns(method, context.SemanticModel, context.CancellationToken);
 
         if (complexPatterns.Length > 0) {
-            var patternDescription = string.Join(", ", complexPatterns);
-            context.ReportDiagnostic(Rule, method.Identifier.GetLocation(), methodSymbol.Name, patternDescription);
+            context.ReportDiagnostic(Rule, method.Identifier.GetLocation(), methodSymbol.Name, string.Join(", ", complexPatterns));
         }
     }
 
     private static bool HasTracedAttribute(ISymbol symbol, INamedTypeSymbol tracedAttributeType) {
         foreach (var attribute in symbol.GetAttributes()) {
-            if (SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, tracedAttributeType)) {
+            if (attribute.AttributeClass.IsEqualTo(tracedAttributeType)) {
                 return true;
             }
         }
@@ -120,7 +112,6 @@ public sealed partial class Al0079ManualSpanRecommendedAnalyzer : AlAnalyzer {
             patterns.Add("ConfigureAwait(false)");
         }
 
-        // Only flag multiple awaits if >= 3 (a reasonable threshold for complexity)
         if (walker.AwaitCount >= 3) {
             patterns.Add($"multiple awaits ({walker.AwaitCount})");
         }
@@ -147,53 +138,34 @@ public sealed partial class Al0079ManualSpanRecommendedAnalyzer : AlAnalyzer {
 
         public override void VisitInvocationExpression(InvocationExpressionSyntax node) {
             if (ModelExtensions.GetSymbolInfo(semanticModel, node, cancellationToken).Symbol is IMethodSymbol methodSymbol) {
-                var containingTypeName = methodSymbol.ContainingType?.ToDisplayString();
-                var methodName = methodSymbol.Name;
-
-                // Check for Task.WhenAll/WhenAny
-                if (containingTypeName == "System.Threading.Tasks.Task") {
-                    if (methodName == "WhenAll") {
+                switch (methodSymbol.ContainingType?.ToDisplayString(), methodSymbol.Name) {
+                    case ("System.Threading.Tasks.Task", "WhenAll"):
                         HasTaskWhenAll = true;
-                    } else if (methodName == "WhenAny") {
+                        break;
+                    case ("System.Threading.Tasks.Task", "WhenAny"):
                         HasTaskWhenAny = true;
-                    }
-                }
-
-                // Check for Parallel.ForEach/For
-                if (containingTypeName == "System.Threading.Tasks.Parallel") {
-                    if (methodName is "ForEach" or "ForEachAsync") {
+                        break;
+                    case ("System.Threading.Tasks.Parallel", "ForEach" or "ForEachAsync"):
                         HasParallelForEach = true;
-                    } else if (methodName is "For" or "ForAsync") {
+                        break;
+                    case ("System.Threading.Tasks.Parallel", "For" or "ForAsync"):
                         HasParallelFor = true;
-                    }
-                }
-
-                // Check for ConfigureAwait(false)
-                if (methodName == "ConfigureAwait" && methodSymbol.Parameters.Length == 1) {
-                    // Check if the argument is 'false'
-                    if (node.ArgumentList.Arguments.Count == 1 &&
-                        node.ArgumentList.Arguments[0].Expression is LiteralExpressionSyntax {
-                            Token.Value: false
-                        }) {
+                        break;
+                    case (_, "ConfigureAwait") when methodSymbol.Parameters.Length == 1
+                        && node.ArgumentList.Arguments is [{ Expression: LiteralExpressionSyntax { Token.Value: false } }]:
                         HasConfigureAwaitFalse = true;
-                    }
+                        break;
                 }
             }
 
             base.VisitInvocationExpression(node);
         }
 
-        // Don't descend into nested lambdas/local functions - they have their own scope
-        public override void VisitParenthesizedLambdaExpression(ParenthesizedLambdaExpressionSyntax node) {
-            // Skip - don't count awaits in nested lambdas
-        }
+        // Nested lambdas/local functions have their own scope -- don't count their awaits
+        public override void VisitParenthesizedLambdaExpression(ParenthesizedLambdaExpressionSyntax node) { }
 
-        public override void VisitSimpleLambdaExpression(SimpleLambdaExpressionSyntax node) {
-            // Skip - don't count awaits in nested lambdas
-        }
+        public override void VisitSimpleLambdaExpression(SimpleLambdaExpressionSyntax node) { }
 
-        public override void VisitLocalFunctionStatement(LocalFunctionStatementSyntax node) {
-            // Skip - don't count awaits in nested local functions
-        }
+        public override void VisitLocalFunctionStatement(LocalFunctionStatementSyntax node) { }
     }
 }

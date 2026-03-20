@@ -132,33 +132,25 @@ public sealed partial class Al0035UseToDisplayStringExtensionsAnalyzer : AlAnaly
             formatArg = conversion.Operand;
         }
 
-        // Check for SymbolDisplayFormat.FullyQualifiedFormat or CSharpErrorMessageFormat
-        if (formatArg is IPropertyReferenceOperation propRef) {
-            if (!propRef.Property.ContainingType.IsEqualTo(symbolDisplayFormat)) {
-                return (null, null);
-            }
-
-            return propRef.Property.Name switch {
+        return formatArg switch {
+            // Check for SymbolDisplayFormat.FullyQualifiedFormat or CSharpErrorMessageFormat
+            IPropertyReferenceOperation propRef when !propRef.Property.ContainingType.IsEqualTo(symbolDisplayFormat) =>
+                (null, null),
+            IPropertyReferenceOperation propRef => propRef.Property.Name switch {
                 "FullyQualifiedFormat" => ("FullyQualifiedFormat", "GetFullyQualifiedName()"),
                 "CSharpErrorMessageFormat" => ("CSharpErrorMessageFormat", "GetMetadataName()"),
                 _ => (null, null)
-            };
-        }
-
-        // Check for field reference (some versions may expose as field)
-        if (formatArg is IFieldReferenceOperation fieldRef) {
-            if (!fieldRef.Field.ContainingType.IsEqualTo(symbolDisplayFormat)) {
-                return (null, null);
-            }
-
-            return fieldRef.Field.Name switch {
+            },
+            // Check for field reference (some versions may expose as field)
+            IFieldReferenceOperation fieldRef when !fieldRef.Field.ContainingType.IsEqualTo(symbolDisplayFormat) => (
+                null, null),
+            IFieldReferenceOperation fieldRef => fieldRef.Field.Name switch {
                 "FullyQualifiedFormat" => ("FullyQualifiedFormat", "GetFullyQualifiedName()"),
                 "CSharpErrorMessageFormat" => ("CSharpErrorMessageFormat", "GetMetadataName()"),
                 _ => (null, null)
-            };
-        }
-
-        return (null, null);
+            },
+            _ => (null, null)
+        };
     }
 
     private static string GetReceiverDisplayName(IInvocationOperation invocation) {

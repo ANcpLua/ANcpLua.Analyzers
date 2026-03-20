@@ -45,57 +45,41 @@ public sealed partial class Al0073TracedActivitySourceNameAnalyzer : AlAnalyzer 
         context.RegisterSymbolAction(AnalyzeMethod, SymbolKind.Method);
     }
 
-    private static void AnalyzeNamedType(SymbolAnalysisContext context) {
-        var namedType = (INamedTypeSymbol)context.Symbol;
-        AnalyzeSymbol(context, namedType, namedType.Name);
-    }
+    private static void AnalyzeNamedType(SymbolAnalysisContext context) =>
+        AnalyzeSymbol(context, (INamedTypeSymbol)context.Symbol);
 
-    private static void AnalyzeMethod(SymbolAnalysisContext context) {
-        var method = (IMethodSymbol)context.Symbol;
-        AnalyzeSymbol(context, method, method.Name);
-    }
+    private static void AnalyzeMethod(SymbolAnalysisContext context) =>
+        AnalyzeSymbol(context, (IMethodSymbol)context.Symbol);
 
-    private static void AnalyzeSymbol(SymbolAnalysisContext context, ISymbol symbol, string symbolName) {
+    private static void AnalyzeSymbol(SymbolAnalysisContext context, ISymbol symbol) {
         if (context.Compilation.GetTypeByMetadataName(TracedAttributeFullName) is not { } tracedAttributeType) {
             return;
         }
 
         foreach (var attribute in symbol.GetAttributes()) {
-            if (!SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, tracedAttributeType)) {
+            if (!attribute.AttributeClass.IsEqualTo(tracedAttributeType)) {
                 continue;
             }
 
-            // Check if ActivitySourceName is provided via constructor or named argument
             string? activitySourceName = null;
 
-            // Check first constructor argument (ActivitySourceName)
-            if (attribute.ConstructorArguments.Length > 0 &&
-                attribute.ConstructorArguments[0].Value is string ctorArg) {
+            if (attribute.ConstructorArguments is [{ Value: string ctorArg }, ..]) {
                 activitySourceName = ctorArg;
             }
 
-            // Check named argument (ActivitySourceName = "...")
             foreach (var namedArg in attribute.NamedArguments) {
-                if (namedArg.Key == "ActivitySourceName" && namedArg.Value.Value is string namedValue) {
+                if (namedArg is { Key: "ActivitySourceName", Value.Value: string namedValue }) {
                     activitySourceName = namedValue;
                     break;
                 }
             }
 
-            // Report if ActivitySourceName is empty/whitespace or not provided at all
             if (string.IsNullOrWhiteSpace(activitySourceName)) {
-                ReportDiagnostic(context, attribute, symbolName);
+                var location = attribute.ApplicationSyntaxReference?.GetSyntax(context.CancellationToken).GetLocation()
+                               ?? Location.None;
+
+                context.ReportDiagnostic(Diagnostic.Create(Rule, location, symbol.Name));
             }
         }
-    }
-
-    private static void ReportDiagnostic(SymbolAnalysisContext context, AttributeData attribute, string symbolName) {
-        var location = attribute.ApplicationSyntaxReference?.GetSyntax(context.CancellationToken).GetLocation()
-                       ?? Location.None;
-
-        context.ReportDiagnostic(Diagnostic.Create(
-            Rule,
-            location,
-            symbolName));
     }
 }

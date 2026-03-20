@@ -58,43 +58,30 @@ public sealed partial class Al0076MissingOTelConfigurationAnalyzer : AlAnalyzer 
     private static void AnalyzeInvocation(SyntaxNodeAnalysisContext context) {
         var invocation = (InvocationExpressionSyntax)context.Node;
 
-        // Look for ServiceDefaults-type calls
-        var methodName = GetMethodName(invocation);
-        if (!IsServiceDefaultsMethod(methodName)) {
+        if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess
+            || !ServiceDefaultsMethods.Contains(memberAccess.Name.Identifier.Text)) {
             return;
         }
 
-        // Check if this is in a method body (likely configuration code)
         if (invocation.Ancestors().OfType<MethodDeclarationSyntax>().FirstOrDefault() is not { } containingMethod) {
             return;
         }
 
-        // Collect all method invocations in the same method
         var allInvocations = new HashSet<string>();
         foreach (var inv in containingMethod.DescendantNodes().OfType<InvocationExpressionSyntax>()) {
-            var name = GetMethodName(inv);
-            if (name is not null) {
+            if (GetMethodName(inv) is { } name) {
                 allInvocations.Add(name);
             }
         }
 
-        // Check if any OTel configuration method is present
-        var hasOTelConfiguration = OTelConfigurationMethods.Any(allInvocations.Contains);
-
-        if (!hasOTelConfiguration) {
-            context.ReportDiagnostic(Diagnostic.Create(
-                Rule,
-                invocation.GetLocation()));
+        if (!OTelConfigurationMethods.Any(allInvocations.Contains)) {
+            context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.GetLocation()));
         }
     }
 
-    private static bool IsServiceDefaultsMethod(string? methodName) =>
-        methodName is not null && ServiceDefaultsMethods.Contains(methodName);
-
+    // Only match member access to avoid matching local methods with same name
     private static string? GetMethodName(InvocationExpressionSyntax invocation) =>
         invocation.Expression switch {
-            // Only match member access (e.g., services.AddServiceDefaults())
-            // Skip IdentifierNameSyntax to avoid matching local methods with same name
             MemberAccessExpressionSyntax memberAccess => memberAccess.Name.Identifier.Text,
             _ => null
         };

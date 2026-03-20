@@ -44,31 +44,15 @@ public sealed partial class Al0091BatchExportDisabledAnalyzer : AlAnalyzer {
         context.RegisterOperationAction(AnalyzeObjectCreation, OperationKind.ObjectCreation);
 
     private static void AnalyzeObjectCreation(OperationAnalysisContext context) {
-        var objectCreation = (IObjectCreationOperation)context.Operation;
-
-        if (objectCreation.Type is null) {
+        if (context.Operation is not IObjectCreationOperation { Type: { } type }) {
             return;
         }
 
-        var typeName = objectCreation.Type.ToDisplayString();
-
-        // Check if the created type is a simple processor
-        if (!IsSimpleProcessor(typeName)) {
-            return;
+        if (IsSimpleProcessor(type.ToDisplayString())) {
+            context.ReportDiagnostic(Diagnostic.Create(Rule, context.Operation.Syntax.GetLocation()));
         }
-
-        context.ReportDiagnostic(Diagnostic.Create(
-            Rule,
-            objectCreation.Syntax.GetLocation()));
     }
 
-    private static bool IsSimpleProcessor(string typeName) {
-        foreach (var simpleProcessorType in SimpleProcessorTypeNames) {
-            if (typeName.EndsWithOrdinal(simpleProcessorType) ||
-                typeName.EqualsOrdinal(simpleProcessorType)) {
-                return true;
-            }
-        }
-        return false;
-    }
+    private static bool IsSimpleProcessor(string typeName) =>
+        SimpleProcessorTypeNames.Any(s => typeName.EndsWithOrdinal(s) || typeName.EqualsOrdinal(s));
 }

@@ -31,16 +31,12 @@ public sealed partial class Al0044AotSafeViolationAnalyzer : AlAnalyzer {
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
-    /// <summary>Registers syntax or operation actions for analysis.</summary>
-
+    /// <inheritdoc />
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterCompilationStartAction(OnCompilationStart);
 
-    private static void OnCompilationStart(CompilationStartAnalysisContext context) {
-        context.RegisterOperationAction(
-            AnalyzeInvocation,
-            OperationKind.Invocation);
-    }
+    private static void OnCompilationStart(CompilationStartAnalysisContext context) =>
+        context.RegisterOperationAction(AnalyzeInvocation, OperationKind.Invocation);
 
     private static void AnalyzeInvocation(OperationAnalysisContext context) {
         var invocation = (IInvocationOperation)context.Operation;
@@ -49,27 +45,17 @@ public sealed partial class Al0044AotSafeViolationAnalyzer : AlAnalyzer {
             return;
         }
 
-        // Check if the calling method or containing type is marked [AotSafe]
-        var hasAttribute = callingMethod.HasAttributeByShortName(AotSafeAttributeName);
-        if (!hasAttribute && callingMethod.ContainingType is { } containingType) {
-            hasAttribute = containingType.HasAttributeByShortName(AotSafeAttributeName);
-        }
-
-        if (!hasAttribute) {
+        if (!callingMethod.HasAttributeByShortName(AotSafeAttributeName) &&
+            callingMethod.ContainingType?.HasAttributeByShortName(AotSafeAttributeName) is not true) {
             return;
         }
 
-        var targetMethod = invocation.TargetMethod;
-
-        // Check if the called method has [RequiresDynamicCode]
-        if (!targetMethod.HasAttributeByShortName(RequiresDynamicCodeAttributeName)) {
+        if (!invocation.TargetMethod.HasAttributeByShortName(RequiresDynamicCodeAttributeName)) {
             return;
         }
 
-        // Report violation
-        var callingMethodName = callingMethod.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
-        var targetMethodName = targetMethod.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
-
-        context.ReportDiagnostic(Rule, invocation.Syntax.GetLocation(), callingMethodName, targetMethodName);
+        context.ReportDiagnostic(Rule, invocation.Syntax.GetLocation(),
+            callingMethod.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat),
+            invocation.TargetMethod.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat));
     }
 }

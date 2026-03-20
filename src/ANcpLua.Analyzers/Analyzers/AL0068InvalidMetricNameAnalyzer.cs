@@ -48,33 +48,23 @@ public sealed partial class Al0068InvalidMetricNameAnalyzer : AlAnalyzer {
         var histogramType = context.Compilation.GetTypeByMetadataName(HistogramAttributeFullName);
 
         foreach (var attribute in method.GetAttributes()) {
-            var isCounter = SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, counterType);
-            var isHistogram = SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, histogramType);
-
-            if (!isCounter && !isHistogram) {
+            if (!attribute.AttributeClass.IsEqualTo(counterType) &&
+                !attribute.AttributeClass.IsEqualTo(histogramType)) {
                 continue;
             }
 
-            // Get the metric name from constructor argument
             if (attribute.ConstructorArguments.Length is 0 ||
-                attribute.ConstructorArguments[0].Value is not string metricName) {
+                attribute.ConstructorArguments[0].Value is not string metricName ||
+                string.IsNullOrWhiteSpace(metricName) ||
+                ValidNamePattern.IsMatch(metricName)) {
                 continue;
             }
 
-            if (string.IsNullOrWhiteSpace(metricName)) {
-                continue; // Empty names are caught by other analyzers
-            }
+            var location = attribute.ApplicationSyntaxReference?.GetSyntax(context.CancellationToken)
+                .GetLocation() ?? method.Locations.FirstOrDefault();
 
-            if (!ValidNamePattern.IsMatch(metricName)) {
-                var location = attribute.ApplicationSyntaxReference?.GetSyntax(context.CancellationToken)
-                    .GetLocation() ?? method.Locations.FirstOrDefault();
-
-                if (location is not null) {
-                    context.ReportDiagnostic(Diagnostic.Create(
-                        Rule,
-                        location,
-                        metricName));
-                }
+            if (location is not null) {
+                context.ReportDiagnostic(Diagnostic.Create(Rule, location, metricName));
             }
         }
     }

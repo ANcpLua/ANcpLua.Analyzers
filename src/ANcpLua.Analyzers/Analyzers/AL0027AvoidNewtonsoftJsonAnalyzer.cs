@@ -30,7 +30,6 @@ public sealed partial class Al0027AvoidNewtonsoftJsonAnalyzer : AlAnalyzer {
         context.RegisterCompilationStartAction(OnCompilationStart);
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
-        // Only report if System.Text.Json is available as an alternative
         if (context.Compilation.GetTypeByMetadataName($"{SystemTextJsonNamespace}.JsonSerializer") is null) {
             return;
         }
@@ -44,26 +43,18 @@ public sealed partial class Al0027AvoidNewtonsoftJsonAnalyzer : AlAnalyzer {
             return;
         }
 
-        var method = invocation.TargetMethod;
-
-        // Check if the method is from legacy JSON library
-        if (IsLegacyJsonType(method.ContainingType)) {
-            context.ReportDiagnostic(Rule, invocation.Syntax.GetLocation(), method.ContainingType.Name);
+        if (IsLegacyJsonType(invocation.TargetMethod.ContainingType)) {
+            context.ReportDiagnostic(Rule, invocation.Syntax.GetLocation(), invocation.TargetMethod.ContainingType.Name);
         }
     }
 
     private static void AnalyzeObjectCreation(OperationAnalysisContext context) {
-        if (context.Operation is not IObjectCreationOperation creation) {
+        if (context.Operation is not IObjectCreationOperation { Type: INamedTypeSymbol type }) {
             return;
         }
 
-        if (creation.Type is not INamedTypeSymbol type) {
-            return;
-        }
-
-        // Check if creating a legacy JSON type
         if (IsLegacyJsonType(type)) {
-            context.ReportDiagnostic(Rule, creation.Syntax.GetLocation(), type.Name);
+            context.ReportDiagnostic(Rule, context.Operation.Syntax.GetLocation(), type.Name);
         }
     }
 
@@ -73,8 +64,7 @@ public sealed partial class Al0027AvoidNewtonsoftJsonAnalyzer : AlAnalyzer {
         }
 
         var ns = type.ContainingNamespace?.ToDisplayString();
-        // Check for exact namespace match or sub-namespace (with dot boundary)
-        // This avoids false positives like "Newtonsoft.JsonX"
+        // Dot boundary prevents false positives on sub-namespaces with similar prefixes
         return ns is not null &&
                (ns.EqualsOrdinal(LegacyJsonNamespace) ||
                 ns.StartsWithOrdinal(LegacyJsonNamespace + "."));

@@ -109,45 +109,27 @@ public sealed partial class Al0088SensitiveDataInAttributeAnalyzer : AlAnalyzer 
         var literal = (LiteralExpressionSyntax)context.Node;
         var value = literal.Token.ValueText;
 
-        if (string.IsNullOrEmpty(value)) {
-            return;
-        }
-
-        // Check if this looks like an attribute name (not a value)
-        if (!IsLikelyAttributeName(literal)) {
-            return;
-        }
-
-        // Check if in telemetry context
-        if (!IsInTelemetryContext(literal)) {
-            return;
-        }
-
-        // Check if the attribute name contains sensitive patterns
-        if (!ContainsSensitivePattern(value)) {
+        if (string.IsNullOrEmpty(value)
+            || !IsLikelyAttributeName(literal)
+            || !IsInTelemetryContext(literal)
+            || !ContainsSensitivePattern(value)) {
             return;
         }
 
         context.ReportDiagnostic(Rule, literal.GetLocation(), value);
     }
 
-    private static bool IsLikelyAttributeName(LiteralExpressionSyntax literal) {
-        var parent = literal.Parent;
-
-        switch (parent)
-        {
-            // Check if it's the first argument in a method invocation (likely the attribute name)
-            // Check if argument is in a regular ArgumentList (method calls)
-            case ArgumentSyntax { Parent: ArgumentListSyntax argumentList } argument when argumentList.Arguments.FirstOrDefault() == argument:
-            // Check if argument is in a BracketedArgumentList (dictionary/indexer access)
-            case ArgumentSyntax { Parent: BracketedArgumentListSyntax }:
-            // Check if it's used in an object initializer as a key
-            case AssignmentExpressionSyntax { Parent: InitializerExpressionSyntax }:
-                return true;
-            default:
-                return false;
-        }
-    }
+    private static bool IsLikelyAttributeName(LiteralExpressionSyntax literal) =>
+        literal.Parent switch {
+            // First argument in a method call (key position)
+            ArgumentSyntax { Parent: ArgumentListSyntax argumentList } argument
+                when argumentList.Arguments.FirstOrDefault() == argument => true,
+            // Dictionary/indexer access
+            ArgumentSyntax { Parent: BracketedArgumentListSyntax } => true,
+            // Key in object initializer
+            AssignmentExpressionSyntax { Parent: InitializerExpressionSyntax } => true,
+            _ => false
+        };
 
     private static bool IsInTelemetryContext(SyntaxNode node) {
         var current = node.Parent;
@@ -170,19 +152,12 @@ public sealed partial class Al0088SensitiveDataInAttributeAnalyzer : AlAnalyzer 
         GetIdentifierName(elementAccess.Expression) is { } identifier &&
         IsLikelyTelemetryContainer(identifier);
 
-    private static bool IsTelemetryInvocation(SyntaxNode node) {
-        if (node is not InvocationExpressionSyntax invocation) {
-            return false;
-        }
-
-        if (GetMethodName(invocation) is not { } methodName) {
-            return false;
-        }
-
-        return TelemetryMethodPatterns.Contains(methodName) ||
-               methodName.ContainsIgnoreCase("ATTRIBUTE") ||
-               methodName.ContainsIgnoreCase("TAG");
-    }
+    private static bool IsTelemetryInvocation(SyntaxNode node) =>
+        node is InvocationExpressionSyntax invocation
+        && GetMethodName(invocation) is { } methodName
+        && (TelemetryMethodPatterns.Contains(methodName)
+            || methodName.ContainsIgnoreCase("ATTRIBUTE")
+            || methodName.ContainsIgnoreCase("TAG"));
 
     private static bool IsTelemetryInitializer(SyntaxNode node) =>
         node is InitializerExpressionSyntax { Parent: ObjectCreationExpressionSyntax creation } &&
@@ -221,22 +196,13 @@ public sealed partial class Al0088SensitiveDataInAttributeAnalyzer : AlAnalyzer 
         foreach (var pattern in SensitiveAttributeNamePatterns) {
             var normalizedPattern = pattern.ToUpperInvariant();
 
-            // Exact match
-            if (normalizedName == normalizedPattern) {
+            if (normalizedName == normalizedPattern || normalizedName.ContainsOrdinal(normalizedPattern)) {
                 return true;
             }
 
-            // Contains match (e.g., "user.password" contains "password")
-            if (normalizedName.ContainsOrdinal(normalizedPattern)) {
-                return true;
-            }
-
-            // Handle variations with different separators
-            var underscorePattern = normalizedPattern.Replace(".", "_", StringComparison.Ordinal);
-            var dotPattern = normalizedPattern.Replace("_", ".", StringComparison.Ordinal);
-
-            if (normalizedName.ContainsOrdinal(underscorePattern) ||
-                normalizedName.ContainsOrdinal(dotPattern)) {
+            // Handle separator variations (dot vs underscore)
+            if (normalizedName.ContainsOrdinal(normalizedPattern.Replace(".", "_", StringComparison.Ordinal))
+                || normalizedName.ContainsOrdinal(normalizedPattern.Replace("_", ".", StringComparison.Ordinal))) {
                 return true;
             }
         }

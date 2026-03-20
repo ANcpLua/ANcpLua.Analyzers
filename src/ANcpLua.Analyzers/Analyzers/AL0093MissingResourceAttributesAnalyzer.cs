@@ -53,40 +53,26 @@ public sealed partial class Al0093MissingResourceAttributesAnalyzer : AlAnalyzer
     private static void AnalyzeInvocation(SyntaxNodeAnalysisContext context) {
         var invocation = (InvocationExpressionSyntax)context.Node;
 
-        // Look for OTel setup calls
         var methodName = GetMethodName(invocation);
-        if (!IsOTelSetupMethod(methodName)) {
+        if (methodName is null || !OTelSetupMethods.Contains(methodName)) {
             return;
         }
 
-        // Check if this is in a method body (likely configuration code)
         if (invocation.Ancestors().OfType<MethodDeclarationSyntax>().FirstOrDefault() is not { } containingMethod) {
             return;
         }
 
-        // Collect all method invocations in the same method
         var allInvocations = new HashSet<string>();
         foreach (var inv in containingMethod.DescendantNodes().OfType<InvocationExpressionSyntax>()) {
-            var name = GetMethodName(inv);
-            if (name is not null) {
+            if (GetMethodName(inv) is { } name) {
                 allInvocations.Add(name);
             }
         }
 
-        // Check if any resource configuration method is present
-        var hasResourceConfig = ResourceConfigMethods.Any(allInvocations.Contains);
-
-        if (!hasResourceConfig) {
-            var location = GetMethodNameLocation(invocation);
-            context.ReportDiagnostic(Diagnostic.Create(
-                Rule,
-                location,
-                "service.name/service.version"));
+        if (!ResourceConfigMethods.Any(allInvocations.Contains)) {
+            context.ReportDiagnostic(Diagnostic.Create(Rule, GetMethodNameLocation(invocation), "service.name/service.version"));
         }
     }
-
-    private static bool IsOTelSetupMethod(string? methodName) =>
-        methodName is not null && OTelSetupMethods.Contains(methodName);
 
     private static string? GetMethodName(InvocationExpressionSyntax invocation) =>
         invocation.Expression switch {

@@ -42,60 +42,28 @@ public sealed partial class Al0052AotSafeCallsAotUnsafeAnalyzer : AlAnalyzer {
     private static void AnalyzeInvocation(OperationAnalysisContext context) {
         var invocation = (IInvocationOperation)context.Operation;
 
-        if (context.ContainingSymbol is not IMethodSymbol callingMethod) {
+        if (context.ContainingSymbol is not IMethodSymbol callingMethod ||
+            !HasAttribute(callingMethod, AotSafeAttributeName) ||
+            !HasAttribute(invocation.TargetMethod, AotUnsafeAttributeName)) {
             return;
         }
 
-        // Check if the calling method or its containing type is marked [AotSafe]
-        if (!IsAotSafe(callingMethod)) {
-            return;
-        }
-
-        var targetMethod = invocation.TargetMethod;
-
-        // Check if the called method or its containing type is marked [AotUnsafe]
-        if (!IsAotUnsafe(targetMethod)) {
-            return;
-        }
-
-        // Report violation
-        var callingMethodName = callingMethod.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
-        var targetMethodName = targetMethod.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
-
-        context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.Syntax.GetLocation(), callingMethodName, targetMethodName));
+        context.ReportDiagnostic(Diagnostic.Create(
+            Rule,
+            invocation.Syntax.GetLocation(),
+            callingMethod.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat),
+            invocation.TargetMethod.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)));
     }
 
-    private static bool IsAotSafe(IMethodSymbol method) {
-        // Check method itself
-        if (method.HasAttributeByShortName(AotSafeAttributeName)) {
+    private static bool HasAttribute(IMethodSymbol method, string attributeName) {
+        if (method.HasAttributeByShortName(attributeName)) {
             return true;
         }
 
-        // Check containing type
-        var containingType = method.ContainingType;
-        while (containingType is not null) {
-            if (containingType.HasAttributeByShortName(AotSafeAttributeName)) {
+        for (var type = method.ContainingType; type is not null; type = type.ContainingType) {
+            if (type.HasAttributeByShortName(attributeName)) {
                 return true;
             }
-            containingType = containingType.ContainingType;
-        }
-
-        return false;
-    }
-
-    private static bool IsAotUnsafe(IMethodSymbol method) {
-        // Check method itself
-        if (method.HasAttributeByShortName(AotUnsafeAttributeName)) {
-            return true;
-        }
-
-        // Check containing type
-        var containingType = method.ContainingType;
-        while (containingType is not null) {
-            if (containingType.HasAttributeByShortName(AotUnsafeAttributeName)) {
-                return true;
-            }
-            containingType = containingType.ContainingType;
         }
 
         return false;

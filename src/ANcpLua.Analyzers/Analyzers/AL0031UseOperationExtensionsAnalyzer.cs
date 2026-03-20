@@ -30,12 +30,10 @@ public sealed partial class Al0031UseOperationExtensionsAnalyzer : AlAnalyzer {
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
     /// <summary>Registers syntax or operation actions for analysis.</summary>
-
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterCompilationStartAction(OnCompilationStart);
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
-        // Only analyze if IInvocationOperation is referenced (indicates Roslyn usage)
         if (context.Compilation.GetTypeByMetadataName(IInvocationOperationTypeName) is null) {
             return;
         }
@@ -48,18 +46,15 @@ public sealed partial class Al0031UseOperationExtensionsAnalyzer : AlAnalyzer {
             return;
         }
 
-        // Pattern: invocation.TargetMethod.Name == "name" -> invocation.IsMethodNamed(containingType, "name")
-        if (binary.OperatorKind is BinaryOperatorKind.Equals or BinaryOperatorKind.NotEquals) {
-            if (IsTargetMethodNameComparison(binary, out var methodName)) {
-                var suggestion = binary.OperatorKind == BinaryOperatorKind.Equals
-                    ? $"invocation.IsMethodNamed(containingType, \"{methodName}\")"
-                    : $"!invocation.IsMethodNamed(containingType, \"{methodName}\")";
-                context.ReportDiagnostic(Rule, binary.Syntax.GetLocation(),
-                    suggestion, "TargetMethod.Name == comparison");
-            }
+        if (binary.OperatorKind is BinaryOperatorKind.Equals or BinaryOperatorKind.NotEquals &&
+            IsTargetMethodNameComparison(binary, out var methodName)) {
+            var suggestion = binary.OperatorKind == BinaryOperatorKind.Equals
+                ? $"invocation.IsMethodNamed(containingType, \"{methodName}\")"
+                : $"!invocation.IsMethodNamed(containingType, \"{methodName}\")";
+            context.ReportDiagnostic(Rule, binary.Syntax.GetLocation(),
+                suggestion, "TargetMethod.Name == comparison");
         }
 
-        // Pattern: operation.ConstantValue.HasValue && ... -> TryGetConstantValue<T>()
         if (binary.OperatorKind == BinaryOperatorKind.ConditionalAnd && IsConstantValueHasValueCheck(binary)) {
             context.ReportDiagnostic(Rule, binary.Syntax.GetLocation(),
                 "operation.TryGetConstantValue<T>(out value)", "ConstantValue.HasValue check");
@@ -74,14 +69,11 @@ public sealed partial class Al0031UseOperationExtensionsAnalyzer : AlAnalyzer {
             return false;
         }
 
-        if (propSide is IPropertyReferenceOperation { Property.Name: "Name", Instance: { } rawInstance }) {
-            // Unwrap conversions on the Instance to find the TargetMethod property access
-            var instance = rawInstance.UnwrapAllConversions();
-            if (instance is IPropertyReferenceOperation { Property.Name: "TargetMethod" } &&
-                literalSide.ConstantValue is { HasValue: true, Value: string value }) {
-                methodName = value;
-                return true;
-            }
+        if (propSide is IPropertyReferenceOperation { Property.Name: "Name", Instance: { } rawInstance } &&
+            rawInstance.UnwrapAllConversions() is IPropertyReferenceOperation { Property.Name: "TargetMethod" } &&
+            literalSide.ConstantValue is { HasValue: true, Value: string value }) {
+            methodName = value;
+            return true;
         }
 
         return false;
@@ -111,23 +103,21 @@ public sealed partial class Al0031UseOperationExtensionsAnalyzer : AlAnalyzer {
                 continue;
             }
 
-            var instance = propRef.Instance?.UnwrapAllConversions();
-
-            // Check for .HasValue on ConstantValue
-            if (propRef.Property.Name == "HasValue" &&
-                instance is IPropertyReferenceOperation { Property.Name: "ConstantValue" }) {
-                hasHasValueCheck = true;
+            if (propRef.Instance?.UnwrapAllConversions() is not IPropertyReferenceOperation { Property.Name: "ConstantValue" }) {
+                continue;
             }
 
-            // Check for .Value on ConstantValue
-            if (propRef.Property.Name == "Value" &&
-                instance is IPropertyReferenceOperation { Property.Name: "ConstantValue" }) {
-                hasValueAccess = true;
+            switch (propRef.Property.Name) {
+                case "HasValue":
+                    hasHasValueCheck = true;
+                    break;
+                case "Value":
+                    hasValueAccess = true;
+                    break;
             }
         }
 
-        // Only suggest TryGetConstantValue when both .HasValue and .Value are accessed
-        // Just checking .HasValue alone is a valid pattern that doesn't need refactoring
+        // .HasValue alone is a valid pattern; only suggest TryGetConstantValue when both are accessed
         return hasHasValueCheck && hasValueAccess;
     }
 }

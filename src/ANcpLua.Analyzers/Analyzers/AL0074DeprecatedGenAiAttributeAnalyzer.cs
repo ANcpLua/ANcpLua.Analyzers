@@ -72,21 +72,12 @@ public sealed partial class Al0074DeprecatedGenAiAttributeAnalyzer : AlAnalyzer 
         var literal = (LiteralExpressionSyntax)context.Node;
         var value = literal.Token.ValueText;
 
-        if (string.IsNullOrEmpty(value)) {
+        if (string.IsNullOrEmpty(value)
+            || !DeprecatedAttributes.TryGetValue(value, out var replacement)
+            || !IsInTelemetryContext(literal)) {
             return;
         }
 
-        // Check if this is a deprecated attribute name
-        if (!DeprecatedAttributes.TryGetValue(value, out var replacement)) {
-            return;
-        }
-
-        // Only flag if in a telemetry context (avoid false positives)
-        if (!IsInTelemetryContext(literal)) {
-            return;
-        }
-
-        // Include replacement in properties for code fix
         var properties = ImmutableDictionary.CreateBuilder<string, string?>();
         properties.Add("Replacement", replacement);
 
@@ -103,27 +94,11 @@ public sealed partial class Al0074DeprecatedGenAiAttributeAnalyzer : AlAnalyzer 
 
         while (current is not null) {
             switch (current) {
-                // Dictionary/collection indexers: tags["gen_ai.prompt.tokens"]
-                case ElementAccessExpressionSyntax elementAccess:
-                    if (IsLikelyTelemetryContainer(GetIdentifierName(elementAccess.Expression))) {
-                        return true;
-                    }
-
-                    break;
-
-                // Method invocations: SetTag("gen_ai.prompt.tokens", value)
-                case InvocationExpressionSyntax invocation:
-                    if (IsLikelyTelemetryMethod(GetMethodName(invocation))) {
-                        return true;
-                    }
-
-                    break;
-
-                // Assignment in initializers: { "gen_ai.prompt.tokens", value }
+                case ElementAccessExpressionSyntax elementAccess
+                    when IsLikelyTelemetryContainer(GetIdentifierName(elementAccess.Expression)):
+                case InvocationExpressionSyntax invocation
+                    when IsLikelyTelemetryMethod(GetMethodName(invocation)):
                 case InitializerExpressionSyntax:
-                    return true;
-
-                // KeyValuePair or anonymous types
                 case AnonymousObjectMemberDeclaratorSyntax:
                     return true;
             }
@@ -153,21 +128,14 @@ public sealed partial class Al0074DeprecatedGenAiAttributeAnalyzer : AlAnalyzer 
             return false;
         }
 
-        // More precise matching to reduce false positives
-        // Match exact method names or those with Tag/Attribute suffixes
-        var name = methodName;
-        return name switch {
-            // Exact matches for common telemetry methods
+        return methodName switch {
             "SetTag" or "AddTag" or "SetAttribute" or "AddAttribute" => true,
             "SetStatus" or "RecordException" => true,
-
-            // Pattern matches for telemetry-related methods
-            _ when name.EndsWithOrdinal("Tag") => true,
-            _ when name.EndsWithOrdinal("Attribute") => true,
-            _ when name.StartsWithOrdinal("SetTag") => true,
-            _ when name.StartsWithOrdinal("AddTag") => true,
-            _ when name.StartsWithOrdinal("Record") => true,
-
+            _ when methodName.EndsWithOrdinal("Tag") => true,
+            _ when methodName.EndsWithOrdinal("Attribute") => true,
+            _ when methodName.StartsWithOrdinal("SetTag") => true,
+            _ when methodName.StartsWithOrdinal("AddTag") => true,
+            _ when methodName.StartsWithOrdinal("Record") => true,
             _ => false
         };
     }

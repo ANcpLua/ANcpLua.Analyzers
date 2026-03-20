@@ -33,11 +33,11 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0007ToAl0009IXmlSerializableAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0007.</summary>
-    public const string DiagnosticIdAL0007 = "AL0007";
+    public const string DiagnosticIdAl0007 = "AL0007";
     /// <summary>The diagnostic identifier for AL0008.</summary>
-    public const string DiagnosticIdAL0008 = "AL0008";
+    public const string DiagnosticIdAl0008 = "AL0008";
     /// <summary>The diagnostic identifier for AL0009.</summary>
-    public const string DiagnosticIdAL0009 = "AL0009";
+    public const string DiagnosticIdAl0009 = "AL0009";
 
     private static readonly LocalizableResourceString TitleAl0007 = new(
         nameof(Resources.AL0007AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
@@ -67,22 +67,22 @@ public sealed partial class Al0007ToAl0009IXmlSerializableAnalyzer : AlAnalyzer 
         nameof(Resources.AL0009AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
 
     private static readonly DiagnosticDescriptor RuleAl0007 = new(
-        DiagnosticIdAL0007,
+        DiagnosticIdAl0007,
         TitleAl0007, MessageFormatAl0007, DiagnosticCategories.Usage,
         DiagnosticSeverity.Error, true, DescriptionAl0007,
-        HelpLinkBase);
+        HelpLink(DiagnosticIdAl0007));
 
     private static readonly DiagnosticDescriptor RuleAl0008 = new(
-        DiagnosticIdAL0008,
+        DiagnosticIdAl0008,
         TitleAl0008, MessageFormatAl0008, DiagnosticCategories.Usage,
         DiagnosticSeverity.Error, true, DescriptionAl0008,
-        HelpLinkBase);
+        HelpLink(DiagnosticIdAl0008));
 
     private static readonly DiagnosticDescriptor RuleAl0009 = new(
-        DiagnosticIdAL0009,
+        DiagnosticIdAl0009,
         TitleAl0009, MessageFormatAl0009, DiagnosticCategories.Usage,
         DiagnosticSeverity.Error, true, DescriptionAl0009,
-        HelpLinkBase);
+        HelpLink(DiagnosticIdAl0009));
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics (AL0007, AL0008, AL0009).</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>

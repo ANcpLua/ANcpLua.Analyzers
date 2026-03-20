@@ -50,7 +50,7 @@ public sealed partial class Al0025PreferStaticLambdaAnalyzer : AlAnalyzer {
 
         // Use data flow analysis to check for captured variables
         var dataFlow = ModelExtensions.AnalyzeDataFlow(semanticModel, lambda);
-        if (dataFlow is null || !dataFlow.Succeeded) {
+        if (!dataFlow.Succeeded) {
             return false;
         }
 

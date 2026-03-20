@@ -26,7 +26,7 @@ public sealed partial class Al0015NormalizeNullGuardStyleAnalyzer : AlAnalyzer {
         DiagnosticSeverity.Info,
         true,
         "Null-guards should be normalized to the preferred project style (Throw, BCL, or Portable).",
-        HelpLinkBase);
+        HelpLink(DiagnosticId));
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];

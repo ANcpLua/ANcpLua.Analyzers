@@ -31,31 +31,31 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0057ToAl0060ThreadingAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0057.</summary>
-    public const string DiagnosticIdAL0057 = "AL0057";
+    public const string DiagnosticIdAl0057 = "AL0057";
     /// <summary>The diagnostic identifier for AL0058.</summary>
-    public const string DiagnosticIdAL0058 = "AL0058";
+    public const string DiagnosticIdAl0058 = "AL0058";
     /// <summary>The diagnostic identifier for AL0059.</summary>
-    public const string DiagnosticIdAL0059 = "AL0059";
+    public const string DiagnosticIdAl0059 = "AL0059";
     /// <summary>The diagnostic identifier for AL0060.</summary>
-    public const string DiagnosticIdAL0060 = "AL0060";
+    public const string DiagnosticIdAl0060 = "AL0060";
 
     private static readonly DiagnosticDescriptor AsyncVoidRule = CreateRule(
-        DiagnosticIdAL0057,
+        DiagnosticIdAl0057,
         DiagnosticCategories.Threading,
         DiagnosticSeverity.Warning);
 
     private static readonly DiagnosticDescriptor LockOnThisRule = CreateRule(
-        DiagnosticIdAL0058,
+        DiagnosticIdAl0058,
         DiagnosticCategories.Threading,
         DiagnosticSeverity.Warning);
 
     private static readonly DiagnosticDescriptor LockOnTypeRule = CreateRule(
-        DiagnosticIdAL0059,
+        DiagnosticIdAl0059,
         DiagnosticCategories.Threading,
         DiagnosticSeverity.Warning);
 
     private static readonly DiagnosticDescriptor LockOnStringRule = CreateRule(
-        DiagnosticIdAL0060,
+        DiagnosticIdAl0060,
         DiagnosticCategories.Threading,
         DiagnosticSeverity.Warning);
 
@@ -69,102 +69,63 @@ public sealed partial class Al0057ToAl0060ThreadingAnalyzer : AlAnalyzer {
         context.RegisterSyntaxNodeAction(AnalyzeLockStatement, SyntaxKind.LockStatement);
     }
 
-    /// <summary>Analyzes method declarations for async void anti-pattern (AL0057).</summary>
     private static void AnalyzeMethodDeclaration(SyntaxNodeAnalysisContext context) {
         var method = (MethodDeclarationSyntax)context.Node;
 
-        // Must be async
-        if (!method.Modifiers.Any(SyntaxKind.AsyncKeyword)) {
+        if (!method.Modifiers.Any(SyntaxKind.AsyncKeyword) ||
+            method.ReturnType is not PredefinedTypeSyntax { Keyword.RawKind: (int)SyntaxKind.VoidKeyword } ||
+            context.SemanticModel.GetDeclaredSymbol(method, context.CancellationToken) is not { } methodSymbol ||
+            IsEventHandler(methodSymbol, context.SemanticModel.Compilation)) {
             return;
         }
 
-        // Must return void (not Task, not Task<T>)
-        if (method.ReturnType is not PredefinedTypeSyntax { Keyword.RawKind: (int)SyntaxKind.VoidKeyword }) {
-            return;
-        }
-
-        // Get method symbol to check for event handler signature
-        if (context.SemanticModel.GetDeclaredSymbol(method, context.CancellationToken) is not { } methodSymbol) {
-            return;
-        }
-
-        // Skip event handlers - async void is valid for them
-        if (IsEventHandler(methodSymbol, context.SemanticModel.Compilation)) {
-            return;
-        }
-
-        // Report on the method name
         context.ReportDiagnostic(AsyncVoidRule, method.Identifier.GetLocation(), methodSymbol.Name);
     }
 
-    /// <summary>Analyzes lock statements for dangerous lock targets (AL0058-AL0060).</summary>
     private static void AnalyzeLockStatement(SyntaxNodeAnalysisContext context) {
         var lockStatement = (LockStatementSyntax)context.Node;
         var expression = lockStatement.Expression;
 
-        // AL0058: lock(this)
-        if (expression is ThisExpressionSyntax) {
-            context.ReportDiagnostic(LockOnThisRule, expression.GetLocation());
-            return;
+        switch (expression) {
+            case ThisExpressionSyntax:
+                context.ReportDiagnostic(LockOnThisRule, expression.GetLocation());
+                return;
+            case TypeOfExpressionSyntax typeOfExpression:
+                context.ReportDiagnostic(LockOnTypeRule, expression.GetLocation(), typeOfExpression.Type.ToString());
+                return;
+            case LiteralExpressionSyntax { RawKind: (int)SyntaxKind.StringLiteralExpression }:
+                context.ReportDiagnostic(LockOnStringRule, expression.GetLocation());
+                return;
         }
 
-        // AL0059: lock(typeof(...))
-        if (expression is TypeOfExpressionSyntax typeOfExpression) {
-            context.ReportDiagnostic(LockOnTypeRule, expression.GetLocation(), typeOfExpression.Type.ToString());
-            return;
-        }
-
-        // AL0060: lock("string literal") or constant string
-        if (expression is LiteralExpressionSyntax { RawKind: (int)SyntaxKind.StringLiteralExpression }) {
-            context.ReportDiagnostic(LockOnStringRule, expression.GetLocation());
-            return;
-        }
-
-        // Also check for constant string expressions (interpolated strings, const fields, etc.)
         if (IsConstantStringExpression(expression, context.SemanticModel, context.CancellationToken)) {
             context.ReportDiagnostic(LockOnStringRule, expression.GetLocation());
         }
     }
 
     /// <summary>
-    ///     Determines if a method is an event handler based on its signature.
-    ///     Event handlers have signature: void MethodName(object sender, EventArgs e)
+    ///     Event handlers have signature: void MethodName(object sender, EventArgs e).
+    ///     async void is valid only for event handlers.
     /// </summary>
     private static bool IsEventHandler(IMethodSymbol method, Compilation compilation) {
-        // Must have exactly 2 parameters
         if (method.Parameters.Length != 2) {
             return false;
         }
 
-        var firstParam = method.Parameters[0];
-        var secondParam = method.Parameters[1];
-
-        // First parameter should be object (sender)
-        if (firstParam.Type.SpecialType != SpecialType.System_Object) {
+        if (method.Parameters[0].Type.SpecialType != SpecialType.System_Object ||
+            compilation.GetTypeByMetadataName("System.EventArgs") is not { } eventArgsType) {
             return false;
         }
 
-        // Second parameter should be EventArgs or a derived type
-        if (compilation.GetTypeByMetadataName("System.EventArgs") is not { } eventArgsType) {
-            return false;
-        }
-
-        return secondParam.Type.IsEqualTo(eventArgsType) ||
-               secondParam.Type.InheritsFrom(eventArgsType);
+        var secondParamType = method.Parameters[1].Type;
+        return secondParamType.IsEqualTo(eventArgsType) || secondParamType.InheritsFrom(eventArgsType);
     }
 
-    /// <summary>Determines if an expression is a constant string (includes const fields, interpolated strings).</summary>
+    /// <summary>Catches constant string expressions not covered by the literal check (const fields, interpolated strings).</summary>
     private static bool IsConstantStringExpression(
         ExpressionSyntax expression,
         SemanticModel semanticModel,
-        CancellationToken cancellationToken) {
-        // Skip if we already handled it as a literal
-        if (expression is LiteralExpressionSyntax) {
-            return false;
-        }
-
-        // Check if it's a string constant (includes const fields, interpolated strings, etc.)
-        var constantValue = semanticModel.GetConstantValue(expression, cancellationToken);
-        return constantValue is { HasValue: true, Value: string };
-    }
+        CancellationToken cancellationToken) =>
+        expression is not LiteralExpressionSyntax &&
+        semanticModel.GetConstantValue(expression, cancellationToken) is { HasValue: true, Value: string };
 }

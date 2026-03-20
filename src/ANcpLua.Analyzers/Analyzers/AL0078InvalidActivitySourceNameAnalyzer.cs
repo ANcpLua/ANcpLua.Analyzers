@@ -42,63 +42,31 @@ public sealed partial class Al0078InvalidActivitySourceNameAnalyzer : AlAnalyzer
     private static void AnalyzeObjectCreation(OperationAnalysisContext context) {
         var objectCreation = (IObjectCreationOperation)context.Operation;
 
-        // Check if this is ActivitySource creation
-        if (objectCreation.Type?.ToDisplayString() != ActivitySourceTypeName) {
+        if (objectCreation.Type?.ToDisplayString() != ActivitySourceTypeName
+            || objectCreation.Arguments is not [{ Value.ConstantValue: { HasValue: true, Value: string sourceName } } firstArg, ..]) {
             return;
         }
 
-        // Get the source name from constructor argument
-        if (objectCreation.Arguments.Length is 0 ||
-            objectCreation.Arguments[0].Value.ConstantValue is not { HasValue: true, Value: string sourceName }) {
-            return;
-        }
-
-        // Validate the ActivitySource name
         if (!IsValidActivitySourceName(sourceName)) {
-            context.ReportDiagnostic(Diagnostic.Create(
-                Rule,
-                objectCreation.Arguments[0].Syntax.GetLocation(),
-                sourceName));
+            context.ReportDiagnostic(Diagnostic.Create(Rule, firstArg.Syntax.GetLocation(), sourceName));
         }
     }
 
-    /// <summary>
-    ///     Validates that an ActivitySource name follows the reverse-DNS naming convention.
-    /// </summary>
-    /// <param name="name">The ActivitySource name to validate.</param>
-    /// <returns>True if the name is valid, false otherwise.</returns>
     private static bool IsValidActivitySourceName(string name) {
-        // Empty or whitespace names are invalid
-        if (string.IsNullOrWhiteSpace(name)) {
+        if (string.IsNullOrWhiteSpace(name) || !name.ContainsOrdinal(".") || name.ContainsOrdinal(" ")) {
             return false;
         }
 
-        // Must contain at least one dot (reverse-DNS format)
-        if (!name.ContainsOrdinal(".")) {
-            return false;
-        }
-
-        // Check for invalid characters: spaces are not allowed
-        if (name.ContainsOrdinal(" ")) {
-            return false;
-        }
-
-        // Validate each segment
         var segments = name.Split('.');
         foreach (var segment in segments) {
-            // Segments cannot be empty (no consecutive dots or leading/trailing dots)
             if (string.IsNullOrEmpty(segment)) {
                 return false;
             }
 
-            // Each character must be lowercase letter, digit, or hyphen
+            // Allow letters (upper and lower), digits, and hyphens
             foreach (var c in segment) {
-                if (!char.IsLower(c) && !char.IsDigit(c) && c != '-') {
-                    // Allow uppercase, but warn (we don't reject, just recommend lowercase)
-                    // Actually, for strictness, let's allow uppercase too since it's common
-                    if (!char.IsUpper(c)) {
-                        return false;
-                    }
+                if (!char.IsLetter(c) && !char.IsDigit(c) && c != '-') {
+                    return false;
                 }
             }
         }

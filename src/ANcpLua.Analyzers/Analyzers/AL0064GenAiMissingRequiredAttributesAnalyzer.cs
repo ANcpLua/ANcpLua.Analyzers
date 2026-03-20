@@ -40,41 +40,26 @@ public sealed partial class Al0064GenAiMissingRequiredAttributesAnalyzer : AlAna
     private static void AnalyzeInvocation(OperationAnalysisContext context) {
         var invocation = (IInvocationOperation)context.Operation;
 
-        // Look for ActivitySource.StartActivity calls
-        if (invocation.TargetMethod.Name != "StartActivity") {
+        if (invocation.TargetMethod.Name != "StartActivity" ||
+            GetActivityName(invocation) is not { } activityName ||
+            !IsGenAiActivity(activityName)) {
             return;
         }
 
-        // Check if the activity name contains "gen_ai" or "genai" (case insensitive)
-        var activityName = GetActivityName(invocation);
-        if (activityName is null || !IsGenAiActivity(activityName)) {
-            return;
-        }
-
-        // Collect set tags in the current method context
         var setTags = CollectSetTagCalls(invocation);
 
-        // Check for missing required attributes
         foreach (var requiredAttribute in RequiredGenAiAttributes) {
             if (!setTags.Contains(requiredAttribute, StringComparer.OrdinalIgnoreCase)) {
-                context.ReportDiagnostic(Diagnostic.Create(
-                    Rule,
-                    invocation.Syntax.GetLocation(),
-                    activityName,
-                    requiredAttribute));
+                context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.Syntax.GetLocation(), activityName, requiredAttribute));
             }
         }
     }
 
-    private static string? GetActivityName(IInvocationOperation invocation) {
-        // First argument is typically the activity name
-        if (invocation.Arguments.Length > 0 &&
-            invocation.Arguments[0].Value.ConstantValue is { HasValue: true, Value: string name }) {
-            return name;
-        }
-
-        return null;
-    }
+    private static string? GetActivityName(IInvocationOperation invocation) =>
+        invocation.Arguments.Length > 0 &&
+        invocation.Arguments[0].Value.ConstantValue is { HasValue: true, Value: string name }
+            ? name
+            : null;
 
     private static bool IsGenAiActivity(string activityName) =>
         activityName.ContainsIgnoreCase("gen_ai") ||
@@ -86,31 +71,18 @@ public sealed partial class Al0064GenAiMissingRequiredAttributesAnalyzer : AlAna
     private static HashSet<string> CollectSetTagCalls(IInvocationOperation startActivity) {
         var tags = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-        if (FindEnclosingBlock(startActivity) is not { } block) {
-            return tags;
+        for (var current = startActivity.Parent; current is not null; current = current.Parent) {
+            if (current is IBlockOperation block) {
+                CollectSetTagCallsRecursive(block, tags);
+                break;
+            }
         }
 
-        CollectSetTagCallsRecursive(block, tags);
         return tags;
     }
 
-    private static IBlockOperation? FindEnclosingBlock(IOperation operation) {
-        var current = operation.Parent;
-        while (current is not null) {
-            if (current is IBlockOperation block) {
-                return block;
-            }
-
-            current = current.Parent;
-        }
-
-        return null;
-    }
-
     private static void CollectSetTagCallsRecursive(IOperation operation, HashSet<string> tags) {
-        if (operation is IInvocationOperation invocation &&
-            invocation.TargetMethod.Name == "SetTag" &&
-            invocation.Arguments.Length >= 1 &&
+        if (operation is IInvocationOperation { TargetMethod.Name: "SetTag", Arguments.Length: >= 1 } invocation &&
             invocation.Arguments[0].Value.ConstantValue is { HasValue: true, Value: string tagName }) {
             tags.Add(tagName);
             return;

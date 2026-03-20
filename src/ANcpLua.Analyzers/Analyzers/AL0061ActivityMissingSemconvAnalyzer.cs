@@ -40,49 +40,24 @@ public sealed partial class Al0061ActivityMissingSemconvAnalyzer : AlAnalyzer {
     private static void AnalyzeInvocation(OperationAnalysisContext context) {
         var invocation = (IInvocationOperation)context.Operation;
 
-        // Look for ActivitySource.StartActivity calls
-        if (invocation.TargetMethod.Name != "StartActivity") {
+        if (invocation.TargetMethod.Name != "StartActivity" ||
+            GetActivityName(invocation) is not { } activityName ||
+            InferOperationType(activityName) is not { } operationType ||
+            !OperationTypePrefixes.TryGetValue(operationType, out var expectedPrefixes)) {
             return;
         }
 
-        // Get the activity name
-        if (GetActivityName(invocation) is not { } activityName) {
-            return;
-        }
-
-        // Determine the operation type from the activity name
-        if (InferOperationType(activityName) is not { } operationType) {
-            return; // Can't determine operation type, skip analysis
-        }
-
-        // Collect SetTag calls in the same scope
         var setTags = CollectSetTagCalls(invocation);
-
-        // Check if any semantic convention attributes for this operation type are present
-        if (!OperationTypePrefixes.TryGetValue(operationType, out var expectedPrefixes)) {
-            return;
-        }
-
-        var hasRelevantTags = setTags.Any(tag =>
-            expectedPrefixes.Any(tag.StartsWithIgnoreCase));
-
-        if (!hasRelevantTags) {
-            context.ReportDiagnostic(Diagnostic.Create(
-                Rule,
-                invocation.Syntax.GetLocation(),
-                activityName,
-                operationType));
+        if (!setTags.Any(tag => expectedPrefixes.Any(tag.StartsWithIgnoreCase))) {
+            context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.Syntax.GetLocation(), activityName, operationType));
         }
     }
 
-    private static string? GetActivityName(IInvocationOperation invocation) {
-        if (invocation.Arguments.Length > 0 &&
-            invocation.Arguments[0].Value.ConstantValue is { HasValue: true, Value: string name }) {
-            return name;
-        }
-
-        return null;
-    }
+    private static string? GetActivityName(IInvocationOperation invocation) =>
+        invocation.Arguments.Length > 0 &&
+        invocation.Arguments[0].Value.ConstantValue is { HasValue: true, Value: string name }
+            ? name
+            : null;
 
     private static string? InferOperationType(string activityName) {
         foreach (var kvp in OperationTypePrefixes) {
@@ -119,31 +94,18 @@ public sealed partial class Al0061ActivityMissingSemconvAnalyzer : AlAnalyzer {
     private static HashSet<string> CollectSetTagCalls(IInvocationOperation startActivity) {
         var tags = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-        if (FindEnclosingBlock(startActivity) is not { } block) {
-            return tags;
+        for (var current = startActivity.Parent; current is not null; current = current.Parent) {
+            if (current is IBlockOperation block) {
+                CollectSetTagCallsRecursive(block, tags);
+                break;
+            }
         }
 
-        CollectSetTagCallsRecursive(block, tags);
         return tags;
     }
 
-    private static IBlockOperation? FindEnclosingBlock(IOperation operation) {
-        var current = operation.Parent;
-        while (current is not null) {
-            if (current is IBlockOperation block) {
-                return block;
-            }
-
-            current = current.Parent;
-        }
-
-        return null;
-    }
-
     private static void CollectSetTagCallsRecursive(IOperation operation, HashSet<string> tags) {
-        if (operation is IInvocationOperation invocation &&
-            invocation.TargetMethod.Name == "SetTag" &&
-            invocation.Arguments.Length >= 1 &&
+        if (operation is IInvocationOperation { TargetMethod.Name: "SetTag", Arguments.Length: >= 1 } invocation &&
             invocation.Arguments[0].Value.ConstantValue is { HasValue: true, Value: string tagName }) {
             tags.Add(tagName);
             return;

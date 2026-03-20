@@ -45,32 +45,23 @@ public sealed partial class Al0065UseTokenUsageHistogramAnalyzer : AlAnalyzer {
         }
 
         foreach (var attribute in method.GetAttributes()) {
-            if (!SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, histogramType)) {
+            if (!attribute.AttributeClass.IsEqualTo(histogramType) ||
+                attribute.ConstructorArguments.Length is 0 ||
+                attribute.ConstructorArguments[0].Value is not string metricName ||
+                !IsTokenRelatedMetric(metricName) ||
+                metricName.EqualsIgnoreCase(CorrectMetricName)) {
                 continue;
             }
 
-            // Get the metric name from constructor argument
-            if (attribute.ConstructorArguments.Length is 0 ||
-                attribute.ConstructorArguments[0].Value is not string metricName) {
-                continue;
-            }
+            var location = attribute.ApplicationSyntaxReference?.GetSyntax(context.CancellationToken)
+                .GetLocation() ?? method.Locations.FirstOrDefault();
 
-            // Check if this looks like a token usage metric but uses wrong name
-            if (IsTokenRelatedMetric(metricName) &&
-                !metricName.EqualsIgnoreCase(CorrectMetricName)) {
-                var location = attribute.ApplicationSyntaxReference?.GetSyntax(context.CancellationToken)
-                    .GetLocation() ?? method.Locations.FirstOrDefault();
-
-                if (location is not null) {
-                    context.ReportDiagnostic(Diagnostic.Create(
-                        Rule,
-                        location,
-                        metricName));
-                }
+            if (location is not null) {
+                context.ReportDiagnostic(Diagnostic.Create(Rule, location, metricName));
             }
         }
     }
 
     private static bool IsTokenRelatedMetric(string metricName) =>
-        TokenRelatedPatterns.Any(pattern => metricName.ContainsIgnoreCase(pattern));
+        TokenRelatedPatterns.Any(metricName.ContainsIgnoreCase);
 }

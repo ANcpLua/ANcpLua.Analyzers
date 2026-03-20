@@ -39,19 +39,16 @@ public sealed partial class Al0096EnableEventSourceSupportAnalyzer : AlAnalyzer 
     private static void AnalyzeCompilation(CompilationAnalysisContext context) {
         var globalOptions = context.Options.AnalyzerConfigOptionsProvider.GlobalOptions;
 
-        // Check if PublishAot is enabled
         if (!globalOptions.TryGetValue(PublishAotProperty, out var publishAot)
             || !string.Equals(publishAot, "true", StringComparison.OrdinalIgnoreCase)) {
             return;
         }
 
-        // Check if EventSourceSupport is already enabled
         if (globalOptions.TryGetValue(EventSourceSupportProperty, out var eventSourceSupport)
             && string.Equals(eventSourceSupport, "true", StringComparison.OrdinalIgnoreCase)) {
             return;
         }
 
-        // PublishAot is true but EventSourceSupport is not true - report diagnostic
         context.ReportDiagnostic(Diagnostic.Create(Rule, Location.None));
     }
 }

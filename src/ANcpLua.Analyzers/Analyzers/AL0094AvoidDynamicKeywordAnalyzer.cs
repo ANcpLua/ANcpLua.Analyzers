@@ -40,9 +40,7 @@ public sealed partial class Al0094AvoidDynamicKeywordAnalyzer : AlAnalyzer {
             OperationKind.DynamicIndexerAccess);
 
     private static void AnalyzeOperation(OperationAnalysisContext context) {
-        var operation = context.Operation;
-
-        var description = operation.Kind switch {
+        var description = context.Operation.Kind switch {
             OperationKind.DynamicMemberReference => "dynamic member reference",
             OperationKind.DynamicInvocation => "dynamic invocation",
             OperationKind.DynamicObjectCreation => "dynamic object creation",
@@ -50,6 +48,6 @@ public sealed partial class Al0094AvoidDynamicKeywordAnalyzer : AlAnalyzer {
             _ => "dynamic"
         };
 
-        context.ReportDiagnostic(Diagnostic.Create(Rule, operation.Syntax.GetLocation(), description));
+        context.ReportDiagnostic(Diagnostic.Create(Rule, context.Operation.Syntax.GetLocation(), description));
     }
 }

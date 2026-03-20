@@ -35,9 +35,6 @@ public sealed partial class Al0053UnnecessaryAotUnsafeAnalyzer : AlAnalyzer {
         DiagnosticCategories.AotTesting,
         DiagnosticSeverities.Suggestion);
 
-    /// <summary>
-    /// Reflection APIs that indicate AOT-incompatible code.
-    /// </summary>
     private static readonly HashSet<string> UnsafeReflectionMethods = new(StringComparer.Ordinal) {
         "GetMethod",
         "GetMethods",
@@ -60,9 +57,6 @@ public sealed partial class Al0053UnnecessaryAotUnsafeAnalyzer : AlAnalyzer {
         "CreateDelegate",
     };
 
-    /// <summary>
-    /// Types that contain reflection APIs.
-    /// </summary>
     private static readonly HashSet<string> UnsafeReflectionTypes = new(StringComparer.Ordinal) {
         "System.Type",
         "System.Reflection.MethodInfo",
@@ -85,152 +79,97 @@ public sealed partial class Al0053UnnecessaryAotUnsafeAnalyzer : AlAnalyzer {
         context.RegisterCompilationStartAction(OnCompilationStart);
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
-        // Track methods marked with [AotUnsafe] and whether they have unsafe patterns
-        // Use ConcurrentDictionary because analyzer callbacks run concurrently
         var methodUnsafePatterns = new ConcurrentDictionary<IMethodSymbol, bool>(SymbolEqualityComparer.Default);
 
-        // Register all methods with [AotUnsafe] attribute first (to catch methods with no operations)
         context.RegisterSymbolAction(ctx => {
             var method = (IMethodSymbol)ctx.Symbol;
             if (method.HasAttributeByShortName(AotUnsafeAttributeName)) {
-                methodUnsafePatterns.TryAdd(method, false); // Assume safe until proven otherwise
+                methodUnsafePatterns.TryAdd(method, false);
             }
         }, SymbolKind.Method);
 
-        // Check all invocations for unsafe patterns
         context.RegisterOperationAction(ctx => {
-            if (ctx.ContainingSymbol is not IMethodSymbol method) {
+            if (!TryGetTrackedMethod(ctx, methodUnsafePatterns, out var method)) {
                 return;
             }
 
-            // Only track methods marked with [AotUnsafe]
-            if (!method.HasAttributeByShortName(AotUnsafeAttributeName)) {
-                return;
-            }
+            var targetMethod = ((IInvocationOperation)ctx.Operation).TargetMethod;
 
-            // If we already found unsafe patterns, skip
-            if (methodUnsafePatterns.TryGetValue(method, out var hasUnsafe) && hasUnsafe) {
-                return;
-            }
-
-            var invocation = (IInvocationOperation)ctx.Operation;
-            var targetMethod = invocation.TargetMethod;
-
-            // Check if target has [RequiresDynamicCode]
-            if (targetMethod.HasAttributeByShortName(RequiresDynamicCodeAttributeName)) {
+            if (targetMethod.HasAttributeByShortName(RequiresDynamicCodeAttributeName) ||
+                IsAotUnsafe(targetMethod) ||
+                IsKnownReflectionApi(targetMethod)) {
                 methodUnsafePatterns[method] = true;
-                return;
+            } else {
+                methodUnsafePatterns.TryAdd(method, false);
             }
-
-            // Check if target is [AotUnsafe]
-            if (IsAotUnsafe(targetMethod)) {
-                methodUnsafePatterns[method] = true;
-                return;
-            }
-
-            // Check if target is a known reflection API
-            if (IsKnownReflectionApi(targetMethod)) {
-                methodUnsafePatterns[method] = true;
-                return;
-            }
-
-            // Mark as not having unsafe patterns (yet)
-            methodUnsafePatterns.TryAdd(method, false);
         }, OperationKind.Invocation);
 
-        // Check object creation for Reflection.Emit types
         context.RegisterOperationAction(ctx => {
-            if (ctx.ContainingSymbol is not IMethodSymbol method) {
+            if (!TryGetTrackedMethod(ctx, methodUnsafePatterns, out var method)) {
                 return;
             }
 
-            if (!method.HasAttributeByShortName(AotUnsafeAttributeName)) {
-                return;
-            }
-
-            if (methodUnsafePatterns.TryGetValue(method, out var hasUnsafe) && hasUnsafe) {
-                return;
-            }
-
-            var creation = (IObjectCreationOperation)ctx.Operation;
-            if (creation.Type is INamedTypeSymbol createdType) {
-                var ns = createdType.ContainingNamespace?.ToDisplayString();
-                if (ns is "System.Reflection.Emit") {
-                    methodUnsafePatterns[method] = true;
-                }
+            if (((IObjectCreationOperation)ctx.Operation).Type is INamedTypeSymbol { ContainingNamespace: { } ns }
+                && ns.ToDisplayString() is "System.Reflection.Emit") {
+                methodUnsafePatterns[method] = true;
             }
         }, OperationKind.ObjectCreation);
 
-        // Check for dynamic type usage
-        context.RegisterOperationAction(ctx => {
-            if (ctx.ContainingSymbol is not IMethodSymbol method) {
-                return;
-            }
+        context.RegisterOperationAction(MarkUnsafe, OperationKind.DynamicInvocation);
+        context.RegisterOperationAction(MarkUnsafe, OperationKind.DynamicMemberReference);
 
-            if (!method.HasAttributeByShortName(AotUnsafeAttributeName)) {
-                return;
-            }
-
-            if (methodUnsafePatterns.TryGetValue(method, out var hasUnsafe) && hasUnsafe) {
-                return;
-            }
-
-            var dynamicInvocation = (IDynamicInvocationOperation)ctx.Operation;
-            // Any dynamic invocation is unsafe
-            methodUnsafePatterns[method] = true;
-        }, OperationKind.DynamicInvocation);
-
-        context.RegisterOperationAction(ctx => {
-            if (ctx.ContainingSymbol is not IMethodSymbol method) {
-                return;
-            }
-
-            if (!method.HasAttributeByShortName(AotUnsafeAttributeName)) {
-                return;
-            }
-
-            if (methodUnsafePatterns.TryGetValue(method, out var hasUnsafe) && hasUnsafe) {
-                return;
-            }
-
-            // Any dynamic member reference is unsafe
-            methodUnsafePatterns[method] = true;
-        }, OperationKind.DynamicMemberReference);
-
-        // Report methods that have [AotUnsafe] but no unsafe patterns
         context.RegisterCompilationEndAction(ctx => {
             foreach (var kvp in methodUnsafePatterns) {
-                if (kvp.Value) {
+                if (kvp.Value || !kvp.Key.HasAttributeByShortName(AotUnsafeAttributeName)) {
                     continue;
                 }
 
-                var method = kvp.Key;
-
-                // Double-check: method still has the attribute
-                if (!method.HasAttributeByShortName(AotUnsafeAttributeName)) {
-                    continue;
-                }
-
-                var attributeLocation = GetAotUnsafeAttributeLocation(method);
-                var methodName = method.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
-
+                var attributeLocation = GetAotUnsafeAttributeLocation(kvp.Key);
                 ctx.ReportDiagnostic(Diagnostic.Create(
                     Rule,
-                    attributeLocation ?? method.Locations.FirstOrDefault(),
-                    methodName));
+                    attributeLocation ?? kvp.Key.Locations.FirstOrDefault(),
+                    kvp.Key.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)));
             }
         });
+        return;
+
+        // Dynamic invocations and member references are always AOT-unsafe
+        void MarkUnsafe(OperationAnalysisContext ctx) {
+            if (TryGetTrackedMethod(ctx, methodUnsafePatterns, out var method)) {
+                methodUnsafePatterns[method] = true;
+            }
+        }
+    }
+
+    private static bool TryGetTrackedMethod(
+        OperationAnalysisContext ctx,
+        ConcurrentDictionary<IMethodSymbol, bool> patterns,
+        out IMethodSymbol method) {
+        method = null!;
+
+        if (ctx.ContainingSymbol is not IMethodSymbol m) {
+            return false;
+        }
+
+        if (!m.HasAttributeByShortName(AotUnsafeAttributeName)) {
+            return false;
+        }
+
+        if (patterns.TryGetValue(m, out var hasUnsafe) && hasUnsafe) {
+            return false;
+        }
+
+        method = m;
+        return true;
     }
 
     private static bool IsAotUnsafe(IMethodSymbol method) {
-        // Check method itself
         if (method.HasAttributeByShortName(AotUnsafeAttributeName)) {
             return true;
         }
 
-        // Check containing type hierarchy
-        for (var containingType = method.ContainingType; containingType is not null; containingType = containingType.ContainingType) {
-            if (containingType.HasAttributeByShortName(AotUnsafeAttributeName)) {
+        for (var type = method.ContainingType; type is not null; type = type.ContainingType) {
+            if (type.HasAttributeByShortName(AotUnsafeAttributeName)) {
                 return true;
             }
         }
@@ -239,26 +178,18 @@ public sealed partial class Al0053UnnecessaryAotUnsafeAnalyzer : AlAnalyzer {
     }
 
     private static bool IsKnownReflectionApi(IMethodSymbol method) {
-        var methodName = method.Name;
-
-        // Quick check: is this a known unsafe method name?
-        if (!UnsafeReflectionMethods.Contains(methodName)) {
+        if (!UnsafeReflectionMethods.Contains(method.Name)) {
             return false;
         }
 
-        // Verify it's from a reflection type
         if (method.ContainingType is not { } containingType) {
             return false;
         }
 
-        var typeName = containingType.ToDisplayString();
-
-        // Direct match
-        if (UnsafeReflectionTypes.Contains(typeName)) {
+        if (UnsafeReflectionTypes.Contains(containingType.ToDisplayString())) {
             return true;
         }
 
-        // Check if it inherits from a reflection type
         for (var baseType = containingType.BaseType; baseType is not null; baseType = baseType.BaseType) {
             if (UnsafeReflectionTypes.Contains(baseType.ToDisplayString())) {
                 return true;

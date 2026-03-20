@@ -32,21 +32,12 @@ public sealed partial class Al0067UnregisteredMeterAnalyzer : AlAnalyzer {
     private static void AnalyzeObjectCreation(OperationAnalysisContext context) {
         var objectCreation = (IObjectCreationOperation)context.Operation;
 
-        // Check if this is Meter creation
-        if (objectCreation.Type?.ToDisplayString() != MeterTypeName) {
-            return;
-        }
-
-        // Get the meter name from constructor argument
-        if (objectCreation.Arguments.Length is 0 ||
+        if (objectCreation.Type?.ToDisplayString() != MeterTypeName ||
+            objectCreation.Arguments.Length is 0 ||
             objectCreation.Arguments[0].Value.ConstantValue is not { HasValue: true, Value: string meterName }) {
             return;
         }
 
-        // Report as reminder/suggestion to ensure registration
-        context.ReportDiagnostic(Diagnostic.Create(
-            Rule,
-            objectCreation.Syntax.GetLocation(),
-            meterName));
+        context.ReportDiagnostic(Diagnostic.Create(Rule, objectCreation.Syntax.GetLocation(), meterName));
     }
 }

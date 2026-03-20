@@ -80,78 +80,51 @@ public sealed partial class Al0090UncompressedExportAnalyzer : AlAnalyzer {
         INamedTypeSymbol? httpProtobufType) {
         var invocation = (InvocationExpressionSyntax)context.Node;
 
-        var methodName = GetMethodName(invocation);
-        if (methodName is null || !OtlpExporterMethods.Contains(methodName)) {
+        if (GetMethodName(invocation) is not { } methodName || !OtlpExporterMethods.Contains(methodName)) {
             return;
         }
 
-        // Check if this is a lambda configuration pattern: AddOtlpExporter(options => { ... })
         var lambdaArg = invocation.ArgumentList.Arguments
             .Select(a => a.Expression)
             .OfType<SimpleLambdaExpressionSyntax>()
             .FirstOrDefault();
 
         if (lambdaArg is not null) {
-            if (HasCompressionConfiguration(lambdaArg)) {
-                return;
-            }
-
-            // Check if Protocol is set to HttpProtobuf
-            if (HasHttpProtobufConfiguration(lambdaArg, httpProtobufType, context.SemanticModel, context.CancellationToken)) {
-                var location = GetMethodLocation(invocation);
-                context.ReportDiagnostic(Rule, location);
+            if (!HasCompressionConfiguration(lambdaArg)
+                && HasHttpProtobufConfiguration(lambdaArg, httpProtobufType, context.SemanticModel, context.CancellationToken)) {
+                context.ReportDiagnostic(Rule, GetMethodLocation(invocation));
             }
 
             return;
         }
 
-        // Check for delegate argument: AddOtlpExporter(ConfigureOtlp)
-        var delegateArg = invocation.ArgumentList.Arguments
-            .Select(a => a.Expression)
-            .OfType<IdentifierNameSyntax>()
-            .FirstOrDefault();
-
-        if (delegateArg is not null) {
-            // We can't easily trace delegate configurations, so we skip this pattern
+        // Delegate arguments (AddOtlpExporter(ConfigureOtlp)) cannot be traced statically
+        if (invocation.ArgumentList.Arguments.Any(a => a.Expression is IdentifierNameSyntax)) {
             return;
         }
 
-        // Check for options object pattern: AddOtlpExporter(options)
         foreach (var arg in invocation.ArgumentList.Arguments) {
             if (ModelExtensions.GetTypeInfo(context.SemanticModel, arg.Expression, context.CancellationToken).Type is not { } argType) {
                 continue;
             }
 
-            if (otlpOptionsTypes.Any(optionsType => argType.InheritsFrom(optionsType) || argType.IsEqualTo(optionsType))) {
-                // Options object passed - check if it has compression configured
-                // This is complex to trace, so we'll report if HttpProtobuf is detected without compression
-                if (IsHttpProtobufOptionsWithoutCompression(arg.Expression, context.SemanticModel, context.CancellationToken)) {
-                    var location = GetMethodLocation(invocation);
-                    context.ReportDiagnostic(Rule, location);
-                }
+            if (otlpOptionsTypes.Any(optionsType => argType.InheritsFrom(optionsType) || argType.IsEqualTo(optionsType))
+                && IsHttpProtobufOptionsWithoutCompression(arg.Expression)) {
+                context.ReportDiagnostic(Rule, GetMethodLocation(invocation));
             }
         }
     }
 
     private static bool HasCompressionConfiguration(SimpleLambdaExpressionSyntax lambda) {
-        // Look for compression-related assignments within the lambda
         foreach (var node in lambda.DescendantNodes()) {
-            if (node is AssignmentExpressionSyntax assignment) {
-                var leftText = GetMemberName(assignment.Left);
-                if (leftText is not null &&
-                    (leftText.ContainsIgnoreCase("compression") ||
-                     leftText.ContainsIgnoreCase("gzip"))) {
-                    return true;
-                }
-            }
+            var name = node switch {
+                AssignmentExpressionSyntax assignment => GetMemberName(assignment.Left),
+                InvocationExpressionSyntax invocation => GetMethodName(invocation),
+                _ => null
+            };
 
-            if (node is InvocationExpressionSyntax nestedInvocation) {
-                var nestedMethod = GetMethodName(nestedInvocation);
-                if (nestedMethod is not null &&
-                    (nestedMethod.ContainsIgnoreCase("compression") ||
-                     nestedMethod.ContainsIgnoreCase("gzip"))) {
-                    return true;
-                }
+            if (name is not null && (name.ContainsIgnoreCase("compression") || name.ContainsIgnoreCase("gzip"))) {
+                return true;
             }
         }
 
@@ -164,31 +137,21 @@ public sealed partial class Al0090UncompressedExportAnalyzer : AlAnalyzer {
         SemanticModel semanticModel,
         CancellationToken cancellationToken) {
         foreach (var node in lambda.DescendantNodes()) {
-            if (node is not AssignmentExpressionSyntax assignment) {
+            if (node is not AssignmentExpressionSyntax { Right: MemberAccessExpressionSyntax memberAccess } assignment
+                || GetMemberName(assignment.Left) is not "Protocol") {
                 continue;
             }
 
-            var leftText = GetMemberName(assignment.Left);
-            if (leftText is null || !leftText.EqualsOrdinal("Protocol")) {
-                continue;
+            if (memberAccess.Name.Identifier.Text.EqualsOrdinal("HttpProtobuf")) {
+                return true;
             }
 
-            // Check if the right side is OtlpExportProtocol.HttpProtobuf
-            if (assignment.Right is MemberAccessExpressionSyntax memberAccess) {
-                var memberName = memberAccess.Name.Identifier.Text;
-                if (memberName.EqualsOrdinal("HttpProtobuf")) {
-                    return true;
-                }
-
-                // Also check via semantic model if available
-                if (httpProtobufType is not null) {
-                    var symbol = ModelExtensions.GetSymbolInfo(semanticModel, memberAccess, cancellationToken).Symbol;
-                    if (symbol is IFieldSymbol fieldSymbol &&
-                        fieldSymbol.ContainingType.IsEqualTo(httpProtobufType) &&
-                        fieldSymbol.Name.EqualsOrdinal("HttpProtobuf")) {
-                        return true;
-                    }
-                }
+            // Fall back to semantic model for aliased/renamed references
+            if (httpProtobufType is not null
+                && ModelExtensions.GetSymbolInfo(semanticModel, memberAccess, cancellationToken).Symbol
+                    is IFieldSymbol { Name: "HttpProtobuf" } fieldSymbol
+                && fieldSymbol.ContainingType.IsEqualTo(httpProtobufType)) {
+                return true;
             }
         }
 
@@ -196,36 +159,23 @@ public sealed partial class Al0090UncompressedExportAnalyzer : AlAnalyzer {
     }
 
     private static bool IsHttpProtobufOptionsWithoutCompression(
-        ExpressionSyntax expression,
-        SemanticModel semanticModel,
-        CancellationToken cancellationToken) {
-        // This is a heuristic check for object initializers like:
-        // new OtlpExporterOptions { Protocol = OtlpExportProtocol.HttpProtobuf }
-        if (expression is not ObjectCreationExpressionSyntax objectCreation) {
-            return false;
-        }
-
-        if (objectCreation.Initializer is null) {
+        ExpressionSyntax expression) {
+        if (expression is not ObjectCreationExpressionSyntax { Initializer: { } initializer }) {
             return false;
         }
 
         var hasHttpProtobuf = false;
         var hasCompression = false;
 
-        foreach (var expr in objectCreation.Initializer.Expressions) {
-            if (expr is not AssignmentExpressionSyntax assignment) {
+        foreach (var expr in initializer.Expressions) {
+            if (expr is not AssignmentExpressionSyntax assignment
+                || GetMemberName(assignment.Left) is not { } leftText) {
                 continue;
             }
 
-            if (GetMemberName(assignment.Left) is not { } leftText) {
-                continue;
-            }
-
-            if (leftText.EqualsOrdinal("Protocol")) {
-                if (assignment.Right is MemberAccessExpressionSyntax memberAccess &&
-                    memberAccess.Name.Identifier.Text.EqualsOrdinal("HttpProtobuf")) {
-                    hasHttpProtobuf = true;
-                }
+            if (leftText.EqualsOrdinal("Protocol")
+                && assignment.Right is MemberAccessExpressionSyntax { Name.Identifier.Text: "HttpProtobuf" }) {
+                hasHttpProtobuf = true;
             }
 
             if (leftText.ContainsIgnoreCase("compression") || leftText.ContainsIgnoreCase("gzip")) {

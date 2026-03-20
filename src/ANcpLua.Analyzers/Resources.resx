@@ -1084,4 +1084,84 @@
     <data name="AL0110AnalyzerDescription" xml:space="preserve">
         <value>The [TracedTag] attribute records parameter values as span attributes at the start of method execution. Parameters with out or ref modifiers are not supported because out parameters have no value at method entry and ref parameters may be mutated during execution.</value>
     </data>
+    <!-- AL0111: SQL interpolation in CommandText -->
+    <data name="AL0111AnalyzerTitle" xml:space="preserve">
+        <value>Avoid SQL string interpolation in CommandText</value>
+    </data>
+    <data name="AL0111AnalyzerMessageFormat" xml:space="preserve">
+        <value>CommandText uses string interpolation which may be vulnerable to SQL injection; use parameterized queries instead</value>
+    </data>
+    <data name="AL0111AnalyzerDescription" xml:space="preserve">
+        <value>String interpolation in SQL CommandText can lead to SQL injection vulnerabilities. Use parameterized queries with placeholders ($1, @param) instead of interpolating values directly.</value>
+    </data>
+    <!-- AL0112: Fire-and-forget task discard -->
+    <data name="AL0112AnalyzerTitle" xml:space="preserve">
+        <value>Avoid fire-and-forget task discard</value>
+    </data>
+    <data name="AL0112AnalyzerMessageFormat" xml:space="preserve">
+        <value>Discarded task from '{0}' will silently swallow exceptions; await the task or add explicit error handling</value>
+    </data>
+    <data name="AL0112AnalyzerDescription" xml:space="preserve">
+        <value>Discarding a Task with _ = causes fire-and-forget behavior where exceptions are silently lost. Await the task, store it for later observation, or add a continuation with error handling.</value>
+    </data>
+    <!-- AL0113: Missing exception recording on Activity error status -->
+    <data name="AL0113AnalyzerTitle" xml:space="preserve">
+        <value>Missing exception recording on Activity error status</value>
+    </data>
+    <data name="AL0113AnalyzerMessageFormat" xml:space="preserve">
+        <value>Activity.SetStatus(Error) without recording the exception; call AddEvent or RecordException to capture exception details</value>
+    </data>
+    <data name="AL0113AnalyzerDescription" xml:space="preserve">
+        <value>When setting an Activity status to Error in a catch block, the exception should be recorded as an event on the span for proper observability. Use activity.AddEvent with exception details or a RecordException helper.</value>
+    </data>
+    <!-- AL0114: Prefer TryParse over Parse -->
+    <data name="AL0114AnalyzerTitle" xml:space="preserve">
+        <value>Prefer TryParse over Parse</value>
+    </data>
+    <data name="AL0114AnalyzerMessageFormat" xml:space="preserve">
+        <value>'{0}.Parse' throws on invalid input; use '{0}.TryParse' instead</value>
+    </data>
+    <data name="AL0114AnalyzerDescription" xml:space="preserve">
+        <value>Parse methods throw FormatException on invalid input. Use TryParse to safely handle invalid input without exceptions, especially when processing user input or external data.</value>
+    </data>
+    <!-- AL0115: Empty catch block swallows exceptions -->
+    <data name="AL0115AnalyzerTitle" xml:space="preserve">
+        <value>Empty catch block swallows exceptions</value>
+    </data>
+    <data name="AL0115AnalyzerMessageFormat" xml:space="preserve">
+        <value>Catch block is empty; add logging, rethrow, or handle the exception</value>
+    </data>
+    <data name="AL0115AnalyzerDescription" xml:space="preserve">
+        <value>Empty catch blocks silently swallow exceptions, making bugs invisible. At minimum, log the exception. If the exception is truly expected, add a comment explaining why it is safe to ignore.</value>
+    </data>
+    <!-- AL0116: Exception details leaked in HTTP response -->
+    <data name="AL0116AnalyzerTitle" xml:space="preserve">
+        <value>Exception details leaked in HTTP response</value>
+    </data>
+    <data name="AL0116AnalyzerMessageFormat" xml:space="preserve">
+        <value>'{0}' exposes exception internals to the client; return a generic error message instead</value>
+    </data>
+    <data name="AL0116AnalyzerDescription" xml:space="preserve">
+        <value>Returning exception messages, stack traces, or ToString() output in HTTP responses can expose sensitive implementation details. Return a generic error message and log the exception server-side.</value>
+    </data>
+    <!-- AL0117: Unnecessary LINQ materialization -->
+    <data name="AL0117AnalyzerTitle" xml:space="preserve">
+        <value>Unnecessary LINQ materialization</value>
+    </data>
+    <data name="AL0117AnalyzerMessageFormat" xml:space="preserve">
+        <value>'{0}' after '{1}' forces immediate materialization; consider removing if deferred execution suffices</value>
+    </data>
+    <data name="AL0117AnalyzerDescription" xml:space="preserve">
+        <value>Calling ToList() or ToArray() immediately after Where(), Select(), or other LINQ operators forces eager evaluation. If the result is only enumerated once, deferred execution avoids allocating an intermediate collection.</value>
+    </data>
+    <!-- AL0118: Read-modify-write without transaction -->
+    <data name="AL0118AnalyzerTitle" xml:space="preserve">
+        <value>Read-modify-write without transaction</value>
+    </data>
+    <data name="AL0118AnalyzerMessageFormat" xml:space="preserve">
+        <value>Method '{0}' performs both read and write operations without a transaction; wrap in BeginTransaction to ensure consistency</value>
+    </data>
+    <data name="AL0118AnalyzerDescription" xml:space="preserve">
+        <value>A method that reads data and then writes based on that data without a transaction is vulnerable to race conditions. Another connection could modify the data between the read and write. Use BeginTransaction/BeginTransactionAsync to ensure isolation.</value>
+    </data>
 </root>

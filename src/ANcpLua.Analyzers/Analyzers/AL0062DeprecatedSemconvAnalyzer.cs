@@ -56,26 +56,18 @@ public sealed partial class Al0062DeprecatedSemconvAnalyzer : AlAnalyzer {
     private static void AnalyzeInvocation(OperationAnalysisContext context) {
         var invocation = (IInvocationOperation)context.Operation;
 
-        // Look for SetTag, AddTag, or similar methods
-        if (!IsTagMethod(invocation.TargetMethod.Name) || invocation.Arguments.Length is 0) {
+        if (invocation.TargetMethod.Name is not ("SetTag" or "AddTag" or "SetAttribute" or "Add") ||
+            invocation.Arguments.Length is 0 ||
+            invocation.Arguments[0].Value.ConstantValue is not { HasValue: true, Value: string attributeName } ||
+            !DeprecatedAttributes.TryGetValue(attributeName, out var info)) {
             return;
         }
 
-        // Check if the first argument is a deprecated attribute name
-        if (invocation.Arguments[0].Value.ConstantValue is not { HasValue: true, Value: string attributeName }) {
-            return;
-        }
-
-        if (DeprecatedAttributes.TryGetValue(attributeName, out var info)) {
-            context.ReportDiagnostic(Diagnostic.Create(
-                Rule,
-                invocation.Arguments[0].Syntax.GetLocation(),
-                attributeName,
-                info.Version,
-                info.Replacement));
-        }
+        context.ReportDiagnostic(Diagnostic.Create(
+            Rule,
+            invocation.Arguments[0].Syntax.GetLocation(),
+            attributeName,
+            info.Version,
+            info.Replacement));
     }
-
-    private static bool IsTagMethod(string methodName) =>
-        methodName is "SetTag" or "AddTag" or "SetAttribute" or "Add";
 }

@@ -47,25 +47,16 @@ public sealed partial class Al0072MetricMethodMustBePartialAnalyzer : AlAnalyzer
     private static void AnalyzeMethodDeclaration(SyntaxNodeAnalysisContext context) {
         var methodDeclaration = (MethodDeclarationSyntax)context.Node;
 
-        // Quick check: skip if no attributes
         if (methodDeclaration.AttributeLists.Count is 0) {
             return;
         }
 
-        // Check if method has [Counter] or [Histogram] attribute
-        if (context.SemanticModel.GetDeclaredSymbol(methodDeclaration, context.CancellationToken) is not { } methodSymbol) {
+        if (context.SemanticModel.GetDeclaredSymbol(methodDeclaration, context.CancellationToken) is not { } methodSymbol
+            || GetMetricAttributeName(methodSymbol, context.SemanticModel.Compilation) is not { } metricAttributeName) {
             return;
         }
 
-        if (GetMetricAttributeName(methodSymbol, context.SemanticModel.Compilation) is not { } metricAttributeName) {
-            return;
-        }
-
-        // Check for partial modifier
-        var hasPartial = methodDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword);
-
-        // Report if missing partial modifier
-        if (!hasPartial) {
+        if (!methodDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword)) {
             context.ReportDiagnostic(Diagnostic.Create(
                 Rule,
                 methodDeclaration.Identifier.GetLocation(),
@@ -80,12 +71,12 @@ public sealed partial class Al0072MetricMethodMustBePartialAnalyzer : AlAnalyzer
 
         foreach (var attribute in methodSymbol.GetAttributes()) {
             if (counterAttributeType is not null &&
-                SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, counterAttributeType)) {
+                attribute.AttributeClass.IsEqualTo(counterAttributeType)) {
                 return "Counter";
             }
 
             if (histogramAttributeType is not null &&
-                SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, histogramAttributeType)) {
+                attribute.AttributeClass.IsEqualTo(histogramAttributeType)) {
                 return "Histogram";
             }
         }

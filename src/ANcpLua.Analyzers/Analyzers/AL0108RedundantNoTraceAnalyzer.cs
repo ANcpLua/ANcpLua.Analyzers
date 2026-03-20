@@ -64,13 +64,7 @@ public sealed partial class Al0108RedundantNoTraceAnalyzer : AlAnalyzer {
         INamedTypeSymbol noTraceType) {
         var method = (IMethodSymbol)context.Symbol;
 
-        // Only report if method has [NoTrace]
-        if (!HasAttribute(method, noTraceType)) {
-            return;
-        }
-
-        // Report only when the declaring type does NOT have class-level [Traced]
-        if (!HasTracedOnType(method.ContainingType, tracedType)) {
+        if (method.HasAttribute(noTraceType) && !HasTracedOnType(method.ContainingType, tracedType)) {
             context.ReportDiagnostic(Diagnostic.Create(
                 Rule,
                 method.Locations.FirstOrDefault() ?? Location.None,
@@ -78,23 +72,11 @@ public sealed partial class Al0108RedundantNoTraceAnalyzer : AlAnalyzer {
         }
     }
 
-    private static bool HasAttribute(ISymbol symbol, INamedTypeSymbol attributeType) {
-        foreach (var attribute in symbol.GetAttributes()) {
-            if (SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, attributeType)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     private static bool HasTracedOnType(INamedTypeSymbol? type, INamedTypeSymbol tracedType) {
-        while (type is not null) {
-            if (HasAttribute(type, tracedType)) {
+        for (var current = type; current is not null; current = current.BaseType) {
+            if (current.HasAttribute(tracedType)) {
                 return true;
             }
-
-            type = type.BaseType;
         }
 
         return false;

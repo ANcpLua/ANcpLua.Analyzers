@@ -31,8 +31,7 @@ public sealed partial class Al0041AotTestMustReturnIntAnalyzer : AlAnalyzer {
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
-    /// <summary>Registers syntax or operation actions for analysis.</summary>
-
+    /// <inheritdoc />
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterCompilationStartAction(OnCompilationStart);
 
@@ -51,24 +50,14 @@ public sealed partial class Al0041AotTestMustReturnIntAnalyzer : AlAnalyzer {
             return;
         }
 
-        // Check for AotTest or TrimTest attribute
-        string? attributeName = null;
-        if (method.HasAttributeByShortName(AotTestAttributeName)) {
-            attributeName = AotTestAttributeName;
-        } else if (method.HasAttributeByShortName(TrimTestAttributeName)) {
-            attributeName = TrimTestAttributeName;
-        }
+        var attributeName = method.HasAttributeByShortName(AotTestAttributeName) ? AotTestAttributeName
+            : method.HasAttributeByShortName(TrimTestAttributeName) ? TrimTestAttributeName
+            : null;
 
-        if (attributeName is null) {
+        if (attributeName is null || method.ReturnType.IsEqualTo(intType)) {
             return;
         }
 
-        // Check if return type is int
-        if (method.ReturnType.IsEqualTo(intType)) {
-            return;
-        }
-
-        var returnTypeName = method.ReturnType.ToDisplayString();
-        context.ReportDiagnostic(Rule, method.Locations[0], method.Name, attributeName, returnTypeName);
+        context.ReportDiagnostic(Rule, method.Locations[0], method.Name, attributeName, method.ReturnType.ToDisplayString());
     }
 }

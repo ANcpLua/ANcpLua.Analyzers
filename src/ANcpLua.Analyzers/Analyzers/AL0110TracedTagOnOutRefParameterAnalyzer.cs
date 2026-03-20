@@ -57,28 +57,13 @@ public sealed partial class Al0110TracedTagOnOutRefParameterAnalyzer : AlAnalyze
         var method = (IMethodSymbol)context.Symbol;
 
         foreach (var param in method.Parameters) {
-            if (param.RefKind is not (RefKind.Out or RefKind.Ref)) {
-                continue;
-            }
-
-            if (!HasAttribute(param, tracedTagType)) {
-                continue;
-            }
-
-            context.ReportDiagnostic(Diagnostic.Create(
-                Rule,
-                param.Locations.FirstOrDefault() ?? Location.None,
-                param.Name));
-        }
-    }
-
-    private static bool HasAttribute(ISymbol symbol, INamedTypeSymbol attributeType) {
-        foreach (var attribute in symbol.GetAttributes()) {
-            if (SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, attributeType)) {
-                return true;
+            if (param.RefKind is RefKind.Out or RefKind.Ref &&
+                param.GetAttributes().Any(a => a.AttributeClass.IsEqualTo(tracedTagType))) {
+                context.ReportDiagnostic(Diagnostic.Create(
+                    Rule,
+                    param.Locations.FirstOrDefault() ?? Location.None,
+                    param.Name));
             }
         }
-
-        return false;
     }
 }

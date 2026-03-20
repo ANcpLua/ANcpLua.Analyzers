@@ -44,12 +44,10 @@ public sealed partial class Al0042AotTestExitCode100Analyzer : AlAnalyzer {
             return;
         }
 
-        // Check if method has [AotTest] or [TrimTest] attribute
         if (!HasAotOrTrimTestAttribute(methodSymbol)) {
             return;
         }
 
-        // Check if method returns int
         var intType = context.SemanticModel.Compilation.GetSpecialType(SpecialType.System_Int32);
         if (!methodSymbol.ReturnType.IsEqualTo(intType)) {
             return;
@@ -66,72 +64,47 @@ public sealed partial class Al0042AotTestExitCode100Analyzer : AlAnalyzer {
             .ToList();
 
         if (returnStatements.Count is 0) {
-            // Method has no explicit return statements
-            // For expression-bodied methods, check the expression
             if (methodDeclaration.ExpressionBody is { } expressionBody) {
                 CheckSingleReturnValue(context, expressionBody.Expression);
             } else {
-                // Block-bodied method with no return statements - implicit return
-                var location = methodDeclaration.Identifier.GetLocation();
                 context.ReportDiagnostic(
-                    Rule, location,
+                    Rule, methodDeclaration.Identifier.GetLocation(),
                     $"Method ends without explicit 'return {ExpectedExitCode};' statement");
             }
 
             return;
         }
 
-        // First pass: check if ANY return statement returns 100
-        var hasSuccessReturn = false;
-        foreach (var returnStatement in returnStatements) {
-            if (returnStatement.Expression is null) {
-                continue;
-            }
-
-            if (IsExpectedExitCode(context, returnStatement.Expression)) {
-                hasSuccessReturn = true;
-                break;
-            }
-        }
-
-        // If there's at least one return 100, don't report on failure returns (they're intentional)
-        if (hasSuccessReturn) {
+        if (returnStatements.Any(r => r.Expression is not null && IsExpectedExitCode(context, r.Expression))) {
             return;
         }
 
-        // No return 100 found - report on the method identifier
-        var methodLocation = methodDeclaration.Identifier.GetLocation();
         context.ReportDiagnostic(
-            Rule, methodLocation,
+            Rule, methodDeclaration.Identifier.GetLocation(),
             $"Method has no 'return {ExpectedExitCode};' statement to indicate success");
     }
 
-    private static bool IsExpectedExitCode(SyntaxNodeAnalysisContext context, ExpressionSyntax expression) {
-        var constantValue = context.SemanticModel.GetConstantValue(expression, context.CancellationToken);
-        return constantValue is { HasValue: true, Value: int intValue } && intValue == ExpectedExitCode;
-    }
+    private static bool IsExpectedExitCode(SyntaxNodeAnalysisContext context, ExpressionSyntax expression) =>
+        context.SemanticModel.GetConstantValue(expression, context.CancellationToken)
+            is { HasValue: true, Value: ExpectedExitCode };
 
     private static void CheckSingleReturnValue(SyntaxNodeAnalysisContext context, ExpressionSyntax expression) {
         var constantValue = context.SemanticModel.GetConstantValue(expression, context.CancellationToken);
 
-        if (!constantValue.HasValue) {
-            // Not a constant - could be a variable or method call
-            context.ReportDiagnostic(
-                Rule, expression.GetLocation(),
-                $"Consider returning {ExpectedExitCode} for success instead of a computed value");
-            return;
+        switch (constantValue) {
+            case { HasValue: false }:
+                context.ReportDiagnostic(
+                    Rule, expression.GetLocation(),
+                    $"Consider returning {ExpectedExitCode} for success instead of a computed value");
+                break;
+            case { Value: ExpectedExitCode }:
+                break;
+            default:
+                context.ReportDiagnostic(
+                    Rule, expression.GetLocation(),
+                    $"Return value should be {ExpectedExitCode} for success, not {constantValue.Value?.ToString() ?? "null"}");
+                break;
         }
-
-        if (constantValue.Value is int intValue && intValue == ExpectedExitCode) {
-            // Correct exit code - no diagnostic
-            return;
-        }
-
-        // Return value is a literal but not 100
-        var actualValue = constantValue.Value?.ToString() ?? "null";
-        context.ReportDiagnostic(
-            Rule, expression.GetLocation(),
-            $"Return value should be {ExpectedExitCode} for success, not {actualValue}");
     }
 
     private static bool HasAotOrTrimTestAttribute(IMethodSymbol method) =>

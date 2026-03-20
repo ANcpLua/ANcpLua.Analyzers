@@ -87,20 +87,15 @@ public sealed partial class Al0092ConsiderSamplingAnalyzer : AlAnalyzer {
             return;
         }
 
-        // Check for SetSampler call within this configuration
         if (HasSamplerConfiguration(invocation, out var usesAlwaysOn)) {
-            // If they explicitly use AlwaysOnSampler, still report
             if (usesAlwaysOn) {
-                var location = GetMethodLocation(invocation);
-                context.ReportDiagnostic(Diagnostic.Create(Rule, location));
+                context.ReportDiagnostic(Diagnostic.Create(Rule, GetMethodLocation(invocation)));
             }
 
             return;
         }
 
-        // No sampler configured - report
-        var diagLocation = GetMethodLocation(invocation);
-        context.ReportDiagnostic(Diagnostic.Create(Rule, diagLocation));
+        context.ReportDiagnostic(Diagnostic.Create(Rule, GetMethodLocation(invocation)));
     }
 
     private static bool IsTracerBuilderCall(
@@ -108,15 +103,11 @@ public sealed partial class Al0092ConsiderSamplingAnalyzer : AlAnalyzer {
         SemanticModel semanticModel,
         ImmutableArray<INamedTypeSymbol> tracerBuilderTypes,
         CancellationToken cancellationToken) {
-        if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess) {
+        if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess
+            || ModelExtensions.GetTypeInfo(semanticModel, memberAccess.Expression, cancellationToken).Type is not { } receiverType) {
             return false;
         }
 
-        if (ModelExtensions.GetTypeInfo(semanticModel, memberAccess.Expression, cancellationToken).Type is not { } receiverType) {
-            return false;
-        }
-
-        // Check if receiver type inherits from or implements any tracer builder type
         return tracerBuilderTypes.Any(builderType =>
             receiverType.InheritsFrom(builderType) || receiverType.Implements(builderType));
     }
@@ -129,7 +120,6 @@ public sealed partial class Al0092ConsiderSamplingAnalyzer : AlAnalyzer {
                 case InvocationExpressionSyntax nestedInvocation: {
                     var nestedMethod = GetMethodName(nestedInvocation);
                     if (nestedMethod?.EqualsOrdinal("SetSampler") == true) {
-                        // Check if it's AlwaysOnSampler
                         usesAlwaysOnSampler = CheckForAlwaysOnSampler(nestedInvocation);
                         return true;
                     }
@@ -156,13 +146,9 @@ public sealed partial class Al0092ConsiderSamplingAnalyzer : AlAnalyzer {
                 case IdentifierNameSyntax identifier
                     when AlwaysOnSamplerTypes.Contains(identifier.Identifier.Text):
                     return true;
-                case ObjectCreationExpressionSyntax creation
-                    when creation.Type is IdentifierNameSyntax typeName &&
-                         AlwaysOnSamplerTypes.Contains(typeName.Identifier.Text):
+                case ObjectCreationExpressionSyntax { Type: IdentifierNameSyntax typeName } when AlwaysOnSamplerTypes.Contains(typeName.Identifier.Text):
                     return true;
-                case ObjectCreationExpressionSyntax creation
-                    when creation.Type is QualifiedNameSyntax qualifiedName &&
-                         AlwaysOnSamplerTypes.Contains(qualifiedName.ToString()):
+                case ObjectCreationExpressionSyntax { Type: QualifiedNameSyntax qualifiedName } when AlwaysOnSamplerTypes.Contains(qualifiedName.ToString()):
                     return true;
             }
         }

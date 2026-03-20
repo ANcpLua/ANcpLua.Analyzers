@@ -47,28 +47,17 @@ public sealed partial class Al0071MeterClassMustBePartialStaticAnalyzer : AlAnal
     private static void AnalyzeClassDeclaration(SyntaxNodeAnalysisContext context) {
         var classDeclaration = (ClassDeclarationSyntax)context.Node;
 
-        // Quick check: skip if no attributes
         if (classDeclaration.AttributeLists.Count is 0) {
             return;
         }
 
-        // Check if class has [Meter] attribute
-        if (context.SemanticModel.GetDeclaredSymbol(classDeclaration, context.CancellationToken) is not { } classSymbol) {
+        if (context.SemanticModel.GetDeclaredSymbol(classDeclaration, context.CancellationToken) is not { } classSymbol
+            || !HasMeterAttribute(classSymbol, context.SemanticModel.Compilation)) {
             return;
         }
 
-        if (!HasMeterAttribute(classSymbol, context.SemanticModel.Compilation)) {
-            return;
-        }
-
-        // Check for partial modifier
-        var hasPartial = classDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword);
-
-        // Check for static modifier
-        var hasStatic = classDeclaration.Modifiers.Any(SyntaxKind.StaticKeyword);
-
-        // Report if missing either modifier
-        if (!hasPartial || !hasStatic) {
+        if (!classDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword)
+            || !classDeclaration.Modifiers.Any(SyntaxKind.StaticKeyword)) {
             context.ReportDiagnostic(Diagnostic.Create(
                 Rule,
                 classDeclaration.Identifier.GetLocation(),
@@ -76,12 +65,7 @@ public sealed partial class Al0071MeterClassMustBePartialStaticAnalyzer : AlAnal
         }
     }
 
-    private static bool HasMeterAttribute(INamedTypeSymbol classSymbol, Compilation compilation) {
-        if (compilation.GetTypeByMetadataName(MeterAttributeFullName) is not { } meterAttributeType) {
-            return false;
-        }
-
-        return classSymbol.GetAttributes().Any(a =>
-            SymbolEqualityComparer.Default.Equals(a.AttributeClass, meterAttributeType));
-    }
+    private static bool HasMeterAttribute(INamedTypeSymbol classSymbol, Compilation compilation) =>
+        compilation.GetTypeByMetadataName(MeterAttributeFullName) is { } meterAttributeType
+        && classSymbol.GetAttributes().Any(a => a.AttributeClass.IsEqualTo(meterAttributeType));
 }

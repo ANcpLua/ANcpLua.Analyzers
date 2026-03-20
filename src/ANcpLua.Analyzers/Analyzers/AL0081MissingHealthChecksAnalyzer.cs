@@ -34,56 +34,38 @@ public sealed partial class Al0081MissingHealthChecksAnalyzer : AlAnalyzer {
     private static void AnalyzeInvocation(SyntaxNodeAnalysisContext context) {
         var invocation = (InvocationExpressionSyntax)context.Node;
 
-        // Look for WebApplication.CreateBuilder or Host.CreateDefaultBuilder calls
-        var methodName = GetMethodName(invocation);
-        if (methodName is not ("CreateBuilder" or "CreateDefaultBuilder")) {
+        if (GetMethodName(invocation) is not ("CreateBuilder" or "CreateDefaultBuilder")
+            || GetReceiverName(invocation) is not ("WebApplication" or "Host")) {
             return;
         }
 
-        // Check if this looks like a web application builder pattern
-        var receiverName = GetReceiverName(invocation);
-        if (receiverName is not ("WebApplication" or "Host")) {
-            return;
-        }
-
-        // Skip test methods — test code creates WebApplication for endpoint registration verification, not production hosting
+        // Test code creates WebApplication for endpoint registration verification, not production hosting
         if (IsInsideTestMethod(invocation)) {
             return;
         }
 
-        // Find the containing method (likely Main or configuration method)
         if (invocation.Ancestors().OfType<MethodDeclarationSyntax>().FirstOrDefault() is not { } containingMethod) {
-            // Also check for top-level statements (no method, but compilation unit)
-            if (invocation.Ancestors().OfType<CompilationUnitSyntax>().FirstOrDefault() is not { } compilationUnit) {
-                return;
-            }
-
-            // Search in top-level statements
-            if (!HasHealthChecksConfigured(compilationUnit, context.SemanticModel)) {
+            if (invocation.Ancestors().OfType<CompilationUnitSyntax>().FirstOrDefault() is { } compilationUnit
+                && !HasHealthChecksConfigured(compilationUnit)) {
                 context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.GetLocation()));
             }
 
             return;
         }
 
-        // Collect all method invocations in the same method
-        if (!HasHealthChecksConfigured(containingMethod, context.SemanticModel)) {
+        if (!HasHealthChecksConfigured(containingMethod)) {
             context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.GetLocation()));
         }
     }
 
-    private static bool HasHealthChecksConfigured(SyntaxNode scope, SemanticModel semanticModel) {
-        var allInvocations = new HashSet<string>();
-
+    private static bool HasHealthChecksConfigured(SyntaxNode scope) {
         foreach (var inv in scope.DescendantNodes().OfType<InvocationExpressionSyntax>()) {
-            var name = GetMethodName(inv);
-            if (name is not null) {
-                allInvocations.Add(name);
+            if (GetMethodName(inv) is "AddHealthChecks") {
+                return true;
             }
         }
 
-        // Check for AddHealthChecks call
-        return allInvocations.Contains("AddHealthChecks");
+        return false;
     }
 
     private static string? GetMethodName(InvocationExpressionSyntax invocation) =>

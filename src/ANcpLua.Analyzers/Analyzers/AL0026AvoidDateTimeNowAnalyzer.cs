@@ -8,12 +8,13 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0026AvoidDateTimeNowAnalyzer : AlAnalyzer {
-    /// <summary>Metadata name for System.TimeProvider (.NET 8+).</summary>
-    private const string TimeProviderMetadataName = "System.TimeProvider";
-    /// <summary>Metadata name for System.DateTime.</summary>
-    private const string DateTimeMetadataName = "System.DateTime";
-    /// <summary>Metadata name for System.DateTimeOffset.</summary>
-    private const string DateTimeOffsetMetadataName = "System.DateTimeOffset";
+    private enum KnownType { TimeProvider, DateTime, DateTimeOffset }
+
+    private static readonly string[] KnownTypeNames = [
+        "System.TimeProvider",
+        "System.DateTime",
+        "System.DateTimeOffset"
+    ];
 
     /// <summary>Property key for the source type (DateTime or DateTimeOffset).</summary>
     public const string PropertyIsDateTimeOffset = "IsDateTimeOffset";
@@ -34,51 +35,42 @@ public sealed partial class Al0026AvoidDateTimeNowAnalyzer : AlAnalyzer {
         context.RegisterCompilationStartAction(OnCompilationStart);
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
-        // Only analyze if TimeProvider is available (.NET 8+)
-        if (context.Compilation.GetTypeByMetadataName(TimeProviderMetadataName) is not { } timeProviderType) {
+        var cache = new TypeCache<KnownType>(type => context.Compilation.GetTypeByMetadataName(KnownTypeNames[(int)type]));
+
+        if (cache.Get(KnownType.TimeProvider) is null) {
             return;
         }
 
-        var dateTimeType = context.Compilation.GetTypeByMetadataName(DateTimeMetadataName);
-        var dateTimeOffsetType = context.Compilation.GetTypeByMetadataName(DateTimeOffsetMetadataName);
-
-        // Need at least one of the types to analyze
-        if (dateTimeType is null && dateTimeOffsetType is null) {
+        if (cache.Get(KnownType.DateTime) is null && cache.Get(KnownType.DateTimeOffset) is null) {
             return;
         }
 
         context.RegisterOperationAction(
-            ctx => AnalyzePropertyReference(ctx, dateTimeType, dateTimeOffsetType, timeProviderType),
+            ctx => AnalyzePropertyReference(ctx, cache),
             OperationKind.PropertyReference);
     }
 
-    private static void AnalyzePropertyReference(
-        OperationAnalysisContext context,
-        INamedTypeSymbol? dateTimeType,
-        INamedTypeSymbol? dateTimeOffsetType,
-        INamedTypeSymbol timeProviderType) {
+    private static void AnalyzePropertyReference(OperationAnalysisContext context, TypeCache<KnownType> cache) {
         if (context.Operation is not IPropertyReferenceOperation propertyRef) {
             return;
         }
 
-        // Skip if we're inside a TimeProvider implementation (polyfills need to call DateTime/DateTimeOffset)
         if (context.ContainingSymbol.ContainingType is { } enclosingType &&
-            InheritsFromOrEquals(enclosingType, timeProviderType)) {
+            (cache.IsType(enclosingType, KnownType.TimeProvider) ||
+             cache.ImplementsOrInheritsFrom(enclosingType, KnownType.TimeProvider))) {
             return;
         }
 
         var property = propertyRef.Property;
         var containingType = property.ContainingType;
 
-        // Check if it's a DateTime or DateTimeOffset static time property
-        var isDateTime = dateTimeType is not null && containingType.IsEqualTo(dateTimeType);
-        var isDateTimeOffset = dateTimeOffsetType is not null && containingType.IsEqualTo(dateTimeOffsetType);
+        var isDateTime = cache.IsType(containingType, KnownType.DateTime);
+        var isDateTimeOffset = cache.IsType(containingType, KnownType.DateTimeOffset);
 
         if (!isDateTime && !isDateTimeOffset) {
             return;
         }
 
-        // Target the "Now" and "UtcNow" properties with correct replacements
         if (property.Name switch {
             "Now" => "GetLocalNow",
             "UtcNow" => "GetUtcNow",
@@ -92,7 +84,4 @@ public sealed partial class Al0026AvoidDateTimeNowAnalyzer : AlAnalyzer {
         properties.Add(PropertyIsDateTimeOffset, isDateTimeOffset.ToString());
         context.ReportDiagnostic(Diagnostic.Create(Rule, propertyRef.Syntax.GetLocation(), properties.ToImmutable(), typeName, property.Name, replacement));
     }
-
-    private static bool InheritsFromOrEquals(INamedTypeSymbol type, INamedTypeSymbol baseType) =>
-        type.IsEqualTo(baseType) || type.InheritsFrom(baseType);
 }

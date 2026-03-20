@@ -37,7 +37,6 @@ public sealed partial class Al0095AvoidExpressionCompileAnalyzer : AlAnalyzer {
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
         if (context.Compilation.GetTypeByMetadataName(LambdaExpressionTypeName) is not { } lambdaExpressionType) {
-            // System.Linq.Expressions is not referenced; nothing to analyze
             return;
         }
 
@@ -50,30 +49,13 @@ public sealed partial class Al0095AvoidExpressionCompileAnalyzer : AlAnalyzer {
         var invocation = (IInvocationOperation)context.Operation;
         var targetMethod = invocation.TargetMethod;
 
-        // Check if the method is Compile or CompileToMethod
-        var methodName = targetMethod.Name;
-        if (methodName is not ("Compile" or "CompileToMethod")) {
+        if (targetMethod.Name is not ("Compile" or "CompileToMethod")
+            || targetMethod.ContainingType is not { } containingType
+            || (!containingType.IsEqualTo(lambdaExpressionType) && !containingType.InheritsFrom(lambdaExpressionType))) {
             return;
         }
 
-        // Check if the containing type derives from LambdaExpression
-        if (targetMethod.ContainingType is not { } containingType
-            || !IsDerivedFromOrEquals(containingType, lambdaExpressionType)) {
-            return;
-        }
-
-        var displayName = $"{containingType.Name}.{methodName}()";
-        context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.Syntax.GetLocation(), displayName));
-    }
-
-    private static bool IsDerivedFromOrEquals(INamedTypeSymbol type, INamedTypeSymbol baseType) {
-        var current = type;
-        while (current is not null) {
-            if (SymbolEqualityComparer.Default.Equals(current, baseType)) {
-                return true;
-            }
-            current = current.BaseType;
-        }
-        return false;
+        context.ReportDiagnostic(Diagnostic.Create(
+            Rule, invocation.Syntax.GetLocation(), $"{containingType.Name}.{targetMethod.Name}()"));
     }
 }

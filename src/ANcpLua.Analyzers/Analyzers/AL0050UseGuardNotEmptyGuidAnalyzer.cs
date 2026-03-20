@@ -33,22 +33,10 @@ public sealed partial class Al0050UseGuardNotEmptyGuidAnalyzer : AlAnalyzer {
     private static void AnalyzeIfStatement(SyntaxNodeAnalysisContext context) {
         var ifStatement = (IfStatementSyntax)context.Node;
 
-        // Don't report for if statements with else clauses
-        if (ifStatement.Else is not null) {
-            return;
-        }
-
-        // Check if the condition is comparing a Guid to Guid.Empty
-        if (!TryParseGuidEmptyCheck(ifStatement.Condition, context.SemanticModel, out var identifier)) {
-            return;
-        }
-
-        // Check if the body is a throw statement with ArgumentException
-        if (TryGetThrowStatement(ifStatement.Statement) is not { } throwStmt) {
-            return;
-        }
-
-        if (!IsArgumentExceptionThrow(throwStmt, context.SemanticModel)) {
+        if (ifStatement.Else is not null ||
+            !TryParseGuidEmptyCheck(ifStatement.Condition, context.SemanticModel, out var identifier) ||
+            TryGetThrowStatement(ifStatement.Statement) is not { } throwStmt ||
+            !IsArgumentExceptionThrow(throwStmt, context.SemanticModel)) {
             return;
         }
 
@@ -68,41 +56,18 @@ public sealed partial class Al0050UseGuardNotEmptyGuidAnalyzer : AlAnalyzer {
         out string identifier) {
         identifier = "";
 
-        // Handle: guid == Guid.Empty or Guid.Empty == guid
         if (condition is not BinaryExpressionSyntax { RawKind: (int)SyntaxKind.EqualsExpression } binary) {
             return false;
         }
 
-        // Check both sides for the pattern
-        if (IsGuidEmpty(binary.Right, model) && TryGetGuidIdentifier(binary.Left, model, out identifier)) {
-            return true;
-        }
-
-        if (IsGuidEmpty(binary.Left, model) && TryGetGuidIdentifier(binary.Right, model, out identifier)) {
-            return true;
-        }
-
-        return false;
+        return (IsGuidEmpty(binary.Right, model) && TryGetGuidIdentifier(binary.Left, model, out identifier)) ||
+               (IsGuidEmpty(binary.Left, model) && TryGetGuidIdentifier(binary.Right, model, out identifier));
     }
 
-    private static bool IsGuidEmpty(ExpressionSyntax expression, SemanticModel model) {
-        // Check for Guid.Empty
-        if (expression is MemberAccessExpressionSyntax {
-                Name.Identifier.Text: "Empty"
-            } memberAccess) {
-            var typeInfo = ModelExtensions.GetTypeInfo(model, memberAccess.Expression);
-            if (typeInfo.Type?.ToDisplayString() == "System.Guid") {
-                return true;
-            }
-
-            // Fallback: check by name pattern
-            if (memberAccess.Expression is IdentifierNameSyntax { Identifier.Text: "Guid" }) {
-                return true;
-            }
-        }
-
-        return false;
-    }
+    private static bool IsGuidEmpty(ExpressionSyntax expression, SemanticModel model) =>
+        expression is MemberAccessExpressionSyntax { Name.Identifier.Text: "Empty" } memberAccess &&
+        (ModelExtensions.GetTypeInfo(model, memberAccess.Expression).Type?.ToDisplayString() == "System.Guid" ||
+         memberAccess.Expression is IdentifierNameSyntax { Identifier.Text: "Guid" });
 
     private static bool TryGetGuidIdentifier(
         ExpressionSyntax expression,
@@ -110,9 +75,7 @@ public sealed partial class Al0050UseGuardNotEmptyGuidAnalyzer : AlAnalyzer {
         out string identifier) {
         identifier = "";
 
-        // Check that it's a Guid type
-        var typeInfo = ModelExtensions.GetTypeInfo(model, expression);
-        if (typeInfo.Type?.ToDisplayString() != "System.Guid") {
+        if (ModelExtensions.GetTypeInfo(model, expression).Type?.ToDisplayString() != "System.Guid") {
             return false;
         }
 
@@ -139,13 +102,11 @@ public sealed partial class Al0050UseGuardNotEmptyGuidAnalyzer : AlAnalyzer {
 
         var typeSymbol = ModelExtensions.GetTypeInfo(model, creation.Type).Type;
         if (typeSymbol is null) {
-            // Fallback to string comparison
             var typeName = creation.Type.ToString();
             return typeName is "ArgumentException" or "System.ArgumentException"
                 or "ArgumentNullException" or "System.ArgumentNullException";
         }
 
-        var displayName = typeSymbol.ToDisplayString();
-        return displayName is "System.ArgumentException" or "System.ArgumentNullException";
+        return typeSymbol.ToDisplayString() is "System.ArgumentException" or "System.ArgumentNullException";
     }
 }

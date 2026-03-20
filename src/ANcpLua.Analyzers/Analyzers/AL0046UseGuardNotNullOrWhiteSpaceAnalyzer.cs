@@ -30,19 +30,9 @@ public sealed partial class Al0046UseGuardNotNullOrWhiteSpaceAnalyzer : AlAnalyz
     private static void AnalyzeIfStatement(SyntaxNodeAnalysisContext context) {
         var ifStatement = (IfStatementSyntax)context.Node;
 
-        // Skip if there's an else clause (can't convert to guard)
-        if (ifStatement.Else is not null) {
-            return;
-        }
-
-        // Check if condition is string.IsNullOrWhiteSpace(x)
-        if (!TryParseIsNullOrWhiteSpaceCheck(ifStatement.Condition, out var parameterName)) {
-            return;
-        }
-
-        // Check if the then-branch throws ArgumentNullException or ArgumentException
-        var throwStmt = TryGetThrowStatement(ifStatement.Statement);
-        if (!IsArgumentNullOrArgumentExceptionThrow(throwStmt, context.SemanticModel)) {
+        if (ifStatement.Else is not null ||
+            !TryParseIsNullOrWhiteSpaceCheck(ifStatement.Condition, out var parameterName) ||
+            !IsArgumentNullOrArgumentExceptionThrow(TryGetThrowStatement(ifStatement.Statement), context.SemanticModel)) {
             return;
         }
 
@@ -52,21 +42,16 @@ public sealed partial class Al0046UseGuardNotNullOrWhiteSpaceAnalyzer : AlAnalyz
     private static bool TryParseIsNullOrWhiteSpaceCheck(ExpressionSyntax condition, out string parameterName) {
         parameterName = "";
 
-        // Match: string.IsNullOrWhiteSpace(x)
         if (condition is InvocationExpressionSyntax {
             Expression: MemberAccessExpressionSyntax {
-                Name.Identifier.Text: "IsNullOrWhiteSpace"
-            } memberAccess,
+                Name.Identifier.Text: "IsNullOrWhiteSpace",
+                Expression: IdentifierNameSyntax { Identifier.Text: "String" }
+                    or PredefinedTypeSyntax { Keyword.RawKind: (int)SyntaxKind.StringKeyword }
+            },
             ArgumentList.Arguments.Count: 1
         } invocation) {
-            // Check if it's called on string type (lowercase keyword or uppercase class name)
-            var expression = memberAccess.Expression;
-            if (expression is IdentifierNameSyntax { Identifier.Text: "String" }
-                or PredefinedTypeSyntax { Keyword.RawKind: (int)SyntaxKind.StringKeyword }) {
-                var argument = invocation.ArgumentList.Arguments[0].Expression;
-                parameterName = GetExpressionName(argument);
-                return !string.IsNullOrEmpty(parameterName);
-            }
+            parameterName = GetExpressionName(invocation.ArgumentList.Arguments[0].Expression);
+            return !string.IsNullOrEmpty(parameterName);
         }
 
         return false;
@@ -89,22 +74,17 @@ public sealed partial class Al0046UseGuardNotNullOrWhiteSpaceAnalyzer : AlAnalyz
     private static bool IsArgumentNullOrArgumentExceptionThrow(
         ThrowStatementSyntax? throwStmt,
         SemanticModel model) {
-        if (throwStmt is null) {
-            return false;
-        }
-        if (throwStmt.Expression is not ObjectCreationExpressionSyntax creation) {
+        if (throwStmt?.Expression is not ObjectCreationExpressionSyntax creation) {
             return false;
         }
 
         var typeSymbol = ModelExtensions.GetTypeInfo(model, creation.Type).Type;
         if (typeSymbol is null) {
-            // Fall back to syntax-based check
             var typeName = creation.Type.ToString();
             return typeName is "ArgumentNullException" or "System.ArgumentNullException"
                    or "ArgumentException" or "System.ArgumentException";
         }
 
-        var displayName = typeSymbol.ToDisplayString();
-        return displayName is "System.ArgumentNullException" or "System.ArgumentException";
+        return typeSymbol.ToDisplayString() is "System.ArgumentNullException" or "System.ArgumentException";
     }
 }

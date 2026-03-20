@@ -111,3 +111,11 @@ AL0107 | OpenTelemetry | Warning | Al0107OrphanedTracedTagAnalyzer
 AL0108 | OpenTelemetry | Info | Al0108RedundantNoTraceAnalyzer
 AL0109 | OpenTelemetry | Warning | Al0109NonInterceptableTracedAnalyzer
 AL0110 | OpenTelemetry | Error | Al0110TracedTagOnOutRefParameterAnalyzer
+AL0111 | Reliability | Warning | Al0111SqlInterpolationInCommandTextAnalyzer
+AL0112 | Reliability | Warning | Al0112FireAndForgetTaskAnalyzer
+AL0113 | OpenTelemetry | Warning | Al0113MissingExceptionRecordingOnActivityAnalyzer
+AL0114 | Reliability | Warning | Al0114PreferTryParseAnalyzer
+AL0115 | Reliability | Warning | Al0115EmptyCatchBlockAnalyzer
+AL0116 | Reliability | Warning | Al0116ExceptionLeakedInResponseAnalyzer
+AL0117 | Usage | Info | Al0117UnnecessaryLinqMaterializationAnalyzer
+AL0118 | Reliability | Warning | Al0118ReadModifyWriteWithoutTransactionAnalyzer

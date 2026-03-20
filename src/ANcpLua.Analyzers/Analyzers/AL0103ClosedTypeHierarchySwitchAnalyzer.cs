@@ -32,7 +32,7 @@ public sealed partial class Al0103ClosedTypeHierarchySwitchAnalyzer : AlAnalyzer
         true,
         "All sealed subtypes of a closed hierarchy should be explicitly handled in switch expressions, " +
         "switch statements, and Match<T> calls.",
-        HelpLinkBase);
+        HelpLink(DiagnosticId));
 
     static readonly InvocationMatcher MatchInvocation = Invoke.Method("Match").Generic();
 
@@ -354,8 +354,7 @@ public sealed partial class Al0103ClosedTypeHierarchySwitchAnalyzer : AlAnalyzer
     static bool TryGetHandledMatchType(ITypeSymbol? delegateType, out INamedTypeSymbol? handledType) {
         handledType = null;
 
-        if (delegateType is not INamedTypeSymbol namedDelegate ||
-            namedDelegate.DelegateInvokeMethod is not { Parameters.Length: > 0 } invokeMethod ||
+        if (delegateType is not INamedTypeSymbol { DelegateInvokeMethod: { Parameters.Length: > 0 } invokeMethod } ||
             invokeMethod.Parameters[0].Type is not INamedTypeSymbol matchType) {
             return false;
         }
@@ -365,22 +364,26 @@ public sealed partial class Al0103ClosedTypeHierarchySwitchAnalyzer : AlAnalyzer
     }
 
     static void CollectTypesFromPattern(IPatternOperation pattern, ICollection<INamedTypeSymbol> types) {
-        switch (pattern) {
-            case IBinaryPatternOperation binary:
-                CollectTypesFromPattern(binary.LeftPattern, types);
-                CollectTypesFromPattern(binary.RightPattern, types);
-                break;
+        while (true) {
+            switch (pattern) {
+                case IBinaryPatternOperation binary:
+                    CollectTypesFromPattern(binary.LeftPattern, types);
+                    pattern = binary.RightPattern;
+                    continue;
 
-            case INegatedPatternOperation:
-            case IDiscardPatternOperation:
-                break;
+                case INegatedPatternOperation:
+                case IDiscardPatternOperation:
+                    break;
 
-            default:
-                if (pattern.NarrowedType is INamedTypeSymbol narrowed) {
-                    AddType(narrowed, types);
-                }
+                default:
+                    if (pattern.NarrowedType is INamedTypeSymbol narrowed) {
+                        AddType(narrowed, types);
+                    }
 
-                break;
+                    break;
+            }
+
+            break;
         }
     }
 

@@ -112,17 +112,9 @@ public sealed partial class Al0087PreferConstantAttributeAnalyzer : AlAnalyzer {
         var literal = (LiteralExpressionSyntax)context.Node;
         var value = literal.Token.ValueText;
 
-        if (string.IsNullOrEmpty(value)) {
-            return;
-        }
-
-        // Check if this is a known attribute name
-        if (!KnownAttributes.TryGetValue(value, out var suggestedConstant)) {
-            return;
-        }
-
-        // Check if we're in a telemetry context
-        if (!IsInTelemetryContext(literal)) {
+        if (string.IsNullOrEmpty(value)
+            || !KnownAttributes.TryGetValue(value, out var suggestedConstant)
+            || !IsInTelemetryContext(literal)) {
             return;
         }
 
@@ -134,23 +126,10 @@ public sealed partial class Al0087PreferConstantAttributeAnalyzer : AlAnalyzer {
 
         while (current is not null) {
             switch (current) {
-                // Method invocations: activity.SetTag("gen_ai.system", value)
-                case InvocationExpressionSyntax invocation:
-                    if (IsLikelyTelemetryMethod(GetMethodName(invocation))) {
-                        return true;
-                    }
-
-                    break;
-
-                // Dictionary/collection indexers: tags["gen_ai.system"]
-                case ElementAccessExpressionSyntax elementAccess:
-                    if (IsLikelyTelemetryContainer(GetIdentifierName(elementAccess.Expression))) {
-                        return true;
-                    }
-
-                    break;
-
-                // Assignment in initializers: { "gen_ai.system", value }
+                case InvocationExpressionSyntax invocation
+                    when IsLikelyTelemetryMethod(GetMethodName(invocation)):
+                case ElementAccessExpressionSyntax elementAccess
+                    when IsLikelyTelemetryContainer(GetIdentifierName(elementAccess.Expression)):
                 case InitializerExpressionSyntax:
                     return true;
             }

@@ -37,7 +37,6 @@ public sealed partial class Al0102AvoidTypeGetTypeAnalyzer : AlAnalyzer {
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
         if (context.Compilation.GetTypeByMetadataName(TypeTypeName) is not { } typeType) {
-            // System.Type is not referenced; nothing to analyze
             return;
         }
 
@@ -48,27 +47,19 @@ public sealed partial class Al0102AvoidTypeGetTypeAnalyzer : AlAnalyzer {
 
     private static void AnalyzeInvocation(OperationAnalysisContext context, INamedTypeSymbol typeType) {
         if (context.Operation is not IInvocationOperation invocation ||
-            !GetTypeInvocation.Matches(invocation)) {
-            return;
-        }
-
-        var targetMethod = invocation.TargetMethod;
-        if (!targetMethod.ContainingType.IsEqualTo(typeType)) {
+            !GetTypeInvocation.Matches(invocation) ||
+            !invocation.TargetMethod.ContainingType.IsEqualTo(typeType)) {
             return;
         }
 
         // Only analyze overloads whose type-name argument is a string.
-        if (GetArgumentValue(invocation, "typeName") is not { } typeNameArgument ||
-            typeNameArgument.Type?.SpecialType is not SpecialType.System_String) {
+        if (GetArgumentValue(invocation, "typeName") is not { Type.SpecialType: SpecialType.System_String } typeNameArgument) {
             return;
         }
 
         var isLiteralTypeName = typeNameArgument.ConstantValue is { HasValue: true, Value: string };
         var ignoreCaseArgument = GetArgumentValue(invocation, "ignoreCase");
 
-        // Report if:
-        // 1. Type name is not a literal, OR
-        // 2. ignoreCase is true or non-literal
         if (!isLiteralTypeName) {
             context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.Syntax.GetLocation(), "a dynamic type name"));
         }
@@ -85,12 +76,6 @@ public sealed partial class Al0102AvoidTypeGetTypeAnalyzer : AlAnalyzer {
         return null;
     }
 
-    private static bool IsPotentiallyTrue(IOperation operation) {
-        var constantValue = operation.ConstantValue;
-        if (!constantValue.HasValue) {
-            return true;
-        }
-
-        return constantValue.Value is true;
-    }
+    private static bool IsPotentiallyTrue(IOperation operation) =>
+        !operation.ConstantValue.HasValue || operation.ConstantValue.Value is true;
 }

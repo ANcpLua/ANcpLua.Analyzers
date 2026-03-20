@@ -60,20 +60,11 @@ public sealed partial class Al0082ConsiderConnectionStringAnalyzer : AlAnalyzer 
     }
 
     private static void AnalyzeObjectCreation(OperationAnalysisContext context) {
-        if (context.Operation is not IObjectCreationOperation creation) {
+        if (context.Operation is not IObjectCreationOperation { Type: INamedTypeSymbol type } creation
+            || !IsConnectionClientType(type)) {
             return;
         }
 
-        if (creation.Type is not INamedTypeSymbol type) {
-            return;
-        }
-
-        // Check if creating a known connection client type
-        if (!IsConnectionClientType(type)) {
-            return;
-        }
-
-        // Check constructor arguments for hardcoded connection strings
         foreach (var argument in creation.Arguments) {
             if (IsHardcodedConnectionString(argument.Value)) {
                 context.ReportDiagnostic(Rule, argument.Syntax.GetLocation());
@@ -83,20 +74,11 @@ public sealed partial class Al0082ConsiderConnectionStringAnalyzer : AlAnalyzer 
     }
 
     private static void AnalyzeInvocation(OperationAnalysisContext context) {
-        if (context.Operation is not IInvocationOperation invocation) {
+        if (context.Operation is not IInvocationOperation invocation
+            || !IsConnectionFactoryMethod(invocation.TargetMethod)) {
             return;
         }
 
-        var method = invocation.TargetMethod;
-
-        // Check for factory methods that accept connection strings
-        // e.g., ConnectionMultiplexer.Connect(connectionString)
-        // e.g., MongoClient.Create(connectionString)
-        if (!IsConnectionFactoryMethod(method)) {
-            return;
-        }
-
-        // Check method arguments for hardcoded connection strings
         foreach (var argument in invocation.Arguments) {
             if (IsHardcodedConnectionString(argument.Value)) {
                 context.ReportDiagnostic(Rule, argument.Syntax.GetLocation());
@@ -111,7 +93,8 @@ public sealed partial class Al0082ConsiderConnectionStringAnalyzer : AlAnalyzer 
             if (typeName.EqualsOrdinal(clientType)) {
                 return true;
             }
-            // Also check if it ends with the client type (e.g., Npgsql.NpgsqlConnection)
+
+            // Fully-qualified match (e.g., Npgsql.NpgsqlConnection)
             if (clientType.ContainsOrdinal(".") && type.ToDisplayString().EndsWithOrdinal(clientType)) {
                 return true;
             }
@@ -119,70 +102,42 @@ public sealed partial class Al0082ConsiderConnectionStringAnalyzer : AlAnalyzer 
         return false;
     }
 
-    private static bool IsConnectionFactoryMethod(IMethodSymbol method) {
-        // Check for common factory methods
-        var methodName = method.Name;
-
-        // ConnectionMultiplexer.Connect, ConnectionMultiplexer.ConnectAsync
-        if ((methodName.EqualsOrdinal("Connect") || methodName.EqualsOrdinal("ConnectAsync")) &&
-            method.ContainingType?.Name.EqualsOrdinal("ConnectionMultiplexer") == true) {
-            return true;
-        }
-
-        // NpgsqlDataSource.Create
-        if (methodName.EqualsOrdinal("Create") &&
-            method.ContainingType?.Name.EqualsOrdinal("NpgsqlDataSource") == true) {
-            return true;
-        }
-
-        // Check for Open/OpenAsync on connection types with string parameter
-        if ((methodName.EqualsOrdinal("Open") || methodName.EqualsOrdinal("OpenAsync")) &&
-            method.ContainingType is { } containingType &&
-            IsConnectionClientType(containingType)) {
-            return true;
-        }
-
-        return false;
-    }
+    private static bool IsConnectionFactoryMethod(IMethodSymbol method) =>
+        method switch {
+            { Name: "Connect" or "ConnectAsync", ContainingType.Name: "ConnectionMultiplexer" } => true,
+            { Name: "Create", ContainingType.Name: "NpgsqlDataSource" } => true,
+            { Name: "Open" or "OpenAsync", ContainingType: INamedTypeSymbol ct } => IsConnectionClientType(ct),
+            _ => false
+        };
 
     private static bool IsHardcodedConnectionString(IOperation? operation) {
         if (operation is null) {
             return false;
         }
 
-        // Unwrap conversions
         var unwrapped = operation.UnwrapAllConversions();
 
-        // Check for literal string
-        if (unwrapped is ILiteralOperation literal &&
-            literal.ConstantValue.HasValue &&
-            literal.ConstantValue.Value is string stringValue) {
-            return LooksLikeConnectionString(stringValue);
-        }
+        switch (unwrapped) {
+            case ILiteralOperation { ConstantValue: { HasValue: true, Value: string stringValue } }:
+                return LooksLikeConnectionString(stringValue);
 
-        // Check for interpolated string with connection string-like content
-        if (unwrapped is IInterpolatedStringOperation interpolated) {
-            // Build the constant parts to check for connection string patterns
-            var constantParts = new System.Text.StringBuilder();
-            foreach (var part in interpolated.Parts) {
-                if (part is IInterpolatedStringTextOperation textPart &&
-                    textPart.Text is ILiteralOperation textLiteral &&
-                    textLiteral.ConstantValue.Value is string text) {
-                    constantParts.Append(text);
+            case IInterpolatedStringOperation interpolated: {
+                var constantParts = new System.Text.StringBuilder();
+                foreach (var part in interpolated.Parts) {
+                    if (part is IInterpolatedStringTextOperation { Text: ILiteralOperation { ConstantValue.Value: string text } }) {
+                        constantParts.Append(text);
+                    }
                 }
+                return LooksLikeConnectionString(constantParts.ToString());
             }
-            return LooksLikeConnectionString(constantParts.ToString());
-        }
 
-        // Check for string concatenation with connection string-like content
-        if (unwrapped is IBinaryOperation binary &&
-            binary.OperatorKind == BinaryOperatorKind.Add) {
-            // Check if either operand is a connection string prefix
-            return IsHardcodedConnectionString(binary.LeftOperand) ||
-                   IsHardcodedConnectionString(binary.RightOperand);
-        }
+            case IBinaryOperation { OperatorKind: BinaryOperatorKind.Add } binary:
+                return IsHardcodedConnectionString(binary.LeftOperand)
+                    || IsHardcodedConnectionString(binary.RightOperand);
 
-        return false;
+            default:
+                return false;
+        }
     }
 
     private static bool LooksLikeConnectionString(string value) {

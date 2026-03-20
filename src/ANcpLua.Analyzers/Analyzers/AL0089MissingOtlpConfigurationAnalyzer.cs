@@ -51,76 +51,41 @@ public sealed partial class Al0089MissingOtlpConfigurationAnalyzer : AlAnalyzer 
     private static void AnalyzeInvocation(SyntaxNodeAnalysisContext context) {
         var invocation = (InvocationExpressionSyntax)context.Node;
 
-        // Look for OTLP exporter calls
-        var methodName = GetMethodName(invocation);
-        if (!IsOtlpExporterMethod(methodName)) {
+        if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess
+            || !OtlpExporterMethods.Contains(memberAccess.Name.Identifier.Text)
+            || HasExplicitEndpointConfiguration(invocation)
+            || HasEnvironmentVariableSet(invocation)) {
             return;
         }
 
-        // Must be called as extension method (builder.UseOtlpExporter())
-        if (invocation.Expression is not MemberAccessExpressionSyntax) {
-            return;
-        }
-
-        // Check if endpoint is explicitly configured
-        if (HasExplicitEndpointConfiguration(invocation)) {
-            return;
-        }
-
-        // Check if OTEL_EXPORTER_OTLP_ENDPOINT is set in the same method
-        if (HasEnvironmentVariableSet(invocation)) {
-            return;
-        }
-
-        context.ReportDiagnostic(Diagnostic.Create(
-            Rule,
-            invocation.GetLocation()));
+        context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.GetLocation()));
     }
-
-    private static bool IsOtlpExporterMethod(string? methodName) =>
-        methodName is not null && OtlpExporterMethods.Contains(methodName);
-
-    private static string? GetMethodName(InvocationExpressionSyntax invocation) =>
-        invocation.Expression switch {
-            MemberAccessExpressionSyntax memberAccess => memberAccess.Name.Identifier.Text,
-            IdentifierNameSyntax identifier => identifier.Identifier.Text,
-            _ => null
-        };
 
     private static bool HasExplicitEndpointConfiguration(InvocationExpressionSyntax invocation) {
         var arguments = invocation.ArgumentList.Arguments;
 
-        // Check for URI parameter (first positional argument that is a Uri or string containing endpoint)
+        // UseOtlpExporter(OtlpExportProtocol.Grpc, new Uri("...")) pattern
+        if (arguments.Count >= 2
+            && arguments[1].Expression is ObjectCreationExpressionSyntax objCreation
+            && objCreation.Type.ToString().ContainsOrdinal("Uri")) {
+            return true;
+        }
+
         foreach (var arg in arguments) {
-            // Check for lambda/delegate configuring options
             if (arg.Expression is SimpleLambdaExpressionSyntax or ParenthesizedLambdaExpressionSyntax or
-                AnonymousMethodExpressionSyntax) {
-                // Check if the lambda sets Endpoint property
-                if (LambdaSetsEndpoint(arg.Expression)) {
-                    return true;
-                }
+                AnonymousMethodExpressionSyntax
+                && LambdaSetsEndpoint(arg.Expression)) {
+                return true;
             }
 
-            // Check for named argument "endpoint" or "configure" with endpoint configuration
             if (arg.NameColon?.Name.Identifier.Text.EqualsIgnoreCase("endpoint") == true) {
                 return true;
             }
 
-            // Check for OtlpExportProtocol enum followed by Uri parameter pattern
-            // UseOtlpExporter(OtlpExportProtocol.Grpc, new Uri("http://localhost:4317"))
-            if (arguments.Count >= 2) {
-                var secondArg = arguments.Count > 1 ? arguments[1] : null;
-                if (secondArg?.Expression is ObjectCreationExpressionSyntax objCreation &&
-                    objCreation.Type.ToString().ContainsOrdinal("Uri")) {
-                    return true;
-                }
-            }
-
-            // Check for inline object creation with endpoint
-            if (arg.Expression is ObjectCreationExpressionSyntax creation &&
-                creation.Initializer?.Expressions.Any(static e =>
-                    e is AssignmentExpressionSyntax assignment &&
-                    assignment.Left.ToString().EqualsIgnoreCase("Endpoint")) == true) {
+            if (arg.Expression is ObjectCreationExpressionSyntax creation
+                && creation.Initializer?.Expressions.Any(static e =>
+                    e is AssignmentExpressionSyntax assignment
+                    && assignment.Left.ToString().EqualsIgnoreCase("Endpoint")) == true) {
                 return true;
             }
         }
@@ -129,7 +94,6 @@ public sealed partial class Al0089MissingOtlpConfigurationAnalyzer : AlAnalyzer 
     }
 
     private static bool LambdaSetsEndpoint(ExpressionSyntax lambda) {
-        // Look for "options.Endpoint = " or "o.Endpoint = " patterns in the lambda body
         if (lambda switch {
             SimpleLambdaExpressionSyntax simple => simple.Body,
             ParenthesizedLambdaExpressionSyntax paren => paren.Body,
@@ -139,14 +103,9 @@ public sealed partial class Al0089MissingOtlpConfigurationAnalyzer : AlAnalyzer 
             return false;
         }
 
-        // Check for Endpoint assignment in the lambda body
-        var assignments = body.DescendantNodesAndSelf()
-            .OfType<AssignmentExpressionSyntax>();
-
-        foreach (var assignment in assignments) {
+        foreach (var assignment in body.DescendantNodesAndSelf().OfType<AssignmentExpressionSyntax>()) {
             var leftText = assignment.Left.ToString();
-            if (leftText.EndsWithIgnoreCase(".Endpoint") ||
-                leftText.EqualsOrdinal("Endpoint")) {
+            if (leftText.EndsWithIgnoreCase(".Endpoint") || leftText.EqualsOrdinal("Endpoint")) {
                 return true;
             }
         }
@@ -154,26 +113,24 @@ public sealed partial class Al0089MissingOtlpConfigurationAnalyzer : AlAnalyzer 
         return false;
     }
 
+    private static string? GetMethodName(InvocationExpressionSyntax invocation) =>
+        invocation.Expression switch {
+            MemberAccessExpressionSyntax memberAccess => memberAccess.Name.Identifier.Text,
+            IdentifierNameSyntax identifier => identifier.Identifier.Text,
+            _ => null
+        };
+
     private static bool HasEnvironmentVariableSet(InvocationExpressionSyntax invocation) {
-        // Check if OTEL_EXPORTER_OTLP_ENDPOINT is set earlier in the same method
         if (invocation.Ancestors().OfType<MethodDeclarationSyntax>().FirstOrDefault() is not { } containingMethod) {
             return false;
         }
 
-        // Look for Environment.SetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT", ...)
-        var invocations = containingMethod.DescendantNodes()
-            .OfType<InvocationExpressionSyntax>()
-            .TakeWhile(inv => inv != invocation); // Only look at invocations before this one
-
-        foreach (var inv in invocations) {
-            var name = GetMethodName(inv);
-            if (name is "SetEnvironmentVariable" or "Add") {
-                var args = inv.ArgumentList.Arguments;
-                if (args.Count >= 1 &&
-                    args[0].Expression is LiteralExpressionSyntax literal &&
-                    literal.Token.ValueText.ContainsIgnoreCase("OTEL_EXPORTER_OTLP_ENDPOINT")) {
-                    return true;
-                }
+        // Only check invocations that appear before this one in the method
+        foreach (var inv in containingMethod.DescendantNodes().OfType<InvocationExpressionSyntax>().TakeWhile(inv => inv != invocation)) {
+            if (GetMethodName(inv) is "SetEnvironmentVariable" or "Add"
+                && inv.ArgumentList.Arguments is [{ Expression: LiteralExpressionSyntax literal }, ..]
+                && literal.Token.ValueText.ContainsIgnoreCase("OTEL_EXPORTER_OTLP_ENDPOINT")) {
+                return true;
             }
         }
 

@@ -115,12 +115,11 @@ public sealed partial class Al0029UseHasAttributeAnalyzer : AlAnalyzer {
         }
 
         foreach (var descendant in MsOperationExtensions.Descendants(body)) {
-            if (descendant is IPropertyReferenceOperation { Property.Name: var propName }) {
+            if (descendant is IPropertyReferenceOperation { Property.Name: "ConstructorArguments" or "NamedArguments" or
+                    "ApplicationSyntaxReference" or "AttributeConstructor" })
                 // These properties extract data from the attribute, not just check existence
-                if (propName is "ConstructorArguments" or "NamedArguments" or
-                    "ApplicationSyntaxReference" or "AttributeConstructor") {
-                    return true;
-                }
+            {
+                return true;
             }
         }
 

@@ -85,65 +85,32 @@ public sealed partial class Al0086IncorrectAttributeTypeAnalyzer : AlAnalyzer {
 
     private static void AnalyzeInvocation(OperationAnalysisContext context) {
         var invocation = (IInvocationOperation)context.Operation;
-        var method = invocation.TargetMethod;
 
-        // Check for SetTag, SetAttribute, AddTag, or similar methods
-        if (!IsAttributeSetterMethod(method)) {
+        if (!IsAttributeSetterMethod(invocation.TargetMethod)
+            || invocation.Arguments.Length < 2
+            || !invocation.Arguments[0].Value.TryGetConstantValue(out string? attributeName)
+            || attributeName is null
+            || !AttributeTypeMap.TryGetValue(attributeName, out var expectedType)) {
             return;
         }
 
-        // Get the attribute name (first argument, must be string constant)
-        if (invocation.Arguments.Length < 2) {
-            return;
-        }
-
-        var nameArg = invocation.Arguments[0];
-        if (!nameArg.Value.TryGetConstantValue(out string? attributeName) || attributeName is null) {
-            return;
-        }
-
-        // Check if this attribute has a known expected type
-        if (!AttributeTypeMap.TryGetValue(attributeName, out var expectedType)) {
-            return;
-        }
-
-        // Get the value argument
         var valueArg = invocation.Arguments[1];
 
-        if (valueArg.Value.Type is not { } valueType) {
+        if (valueArg.Value.Type is not { } valueType || IsTypeMatch(valueType, expectedType)) {
             return;
         }
 
-        // Check if the actual type matches the expected type
-        if (IsTypeMatch(valueType, expectedType)) {
-            return;
-        }
-
-        // Report diagnostic
-        var expectedTypeName = GetTypeName(expectedType);
-        var actualTypeName = valueType.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
-
-        context.ReportDiagnostic(Rule, valueArg.Syntax.GetLocation(), attributeName, expectedTypeName, actualTypeName);
+        context.ReportDiagnostic(Rule, valueArg.Syntax.GetLocation(), attributeName,
+            GetTypeName(expectedType), valueType.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat));
     }
 
-    private static bool IsAttributeSetterMethod(IMethodSymbol method) {
-        var methodName = method.Name;
-
-        // Common Activity/Span attribute setter methods
-        return methodName.EqualsOrdinal("SetTag") ||
-               methodName.EqualsOrdinal("SetAttribute") ||
-               methodName.EqualsOrdinal("AddTag") ||
-               methodName.EqualsOrdinal("SetCustomProperty") ||
-               methodName.EqualsOrdinal("Add") && IsTagContextMethod(method);
-    }
-
-    private static bool IsTagContextMethod(IMethodSymbol method) {
-        // Check if this is a dictionary-style Add where the containing type suggests tags
-        var containingType = method.ContainingType?.Name;
-        return containingType is not null &&
-               (containingType.ContainsOrdinal("Tag") ||
-                containingType.ContainsOrdinal("Attribute"));
-    }
+    private static bool IsAttributeSetterMethod(IMethodSymbol method) =>
+        method.Name switch {
+            "SetTag" or "SetAttribute" or "AddTag" or "SetCustomProperty" => true,
+            "Add" => method.ContainingType?.Name is { } name
+                && (name.ContainsOrdinal("Tag") || name.ContainsOrdinal("Attribute")),
+            _ => false
+        };
 
     private static bool IsTypeMatch(ITypeSymbol actualType, ExpectedType expectedType) {
         return expectedType switch {
@@ -179,25 +146,16 @@ public sealed partial class Al0086IncorrectAttributeTypeAnalyzer : AlAnalyzer {
             SpecialType.System_Double or
             SpecialType.System_Decimal;
 
-    private static bool IsStringArrayType(ITypeSymbol type) {
-        if (type is IArrayTypeSymbol arrayType) {
-            return arrayType.ElementType.SpecialType == SpecialType.System_String;
-        }
-
-        // Also accept List<string>, IEnumerable<string>, etc.
-        if (type is INamedTypeSymbol namedType && namedType.IsGenericType) {
-            var typeArgs = namedType.TypeArguments;
-            if (typeArgs.Length == 1 && typeArgs[0].SpecialType == SpecialType.System_String) {
-                var typeName = namedType.Name;
-                return typeName.ContainsOrdinal("List") ||
-                       typeName.ContainsOrdinal("Enumerable") ||
-                       typeName.ContainsOrdinal("Collection") ||
-                       typeName.ContainsOrdinal("Array");
-            }
-        }
-
-        return false;
-    }
+    private static bool IsStringArrayType(ITypeSymbol type) =>
+        type switch {
+            IArrayTypeSymbol { ElementType.SpecialType: SpecialType.System_String } => true,
+            INamedTypeSymbol { IsGenericType: true, TypeArguments: [{ SpecialType: SpecialType.System_String }] } namedType =>
+                namedType.Name.ContainsOrdinal("List")
+                || namedType.Name.ContainsOrdinal("Enumerable")
+                || namedType.Name.ContainsOrdinal("Collection")
+                || namedType.Name.ContainsOrdinal("Array"),
+            _ => false
+        };
 
     private static string GetTypeName(ExpectedType expectedType) =>
         expectedType switch {

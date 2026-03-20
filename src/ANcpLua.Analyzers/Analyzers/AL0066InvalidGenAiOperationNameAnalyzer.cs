@@ -37,30 +37,15 @@ public sealed partial class Al0066InvalidGenAiOperationNameAnalyzer : AlAnalyzer
     private static void AnalyzeInvocation(OperationAnalysisContext context) {
         var invocation = (IInvocationOperation)context.Operation;
 
-        // Look for SetTag calls with "gen_ai.operation.name" key
-        if (invocation.TargetMethod.Name != "SetTag" || invocation.Arguments.Length < 2) {
+        if (invocation.TargetMethod.Name != "SetTag" ||
+            invocation.Arguments.Length < 2 ||
+            invocation.Arguments[0].Value.ConstantValue is not { HasValue: true, Value: string tagName } ||
+            !tagName.EqualsIgnoreCase("gen_ai.operation.name") ||
+            invocation.Arguments[1].Value.ConstantValue is not { HasValue: true, Value: string operationName } ||
+            ValidOperationNames.Contains(operationName)) {
             return;
         }
 
-        // Check if the first argument is "gen_ai.operation.name"
-        if (invocation.Arguments[0].Value.ConstantValue is not { HasValue: true, Value: string tagName }) {
-            return;
-        }
-
-        if (!tagName.EqualsIgnoreCase("gen_ai.operation.name")) {
-            return;
-        }
-
-        // Check if the second argument is a valid operation name
-        if (invocation.Arguments[1].Value.ConstantValue is not { HasValue: true, Value: string operationName }) {
-            return;
-        }
-
-        if (!ValidOperationNames.Contains(operationName)) {
-            context.ReportDiagnostic(Diagnostic.Create(
-                Rule,
-                invocation.Arguments[1].Syntax.GetLocation(),
-                operationName));
-        }
+        context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.Arguments[1].Syntax.GetLocation(), operationName));
     }
 }

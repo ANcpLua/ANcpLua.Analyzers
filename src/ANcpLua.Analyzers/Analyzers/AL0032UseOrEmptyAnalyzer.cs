@@ -25,7 +25,6 @@ public sealed partial class Al0032UseOrEmptyAnalyzer : AlAnalyzer {
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
     /// <summary>Registers syntax or operation actions for analysis.</summary>
-
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterOperationAction(AnalyzeCoalesce, OperationKind.Coalesce);
 
@@ -34,21 +33,16 @@ public sealed partial class Al0032UseOrEmptyAnalyzer : AlAnalyzer {
             return;
         }
 
-        // Only fire when OrEmpty() is actually available in the compilation.
-        // Without the utilities package, the suggested fix wouldn't compile.
         if (!HasOrEmptyExtension(context.Compilation)) {
             return;
         }
 
-        // Check if the right side is an empty collection pattern
         if (!IsEmptyCollectionExpression(coalesce.WhenNull)) {
             return;
         }
 
-        // Check the coalesce result type — this is the type the ?? expression evaluates to.
-        // OrEmpty() returns IEnumerable<T>, so only fire when the result type IS IEnumerable<T>.
-        // If the result is a concrete type (Dictionary, List, string[], IList, etc.),
-        // .OrEmpty() would lose that type information.
+        // OrEmpty() returns IEnumerable<T>, so only fire when the result type matches.
+        // Concrete types (Dictionary, List, string[], etc.) would lose type information.
         var resultType = coalesce.Type;
         if (resultType is null || resultType.SpecialType == SpecialType.System_String) {
             return;
@@ -68,60 +62,32 @@ public sealed partial class Al0032UseOrEmptyAnalyzer : AlAnalyzer {
             return false;
         }
 
-        // Unwrap conversions
         operation = operation.UnwrapAllConversions();
 
         switch (operation) {
-            // Check for collection expression [] (empty)
             case ICollectionExpressionOperation { Elements.Length: 0 }:
                 return true;
-            // Check for Array.Empty<T>() or Enumerable.Empty<T>()
-            // Use name-based comparison since these are well-known types
-            case IInvocationOperation invocation: {
-                var method = invocation.TargetMethod;
-                if (method is {
-                    Name: "Empty",
-                    IsStatic: true,
-                    Parameters.Length: 0
-                }) {
-                    var containingType = method.ContainingType;
-                    if (containingType is not null) {
-                        var typeName = containingType.Name;
-                        var namespaceName = containingType.ContainingNamespace?.ToDisplayString();
-                        if (typeName == "Array" && namespaceName == "System" ||
-                            typeName == "Enumerable" && namespaceName == "System.Linq") {
-                            return true;
-                        }
-                    }
-                }
-
-                break;
-            }
-            // Check for new T[0] or new T[] { }
-            // Check if it's an empty array (size 0 or empty initializer)
+            case IInvocationOperation { TargetMethod: { Name: "Empty", IsStatic: true, Parameters.Length: 0 } method }
+                when method.ContainingType is { } containingType
+                     && containingType.ContainingNamespace?.ToDisplayString() is { } ns
+                     && (containingType.Name == "Array" && ns == "System" ||
+                         containingType.Name == "Enumerable" && ns == "System.Linq"):
+                return true;
             case IArrayCreationOperation {
-                DimensionSizes: [
-                    {
-                        ConstantValue: { HasValue: true, Value: 0 }
-                    }
-                ]
+                DimensionSizes: [{ ConstantValue: { HasValue: true, Value: 0 } }]
             }:
             case IArrayCreationOperation {
                 Initializer.ElementValues.Length: 0
             }:
                 return true;
+            default:
+                return false;
         }
-
-        return false;
     }
 
-    private static bool IsEnumerableType(ITypeSymbol type) {
-        // Only match IEnumerable<T> itself — not concrete types that implement it.
-        // OrEmpty() returns IEnumerable<T>, so replacing `dict ?? []` with `dict.OrEmpty()`
-        // would lose the concrete type (Dictionary, List, string[], IList, etc.).
-        return type is INamedTypeSymbol { IsGenericType: true } named
-               && named.OriginalDefinition.ToDisplayString() == "System.Collections.Generic.IEnumerable<T>";
-    }
+    private static bool IsEnumerableType(ITypeSymbol type) =>
+        type is INamedTypeSymbol { IsGenericType: true } named
+        && named.OriginalDefinition.ToDisplayString() == "System.Collections.Generic.IEnumerable<T>";
 
     private static bool HasOrEmptyExtension(Compilation compilation) {
         foreach (var reference in compilation.References) {
@@ -131,7 +97,6 @@ public sealed partial class Al0032UseOrEmptyAnalyzer : AlAnalyzer {
             }
         }
 
-        // Also check the compilation's own assembly (extension defined in the same project)
         return HasOrEmptyInAssembly(compilation.Assembly);
     }
 

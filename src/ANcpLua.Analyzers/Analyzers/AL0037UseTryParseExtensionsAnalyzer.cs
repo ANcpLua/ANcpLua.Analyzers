@@ -25,7 +25,6 @@ public sealed partial class Al0037UseTryParseExtensionsAnalyzer : AlAnalyzer {
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
     /// <summary>Registers syntax or operation actions for analysis.</summary>
-
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterOperationAction(AnalyzeConditional, OperationKind.Conditional);
 
@@ -34,10 +33,8 @@ public sealed partial class Al0037UseTryParseExtensionsAnalyzer : AlAnalyzer {
             return;
         }
 
-        // Check if condition is a TryParse invocation
         var condition = conditional.Condition;
 
-        // Unwrap parentheses and conversions
         while (condition is IParenthesizedOperation paren) {
             condition = paren.Operand;
         }
@@ -48,71 +45,53 @@ public sealed partial class Al0037UseTryParseExtensionsAnalyzer : AlAnalyzer {
 
         var method = invocation.TargetMethod;
 
-        // Check if it's a TryParse method
         if (method.Name != "TryParse" || !method.IsStatic || method.Parameters.Length < 2) {
             return;
         }
 
-        // Get the containing type to determine which extension to suggest
         if (method.ContainingType is not { } containingType) {
             return;
         }
 
-        var typeName = containingType.ToDisplayString();
-        if (MappingRegistry.GetTryParseExtension(typeName) is not { } extensionName) {
+        if (MappingRegistry.GetTryParseExtension(containingType.ToDisplayString()) is not { } extensionName) {
             return;
         }
 
-        // Check if the WhenTrue branch returns the out parameter
-        // and the WhenFalse returns null/default
         if (!IsTryParseResultPattern(conditional, invocation)) {
             return;
         }
 
-        // Get the string argument name for the suggestion
         var stringArg = GetStringArgumentName(invocation);
-        var suggestion = $"{stringArg}.{extensionName}()";
-
-        context.ReportDiagnostic(Diagnostic.Create(Rule, conditional.Syntax.GetLocation(), suggestion));
+        context.ReportDiagnostic(Diagnostic.Create(Rule, conditional.Syntax.GetLocation(),
+            $"{stringArg}.{extensionName}()"));
     }
 
     private static bool IsTryParseResultPattern(IConditionalOperation conditional, IInvocationOperation tryParse) {
-        // The out parameter should be the second argument
         if (tryParse.Arguments.Length < 2) {
             return false;
         }
 
-        // Get the out argument
-        var outArg = tryParse.Arguments[1];
-        if (outArg.Parameter?.RefKind != RefKind.Out) {
+        if (tryParse.Arguments[1].Parameter?.RefKind != RefKind.Out) {
             return false;
         }
 
-        // The WhenTrue should reference the out variable
         if (conditional.WhenTrue is not { } whenTrueOp) {
             return false;
         }
 
-        var whenTrue = whenTrueOp.UnwrapAllConversions();
-
-        // Check if WhenTrue is referencing a local that was declared in the out argument
-        if (whenTrue is not ILocalReferenceOperation) {
+        if (whenTrueOp.UnwrapAllConversions() is not ILocalReferenceOperation) {
             return false;
         }
 
-        // The WhenFalse should be null or default only (not other constants like 0)
-        // because the extension method returns null on parse failure, not 0
         if (conditional.WhenFalse is not { } whenFalseOp) {
             return false;
         }
 
-        var whenFalse = whenFalseOp.UnwrapAllConversions();
-
-        return whenFalse switch {
+        return whenFalseOp.UnwrapAllConversions() switch {
             IDefaultValueOperation => true,
             ILiteralOperation { ConstantValue: { HasValue: true, Value: null } } => true,
             IConversionOperation { Operand: IDefaultValueOperation } => true,
-            // Do NOT match non-null literals like 0, false, etc. - semantic change
+            // Non-null literals (0, false, etc.) would change semantics
             _ => false
         };
     }

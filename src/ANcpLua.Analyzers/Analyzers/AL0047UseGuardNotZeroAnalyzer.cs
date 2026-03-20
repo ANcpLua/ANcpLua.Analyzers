@@ -33,22 +33,18 @@ public sealed partial class Al0047UseGuardNotZeroAnalyzer : AlAnalyzer {
     private static void AnalyzeIfStatement(SyntaxNodeAnalysisContext context) {
         var ifStatement = (IfStatementSyntax)context.Node;
 
-        // Skip if there's an else clause - Guard.NotZero only replaces simple throw patterns
         if (ifStatement.Else is not null) {
             return;
         }
 
-        // Check if condition is a zero comparison
         if (!TryParseZeroCheck(ifStatement.Condition, out var identifier)) {
             return;
         }
 
-        // Check if the body is a throw statement
         if (TryGetThrowStatement(ifStatement.Statement) is not { } throwStmt) {
             return;
         }
 
-        // Check if it throws ArgumentOutOfRangeException
         if (!IsArgumentOutOfRangeExceptionThrow(throwStmt, context.SemanticModel)) {
             return;
         }
@@ -66,31 +62,27 @@ public sealed partial class Al0047UseGuardNotZeroAnalyzer : AlAnalyzer {
     private static bool TryParseZeroCheck(ExpressionSyntax condition, out string identifier) {
         identifier = "";
 
-        // Handle: x == 0 or 0 == x
-        if (condition is BinaryExpressionSyntax { RawKind: (int)SyntaxKind.EqualsExpression } binary) {
+        switch (condition)
+        {
+            // Handle: x == 0 or 0 == x
             // Check for: x == 0
-            if (IsZeroLiteral(binary.Right) && binary.Left is IdentifierNameSyntax leftId) {
+            case BinaryExpressionSyntax { RawKind: (int)SyntaxKind.EqualsExpression } binary when IsZeroLiteral(binary.Right) && binary.Left is IdentifierNameSyntax leftId:
                 identifier = leftId.Identifier.Text;
                 return true;
-            }
-
             // Check for: 0 == x
-            if (IsZeroLiteral(binary.Left) && binary.Right is IdentifierNameSyntax rightId) {
+            case BinaryExpressionSyntax { RawKind: (int)SyntaxKind.EqualsExpression } binary when IsZeroLiteral(binary.Left) && binary.Right is IdentifierNameSyntax rightId:
                 identifier = rightId.Identifier.Text;
                 return true;
-            }
-        }
-
-        // Handle: x is 0
-        if (condition is IsPatternExpressionSyntax {
+            // Handle: x is 0
+            case IsPatternExpressionSyntax {
                 Expression: IdentifierNameSyntax patternId,
                 Pattern: ConstantPatternSyntax { Expression: LiteralExpressionSyntax literal }
-            } && IsZeroLiteral(literal)) {
-            identifier = patternId.Identifier.Text;
-            return true;
+            } when IsZeroLiteral(literal):
+                identifier = patternId.Identifier.Text;
+                return true;
+            default:
+                return false;
         }
-
-        return false;
     }
 
     private static bool IsZeroLiteral(ExpressionSyntax expression) {
@@ -98,7 +90,6 @@ public sealed partial class Al0047UseGuardNotZeroAnalyzer : AlAnalyzer {
             return false;
         }
 
-        // Check for numeric zero literals (int, long, double, decimal, etc.)
         return literal.Token.Value switch {
             0 or 0L or 0UL or 0U => true,
             0.0 or 0.0f or 0.0m => true,
@@ -113,20 +104,13 @@ public sealed partial class Al0047UseGuardNotZeroAnalyzer : AlAnalyzer {
             _ => null
         };
 
-    private static bool IsArgumentOutOfRangeExceptionThrow(
-        ThrowStatementSyntax throwStmt,
-        SemanticModel model) {
+    private static bool IsArgumentOutOfRangeExceptionThrow(ThrowStatementSyntax throwStmt, SemanticModel model) {
         if (throwStmt.Expression is not ObjectCreationExpressionSyntax creation) {
             return false;
         }
 
-        var typeSymbol = ModelExtensions.GetTypeInfo(model, creation.Type).Type;
-        if (typeSymbol is null) {
-            // Fallback to string comparison if symbol resolution fails
-            var typeName = creation.Type.ToString();
-            return typeName is "ArgumentOutOfRangeException" or "System.ArgumentOutOfRangeException";
-        }
-
-        return typeSymbol.ToDisplayString() == "System.ArgumentOutOfRangeException";
+        var typeName = ModelExtensions.GetTypeInfo(model, creation.Type).Type?.ToDisplayString()
+                       ?? creation.Type.ToString();
+        return typeName is "System.ArgumentOutOfRangeException" or "ArgumentOutOfRangeException";
     }
 }

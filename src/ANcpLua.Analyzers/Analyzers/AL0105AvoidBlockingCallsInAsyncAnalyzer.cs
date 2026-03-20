@@ -32,6 +32,15 @@ public sealed partial class Al0105AvoidBlockingCallsInAsyncAnalyzer : AlAnalyzer
     /// <summary>The diagnostic identifier for AL0105.</summary>
     public const string DiagnosticId = "AL0105";
 
+    private enum KnownType { Task, TaskOfT, ValueTask, ValueTaskOfT }
+
+    private static readonly string[] KnownTypeNames = [
+        "System.Threading.Tasks.Task",
+        "System.Threading.Tasks.Task`1",
+        "System.Threading.Tasks.ValueTask",
+        "System.Threading.Tasks.ValueTask`1"
+    ];
+
     private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.Threading,
@@ -45,93 +54,64 @@ public sealed partial class Al0105AvoidBlockingCallsInAsyncAnalyzer : AlAnalyzer
         context.RegisterCompilationStartAction(OnCompilationStart);
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
-        var taskType = context.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task");
-        var taskOfTType = context.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
-        var valueTaskType = context.Compilation.GetTypeByMetadataName("System.Threading.Tasks.ValueTask");
-        var valueTaskOfTType = context.Compilation.GetTypeByMetadataName("System.Threading.Tasks.ValueTask`1");
+        var cache = new TypeCache<KnownType>(type => context.Compilation.GetTypeByMetadataName(KnownTypeNames[(int)type]));
 
-        if (taskType is null && taskOfTType is null) {
+        if (cache.Get(KnownType.Task) is null && cache.Get(KnownType.TaskOfT) is null) {
             return;
         }
 
         context.RegisterSyntaxNodeAction(
-            ctx => AnalyzeMemberAccess(ctx, taskType, taskOfTType, valueTaskType, valueTaskOfTType),
+            ctx => AnalyzeMemberAccess(ctx, cache),
             SyntaxKind.SimpleMemberAccessExpression);
 
         context.RegisterSyntaxNodeAction(
-            ctx => AnalyzeInvocation(ctx, taskType, taskOfTType, valueTaskType, valueTaskOfTType),
+            ctx => AnalyzeInvocation(ctx, cache),
             SyntaxKind.InvocationExpression);
     }
 
-    /// <summary>Analyzes property access for .Result on Task types.</summary>
-    private static void AnalyzeMemberAccess(
-        SyntaxNodeAnalysisContext context,
-        INamedTypeSymbol? taskType,
-        INamedTypeSymbol? taskOfTType,
-        INamedTypeSymbol? valueTaskType,
-        INamedTypeSymbol? valueTaskOfTType) {
+    private static void AnalyzeMemberAccess(SyntaxNodeAnalysisContext context, TypeCache<KnownType> cache) {
         var memberAccess = (MemberAccessExpressionSyntax)context.Node;
 
-        // Only interested in .Result property access
         if (memberAccess.Name.Identifier.Text != "Result") {
             return;
         }
 
-        // Must be inside an async context
         if (!AsyncContextHelper.IsInsideAsyncContext(memberAccess)) {
             return;
         }
 
-        // Check if the expression type is a Task/ValueTask type
-        var typeInfo = context.SemanticModel.GetTypeInfo(memberAccess.Expression, context.CancellationToken);
-        if (typeInfo.Type is not { } expressionType) {
-            return;
-        }
-
-        if (IsTaskLike(expressionType, taskType, taskOfTType, valueTaskType, valueTaskOfTType)) {
+        if (context.SemanticModel.GetTypeInfo(memberAccess.Expression, context.CancellationToken).Type is { } expressionType &&
+            IsTaskLike(expressionType, cache)) {
             context.ReportDiagnostic(Rule, memberAccess.Name.GetLocation(), ".Result");
         }
     }
 
-    /// <summary>Analyzes method calls for .Wait() and .GetAwaiter().GetResult() on Task types.</summary>
-    private static void AnalyzeInvocation(
-        SyntaxNodeAnalysisContext context,
-        INamedTypeSymbol? taskType,
-        INamedTypeSymbol? taskOfTType,
-        INamedTypeSymbol? valueTaskType,
-        INamedTypeSymbol? valueTaskOfTType) {
+    private static void AnalyzeInvocation(SyntaxNodeAnalysisContext context, TypeCache<KnownType> cache) {
         var invocation = (InvocationExpressionSyntax)context.Node;
 
         if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess) {
             return;
         }
 
-        // Must be inside an async context
         if (!AsyncContextHelper.IsInsideAsyncContext(invocation)) {
             return;
         }
 
-        var methodName = memberAccess.Name.Identifier.Text;
-
-        switch (methodName) {
-            // task.Wait()
+        switch (memberAccess.Name.Identifier.Text) {
             case "Wait": {
-                var typeInfo = context.SemanticModel.GetTypeInfo(memberAccess.Expression, context.CancellationToken);
-                if (typeInfo.Type is { } expressionType &&
-                    IsTaskLike(expressionType, taskType, taskOfTType, valueTaskType, valueTaskOfTType)) {
+                if (context.SemanticModel.GetTypeInfo(memberAccess.Expression, context.CancellationToken).Type is { } expressionType &&
+                    IsTaskLike(expressionType, cache)) {
                     context.ReportDiagnostic(Rule, memberAccess.Name.GetLocation(), ".Wait()");
                 }
 
                 break;
             }
 
-            // task.GetAwaiter().GetResult()
             case "GetResult" when memberAccess.Expression is InvocationExpressionSyntax innerInvocation &&
                                   innerInvocation.Expression is MemberAccessExpressionSyntax innerMember &&
                                   innerMember.Name.Identifier.Text == "GetAwaiter": {
-                var typeInfo = context.SemanticModel.GetTypeInfo(innerMember.Expression, context.CancellationToken);
-                if (typeInfo.Type is { } expressionType &&
-                    IsTaskLike(expressionType, taskType, taskOfTType, valueTaskType, valueTaskOfTType)) {
+                if (context.SemanticModel.GetTypeInfo(innerMember.Expression, context.CancellationToken).Type is { } expressionType &&
+                    IsTaskLike(expressionType, cache)) {
                     context.ReportDiagnostic(Rule, memberAccess.Name.GetLocation(), ".GetAwaiter().GetResult()");
                 }
 
@@ -140,25 +120,9 @@ public sealed partial class Al0105AvoidBlockingCallsInAsyncAnalyzer : AlAnalyzer
         }
     }
 
-    /// <summary>Determines if a type is Task, Task&lt;T&gt;, ValueTask, or ValueTask&lt;T&gt;.</summary>
-    private static bool IsTaskLike(
-        ITypeSymbol type,
-        INamedTypeSymbol? taskType,
-        INamedTypeSymbol? taskOfTType,
-        INamedTypeSymbol? valueTaskType,
-        INamedTypeSymbol? valueTaskOfTType) {
-        if (taskType is not null && type.IsEqualTo(taskType)) {
-            return true;
-        }
-
-        if (taskOfTType is not null && type.OriginalDefinition.IsEqualTo(taskOfTType)) {
-            return true;
-        }
-
-        if (valueTaskType is not null && type.IsEqualTo(valueTaskType)) {
-            return true;
-        }
-
-        return valueTaskOfTType is not null && type.OriginalDefinition.IsEqualTo(valueTaskOfTType);
-    }
+    private static bool IsTaskLike(ITypeSymbol type, TypeCache<KnownType> cache) =>
+        cache.IsType(type, KnownType.Task) ||
+        cache.IsTypeDefinition(type, KnownType.TaskOfT) ||
+        cache.IsType(type, KnownType.ValueTask) ||
+        cache.IsTypeDefinition(type, KnownType.ValueTaskOfT);
 }

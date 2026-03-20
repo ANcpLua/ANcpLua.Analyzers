@@ -40,41 +40,23 @@ public sealed partial class Al0080MissingResilienceConfigurationAnalyzer : AlAna
         context.RegisterOperationAction(AnalyzeInvocation, OperationKind.Invocation);
 
     private static void AnalyzeInvocation(OperationAnalysisContext context) {
-        if (context.Operation is not IInvocationOperation invocation) {
-            return;
-        }
-
-        // Check if this is an AddHttpClient call
-        if (!IsAddHttpClientCall(invocation)) {
-            return;
-        }
-
-        // Get the containing method body and check for resilience configuration
-        if (GetContainingMethodBody(invocation) is not { } containingMethod
+        if (context.Operation is not IInvocationOperation invocation
+            || !IsAddHttpClientCall(invocation)
+            || GetContainingMethodBody(invocation) is not { } containingMethod
             || HasResilienceConfiguration(containingMethod)) {
             return;
         }
 
-        // Extract HTTP client name for the diagnostic message
-        var clientName = GetHttpClientName(invocation);
-
         context.ReportDiagnostic(Diagnostic.Create(
             Rule,
             invocation.Syntax.GetLocation(),
-            clientName));
+            GetHttpClientName(invocation)));
     }
 
-    private static bool IsAddHttpClientCall(IInvocationOperation invocation) {
-        var methodName = invocation.TargetMethod.Name;
-        if (methodName is not "AddHttpClient") {
-            return false;
-        }
-
-        // Check if it's an extension method on IServiceCollection
-        var containingType = invocation.TargetMethod.ContainingType?.ToDisplayString();
-        return containingType is "Microsoft.Extensions.DependencyInjection.HttpClientFactoryServiceCollectionExtensions"
+    private static bool IsAddHttpClientCall(IInvocationOperation invocation) =>
+        invocation.TargetMethod is { Name: "AddHttpClient", ContainingType: { } containingType }
+        && containingType.ToDisplayString() is "Microsoft.Extensions.DependencyInjection.HttpClientFactoryServiceCollectionExtensions"
             or "Microsoft.Extensions.DependencyInjection.HttpClientBuilderExtensions";
-    }
 
     private static IOperation? GetContainingMethodBody(IOperation operation) {
         var current = operation.Parent;
@@ -109,12 +91,10 @@ public sealed partial class Al0080MissingResilienceConfigurationAnalyzer : AlAna
     }
 
     private static string GetHttpClientName(IInvocationOperation invocation) {
-        // Try to get the client name from the type argument
         if (invocation.TargetMethod.TypeArguments is [{ } typeArg]) {
             return typeArg.Name;
         }
 
-        // Try to get the client name from the first string argument
         foreach (var arg in invocation.Arguments) {
             if (arg.Value is ILiteralOperation { ConstantValue: { HasValue: true, Value: string clientName } }) {
                 return clientName;

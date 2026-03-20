@@ -6,7 +6,10 @@
 /// </summary>
 public abstract partial class AlAnalyzer : DiagnosticAnalyzerBase {
     /// <summary>Base URL for diagnostic help links.</summary>
-    public const string HelpLinkBase = "https://github.com/ANcpLua/ANcpLua.Analyzers#rules";
+    public const string HelpLinkBase = "https://ancplua.mintlify.app/analyzers/rules/";
+
+    /// <summary>Returns the full help link URL for a specific diagnostic ID.</summary>
+    public static string HelpLink(string id) => HelpLinkBase + id;
 
     /// <inheritdoc />
     protected sealed override void InitializeCore(AnalysisContext context) => RegisterActions(context);
@@ -36,6 +39,6 @@ public abstract partial class AlAnalyzer : DiagnosticAnalyzerBase {
             severity,
             isEnabledByDefault,
             new LocalizableResourceString($"{id}AnalyzerDescription", Resources.ResourceManager, typeof(Resources)),
-            HelpLinkBase);
+            HelpLink(id));
     }
 }

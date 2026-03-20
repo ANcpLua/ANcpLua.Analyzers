@@ -28,30 +28,30 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0020ToAl0024FormBindingAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0020.</summary>
-    public const string DiagnosticIdAL0020 = "AL0020";
+    public const string DiagnosticIdAl0020 = "AL0020";
     /// <summary>The diagnostic identifier for AL0021.</summary>
-    public const string DiagnosticIdAL0021 = "AL0021";
+    public const string DiagnosticIdAl0021 = "AL0021";
     /// <summary>The diagnostic identifier for AL0022.</summary>
-    public const string DiagnosticIdAL0022 = "AL0022";
+    public const string DiagnosticIdAl0022 = "AL0022";
     /// <summary>The diagnostic identifier for AL0023.</summary>
-    public const string DiagnosticIdAL0023 = "AL0023";
+    public const string DiagnosticIdAl0023 = "AL0023";
     /// <summary>The diagnostic identifier for AL0024.</summary>
-    public const string DiagnosticIdAL0024 = "AL0024";
+    public const string DiagnosticIdAl0024 = "AL0024";
 
     private static readonly DiagnosticDescriptor RuleAl0020 = CreateRule(
-        DiagnosticIdAL0020, "AL0020");
+        DiagnosticIdAl0020, "AL0020");
 
     private static readonly DiagnosticDescriptor RuleAl0021 = CreateRule(
-        DiagnosticIdAL0021, "AL0021");
+        DiagnosticIdAl0021, "AL0021");
 
     private static readonly DiagnosticDescriptor RuleAl0022 = CreateRule(
-        DiagnosticIdAL0022, "AL0022");
+        DiagnosticIdAl0022, "AL0022");
 
     private static readonly DiagnosticDescriptor RuleAl0023 = CreateRule(
-        DiagnosticIdAL0023, "AL0023");
+        DiagnosticIdAl0023, "AL0023");
 
     private static readonly DiagnosticDescriptor RuleAl0024 = CreateRule(
-        DiagnosticIdAL0024, "AL0024");
+        DiagnosticIdAl0024, "AL0024");
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics (AL0020-AL0024).</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
@@ -67,7 +67,7 @@ public sealed partial class Al0020ToAl0024FormBindingAnalyzer : AlAnalyzer {
         DiagnosticSeverity.Error,
         true,
         new LocalizableResourceString($"{ruleNumber}AnalyzerDescription", Resources.ResourceManager, typeof(Resources)),
-        HelpLinkBase);
+        HelpLink(id));
 
     /// <summary>Registers method symbol actions to analyze endpoint parameter binding.</summary>
     protected override void RegisterActions(AnalysisContext context) =>

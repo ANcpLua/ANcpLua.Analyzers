@@ -104,13 +104,12 @@ public sealed partial class Al0038UseGetOrNullAnalyzer : AlAnalyzer {
         }
 
         var outArg = invocation.Arguments[1];
-        if (outArg.Value is not IDeclarationExpressionOperation declExpr ||
-            declExpr.Expression is not ILocalReferenceOperation outLocal) {
+        if (outArg.Value is not IDeclarationExpressionOperation { Expression: ILocalReferenceOperation outLocal }) {
             return false;
         }
 
         // Verify WhenTrue references the same local as the out parameter
-        if (!SymbolEqualityComparer.Default.Equals(localRef.Local, outLocal.Local)) {
+        if (!localRef.Local.IsEqualTo(outLocal.Local)) {
             return false;
         }
 
@@ -123,7 +122,7 @@ public sealed partial class Al0038UseGetOrNullAnalyzer : AlAnalyzer {
 
         return whenFalse switch {
             IDefaultValueOperation => true,
-            ILiteralOperation { ConstantValue.HasValue: true, ConstantValue.Value: null } => true,
+            ILiteralOperation { ConstantValue: { HasValue: true, Value: null } } => true,
             IConversionOperation { Operand: IDefaultValueOperation } => true,
             _ => false
         };
@@ -143,7 +142,7 @@ public sealed partial class Al0038UseGetOrNullAnalyzer : AlAnalyzer {
         // Determine extension: GetOrNull if WhenFalse is null, GetOrDefault otherwise
         var whenFalse = conditional.WhenFalse?.UnwrapAllConversions();
         var extensionName = whenFalse switch {
-            ILiteralOperation { ConstantValue.HasValue: true, ConstantValue.Value: null } => "GetOrNull",
+            ILiteralOperation { ConstantValue: { HasValue: true, Value: null } } => "GetOrNull",
             IDefaultValueOperation => "GetOrNull",
             _ => "GetOrDefault"
         };

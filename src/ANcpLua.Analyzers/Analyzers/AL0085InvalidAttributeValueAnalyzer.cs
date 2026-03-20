@@ -96,34 +96,17 @@ public sealed partial class Al0085InvalidAttributeValueAnalyzer : AlAnalyzer {
     private static void AnalyzeInvocation(OperationAnalysisContext context) {
         var invocation = (IInvocationOperation)context.Operation;
 
-        // Look for SetTag or SetAttribute calls
-        var methodName = invocation.TargetMethod.Name;
-        if (methodName != "SetTag" && methodName != "SetAttribute" && methodName != "Add") {
+        if (invocation.TargetMethod.Name is not ("SetTag" or "SetAttribute" or "Add")
+            || invocation.Arguments.Length < 2
+            || invocation.Arguments[0].Value.ConstantValue is not { HasValue: true, Value: string attributeName }
+            || !Validators.TryGetValue(attributeName, out var validator)) {
             return;
         }
 
-        // Need at least 2 arguments (key, value)
-        if (invocation.Arguments.Length < 2) {
-            return;
-        }
-
-        // Get the attribute name
-        if (invocation.Arguments[0].Value.ConstantValue is not { HasValue: true, Value: string attributeName }) {
-            return;
-        }
-
-        // Check if we have a validator for this attribute
-        if (!Validators.TryGetValue(attributeName, out var validator)) {
-            return;
-        }
-
-        // Get the value - could be a constant or we need to check the type
         var valueArg = invocation.Arguments[1].Value;
 
-        // If we have a constant value, validate it
         if (valueArg.ConstantValue.HasValue) {
-            var value = valueArg.ConstantValue.Value;
-            var valueString = value?.ToString() ?? string.Empty;
+            var valueString = valueArg.ConstantValue.Value?.ToString() ?? string.Empty;
 
             if (!validator.Validate(valueString)) {
                 context.ReportDiagnostic(Diagnostic.Create(
@@ -136,26 +119,12 @@ public sealed partial class Al0085InvalidAttributeValueAnalyzer : AlAnalyzer {
         }
     }
 
-    private static bool ValidateHttpStatusCode(string value) {
-        if (!int.TryParse(value, out var code)) {
-            return false;
-        }
+    private static bool ValidateHttpStatusCode(string value) =>
+        int.TryParse(value, out var code) && code is >= 100 and <= 599;
 
-        return code >= 100 && code <= 599;
-    }
-
-    private static bool ValidateHttpMethod(string value) {
-        return value.EqualsOrdinal("GET") ||
-               value.EqualsOrdinal("POST") ||
-               value.EqualsOrdinal("PUT") ||
-               value.EqualsOrdinal("DELETE") ||
-               value.EqualsOrdinal("PATCH") ||
-               value.EqualsOrdinal("HEAD") ||
-               value.EqualsOrdinal("OPTIONS") ||
-               value.EqualsOrdinal("TRACE") ||
-               value.EqualsOrdinal("CONNECT") ||
-               value.EqualsOrdinal("_OTHER");
-    }
+    private static bool ValidateHttpMethod(string value) =>
+        value is "GET" or "POST" or "PUT" or "DELETE" or "PATCH"
+            or "HEAD" or "OPTIONS" or "TRACE" or "CONNECT" or "_OTHER";
 
     private static bool ValidateGenAiSystem(string value) =>
         ValidGenAiSystems.Contains(value);
@@ -163,61 +132,34 @@ public sealed partial class Al0085InvalidAttributeValueAnalyzer : AlAnalyzer {
     private static bool ValidateGenAiOperation(string value) =>
         ValidGenAiOperations.Contains(value);
 
-    private static bool ValidatePositiveInteger(string value) {
-        if (!int.TryParse(value, out var num)) {
-            return false;
-        }
+    private static bool ValidatePositiveInteger(string value) =>
+        int.TryParse(value, out var num) && num > 0;
 
-        return num > 0;
-    }
+    private static bool ValidateNonNegativeInteger(string value) =>
+        int.TryParse(value, out var num) && num >= 0;
 
-    private static bool ValidateNonNegativeInteger(string value) {
-        if (!int.TryParse(value, out var num)) {
-            return false;
-        }
+    private static bool ValidateTemperature(string value) =>
+        double.TryParse(value, out var temp) && temp is >= 0.0 and <= 2.0;
 
-        return num >= 0;
-    }
+    private static bool ValidateProbability(string value) =>
+        double.TryParse(value, out var prob) && prob is >= 0.0 and <= 1.0;
 
-    private static bool ValidateTemperature(string value) {
-        if (!double.TryParse(value, out var temp)) {
-            return false;
-        }
+    private static bool ValidateFinishReason(string value) =>
+        value.EqualsIgnoreCase("stop")
+        || value.EqualsIgnoreCase("length")
+        || value.EqualsIgnoreCase("content_filter")
+        || value.EqualsIgnoreCase("tool_calls")
+        || value.EqualsIgnoreCase("error");
 
-        return temp >= 0.0 && temp <= 2.0;
-    }
+    private static bool ValidateGrpcStatusCode(string value) =>
+        int.TryParse(value, out var code) && code is >= 0 and <= 16;
 
-    private static bool ValidateProbability(string value) {
-        if (!double.TryParse(value, out var prob)) {
-            return false;
-        }
-
-        return prob >= 0.0 && prob <= 1.0;
-    }
-
-    private static bool ValidateFinishReason(string value) {
-        return value.EqualsIgnoreCase("stop") ||
-               value.EqualsIgnoreCase("length") ||
-               value.EqualsIgnoreCase("content_filter") ||
-               value.EqualsIgnoreCase("tool_calls") ||
-               value.EqualsIgnoreCase("error");
-    }
-
-    private static bool ValidateGrpcStatusCode(string value) {
-        if (!int.TryParse(value, out var code)) {
-            return false;
-        }
-
-        return code >= 0 && code <= 16;
-    }
-
-    private static bool ValidateUrlScheme(string value) {
-        return value.EqualsIgnoreCase("http") ||
-               value.EqualsIgnoreCase("https") ||
-               value.EqualsIgnoreCase("ftp") ||
-               value.EqualsIgnoreCase("ws") ||
-               value.EqualsIgnoreCase("wss");
-    }
+    private static bool ValidateUrlScheme(string value) =>
+        value.EqualsIgnoreCase("http")
+        || value.EqualsIgnoreCase("https")
+        || value.EqualsIgnoreCase("ftp")
+        || value.EqualsIgnoreCase("ws")
+        || value.EqualsIgnoreCase("wss");
 
     /// <summary>Encapsulates validation logic and expected format message.</summary>
     private sealed partial class AttributeValidator(Func<string, bool> validate, string expectedFormat) {

@@ -28,43 +28,26 @@ public sealed partial class Al0036UseGuardNotNullAnalyzer : AlAnalyzer {
         context.RegisterOperationAction(AnalyzeCoalesce, OperationKind.Coalesce);
 
     private static void AnalyzeCoalesce(OperationAnalysisContext context) {
-        if (context.Operation is not ICoalesceOperation coalesce) {
+        if (context.Operation is not ICoalesceOperation coalesce ||
+            !IsArgumentNullExceptionThrow(coalesce.WhenNull)) {
             return;
         }
 
-        // Check if the right side is a throw expression with ArgumentNullException
-        if (!IsArgumentNullExceptionThrow(coalesce.WhenNull)) {
-            return;
-        }
-
-        // Get the name of the left operand for the message
-        var operandName = coalesce.Value.GetOperandName();
-
-        context.ReportDiagnostic(Diagnostic.Create(Rule, coalesce.Syntax.GetLocation(), operandName));
+        context.ReportDiagnostic(Diagnostic.Create(Rule, coalesce.Syntax.GetLocation(), coalesce.Value.GetOperandName()));
     }
 
     private static bool IsArgumentNullExceptionThrow(IOperation? operation) {
-        // Unwrap conversions - use pattern match to handle nullable
-        if (operation is not IConversionOperation and not IThrowOperation) {
-            // Fast path: not a conversion or throw
-            if (operation is null) {
-                return false;
-            }
+        // Fast path: only conversions and throws are relevant
+        if (operation is not IConversionOperation and not IThrowOperation and null) {
+            return false;
         }
 
         while (operation is IConversionOperation conversion) {
             operation = conversion.Operand;
         }
 
-        // Check for throw expression
-        if (operation is not IThrowOperation { Exception: { } exception }) {
-            return false;
-        }
-
-        // Unwrap conversions and check if creating an ArgumentNullException
-        var unwrappedException = exception.UnwrapAllConversions();
-
-        return unwrappedException is IObjectCreationOperation { Type: { } exceptionType }
-               && OperationHelper.IsArgumentNullException(exceptionType);
+        return operation is IThrowOperation { Exception: { } exception } &&
+               exception.UnwrapAllConversions() is IObjectCreationOperation { Type: { } exceptionType } &&
+               OperationHelper.IsArgumentNullException(exceptionType);
     }
 }

@@ -68,9 +68,7 @@ public sealed partial class Al0083InsecureEndpointAnalyzer : AlAnalyzer {
     private static void AnalyzeAssignment(OperationAnalysisContext context) {
         var assignment = (ISimpleAssignmentOperation)context.Operation;
 
-        // Check if this is an endpoint property assignment
-        var propertyName = GetPropertyName(assignment.Target);
-        if (propertyName is null || !IsEndpointProperty(propertyName)) {
+        if (GetPropertyName(assignment.Target) is not { } propertyName || !IsEndpointProperty(propertyName)) {
             return;
         }
 
@@ -80,15 +78,12 @@ public sealed partial class Al0083InsecureEndpointAnalyzer : AlAnalyzer {
     private static void AnalyzeArgument(OperationAnalysisContext context) {
         var argument = (IArgumentOperation)context.Operation;
 
-        // Skip if parent is Uri/HttpClient object creation (handled by AnalyzeObjectCreation)
-        if (argument.Parent is IObjectCreationOperation creation &&
-            creation.Type?.Name is "Uri" or "HttpClient") {
+        // AnalyzeObjectCreation handles Uri/HttpClient creation arguments
+        if (argument.Parent is IObjectCreationOperation { Type.Name: "Uri" or "HttpClient" }) {
             return;
         }
 
-        // Check if parameter name suggests endpoint usage
-        var parameterName = argument.Parameter?.Name;
-        if (parameterName is null || !IsEndpointProperty(parameterName)) {
+        if (argument.Parameter?.Name is not { } parameterName || !IsEndpointProperty(parameterName)) {
             return;
         }
 
@@ -98,9 +93,7 @@ public sealed partial class Al0083InsecureEndpointAnalyzer : AlAnalyzer {
     private static void AnalyzeObjectCreation(OperationAnalysisContext context) {
         var creation = (IObjectCreationOperation)context.Operation;
 
-        // Check for Uri/HttpClient creation with http:// string
-        var typeName = creation.Type?.Name;
-        if (typeName is not ("Uri" or "HttpClient")) {
+        if (creation.Type?.Name is not ("Uri" or "HttpClient")) {
             return;
         }
 
@@ -110,18 +103,10 @@ public sealed partial class Al0083InsecureEndpointAnalyzer : AlAnalyzer {
     }
 
     private static void CheckForInsecureEndpoint(OperationAnalysisContext context, IOperation operation) {
-        // Unwrap conversions to get the actual value
         var value = operation.UnwrapAllConversions();
 
-        if (value.ConstantValue is not { HasValue: true, Value: string endpoint }) {
-            return;
-        }
-
-        if (IsInsecureEndpoint(endpoint)) {
-            context.ReportDiagnostic(Diagnostic.Create(
-                Rule,
-                operation.Syntax.GetLocation(),
-                endpoint));
+        if (value.ConstantValue is { HasValue: true, Value: string endpoint } && IsInsecureEndpoint(endpoint)) {
+            context.ReportDiagnostic(Diagnostic.Create(Rule, operation.Syntax.GetLocation(), endpoint));
         }
     }
 
@@ -143,25 +128,16 @@ public sealed partial class Al0083InsecureEndpointAnalyzer : AlAnalyzer {
     }
 
     private static bool IsInsecureEndpoint(string endpoint) {
-        // Must start with http:// (not https://)
-        if (!endpoint.StartsWithOrdinal(HttpPrefix)) {
+        if (!endpoint.StartsWithOrdinal(HttpPrefix) || endpoint.StartsWithOrdinal(HttpsPrefix)) {
             return false;
         }
 
-        // Exclude https:// (defensive, but shouldn't match above)
-        if (endpoint.StartsWithOrdinal(HttpsPrefix)) {
-            return false;
-        }
-
-        // Exclude localhost patterns (development use)
+        // Exclude localhost patterns (development use), but not "localhost-prod" style prefixes
         var hostPart = endpoint.Substring(HttpPrefix.Length);
         foreach (var localhost in LocalhostPatterns) {
-            if (hostPart.StartsWithIgnoreCase(localhost)) {
-                // Check it's not just a prefix (e.g., "localhost" not "localhost-prod")
-                if (hostPart.Length == localhost.Length ||
-                    hostPart[localhost.Length] is ':' or '/' or '?') {
-                    return false;
-                }
+            if (hostPart.StartsWithIgnoreCase(localhost)
+                && (hostPart.Length == localhost.Length || hostPart[localhost.Length] is ':' or '/' or '?')) {
+                return false;
             }
         }
 

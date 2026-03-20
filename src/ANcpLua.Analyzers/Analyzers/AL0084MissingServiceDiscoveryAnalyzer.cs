@@ -35,62 +35,34 @@ public sealed partial class Al0084MissingServiceDiscoveryAnalyzer : AlAnalyzer {
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
-    /// <summary>Registers operation actions to analyze URL assignments.</summary>
-    private static readonly ImmutableArray<string> TestAttributeNames =
-    [
-        "TestFixtureAttribute", // NUnit
-        "TestClassAttribute",   // MSTest
-    ];
-
     /// <summary>Registers compilation start actions to analyze service discovery configuration.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterCompilationStartAction(compilationContext => {
-            var httpClientType = compilationContext.Compilation.GetTypeByMetadataName("System.Net.Http.HttpClient");
-            var uriType = compilationContext.Compilation.GetTypeByMetadataName("System.Uri");
+            var compilation = compilationContext.Compilation;
 
-            // Skip if HttpClient is not referenced (not a web project)
+            if (IsTestProject(compilation)) {
+                return;
+            }
+
+            var httpClientType = compilation.GetTypeByMetadataName("System.Net.Http.HttpClient");
+            var uriType = compilation.GetTypeByMetadataName("System.Uri");
+
             if (httpClientType is null || uriType is null) {
                 return;
             }
 
-            // Check if service discovery is configured (AddServiceDiscovery called)
-            var hasServiceDiscovery = HasServiceDiscoveryConfigured(compilationContext.Compilation);
-
-            compilationContext.RegisterOperationAction(ctx => {
-                    if (!IsInTestClass(ctx.ContainingSymbol))
-                        AnalyzeAssignment(ctx, httpClientType, hasServiceDiscovery);
-                },
+            compilationContext.RegisterOperationAction(
+                ctx => AnalyzeAssignment(ctx, httpClientType),
                 OperationKind.SimpleAssignment);
 
-            compilationContext.RegisterOperationAction(ctx => {
-                    if (!IsInTestClass(ctx.ContainingSymbol))
-                        AnalyzeObjectCreation(ctx, uriType, hasServiceDiscovery);
-                },
+            compilationContext.RegisterOperationAction(
+                ctx => AnalyzeObjectCreation(ctx, uriType),
                 OperationKind.ObjectCreation);
         });
 
-    private static bool HasServiceDiscoveryConfigured(Compilation compilation) {
-        // Check for Microsoft.Extensions.ServiceDiscovery reference
-        var serviceDiscoveryType = compilation.GetTypeByMetadataName(
-            "Microsoft.Extensions.ServiceDiscovery.ServiceEndpointResolver");
-        if (serviceDiscoveryType is not null) {
-            return true;
-        }
-
-        // Check for Aspire reference
-        var aspireType = compilation.GetTypeByMetadataName(
-            "Aspire.Hosting.ApplicationModel.IResource");
-
-        return aspireType is not null;
-    }
-
-    private static void AnalyzeAssignment(
-        OperationAnalysisContext context,
-        ISymbol httpClientType,
-        bool hasServiceDiscovery) {
+    private static void AnalyzeAssignment(OperationAnalysisContext context, ISymbol httpClientType) {
         var assignment = (ISimpleAssignmentOperation)context.Operation;
 
-        // Check if assigning to HttpClient.BaseAddress
         if (assignment.Target is not IPropertyReferenceOperation { Property.Name: "BaseAddress" } propRef) {
             return;
         }
@@ -99,47 +71,39 @@ public sealed partial class Al0084MissingServiceDiscoveryAnalyzer : AlAnalyzer {
             return;
         }
 
-        // Get the URL being assigned
         if (GetUrlFromOperation(assignment.Value) is not { } url) {
             return;
         }
 
-        // Check if this looks like a hardcoded URL
         if (IsHardcodedUrl(url) && !IsServiceDiscoveryUrl(url)) {
             context.ReportDiagnostic(Diagnostic.Create(Rule, assignment.Syntax.GetLocation(), url.OriginalString));
         }
     }
 
-    private static void AnalyzeObjectCreation(
-        OperationAnalysisContext context,
-        ISymbol uriType,
-        bool hasServiceDiscovery) {
+    private static void AnalyzeObjectCreation(OperationAnalysisContext context, ISymbol uriType) {
         var creation = (IObjectCreationOperation)context.Operation;
 
         if (!creation.Type.IsEqualTo(uriType)) {
             return;
         }
 
-        // Check if this Uri is used for HttpClient configuration
         if (!IsHttpClientRelated(context.Operation, out var isDirectBaseAddressAssignment)) {
             return;
         }
 
-        // Skip if this is a direct BaseAddress assignment - AnalyzeAssignment handles that
+        // AnalyzeAssignment handles direct BaseAddress assignments
         if (isDirectBaseAddressAssignment) {
             return;
         }
 
-        // Get the URL from constructor argument
-        if (creation.Arguments.Length is 0) {
+        if (creation.Arguments is not [{ Value: var firstArg }, ..]) {
             return;
         }
 
-        if (GetUrlFromOperation(creation.Arguments[0].Value) is not { } url) {
+        if (GetUrlFromOperation(firstArg) is not { } url) {
             return;
         }
 
-        // Check if this looks like a hardcoded URL
         if (IsHardcodedUrl(url) && !IsServiceDiscoveryUrl(url)) {
             context.ReportDiagnostic(Diagnostic.Create(Rule, creation.Syntax.GetLocation(), url.OriginalString));
         }
@@ -150,21 +114,26 @@ public sealed partial class Al0084MissingServiceDiscoveryAnalyzer : AlAnalyzer {
             return null;
         }
 
-        // Unwrap conversions
         var unwrapped = operation.UnwrapAllConversions();
 
-        // Check for constant string
         if (unwrapped.ConstantValue is { HasValue: true, Value: string urlString }) {
             return TryParseUri(urlString);
         }
 
-        // Check for Uri constructor with string
-        if (unwrapped is IObjectCreationOperation { Arguments.Length: > 0 } objCreation) {
-            return GetUrlFromOperation(objCreation.Arguments[0].Value);
+        if (unwrapped is IObjectCreationOperation { Arguments: [{ Value: var innerArg }, ..] }) {
+            return GetUrlFromOperation(innerArg);
         }
 
         return null;
     }
+
+    /// <summary>RFC 6761 reserved TLDs — these never resolve in production.</summary>
+    private static readonly ImmutableArray<string> ReservedTlds =
+        [".test", ".invalid", ".example", ".localhost"];
+
+    /// <summary>RFC 2606 / 6761 reserved second-level domains.</summary>
+    private static readonly ImmutableArray<string> ReservedDomains =
+        ["example.com", "example.net", "example.org"];
 
     private static bool IsHardcodedUrl(Uri uri) {
         if (!uri.Scheme.EqualsIgnoreCase("http") && !uri.Scheme.EqualsIgnoreCase("https")) {
@@ -172,6 +141,10 @@ public sealed partial class Al0084MissingServiceDiscoveryAnalyzer : AlAnalyzer {
         }
 
         var host = uri.Host;
+
+        if (IsReservedDomain(host)) {
+            return false;
+        }
 
         if (IsLocalhost(host)) {
             return true;
@@ -182,45 +155,24 @@ public sealed partial class Al0084MissingServiceDiscoveryAnalyzer : AlAnalyzer {
             return true;
         }
 
-        if (!uri.IsDefaultPort) {
-            return true;
-        }
-
-        if (host.ContainsOrdinal(".")) {
-            return true;
-        }
-
-        return false;
+        return !uri.IsDefaultPort || host.ContainsOrdinal(".");
     }
 
     private static bool IsServiceDiscoveryUrl(Uri uri) {
         var scheme = uri.Scheme;
-        // Service discovery URLs use the http+https:// or https+http:// scheme
-        if (scheme.EqualsIgnoreCase("http+https") ||
-            scheme.EqualsIgnoreCase("https+http")) {
+
+        if (scheme.EqualsIgnoreCase("http+https") || scheme.EqualsIgnoreCase("https+http")) {
             return true;
         }
 
-        // URLs without dots in hostname might be service names
-        // But if they have an explicit non-default port, they're likely hardcoded
-        if (!uri.Host.ContainsOrdinal(".") &&
-            !IsLocalhost(uri.Host) &&
-            !HasExplicitPort(uri)) {
-            return true;
-        }
-
-        return false;
+        return !uri.Host.ContainsOrdinal(".") &&
+               !IsLocalhost(uri.Host) &&
+               uri.IsDefaultPort;
     }
 
-    private static bool HasExplicitPort(Uri uri) {
-        // Check if the URL has an explicit port that's not the default for the scheme
-        if (uri.IsDefaultPort) {
-            return false;
-        }
-
-        // Any non-default port means the URL is hardcoded
-        return true;
-    }
+    private static bool IsReservedDomain(string host) =>
+        ReservedTlds.Any(host.EndsWithIgnoreCase) ||
+        ReservedDomains.Any(d => host.EqualsIgnoreCase(d) || host.EndsWithIgnoreCase("." + d));
 
     private static bool IsLocalhost(string host) =>
         host.EqualsIgnoreCase("localhost") ||
@@ -234,30 +186,20 @@ public sealed partial class Al0084MissingServiceDiscoveryAnalyzer : AlAnalyzer {
         }
     }
 
-    private static bool IsInTestClass(ISymbol? containingSymbol) {
-        var type = containingSymbol as INamedTypeSymbol ?? containingSymbol?.ContainingType;
-        while (type is not null) {
-            foreach (var name in TestAttributeNames) {
-                if (type.HasAttributeByShortName(name)) {
-                    return true;
-                }
-            }
-
-            type = type.ContainingType;
-        }
-
-        return false;
-    }
+    private static bool IsTestProject(Compilation compilation) =>
+        compilation.ReferencedAssemblyNames.Any(static a =>
+            a.Name is "xunit.core" or "xunit.v3.core"
+                   or "nunit.framework"
+                   or "Microsoft.VisualStudio.TestPlatform.TestFramework"
+                   or "Microsoft.Testing.Framework");
 
     private static bool IsHttpClientRelated(IOperation operation, out bool isDirectBaseAddressAssignment) {
         isDirectBaseAddressAssignment = false;
 
-        // Walk up the tree to find HttpClient-related context
         var parent = operation.Parent;
         while (parent is not null) {
             switch (parent) {
                 case ISimpleAssignmentOperation { Target: IPropertyReferenceOperation { Property.Name: "BaseAddress" } }:
-                    // This will be caught by AnalyzeAssignment, don't double-report
                     isDirectBaseAddressAssignment = true;
                     return true;
                 case IArgumentOperation { Parameter.Name: "baseAddress" or "requestUri" or "uri" }:

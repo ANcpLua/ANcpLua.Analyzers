@@ -31,16 +31,12 @@ public sealed partial class Al0043TrimSafeViolationAnalyzer : AlAnalyzer {
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
-    /// <summary>Registers syntax or operation actions for analysis.</summary>
-
+    /// <inheritdoc />
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterCompilationStartAction(OnCompilationStart);
 
-    private static void OnCompilationStart(CompilationStartAnalysisContext context) {
-        context.RegisterOperationAction(
-            AnalyzeInvocation,
-            OperationKind.Invocation);
-    }
+    private static void OnCompilationStart(CompilationStartAnalysisContext context) =>
+        context.RegisterOperationAction(AnalyzeInvocation, OperationKind.Invocation);
 
     private static void AnalyzeInvocation(OperationAnalysisContext context) {
         var invocation = (IInvocationOperation)context.Operation;
@@ -49,27 +45,17 @@ public sealed partial class Al0043TrimSafeViolationAnalyzer : AlAnalyzer {
             return;
         }
 
-        // Check if the calling method or containing type is marked [TrimSafe]
-        var hasAttribute = callingMethod.HasAttributeByShortName(TrimSafeAttributeName);
-        if (!hasAttribute && callingMethod.ContainingType is { } containingType) {
-            hasAttribute = containingType.HasAttributeByShortName(TrimSafeAttributeName);
-        }
-
-        if (!hasAttribute) {
+        if (!callingMethod.HasAttributeByShortName(TrimSafeAttributeName) &&
+            callingMethod.ContainingType?.HasAttributeByShortName(TrimSafeAttributeName) is not true) {
             return;
         }
 
-        var targetMethod = invocation.TargetMethod;
-
-        // Check if the called method has [RequiresUnreferencedCode]
-        if (!targetMethod.HasAttributeByShortName(RequiresUnreferencedCodeAttributeName)) {
+        if (!invocation.TargetMethod.HasAttributeByShortName(RequiresUnreferencedCodeAttributeName)) {
             return;
         }
 
-        // Report violation
-        var callingMethodName = callingMethod.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
-        var targetMethodName = targetMethod.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
-
-        context.ReportDiagnostic(Rule, invocation.Syntax.GetLocation(), callingMethodName, targetMethodName);
+        context.ReportDiagnostic(Rule, invocation.Syntax.GetLocation(),
+            callingMethod.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat),
+            invocation.TargetMethod.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat));
     }
 }

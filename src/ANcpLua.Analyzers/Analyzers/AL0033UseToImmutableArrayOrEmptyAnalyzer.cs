@@ -22,7 +22,6 @@ public sealed partial class Al0033UseToImmutableArrayOrEmptyAnalyzer : AlAnalyze
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
     /// <summary>Registers syntax or operation actions for analysis.</summary>
-
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterOperationAction(AnalyzeCoalesce, OperationKind.Coalesce);
 
@@ -31,17 +30,14 @@ public sealed partial class Al0033UseToImmutableArrayOrEmptyAnalyzer : AlAnalyze
             return;
         }
 
-        // Only fire when ToImmutableArrayOrEmpty() is actually available in the compilation.
         if (!HasToImmutableArrayOrEmptyExtension(context.Compilation)) {
             return;
         }
 
-        // Check if the right side is ImmutableArray<T>.Empty
         if (!IsImmutableArrayEmpty(coalesce.WhenNull)) {
             return;
         }
 
-        // Check if the left side is a null-conditional ToImmutableArray() call
         if (!TryGetToImmutableArraySource(coalesce.Value, out var sourceName)) {
             return;
         }
@@ -55,35 +51,20 @@ public sealed partial class Al0033UseToImmutableArrayOrEmptyAnalyzer : AlAnalyze
             return false;
         }
 
-        // Unwrap conversions
         operation = operation.UnwrapAllConversions();
 
-        switch (operation) {
-            // Check for ImmutableArray<T>.Empty field access
-            // Use display string check since GetTypeByMetadataName can fail for some compilation contexts
-            case IFieldReferenceOperation {
-                Field: {
-                    Name: "Empty",
-                    IsStatic: true
-                }
-            } fieldRef when IsImmutableArrayType(fieldRef.Field.ContainingType):
-            // Also check for default(ImmutableArray<T>) or ImmutableArray<T>.default or just default
-            case IDefaultValueOperation defaultOp when IsImmutableArrayType(defaultOp.Type):
-                return true;
-            default:
-                return false;
-        }
+        return operation switch {
+            IFieldReferenceOperation { Field: { Name: "Empty", IsStatic: true } } fieldRef
+                when IsImmutableArrayType(fieldRef.Field.ContainingType) => true,
+            IDefaultValueOperation defaultOp
+                when IsImmutableArrayType(defaultOp.Type) => true,
+            _ => false
+        };
     }
 
-    private static bool IsImmutableArrayType(ITypeSymbol? type) {
-        if (type is null) {
-            return false;
-        }
-
-        // Check via display string (more reliable across compilation contexts)
-        var displayName = type.OriginalDefinition.ToDisplayString();
-        return displayName == "System.Collections.Immutable.ImmutableArray<T>";
-    }
+    private static bool IsImmutableArrayType(ITypeSymbol? type) =>
+        type is not null &&
+        type.OriginalDefinition.ToDisplayString() == "System.Collections.Immutable.ImmutableArray<T>";
 
     private static bool TryGetToImmutableArraySource(IOperation? operation, out string sourceName) {
         sourceName = "collection";
@@ -92,14 +73,10 @@ public sealed partial class Al0033UseToImmutableArrayOrEmptyAnalyzer : AlAnalyze
             return false;
         }
 
-        // Unwrap conversions
         operation = operation.UnwrapAllConversions();
 
-        // Check for null-conditional invocation: source?.ToImmutableArray()
         if (operation is IConditionalAccessOperation {
-            WhenNotNull: IInvocationOperation {
-                TargetMethod.Name: "ToImmutableArray"
-            }
+            WhenNotNull: IInvocationOperation { TargetMethod.Name: "ToImmutableArray" }
         } conditionalAccess) {
             sourceName = GetOperandDisplayName(conditionalAccess.Operation);
             return true;

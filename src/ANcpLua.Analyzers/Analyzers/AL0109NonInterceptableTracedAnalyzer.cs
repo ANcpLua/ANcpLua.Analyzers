@@ -57,29 +57,17 @@ public sealed partial class Al0109NonInterceptableTracedAnalyzer : AlAnalyzer {
     }
 
     private static void AnalyzeMethod(SymbolAnalysisContext context, INamedTypeSymbol tracedType) {
-        var method = (IMethodSymbol)context.Symbol;
-
-        // Only check methods that have [Traced] directly on them
-        if (!HasAttribute(method, tracedType)) {
+        if (context.Symbol is not IMethodSymbol { IsAbstract: true } and not IMethodSymbol { IsExtern: true } and not IMethodSymbol { IsPartialDefinition: true }) {
             return;
         }
 
-        // Report if the method is abstract, extern, or a partial definition
-        if (method.IsAbstract || method.IsExtern || method.IsPartialDefinition) {
+        var method = (IMethodSymbol)context.Symbol;
+
+        if (method.HasAttribute(tracedType)) {
             context.ReportDiagnostic(Diagnostic.Create(
                 Rule,
                 method.Locations.FirstOrDefault() ?? Location.None,
                 method.Name));
         }
-    }
-
-    private static bool HasAttribute(ISymbol symbol, INamedTypeSymbol attributeType) {
-        foreach (var attribute in symbol.GetAttributes()) {
-            if (SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, attributeType)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

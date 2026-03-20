@@ -26,7 +26,6 @@ public sealed partial class Al0039UseStringComparisonExtensionsAnalyzer : AlAnal
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
     /// <summary>Registers syntax or operation actions for analysis.</summary>
-
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterOperationAction(AnalyzeInvocation, OperationKind.Invocation);
 
@@ -37,31 +36,23 @@ public sealed partial class Al0039UseStringComparisonExtensionsAnalyzer : AlAnal
 
         var method = invocation.TargetMethod;
 
-        // Check if it's a supported string method
         if (!MappingRegistry.HasStringComparisonExtension(method.Name)) {
             return;
         }
 
-        // Check if the receiver is a string
-        var receiverType = invocation.Instance?.Type;
-        if (receiverType?.SpecialType != SpecialType.System_String) {
+        if (invocation.Instance?.Type?.SpecialType != SpecialType.System_String) {
             return;
         }
 
-        // Check if one of the arguments is a StringComparison
         if (FindStringComparisonArgument(invocation) is not { } comparisonArg) {
             return;
         }
 
-        // Extensions only exist for simple cases (value + StringComparison).
-        // If there are additional parameters (startIndex, count), skip.
-        // Expected: 2 args for simple case (value + StringComparison)
-        var nonComparisonArgCount = CountNonStringComparisonArgs(invocation);
-        if (nonComparisonArgCount > 1) {
+        // Extensions only cover simple cases (value + StringComparison), not overloads with startIndex/count
+        if (CountNonStringComparisonArgs(invocation) > 1) {
             return;
         }
 
-        // Get the StringComparison value and suffix
         if (GetStringComparisonValue(comparisonArg) is not { } comparisonValue) {
             return;
         }
@@ -70,13 +61,12 @@ public sealed partial class Al0039UseStringComparisonExtensionsAnalyzer : AlAnal
             return;
         }
 
-        // Build the suggestion
         var receiverName = invocation.Instance.GetOperandName("str");
         var extensionName = $"{method.Name}{suffix}";
         var argName = GetFirstStringArgument(invocation);
-        var suggestion = $"{receiverName}.{extensionName}({argName})";
 
-        context.ReportDiagnostic(Rule, invocation.Syntax.GetLocation(), suggestion);
+        context.ReportDiagnostic(Rule, invocation.Syntax.GetLocation(),
+            $"{receiverName}.{extensionName}({argName})");
     }
 
     private static int CountNonStringComparisonArgs(IInvocationOperation invocation) {
@@ -115,24 +105,16 @@ public sealed partial class Al0039UseStringComparisonExtensionsAnalyzer : AlAnal
     private static string? GetStringComparisonValue(IArgumentOperation argument) {
         var value = argument.Value;
 
-        // Unwrap conversions
         while (value is IConversionOperation conversion) {
             value = conversion.Operand;
         }
 
-        // Check for field reference (e.g., StringComparison.Ordinal)
-        if (value is IFieldReferenceOperation fieldRef) {
-            return fieldRef.Field.Name;
-        }
-
-        return null;
+        return value is IFieldReferenceOperation fieldRef ? fieldRef.Field.Name : null;
     }
 
     private static string GetFirstStringArgument(IInvocationOperation invocation) {
         foreach (var arg in invocation.Arguments) {
-            // Skip StringComparison arguments
-            var type = arg.Value.Type;
-            var typeName = type?.ToDisplayString();
+            var typeName = arg.Value.Type?.ToDisplayString();
             if (typeName is "System.StringComparison" or "StringComparison") {
                 continue;
             }

@@ -30,6 +30,14 @@ public sealed partial class Al0106AvoidTaskRunInAspNetCoreAnalyzer : AlAnalyzer 
     /// <summary>The diagnostic identifier for AL0106.</summary>
     public const string DiagnosticId = "AL0106";
 
+    private enum KnownType { Task, ControllerBase, PageModel }
+
+    private static readonly string[] KnownTypeNames = [
+        "System.Threading.Tasks.Task",
+        "Microsoft.AspNetCore.Mvc.ControllerBase",
+        "Microsoft.AspNetCore.Mvc.RazorPages.PageModel"
+    ];
+
     private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.AspNetCore,
@@ -43,106 +51,65 @@ public sealed partial class Al0106AvoidTaskRunInAspNetCoreAnalyzer : AlAnalyzer 
         context.RegisterCompilationStartAction(OnCompilationStart);
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
-        if (context.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task") is not { } taskType) {
+        var cache = new TypeCache<KnownType>(type => context.Compilation.GetTypeByMetadataName(KnownTypeNames[(int)type]));
+
+        if (cache.Get(KnownType.Task) is null) {
             return;
         }
 
-        var controllerBaseType = context.Compilation.GetTypeByMetadataName(
-            "Microsoft.AspNetCore.Mvc.ControllerBase");
-        var pageModelType = context.Compilation.GetTypeByMetadataName(
-            "Microsoft.AspNetCore.Mvc.RazorPages.PageModel");
-
-        // If none of the ASP.NET Core types are available, this isn't an ASP.NET Core project
-        if (controllerBaseType is null && pageModelType is null) {
+        if (cache.Get(KnownType.ControllerBase) is null && cache.Get(KnownType.PageModel) is null) {
             return;
         }
 
         context.RegisterSyntaxNodeAction(
-            ctx => AnalyzeInvocation(ctx, taskType, controllerBaseType, pageModelType),
+            ctx => AnalyzeInvocation(ctx, cache),
             SyntaxKind.InvocationExpression);
     }
 
-    /// <summary>Analyzes invocation expressions for Task.Run calls in ASP.NET Core handlers.</summary>
-    private static void AnalyzeInvocation(
-        SyntaxNodeAnalysisContext context,
-        INamedTypeSymbol taskType,
-        INamedTypeSymbol? controllerBaseType,
-        INamedTypeSymbol? pageModelType) {
+    private static void AnalyzeInvocation(SyntaxNodeAnalysisContext context, TypeCache<KnownType> cache) {
         var invocation = (InvocationExpressionSyntax)context.Node;
 
-        // Check if this is Task.Run(...)
         if (invocation.Expression is not MemberAccessExpressionSyntax { Name.Identifier.Text: "Run" } memberAccess) {
             return;
         }
 
-        // Verify the receiver is System.Threading.Tasks.Task
         var typeInfo = context.SemanticModel.GetTypeInfo(memberAccess.Expression, context.CancellationToken);
-        if (typeInfo.Type is not { } receiverType || !receiverType.IsEqualTo(taskType)) {
-            // Also check for static access: Task.Run (where expression is the type name, not an instance)
+        if (typeInfo.Type is not { } receiverType || !cache.IsType(receiverType, KnownType.Task)) {
             if (context.SemanticModel.GetSymbolInfo(memberAccess.Expression, context.CancellationToken).Symbol is not INamedTypeSymbol namedType ||
-                !namedType.IsEqualTo(taskType)) {
+                !cache.IsType(namedType, KnownType.Task)) {
                 return;
             }
         }
 
-        // Find the containing method and check if it's in an ASP.NET Core handler
-        if (!IsInsideAspNetCoreHandler(invocation, context.SemanticModel, controllerBaseType, pageModelType, context.CancellationToken)) {
-            return;
+        if (IsInsideAspNetCoreHandler(invocation, context.SemanticModel, cache, context.CancellationToken)) {
+            context.ReportDiagnostic(Rule, invocation.GetLocation());
         }
-
-        context.ReportDiagnostic(Rule, invocation.GetLocation());
     }
 
-    /// <summary>Determines if a node is inside an ASP.NET Core request handler method.</summary>
     private static bool IsInsideAspNetCoreHandler(
         SyntaxNode node,
         SemanticModel semanticModel,
-        INamedTypeSymbol? controllerBaseType,
-        INamedTypeSymbol? pageModelType,
+        TypeCache<KnownType> cache,
         CancellationToken cancellationToken) {
-        // Walk up to find the containing method
         for (var current = node.Parent; current is not null; current = current.Parent) {
-            // Local functions and lambdas are separate scopes — stop searching
             if (current is LocalFunctionStatementSyntax or AnonymousFunctionExpressionSyntax) {
                 return false;
             }
 
-            if (current is not MethodDeclarationSyntax method) {
+            if (current is not MethodDeclarationSyntax method ||
+                semanticModel.GetDeclaredSymbol(method, cancellationToken) is not { ContainingType: { } containingType } methodSymbol) {
                 continue;
             }
 
-            if (semanticModel.GetDeclaredSymbol(method, cancellationToken) is not { } methodSymbol) {
-                continue;
-            }
-
-            if (methodSymbol.ContainingType is not { } containingType) {
-                continue;
-            }
-
-            // Check if containing type inherits from ControllerBase
-            if (controllerBaseType is not null && containingType.InheritsFrom(controllerBaseType)) {
-                // Only flag public methods (action methods)
-                if (methodSymbol.DeclaredAccessibility == Accessibility.Public) {
-                    return true;
-                }
-            }
-
-            // Check if containing type inherits from PageModel
-            if (pageModelType is not null && containingType.InheritsFrom(pageModelType)) {
-                // Razor Page handlers: OnGet*, OnPost*, OnPut*, OnDelete*, OnPatch*
-                if (IsRazorPageHandler(methodSymbol.Name)) {
-                    return true;
-                }
-            }
-
-            // Found the containing method but it's not a handler — stop searching
-            return false;
+            return (cache.ImplementsOrInheritsFrom(containingType, KnownType.ControllerBase) &&
+                    methodSymbol.DeclaredAccessibility == Accessibility.Public) ||
+                   (cache.ImplementsOrInheritsFrom(containingType, KnownType.PageModel) &&
+                    IsRazorPageHandler(methodSymbol.Name));
         }
 
         return false;
     }
 
-    /// <summary>Determines if a method name matches Razor Page handler conventions.</summary>
     private static bool IsRazorPageHandler(string methodName) =>
         methodName.StartsWithOrdinal("OnGet") ||
         methodName.StartsWithOrdinal("OnPost") ||

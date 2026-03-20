@@ -29,22 +29,15 @@ public sealed partial class Al0051UseGuardDefinedEnumAnalyzer : AlAnalyzer {
         context.RegisterOperationAction(AnalyzeConditional, OperationKind.Conditional);
 
     private static void AnalyzeConditional(OperationAnalysisContext context) {
-        if (context.Operation is not IConditionalOperation conditional) {
+        if (context.Operation is not IConditionalOperation { Syntax: IfStatementSyntax } conditional) {
             return;
         }
 
-        // We're looking for if-statements, not ternary expressions
-        if (conditional.Syntax is not IfStatementSyntax) {
-            return;
-        }
-
-        // Check if condition is !Enum.IsDefined(...)
         var (isMatch, operandName) = IsNegatedEnumIsDefinedCheck(conditional.Condition);
         if (!isMatch || operandName is null) {
             return;
         }
 
-        // Check if the WhenTrue branch throws ArgumentException or ArgumentOutOfRangeException
         if (!ContainsArgumentExceptionThrow(conditional.WhenTrue)) {
             return;
         }
@@ -57,101 +50,61 @@ public sealed partial class Al0051UseGuardDefinedEnumAnalyzer : AlAnalyzer {
             return (false, null);
         }
 
-        // Unwrap parentheses
         while (condition is IParenthesizedOperation paren) {
             condition = paren.Operand;
         }
 
-        // Check for negation: !Enum.IsDefined(...)
         if (condition is not IUnaryOperation { OperatorKind: UnaryOperatorKind.Not } unary) {
             return (false, null);
         }
 
-        // Get the operand of the negation
         var operand = unary.Operand.UnwrapAllConversions();
 
-        // Unwrap parentheses on the operand too
         while (operand is IParenthesizedOperation parenOp) {
             operand = parenOp.Operand;
         }
 
-        // Check if it's an Enum.IsDefined invocation
         if (operand is not IInvocationOperation invocation) {
             return (false, null);
         }
 
         var method = invocation.TargetMethod;
 
-        // Check if it's Enum.IsDefined
         if (method.Name != "IsDefined" ||
             method.ContainingType?.ToDisplayString() is not ("System.Enum" or "Enum")) {
             return (false, null);
         }
 
-        // Extract the enum value argument
-        // Pattern 1: Enum.IsDefined(Type enumType, object value) - 2 args
-        // Pattern 2: Enum.IsDefined<TEnum>(TEnum value) - 1 arg (generic)
-        string? valueName = null;
-
-        if (method.IsGenericMethod && invocation.Arguments.Length >= 1) {
-            // Generic version: Enum.IsDefined<T>(value)
-            valueName = invocation.Arguments[0].Value.GetOperandName();
-        } else if (!method.IsGenericMethod && invocation.Arguments.Length >= 2) {
-            // Non-generic version: Enum.IsDefined(typeof(T), value)
-            valueName = invocation.Arguments[1].Value.GetOperandName();
-        }
+        var valueName = (method.IsGenericMethod, invocation.Arguments.Length) switch {
+            (true, >= 1) => invocation.Arguments[0].Value.GetOperandName(),
+            (false, >= 2) => invocation.Arguments[1].Value.GetOperandName(),
+            _ => null
+        };
 
         return valueName is not null ? (true, valueName) : (false, null);
     }
 
-    private static bool ContainsArgumentExceptionThrow(IOperation? operation) {
-        if (operation is null) {
-            return false;
-        }
-
-        // Handle block statement: if (!Enum.IsDefined(...)) { throw ...; }
-        if (operation is IBlockOperation block) {
-            foreach (var statement in block.Operations) {
-                if (IsArgumentExceptionThrow(statement)) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        // Handle direct throw statement: if (!Enum.IsDefined(...)) throw ...;
-        return IsArgumentExceptionThrow(operation);
-    }
+    private static bool ContainsArgumentExceptionThrow(IOperation? operation) =>
+        operation switch {
+            null => false,
+            IBlockOperation block => block.Operations.Any(IsArgumentExceptionThrow),
+            _ => IsArgumentExceptionThrow(operation)
+        };
 
     private static bool IsArgumentExceptionThrow(IOperation? operation) {
-        if (operation is null) {
-            return false;
-        }
-
-        // Unwrap expression statement if present
         if (operation is IExpressionStatementOperation exprStmt) {
             operation = exprStmt.Operation;
         }
 
-        // Check for throw operation
-        if (operation is not IThrowOperation throwOp) {
+        if (operation is not IThrowOperation { Exception: { } exception }) {
             return false;
         }
 
-        // Get the exception being thrown
-        if (throwOp.Exception is not { } exception) {
-            return false;
-        }
-
-        // Unwrap conversions and check if it's creating an exception
         if (exception.UnwrapAllConversions() is not IObjectCreationOperation { Type: { } exceptionType }) {
             return false;
         }
 
-        // Check if it's ArgumentException or ArgumentOutOfRangeException
-        var typeName = exceptionType.ToDisplayString();
-        return typeName is
+        return exceptionType.ToDisplayString() is
             "System.ArgumentException" or "ArgumentException" or
             "System.ArgumentOutOfRangeException" or "ArgumentOutOfRangeException";
     }

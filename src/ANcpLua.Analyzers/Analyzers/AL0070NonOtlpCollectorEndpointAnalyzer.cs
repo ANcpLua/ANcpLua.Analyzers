@@ -46,24 +46,14 @@ public sealed partial class Al0070NonOtlpCollectorEndpointAnalyzer : AlAnalyzer 
     private static void AnalyzeAssignment(OperationAnalysisContext context) {
         var assignment = (ISimpleAssignmentOperation)context.Operation;
 
-        // Check if this is an endpoint property assignment
-        var propertyName = GetPropertyName(assignment.Target);
-        if (propertyName is null || !EndpointPropertyNames.Contains(propertyName, StringComparer.OrdinalIgnoreCase)) {
+        if (GetPropertyName(assignment.Target) is not { } propertyName ||
+            !EndpointPropertyNames.Contains(propertyName, StringComparer.OrdinalIgnoreCase) ||
+            assignment.Value.ConstantValue is not { HasValue: true, Value: string endpoint } ||
+            IsOtlpEndpoint(endpoint)) {
             return;
         }
 
-        // Get the assigned value
-        if (assignment.Value.ConstantValue is not { HasValue: true, Value: string endpoint }) {
-            return;
-        }
-
-        // Check if the endpoint looks like OTLP
-        if (!IsOtlpEndpoint(endpoint)) {
-            context.ReportDiagnostic(Diagnostic.Create(
-                Rule,
-                assignment.Syntax.GetLocation(),
-                endpoint));
-        }
+        context.ReportDiagnostic(Diagnostic.Create(Rule, assignment.Syntax.GetLocation(), endpoint));
     }
 
     private static string? GetPropertyName(IOperation target) =>
@@ -73,13 +63,6 @@ public sealed partial class Al0070NonOtlpCollectorEndpointAnalyzer : AlAnalyzer 
             _ => null
         };
 
-    private static bool IsOtlpEndpoint(string endpoint) {
-        foreach (var pattern in OtlpPatterns) {
-            if (endpoint.ContainsIgnoreCase(pattern)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
+    private static bool IsOtlpEndpoint(string endpoint) =>
+        OtlpPatterns.Any(endpoint.ContainsIgnoreCase);
 }
