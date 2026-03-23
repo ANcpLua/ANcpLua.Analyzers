@@ -95,8 +95,9 @@ public sealed partial class Al0086IncorrectAttributeTypeAnalyzer : AlAnalyzer {
         }
 
         var valueArg = invocation.Arguments[1];
+        var unwrapped = valueArg.Value.UnwrapAllConversions();
 
-        if (valueArg.Value.Type is not { } valueType || IsTypeMatch(valueType, expectedType)) {
+        if (unwrapped.Type is not { } valueType || IsTypeMatch(valueType, expectedType)) {
             return;
         }
 

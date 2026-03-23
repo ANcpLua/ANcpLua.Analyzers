@@ -163,4 +163,44 @@ public sealed partial class Al0086IncorrectAttributeTypeTests : AnalyzerTest<Al0
                           }
                       }
                       """);
+
+    private const string ObjectOnlyActivity = """
+                                              namespace System.Diagnostics {
+                                                  public class Activity {
+                                                      public Activity SetTag(string key, object? value) => this;
+                                                  }
+                                              }
+                                              """;
+
+    [Theory]
+    [InlineData("gen_ai.usage.input_tokens", "int tokens = 100; activity.SetTag(\"gen_ai.usage.input_tokens\", tokens)")]
+    [InlineData("gen_ai.usage.output_tokens", "activity.SetTag(\"gen_ai.usage.output_tokens\", 42)")]
+    [InlineData("gen_ai.request.temperature", "activity.SetTag(\"gen_ai.request.temperature\", 0.7)")]
+    [InlineData("gen_ai.request.temperature", "activity.SetTag(\"gen_ai.request.temperature\", (double)0.7f)")]
+    [InlineData("gen_ai.request.max_tokens", "activity.SetTag(\"gen_ai.request.max_tokens\", (int)100L)")]
+    [InlineData("gen_ai.response.finish_reasons", "activity.SetTag(\"gen_ai.response.finish_reasons\", new string[] { \"stop\" })")]
+    public Task ShouldNotReportCorrectTypeBoxedToObject(string _, string statement) =>
+        VerifyAsync($$"""
+                      {{ObjectOnlyActivity}}
+
+                      public class C {
+                          void M(System.Diagnostics.Activity activity) {
+                              {{statement}};
+                          }
+                      }
+                      """);
+
+    [Theory]
+    [InlineData("gen_ai.usage.input_tokens", "\"100\"")]
+    [InlineData("gen_ai.request.temperature", "\"0.7\"")]
+    public Task ShouldReportIncorrectTypeBoxedToObject(string attributeName, string value) =>
+        VerifyAsync($$"""
+                      {{ObjectOnlyActivity}}
+
+                      public class C {
+                          void M(System.Diagnostics.Activity activity) {
+                              activity.SetTag("{{attributeName}}", [|{{value}}|]);
+                          }
+                      }
+                      """);
 }
