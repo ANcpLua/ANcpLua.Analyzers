@@ -125,3 +125,4 @@ AL0121 | Roslyn Utilities | Warning | Al0121NormalizeWhitespaceAnalyzer
 AL0122 | Design | Error | Al0122DuckDbTableMustBePartialAnalyzer
 AL0123 | Design | Warning | Al0123DuckDbColumnConflictingOrdinalAnalyzer
 AL0124 | GenAI | Warning | Al0124NonInterceptableAgentTracedAnalyzer
+AL0125 | Roslyn Utilities | Info | Al0125UseStringComparisonAnyExtensionsAnalyzer

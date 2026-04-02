@@ -1224,4 +1224,14 @@
     <data name="AL0124AnalyzerDescription" xml:space="preserve">
         <value>The [AgentTraced] attribute triggers compile-time interception to create agent spans. Abstract, extern, and partial definition methods cannot be intercepted by the source generator, so [AgentTraced] will be silently ignored.</value>
     </data>
+    <!-- AL0125: Use *Any* string comparison extensions -->
+    <data name="AL0125AnalyzerTitle" xml:space="preserve">
+        <value>Use *Any* string comparison extension</value>
+    </data>
+    <data name="AL0125AnalyzerMessageFormat" xml:space="preserve">
+        <value>Use '{0}' to collapse chained equality checks</value>
+    </data>
+    <data name="AL0125AnalyzerDescription" xml:space="preserve">
+        <value>Chained string equality comparisons (s == "a" || s == "b") can be collapsed into a single EqualsAnyOrdinal/EqualsAnyIgnoreCase call.</value>
+    </data>
 </root>

@@ -71,6 +71,30 @@ public sealed partial class Al0039UseStringComparisonExtensionsTests : AnalyzerT
             int M(string s) => s.LastIndexOf("x", StringComparison.Ordinal);
         }
         """);
+
+    [Fact]
+    public Task ShouldReportForReplaceIgnoreCase() => VerifyAsync("""
+        using System;
+        public class C {
+            string M(string s) => [|s.Replace("old", "new", StringComparison.OrdinalIgnoreCase)|];
+        }
+        """);
+
+    [Fact]
+    public Task ShouldNotReportForReplaceWithoutComparison() => VerifyAsync("""
+        using System;
+        public class C {
+            string M(string s) => s.Replace("old", "new");
+        }
+        """);
+
+    [Fact]
+    public Task ShouldReportForEndsWithIgnoreCase() => VerifyAsync("""
+        using System;
+        public class C {
+            bool M(string s, string suffix) => [|s.EndsWith(suffix, StringComparison.OrdinalIgnoreCase)|];
+        }
+        """);
 }
 
 /// <summary>
@@ -94,6 +118,7 @@ public sealed partial class Al0039CodeFixTests
                 public static bool ContainsIgnoreCase(this string s, string value) => true;
                 public static int IndexOfOrdinal(this string s, string value) => 0;
                 public static int IndexOfIgnoreCase(this string s, string value) => 0;
+                public static string ReplaceIgnoreCase(this string s, string oldValue, string newValue) => s;
             }
         }
         """;
@@ -188,5 +213,17 @@ public sealed partial class Al0039CodeFixTests
                     s.StartsWithOrdinal(a) &&
                     s.EndsWithOrdinal(b);
             }
+            """);
+
+    [Fact]
+    public Task ShouldFixReplaceIgnoreCase() =>
+        VerifyAsync(
+            $$"""
+            {{ExtensionsPolyfill}}
+            public class C { string M(string s) => [|s.Replace("old", "new", StringComparison.OrdinalIgnoreCase)|]; }
+            """,
+            $$"""
+            {{ExtensionsPolyfill}}
+            public class C { string M(string s) => s.ReplaceIgnoreCase("old", "new"); }
             """);
 }

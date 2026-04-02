@@ -48,8 +48,10 @@ public sealed partial class Al0039UseStringComparisonExtensionsAnalyzer : AlAnal
             return;
         }
 
-        // Extensions only cover simple cases (value + StringComparison), not overloads with startIndex/count
-        if (CountNonStringComparisonArgs(invocation) > 1) {
+        // Extensions only cover simple cases, not overloads with startIndex/count.
+        // Replace takes 2 non-comparison args (oldValue, newValue) — all others take 1.
+        var maxNonComparisonArgs = method.Name is "Replace" ? 2 : 1;
+        if (CountNonStringComparisonArgs(invocation) > maxNonComparisonArgs) {
             return;
         }
 
