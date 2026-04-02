@@ -45,6 +45,7 @@ public sealed partial class Al0063UnregisteredActivitySourceAnalyzer : AlAnalyze
         var registeredSources = new ConcurrentBag<string>();
         var activitySourceCreations = new ConcurrentBag<(Location Location, string Name)>();
         var fieldSourceNames = new ConcurrentDictionary<IFieldSymbol, ImmutableArray<string>>(SymbolEqualityComparer.Default);
+        var pendingForeachResolutions = new ConcurrentBag<IOperation>();
 
         // Pre-index static readonly string[] fields once, using the already-provided ctx.SemanticModel
         context.RegisterSyntaxNodeAction(
@@ -62,7 +63,8 @@ public sealed partial class Al0063UnregisteredActivitySourceAnalyzer : AlAnalyze
             if (argumentValue.ConstantValue is { HasValue: true, Value: string name }) {
                 registeredSources.Add(name);
             } else {
-                ResolveFromForeachCollection(argumentValue, fieldSourceNames, registeredSources);
+                // Defer foreach resolution to CompilationEnd where fieldSourceNames is fully populated
+                pendingForeachResolutions.Add(argumentValue);
             }
         }, OperationKind.Invocation);
 
@@ -78,6 +80,11 @@ public sealed partial class Al0063UnregisteredActivitySourceAnalyzer : AlAnalyze
         }, OperationKind.ObjectCreation);
 
         context.RegisterCompilationEndAction(endCtx => {
+            // Resolve foreach-based registrations now that all field constants are indexed
+            foreach (var argumentValue in pendingForeachResolutions) {
+                ResolveFromForeachCollection(argumentValue, fieldSourceNames, registeredSources);
+            }
+
             var registered = registeredSources.ToArray();
 
             foreach (var (location, sourceName) in activitySourceCreations) {
