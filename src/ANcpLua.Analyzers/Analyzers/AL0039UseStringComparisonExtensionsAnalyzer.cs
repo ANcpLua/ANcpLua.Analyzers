@@ -17,6 +17,9 @@ public sealed partial class Al0039UseStringComparisonExtensionsAnalyzer : AlAnal
     /// <summary>The diagnostic identifier for AL0039.</summary>
     public const string DiagnosticId = "AL0039";
 
+    // Methods with StringComparison extensions not yet in MappingRegistry
+    private static readonly HashSet<string> AdditionalMethods = new(StringComparer.Ordinal) { "Replace" };
+
     private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.RoslynUtilities,
@@ -36,7 +39,7 @@ public sealed partial class Al0039UseStringComparisonExtensionsAnalyzer : AlAnal
 
         var method = invocation.TargetMethod;
 
-        if (!MappingRegistry.HasStringComparisonExtension(method.Name)) {
+        if (!MappingRegistry.HasStringComparisonExtension(method.Name) && !AdditionalMethods.Contains(method.Name)) {
             return;
         }
 
