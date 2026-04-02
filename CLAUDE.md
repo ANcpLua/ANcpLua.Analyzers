@@ -129,7 +129,7 @@ LAYER 3: qyl, TourPlanner, etc     <- END USERS (auto-injected by SDK)
 | Package | Variable | Purpose |
 |---------|----------|---------|
 | Microsoft.CodeAnalysis.CSharp | `$(RoslynVersion)` 5.3.0 | Roslyn APIs |
-| ANcpLua.Roslyn.Utilities.Sources | `$(ANcpLuaRoslynUtilitiesSourcesVersion)` 1.47.0 | Compile-time source package |
-| ANcpLua.Roslyn.Utilities.Testing | `$(ANcpLuaRoslynUtilitiesTestingVersion)` 1.47.0 | Test infrastructure |
+| ANcpLua.Roslyn.Utilities.Sources | `$(ANcpLuaRoslynUtilitiesSourcesVersion)` 1.48.0 | Compile-time source package |
+| ANcpLua.Roslyn.Utilities.Testing | `$(ANcpLuaRoslynUtilitiesTestingVersion)` 1.48.0 | Test infrastructure |
 | xunit.v3.mtp-v2 | `$(XunitV3Version)` 3.2.2 | Test framework |
 | AwesomeAssertions | `$(AwesomeAssertionsVersion)` 9.4.0 | Assertions |

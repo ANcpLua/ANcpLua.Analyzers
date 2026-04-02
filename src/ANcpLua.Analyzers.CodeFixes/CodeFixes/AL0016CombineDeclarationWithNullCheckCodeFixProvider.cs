@@ -47,11 +47,11 @@ public sealed partial class Al0016CombineDeclarationWithNullCheckCodeFixProvider
         CancellationToken ct) {
         var editor = await DocumentEditor.CreateAsync(document, ct);
 
-        var patternText = $"{initializer.WithoutTrivia().NormalizeWhitespace()} is not {{ }} {variableName}";
+        var patternText = $"{initializer.WithoutTrivia().ToFullString().Trim()} is not {{ }} {variableName}";
         var condition = SyntaxFactory.ParseExpression(patternText);
 
         if (initializer is AssignmentExpressionSyntax or ConditionalExpressionSyntax or LambdaExpressionSyntax) {
-            patternText = $"({initializer.WithoutTrivia().NormalizeWhitespace()}) is not {{ }} {variableName}";
+            patternText = $"({initializer.WithoutTrivia().ToFullString().Trim()}) is not {{ }} {variableName}";
             condition = SyntaxFactory.ParseExpression(patternText);
         }
 
