@@ -228,7 +228,7 @@ public sealed partial class Al0017HardcodedPackageVersionAnalyzer : DiagnosticAn
                 context.ReportDiagnostic(diagnostic);
             }
         } catch (Exception) {
-            // Malformed XML — skip
+            return;
         }
     }
 

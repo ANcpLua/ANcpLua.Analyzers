@@ -1,0 +1,51 @@
+using ANcpLua.Analyzers.Analyzers;
+
+namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
+
+/// <summary>
+///     Code fix provider for AL0121 - removes NormalizeWhitespace() from the call chain.
+/// </summary>
+[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0121NormalizeWhitespaceCodeFixProvider))]
+[Shared]
+public sealed partial class Al0121NormalizeWhitespaceCodeFixProvider : CodeFixProvider {
+    public override ImmutableArray<string> FixableDiagnosticIds =>
+        [Al0121NormalizeWhitespaceAnalyzer.DiagnosticId];
+
+    public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
+
+    public override async Task RegisterCodeFixesAsync(CodeFixContext context) {
+        if (await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false) is not
+            { } root) {
+            return;
+        }
+
+        foreach (var diagnostic in context.Diagnostics) {
+            var node = root.FindNode(diagnostic.Location.SourceSpan);
+            if (node.FirstAncestorOrSelf<InvocationExpressionSyntax>() is not { } invocation) {
+                continue;
+            }
+
+            context.RegisterCodeFix(
+                CodeAction.Create(
+                    CodeFixResources.AL0121CodeFixTitle,
+                    _ => RemoveNormalizeWhitespaceAsync(context.Document, invocation, root),
+                    nameof(CodeFixResources.AL0121CodeFixTitle)),
+                diagnostic);
+        }
+    }
+
+    private static Task<Document> RemoveNormalizeWhitespaceAsync(
+        Document document,
+        InvocationExpressionSyntax invocation,
+        SyntaxNode root) {
+        // invocation is: receiver.NormalizeWhitespace(args)
+        // We want to replace it with just: receiver
+        if (invocation.Expression is MemberAccessExpressionSyntax memberAccess) {
+            var receiver = memberAccess.Expression.WithTriviaFrom(invocation);
+            var newRoot = root.ReplaceNode(invocation, receiver);
+            return Task.FromResult(document.WithSyntaxRoot(newRoot));
+        }
+
+        return Task.FromResult(document);
+    }
+}

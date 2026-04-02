@@ -119,3 +119,9 @@ AL0115 | Reliability | Warning | Al0115EmptyCatchBlockAnalyzer
 AL0116 | Reliability | Warning | Al0116ExceptionLeakedInResponseAnalyzer
 AL0117 | Usage | Info | Al0117UnnecessaryLinqMaterializationAnalyzer
 AL0118 | Reliability | Warning | Al0118ReadModifyWriteWithoutTransactionAnalyzer
+AL0119 | Roslyn Utilities | Warning | Al0119SymbolStoredInModelAnalyzer
+AL0120 | Roslyn Utilities | Warning | Al0120UseIncrementalGeneratorAnalyzer
+AL0121 | Roslyn Utilities | Warning | Al0121NormalizeWhitespaceAnalyzer
+AL0122 | Design | Error | Al0122DuckDbTableMustBePartialAnalyzer
+AL0123 | Design | Warning | Al0123DuckDbColumnConflictingOrdinalAnalyzer
+AL0124 | GenAI | Warning | Al0124NonInterceptableAgentTracedAnalyzer

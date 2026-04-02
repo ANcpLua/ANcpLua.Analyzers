@@ -1164,4 +1164,64 @@
     <data name="AL0118AnalyzerDescription" xml:space="preserve">
         <value>A method that reads data and then writes based on that data without a transaction is vulnerable to race conditions. Another connection could modify the data between the read and write. Use BeginTransaction/BeginTransactionAsync to ensure isolation.</value>
     </data>
+    <!-- AL0119: ISymbol stored in generator model -->
+    <data name="AL0119AnalyzerTitle" xml:space="preserve">
+        <value>Avoid storing ISymbol in source generator models</value>
+    </data>
+    <data name="AL0119AnalyzerMessageFormat" xml:space="preserve">
+        <value>Member '{0}' stores ISymbol-derived type '{1}' which breaks incremental generator caching</value>
+    </data>
+    <data name="AL0119AnalyzerDescription" xml:space="preserve">
+        <value>ISymbol types do not implement value equality. Storing them in source generator models causes the incremental generator cache to be invalidated on every keystroke, defeating the purpose of incremental generation. Extract the needed data as strings or primitive values instead.</value>
+    </data>
+    <!-- AL0120: Use IIncrementalGenerator instead of ISourceGenerator -->
+    <data name="AL0120AnalyzerTitle" xml:space="preserve">
+        <value>Use IIncrementalGenerator instead of ISourceGenerator</value>
+    </data>
+    <data name="AL0120AnalyzerMessageFormat" xml:space="preserve">
+        <value>Type '{0}' implements ISourceGenerator; use IIncrementalGenerator for better IDE performance</value>
+    </data>
+    <data name="AL0120AnalyzerDescription" xml:space="preserve">
+        <value>ISourceGenerator (v1 API) runs on every keystroke without caching. IIncrementalGenerator provides an incremental pipeline with automatic caching, significantly improving IDE responsiveness.</value>
+    </data>
+    <!-- AL0121: NormalizeWhitespace in source generator -->
+    <data name="AL0121AnalyzerTitle" xml:space="preserve">
+        <value>Avoid NormalizeWhitespace in source generators</value>
+    </data>
+    <data name="AL0121AnalyzerMessageFormat" xml:space="preserve">
+        <value>NormalizeWhitespace() is expensive; use raw string literals or manual formatting for source generation</value>
+    </data>
+    <data name="AL0121AnalyzerDescription" xml:space="preserve">
+        <value>SyntaxFactory.NormalizeWhitespace() traverses the entire syntax tree to rewrite whitespace, which is expensive in source generators that run frequently. Use raw string literals or manual formatting instead.</value>
+    </data>
+    <!-- AL0122: DuckDbTable type must be partial -->
+    <data name="AL0122AnalyzerTitle" xml:space="preserve">
+        <value>[DuckDbTable] type must be partial</value>
+    </data>
+    <data name="AL0122AnalyzerMessageFormat" xml:space="preserve">
+        <value>Type '{0}' has [DuckDbTable] but is not partial; the source generator cannot extend it</value>
+    </data>
+    <data name="AL0122AnalyzerDescription" xml:space="preserve">
+        <value>The DuckDbInsertGenerator source generator creates additional methods (AddParameters, MapFromReader, BuildMultiRowInsertSql) on types marked with [DuckDbTable]. The type must be partial so the generator can add these members.</value>
+    </data>
+    <!-- AL0123: Conflicting DuckDbColumn ordinals -->
+    <data name="AL0123AnalyzerTitle" xml:space="preserve">
+        <value>Conflicting [DuckDbColumn] ordinal values</value>
+    </data>
+    <data name="AL0123AnalyzerMessageFormat" xml:space="preserve">
+        <value>Properties '{0}' and '{1}' on type '{2}' both specify Ordinal = {3}</value>
+    </data>
+    <data name="AL0123AnalyzerDescription" xml:space="preserve">
+        <value>Multiple properties in a [DuckDbTable] type have the same Ordinal value in their [DuckDbColumn] attribute. Each column must have a unique ordinal to ensure deterministic column ordering in generated SQL.</value>
+    </data>
+    <!-- AL0124: Non-interceptable AgentTraced -->
+    <data name="AL0124AnalyzerTitle" xml:space="preserve">
+        <value>Non-interceptable [AgentTraced]</value>
+    </data>
+    <data name="AL0124AnalyzerMessageFormat" xml:space="preserve">
+        <value>[AgentTraced] on '{0}' will be ignored because abstract, extern, and partial methods cannot be intercepted</value>
+    </data>
+    <data name="AL0124AnalyzerDescription" xml:space="preserve">
+        <value>The [AgentTraced] attribute triggers compile-time interception to create agent spans. Abstract, extern, and partial definition methods cannot be intercepted by the source generator, so [AgentTraced] will be silently ignored.</value>
+    </data>
 </root>

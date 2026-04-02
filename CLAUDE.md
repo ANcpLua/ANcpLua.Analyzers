@@ -1,6 +1,6 @@
  # CLAUDE.md - ANcpLua.Analyzers
 
-118 Roslyn diagnostic analyzers (AL0001-AL0118) with code fixes, targeting netstandard2.0.
+124 Roslyn diagnostic analyzers (AL0001-AL0124) with code fixes, targeting netstandard2.0.
 
 ## Commands
 

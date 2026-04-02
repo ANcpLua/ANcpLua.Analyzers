@@ -182,7 +182,7 @@ public sealed partial class Al0019UndefinedVersionVariableAnalyzer : DiagnosticA
                 }
             }
         } catch (Exception) {
-            // XML parsing failed - return empty set
+            return properties;
         }
 
         return properties;
@@ -250,7 +250,7 @@ public sealed partial class Al0019UndefinedVersionVariableAnalyzer : DiagnosticA
                 context.ReportDiagnostic(diagnostic);
             }
         } catch (Exception) {
-            // XML parsing failed - silently ignore malformed files
+            return;
         }
     }
 

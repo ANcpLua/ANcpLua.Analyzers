@@ -199,4 +199,14 @@
     <data name="AL0110CodeFixTitle" xml:space="preserve">
         <value>Remove [TracedTag] attribute</value>
     </data>
+    <!-- AL0121-AL0124 Code Fix Titles -->
+    <data name="AL0121CodeFixTitle" xml:space="preserve">
+        <value>Remove NormalizeWhitespace call</value>
+    </data>
+    <data name="AL0122CodeFixTitle" xml:space="preserve">
+        <value>Make type partial</value>
+    </data>
+    <data name="AL0124CodeFixTitle" xml:space="preserve">
+        <value>Remove [AgentTraced] attribute</value>
+    </data>
 </root>

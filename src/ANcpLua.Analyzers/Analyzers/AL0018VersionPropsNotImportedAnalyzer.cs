@@ -188,7 +188,7 @@ public sealed partial class Al0018VersionPropsNotImportedAnalyzer : DiagnosticAn
                 context.ReportDiagnostic(diagnostic);
             }
         } catch (Exception) {
-            // XML parsing failed - silently ignore malformed files
+            return;
         }
     }
 }

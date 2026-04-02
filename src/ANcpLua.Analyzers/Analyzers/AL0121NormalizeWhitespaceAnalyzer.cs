@@ -1,0 +1,59 @@
+
+namespace ANcpLua.Analyzers.Analyzers;
+
+/// <summary>
+///     AL0121: Detects calls to NormalizeWhitespace() which is expensive in source generators.
+/// </summary>
+/// <remarks>
+///     NormalizeWhitespace (from Microsoft.CodeAnalysis.SyntaxNodeExtensions)
+///     traverses the entire syntax tree to rewrite whitespace trivia. In source generators that run
+///     on every keystroke, this adds unnecessary overhead. Raw string literals or manual string building
+///     produces identical output without the syntax tree overhead.
+/// </remarks>
+[DiagnosticAnalyzer(LanguageNames.CSharp)]
+public sealed partial class Al0121NormalizeWhitespaceAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL0121.</summary>
+    public const string DiagnosticId = "AL0121";
+
+    private static readonly DiagnosticDescriptor Rule = CreateRule(
+        DiagnosticId,
+        DiagnosticCategories.RoslynUtilities,
+        DiagnosticSeverities.Suggestion);
+
+    /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+
+    /// <summary>Registers an operation action to analyze method invocations.</summary>
+    protected override void RegisterActions(AnalysisContext context) =>
+        context.RegisterCompilationStartAction(OnCompilationStart);
+
+    private static void OnCompilationStart(CompilationStartAnalysisContext context) {
+        if (context.Compilation.GetTypeByMetadataName("Microsoft.CodeAnalysis.SyntaxNode") is null) {
+            return;
+        }
+
+        context.RegisterOperationAction(AnalyzeInvocation, OperationKind.Invocation);
+    }
+
+    private static void AnalyzeInvocation(OperationAnalysisContext context) {
+        var invocation = (IInvocationOperation)context.Operation;
+        var method = invocation.TargetMethod;
+
+        if (method.Name is not "NormalizeWhitespace") {
+            return;
+        }
+
+        if (method.ContainingType?.ContainingNamespace?.ToDisplayString() is not "Microsoft.CodeAnalysis") {
+            return;
+        }
+
+        // Narrow the span to just NormalizeWhitespace() rather than the full receiver chain
+        if (invocation.Syntax is InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax memberAccess } invocationSyntax) {
+            var span = Microsoft.CodeAnalysis.Text.TextSpan.FromBounds(memberAccess.Name.SpanStart, invocationSyntax.Span.End);
+            context.ReportDiagnostic(Diagnostic.Create(Rule,
+                Location.Create(invocationSyntax.SyntaxTree, span)));
+        } else {
+            context.ReportDiagnostic(Rule, invocation.Syntax.GetLocation());
+        }
+    }
+}
