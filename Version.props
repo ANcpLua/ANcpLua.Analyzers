@@ -19,7 +19,7 @@
     <ANcpSdkPackageVersion>999.9.9</ANcpSdkPackageVersion>
   </PropertyGroup>
   <PropertyGroup Label=".NET SDK">
-    <DotNetSdkVersion>10.0.201</DotNetSdkVersion>
+    <DotNetSdkVersion>10.0.200</DotNetSdkVersion>
     <DotNetSdkRollForward>latestMinor</DotNetSdkRollForward>
   </PropertyGroup>
 
@@ -36,28 +36,28 @@
        ROSLYN.UTILITIES (Runtime package)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Roslyn.Utilities">
-    <ANcpLuaRoslynUtilitiesVersion>1.49.0</ANcpLuaRoslynUtilitiesVersion>
+    <ANcpLuaRoslynUtilitiesVersion>1.51.0</ANcpLuaRoslynUtilitiesVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
        ROSLYN.UTILITIES.SOURCES (Source-only package for generators)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Roslyn.Utilities.Sources">
-    <ANcpLuaRoslynUtilitiesSourcesVersion>1.49.0</ANcpLuaRoslynUtilitiesSourcesVersion>
+    <ANcpLuaRoslynUtilitiesSourcesVersion>1.51.0</ANcpLuaRoslynUtilitiesSourcesVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
        ROSLYN.UTILITIES.POLYFILLS (Source-only polyfills for netstandard2.0)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Roslyn.Utilities.Polyfills">
-    <ANcpLuaRoslynUtilitiesPolyfillsVersion>1.49.0</ANcpLuaRoslynUtilitiesPolyfillsVersion>
+    <ANcpLuaRoslynUtilitiesPolyfillsVersion>1.51.0</ANcpLuaRoslynUtilitiesPolyfillsVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
        ROSLYN.UTILITIES.TESTING (Analyzer/CodeFix/Generator test infrastructure)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Roslyn.Utilities.Testing">
-    <ANcpLuaRoslynUtilitiesTestingVersion>1.49.0</ANcpLuaRoslynUtilitiesTestingVersion>
+    <ANcpLuaRoslynUtilitiesTestingVersion>1.51.0</ANcpLuaRoslynUtilitiesTestingVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
@@ -81,12 +81,12 @@
        Used by: SDK, Roslyn.Utilities
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Meziantou">
-    <MeziantouFrameworkVersion>5.0.13</MeziantouFrameworkVersion>
-    <MeziantouFullPathVersion>1.1.16</MeziantouFullPathVersion>
+    <MeziantouFrameworkVersion>5.0.14</MeziantouFrameworkVersion>
+    <MeziantouFullPathVersion>1.1.18</MeziantouFullPathVersion>
     <MeziantouTemporaryDirectoryVersion>1.0.35</MeziantouTemporaryDirectoryVersion>
     <MeziantouThreadingVersion>2.0.4</MeziantouThreadingVersion>
-    <MeziantouDependencyScanningVersion>2.0.7</MeziantouDependencyScanningVersion>
-    <MeziantouAnalyzerVersion>3.0.23</MeziantouAnalyzerVersion>
+    <MeziantouDependencyScanningVersion>2.0.9</MeziantouDependencyScanningVersion>
+    <MeziantouAnalyzerVersion>3.0.44</MeziantouAnalyzerVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
@@ -108,7 +108,7 @@
     <CodeCoverageVersion>18.4.1</CodeCoverageVersion>
     <TestSdkVersion>18.3.0</TestSdkVersion>
     <DiagnosticsTestingVersion>10.4.0</DiagnosticsTestingVersion>
-    <GitHubActionsLoggerMTPVersion>3.0.1</GitHubActionsLoggerMTPVersion>
+    <GitHubActionsLoggerMTPVersion>3.0.2</GitHubActionsLoggerMTPVersion>
     <GitHubActionsLoggerVSTestVersion>2.4.1</GitHubActionsLoggerVSTestVersion>
   </PropertyGroup>
 
@@ -130,9 +130,9 @@
        Used by: Web projects
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Microsoft.Extensions">
-    <MicrosoftExtensionsVersion>10.0.5</MicrosoftExtensionsVersion>
-    <AspNetCoreVersion>10.0.5</AspNetCoreVersion>
-    <MicrosoftBclAsyncInterfacesVersion>10.0.5</MicrosoftBclAsyncInterfacesVersion>
+    <MicrosoftExtensionsVersion>10.4.0</MicrosoftExtensionsVersion>
+    <AspNetCoreVersion>10.4.0</AspNetCoreVersion>
+    <MicrosoftBclAsyncInterfacesVersion>10.4.0</MicrosoftBclAsyncInterfacesVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
@@ -149,7 +149,7 @@
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Build Tools">
     <NuGetVersion>7.3.0</NuGetVersion>
-    <MSBuildStructuredLoggerVersion>2.3.113</MSBuildStructuredLoggerVersion>
+    <MSBuildStructuredLoggerVersion>2.3.154</MSBuildStructuredLoggerVersion>
     <MicrosoftSourceLinkVersion>10.0.201</MicrosoftSourceLinkVersion>
     <MicrosoftDeploymentDotNetReleasesVersion>1.0.1</MicrosoftDeploymentDotNetReleasesVersion>
   </PropertyGroup>
