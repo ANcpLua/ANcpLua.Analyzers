@@ -126,3 +126,8 @@ AL0122 | Design | Error | Al0122DuckDbTableMustBePartialAnalyzer
 AL0123 | Design | Warning | Al0123DuckDbColumnConflictingOrdinalAnalyzer
 AL0124 | GenAI | Warning | Al0124NonInterceptableAgentTracedAnalyzer
 AL0125 | Roslyn Utilities | Info | Al0125UseStringComparisonAnyExtensionsAnalyzer
+AL0126 | Reliability | Info | Al0126CancellationTokenPropagationAnalyzer
+AL0127 | VersionManagement | Warning | Al0127OutdatedMafPackageVersionAnalyzer
+AL0128 | GenAI | Warning | Al0128DestructiveToolMustRequireApprovalAnalyzer
+AL0129 | GenAI | Info | Al0129ToolMustDeclareSideEffectAnalyzer
+AL0130 | GenAI | Info | Al0130ToolMustDeclareCapabilityAnalyzer

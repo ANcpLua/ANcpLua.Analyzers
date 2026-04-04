@@ -1234,4 +1234,54 @@
     <data name="AL0125AnalyzerDescription" xml:space="preserve">
         <value>Chained string equality comparisons (s == "a" || s == "b") can be collapsed into a single EqualsAnyOrdinal/EqualsAnyIgnoreCase call.</value>
     </data>
+    <!-- AL0126: CancellationToken propagation -->
+    <data name="AL0126AnalyzerTitle" xml:space="preserve">
+        <value>Forward CancellationToken to invocations that support it</value>
+    </data>
+    <data name="AL0126AnalyzerMessageFormat" xml:space="preserve">
+        <value>'{0}' has an overload that accepts a CancellationToken</value>
+    </data>
+    <data name="AL0126AnalyzerDescription" xml:space="preserve">
+        <value>When a CancellationToken is available in scope and the invoked method has an overload accepting one, forward it to enable cooperative cancellation.</value>
+    </data>
+    <!-- AL0127: Outdated MAF ecosystem package version -->
+    <data name="AL0127AnalyzerTitle" xml:space="preserve">
+        <value>Outdated MAF ecosystem package version</value>
+    </data>
+    <data name="AL0127AnalyzerMessageFormat" xml:space="preserve">
+        <value>Package '{0}' version '{1}' is outdated; minimum required is '{2}'</value>
+    </data>
+    <data name="AL0127AnalyzerDescription" xml:space="preserve">
+        <value>Detects outdated Microsoft Agent Framework and related package versions. Update to the minimum required version to ensure compatibility with GA APIs and AIFunctionFactoryOptions.</value>
+    </data>
+    <!-- AL0128: Destructive Loom tool must require approval -->
+    <data name="AL0128AnalyzerTitle" xml:space="preserve">
+        <value>Destructive Loom tool must require approval</value>
+    </data>
+    <data name="AL0128AnalyzerMessageFormat" xml:space="preserve">
+        <value>Loom tool '{0}' has destructive side effect '{1}' but does not require approval. Add [RequiresApproval] to ensure governance.</value>
+    </data>
+    <data name="AL0128AnalyzerDescription" xml:space="preserve">
+        <value>Loom tools with destructive side effects (WritesExternalState, MutatesCode, Deploys, ClosesIssue) must declare [RequiresApproval] to ensure governance gates are in place before execution.</value>
+    </data>
+    <!-- AL0129: Loom tool must declare side effect -->
+    <data name="AL0129AnalyzerTitle" xml:space="preserve">
+        <value>Loom tool should declare its side effect</value>
+    </data>
+    <data name="AL0129AnalyzerMessageFormat" xml:space="preserve">
+        <value>Loom tool '{0}' does not declare its side effect. Add [ToolSideEffect] to make governance explicit.</value>
+    </data>
+    <data name="AL0129AnalyzerDescription" xml:space="preserve">
+        <value>Every Loom tool should declare its side effect via [ToolSideEffect] on the method or containing type so that governance policies can be enforced automatically.</value>
+    </data>
+    <!-- AL0130: Loom tool must declare capability -->
+    <data name="AL0130AnalyzerTitle" xml:space="preserve">
+        <value>Loom tool should declare required capabilities</value>
+    </data>
+    <data name="AL0130AnalyzerMessageFormat" xml:space="preserve">
+        <value>Loom tool '{0}' does not declare any required capabilities. Add [RequiresCapability] to enable fine-grained access control.</value>
+    </data>
+    <data name="AL0130AnalyzerDescription" xml:space="preserve">
+        <value>Every Loom tool should declare its required capabilities via [RequiresCapability] on the method or containing type to enable fine-grained access control.</value>
+    </data>
 </root>

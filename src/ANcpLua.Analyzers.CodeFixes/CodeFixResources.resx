@@ -209,4 +209,7 @@
     <data name="AL0124CodeFixTitle" xml:space="preserve">
         <value>Remove [AgentTraced] attribute</value>
     </data>
+    <data name="AL0126CodeFixTitle" xml:space="preserve">
+        <value>Forward CancellationToken</value>
+    </data>
 </root>
