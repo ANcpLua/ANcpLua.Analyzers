@@ -50,8 +50,8 @@
         <PackageVersion Update="AwesomeAssertions" Version="$(AwesomeAssertionsVersion)"/>
         <PackageVersion Update="xunit.v3" Version="$(XunitV3Version)"/>
         <PackageVersion Update="xunit.v3.mtp-v2" Version="$(XunitV3Version)"/>
-        <PackageVersion Include="Microsoft.Testing.Platform" Version="$(MTPExtensionsVersion)"/>
-        <PackageVersion Include="Microsoft.Testing.Platform.MSBuild" Version="$(MTPExtensionsVersion)"/>
+        <PackageVersion Update="Microsoft.Testing.Platform" Version="$(MTPExtensionsVersion)"/>
+        <PackageVersion Update="Microsoft.Testing.Platform.MSBuild" Version="$(MTPExtensionsVersion)"/>
     </ItemGroup>
 
     <!-- SDK-injected analyzers: Use Update (not Include) to override SDK-provided versions -->
