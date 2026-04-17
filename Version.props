@@ -154,7 +154,7 @@
     <MicrosoftExtensionsAIAbstractionsVersion>10.5.0</MicrosoftExtensionsAIAbstractionsVersion>
     <MicrosoftExtensionsAIOpenAIVersion>10.5.0</MicrosoftExtensionsAIOpenAIVersion>
     <AspNetCoreVersion>10.0.6</AspNetCoreVersion>
-    <MicrosoftBclAsyncInterfacesVersion>10.0.4</MicrosoftBclAsyncInterfacesVersion>
+    <MicrosoftBclAsyncInterfacesVersion>10.0.6</MicrosoftBclAsyncInterfacesVersion>
     <BclAsyncInterfacesVersion>10.0.6</BclAsyncInterfacesVersion>
     <BclHashCodeVersion>6.0.0</BclHashCodeVersion>
     <SystemThreadingChannelsVersion>10.0.6</SystemThreadingChannelsVersion>
