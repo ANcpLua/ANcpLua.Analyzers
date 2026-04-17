@@ -1,23 +1,36 @@
 <Project>
   <!--
     ═══════════════════════════════════════════════════════════════════════════
-    CENTRALIZED PACKAGE VERSIONS - Single Source of Truth
+    ANcpLua.NET.Sdk — Version.props (shipped via NuGet)
     ═══════════════════════════════════════════════════════════════════════════
 
-    This file is the source of truth for all package versions.
-    Edit this file directly when bumping versions.
+    This file is packed into the ANcpLua.NET.Sdk NuGet and imported automatically
+    for any project declaring <Project Sdk="ANcpLua.NET.Sdk">. Downstream repos
+    (ANcpLua.Roslyn.Utilities, ANcpLua.Analyzers, qyl, consumers) get these
+    `$(…Version)` properties for free via MSBuild SDK resolution.
 
-    This file defines ALL shared package versions used across:
-    - ANcpLua.NET.Sdk (this SDK)
-    - ANcpLua.Roslyn.Utilities (via symlink)
-    - ANcpLua.Analyzers (via symlink)
+    DISTRIBUTION MODEL: NuGet, not symlinks. The SDK is the source of truth via
+    the published nupkg — downstream repos are NOT cross-repo-symlinked to this
+    file (git doesn't allow that cleanly across repositories).
 
-    USAGE IN CONSUMING PROJECTS' Directory.Packages.props:
+    LOCAL OVERRIDES: A downstream repo MAY keep its own root-level Version.props
+    to pin versions AHEAD of the currently-published SDK. The local file is
+    imported by that repo's Directory.Packages.props AFTER the SDK-shipped
+    values, so "last wins" — locals override. Prune local entries once the SDK
+    publishes with matching versions. Drift is a signal a consumer has stale
+    local overrides, not a broken symlink.
+
+    USAGE in a Directory.Packages.props:
       <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="$(RoslynVersion)"/>
+
+    EDIT RULE: bump versions here for cross-cutting changes (Roslyn, testing
+    frameworks, Microsoft.Extensions, Microsoft.Agents, etc.). Dependabot
+    groups and SDK publish pipeline handle propagation downstream.
   -->
   <PropertyGroup Label="SDK Version (Auto-generated)">
     <ANcpSdkPackageVersion>999.9.9</ANcpSdkPackageVersion>
   </PropertyGroup>
+
   <PropertyGroup Label=".NET SDK">
     <DotNetSdkVersion>10.0.200</DotNetSdkVersion>
     <DotNetSdkRollForward>latestMinor</DotNetSdkRollForward>
@@ -61,6 +74,13 @@
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
+       ROSLYN.UTILITIES.TESTING.WORKFLOWS (MAF workflow test infrastructure)
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <PropertyGroup Label="Roslyn.Utilities.Testing.Workflows">
+    <ANcpLuaRoslynUtilitiesTestingWorkflowsVersion>1.52.0</ANcpLuaRoslynUtilitiesTestingWorkflowsVersion>
+  </PropertyGroup>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
        ROSLYN ANALYZER TESTING
        Used by: Roslyn.Utilities.Testing, Analyzers.Tests
        ═══════════════════════════════════════════════════════════════════════ -->
@@ -73,7 +93,7 @@
        Used by: Roslyn.Utilities.Testing, Analyzers.Tests
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Reference Assemblies">
-    <BasicReferenceAssembliesVersion>1.8.4</BasicReferenceAssembliesVersion>
+    <BasicReferenceAssembliesVersion>1.8.5</BasicReferenceAssembliesVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
@@ -81,11 +101,11 @@
        Used by: SDK, Roslyn.Utilities
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Meziantou">
-    <MeziantouFrameworkVersion>5.0.14</MeziantouFrameworkVersion>
+    <MeziantouFrameworkVersion>5.0.15</MeziantouFrameworkVersion>
     <MeziantouFullPathVersion>1.1.18</MeziantouFullPathVersion>
-    <MeziantouTemporaryDirectoryVersion>1.0.35</MeziantouTemporaryDirectoryVersion>
+    <MeziantouTemporaryDirectoryVersion>1.0.37</MeziantouTemporaryDirectoryVersion>
     <MeziantouThreadingVersion>2.0.4</MeziantouThreadingVersion>
-    <MeziantouDependencyScanningVersion>2.0.9</MeziantouDependencyScanningVersion>
+    <MeziantouDependencyScanningVersion>2.0.10</MeziantouDependencyScanningVersion>
     <MeziantouAnalyzerVersion>3.0.44</MeziantouAnalyzerVersion>
   </PropertyGroup>
 
@@ -95,6 +115,9 @@
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Testing">
     <XunitV3Version>3.2.2</XunitV3Version>
+    <NUnitVersion>4.5.1</NUnitVersion>
+    <TUnitCoreVersion>1.34.5</TUnitCoreVersion>
+    <BunitVersion>2.7.2</BunitVersion>
     <AwesomeAssertionsVersion>9.4.0</AwesomeAssertionsVersion>
     <AwesomeAssertionsAnalyzersVersion>9.0.8</AwesomeAssertionsAnalyzersVersion>
   </PropertyGroup>
@@ -108,7 +131,7 @@
     <CodeCoverageVersion>18.4.1</CodeCoverageVersion>
     <TestSdkVersion>18.3.0</TestSdkVersion>
     <DiagnosticsTestingVersion>10.4.0</DiagnosticsTestingVersion>
-    <GitHubActionsLoggerMTPVersion>3.0.2</GitHubActionsLoggerMTPVersion>
+    <GitHubActionsLoggerMTPVersion>3.0.3</GitHubActionsLoggerMTPVersion>
     <GitHubActionsLoggerVSTestVersion>2.4.1</GitHubActionsLoggerVSTestVersion>
   </PropertyGroup>
 
@@ -116,9 +139,6 @@
        ANALYZERS (SDK-injected)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Analyzers">
-    <!-- IMPORTANT: Must be the last PUBLISHED version on nuget.org.
-         The publish workflow sets the new version via -p:Version at build/pack time.
-         Bumping this ahead of publishing causes NU1102 (SDK injects this as a PackageReference). -->
     <ANcpLuaAnalyzersVersion>1.23.0</ANcpLuaAnalyzersVersion>
     <SbomTargetsVersion>4.1.5</SbomTargetsVersion>
     <BannedApiAnalyzersVersion>4.14.0</BannedApiAnalyzersVersion>
@@ -126,13 +146,18 @@
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
-       MICROSOFT.EXTENSIONS (ASP.NET Core / Hosting)
-       Used by: Web projects
+       MICROSOFT.EXTENSIONS (ASP.NET Core / Hosting / AI)
+       Used by: Web projects, Roslyn.Utilities
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Microsoft.Extensions">
-    <MicrosoftExtensionsVersion>10.4.0</MicrosoftExtensionsVersion>
-    <AspNetCoreVersion>10.4.0</AspNetCoreVersion>
-    <MicrosoftBclAsyncInterfacesVersion>10.4.0</MicrosoftBclAsyncInterfacesVersion>
+    <MicrosoftExtensionsVersion>10.5.0</MicrosoftExtensionsVersion>
+    <MicrosoftExtensionsAIAbstractionsVersion>10.5.0</MicrosoftExtensionsAIAbstractionsVersion>
+    <MicrosoftExtensionsAIOpenAIVersion>10.5.0</MicrosoftExtensionsAIOpenAIVersion>
+    <AspNetCoreVersion>10.0.6</AspNetCoreVersion>
+    <MicrosoftBclAsyncInterfacesVersion>10.0.4</MicrosoftBclAsyncInterfacesVersion>
+    <BclAsyncInterfacesVersion>10.0.6</BclAsyncInterfacesVersion>
+    <BclHashCodeVersion>6.0.0</BclHashCodeVersion>
+    <SystemThreadingChannelsVersion>10.0.6</SystemThreadingChannelsVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
@@ -148,7 +173,7 @@
        Used by: SDK
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Build Tools">
-    <NuGetVersion>7.3.0</NuGetVersion>
+    <NuGetVersion>7.3.1</NuGetVersion>
     <MSBuildStructuredLoggerVersion>2.3.154</MSBuildStructuredLoggerVersion>
     <MicrosoftSourceLinkVersion>10.0.201</MicrosoftSourceLinkVersion>
     <MicrosoftDeploymentDotNetReleasesVersion>1.0.1</MicrosoftDeploymentDotNetReleasesVersion>
@@ -163,6 +188,40 @@
     <MicrosoftOpenApiVersion>3.3.1</MicrosoftOpenApiVersion>
     <MicrosoftOpenApiReadersVersion>2.0.0-preview.13</MicrosoftOpenApiReadersVersion>
     <YamlDotNetVersion>16.3.0</YamlDotNetVersion>
+  </PropertyGroup>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       MICROSOFT AGENTS
+       Used by: Roslyn.Utilities.Testing (Agent test infrastructure),
+                Roslyn.Utilities.Testing.Workflows (Workflow test infrastructure)
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <PropertyGroup Label="Microsoft.Agents">
+    <MicrosoftAgentsAIVersion>1.1.0</MicrosoftAgentsAIVersion>
+    <MicrosoftAgentsAIHostingAGUIAspNetCoreVersion>1.0.0-preview.260402.1</MicrosoftAgentsAIHostingAGUIAspNetCoreVersion>
+    <MicrosoftAgentsAIWorkflowsVersion>1.1.0</MicrosoftAgentsAIWorkflowsVersion>
+    <MicrosoftAgentsAIWorkflowsDeclarativeVersion>1.0.0-rc6</MicrosoftAgentsAIWorkflowsDeclarativeVersion>
+  </PropertyGroup>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       LLM PROVIDER SDKs
+       Used by: Roslyn.Utilities.Testing.AgentTesting (Conformance/Examples fixtures)
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <PropertyGroup Label="LLM Providers">
+    <OpenAIVersion>2.10.0</OpenAIVersion>
+    <AzureAIOpenAIVersion>2.1.0</AzureAIOpenAIVersion>
+    <AzureIdentityVersion>1.21.0</AzureIdentityVersion>
+    <AnthropicSDKVersion>5.10.0</AnthropicSDKVersion>
+    <OllamaSharpVersion>5.4.25</OllamaSharpVersion>
+    <MsccGenerativeAIVersion>3.1.0</MsccGenerativeAIVersion>
+    <MsccGenerativeAIMicrosoftVersion>3.1.0</MsccGenerativeAIMicrosoftVersion>
+  </PropertyGroup>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       WORKFLOW TEST DEPENDENCIES
+       Used by: Roslyn.Utilities.Testing.Workflows
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <PropertyGroup Label="Workflow Testing">
+    <MoqVersion>4.20.72</MoqVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
