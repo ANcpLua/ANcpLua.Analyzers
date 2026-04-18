@@ -116,6 +116,8 @@ public sealed partial class Al0019UndefinedVersionVariableAnalyzer : DiagnosticA
         "ANcpLuaRoslynUtilitiesVersion",
         "ANcpLuaRoslynUtilitiesSourcesVersion",
         "ANcpLuaRoslynUtilitiesTestingVersion",
+        "ANcpLuaRoslynUtilitiesPolyfillsVersion",
+        "ANcpLuaRoslynUtilitiesTestingWorkflowsVersion",
         "SbomTargetsVersion",
         "BannedApiAnalyzersVersion",
         "JonSkeetAnalyzersVersion",
