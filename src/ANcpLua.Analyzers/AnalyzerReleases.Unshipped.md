@@ -131,3 +131,4 @@ AL0127 | VersionManagement | Warning | Al0127OutdatedMafPackageVersionAnalyzer
 AL0128 | GenAI | Warning | Al0128DestructiveToolMustRequireApprovalAnalyzer
 AL0129 | GenAI | Info | Al0129ToolMustDeclareSideEffectAnalyzer
 AL0130 | GenAI | Info | Al0130ToolMustDeclareCapabilityAnalyzer
+AL0131 | GenAI | Warning | Al0131DirectGenAiSdkUsageAnalyzer

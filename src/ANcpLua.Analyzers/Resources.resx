@@ -1284,4 +1284,14 @@
     <data name="AL0130AnalyzerDescription" xml:space="preserve">
         <value>Every Loom tool should declare its required capabilities via [RequiresCapability] on the method or containing type to enable fine-grained access control.</value>
     </data>
+    <!-- AL0131: Direct GenAI SDK usage bypasses automatic OTel instrumentation -->
+    <data name="AL0131AnalyzerTitle" xml:space="preserve">
+        <value>Direct GenAI SDK call bypasses automatic OTel instrumentation</value>
+    </data>
+    <data name="AL0131AnalyzerMessageFormat" xml:space="preserve">
+        <value>Direct {0} SDK call detected. Register the client via AddChatClient(...).AsBuilder().UseFunctionInvocation().UseOpenTelemetry(...).Build() to produce telemetry automatically.</value>
+    </data>
+    <data name="AL0131AnalyzerDescription" xml:space="preserve">
+        <value>Calling a GenAI SDK type directly prevents automatic OpenTelemetry span emission. Wrap the provider client through Microsoft.Extensions.AI.IChatClient so all LLM calls are traced without changes to call sites.</value>
+    </data>
 </root>
