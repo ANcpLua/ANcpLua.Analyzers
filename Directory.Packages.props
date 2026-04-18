@@ -4,12 +4,15 @@
       ANcpLua.Analyzers - Directory.Packages.props
       ═══════════════════════════════════════════════════════════════════════════
 
-      LAYERING PATTERN: Local Version.props provides versions AHEAD of published SDK.
-      Once SDK publishes with these versions, local Version.props can be removed.
-    -->
+      All $(...)Version properties are provided by ANcpLua.NET.Sdk via
+      <Project Sdk="ANcpLua.NET.Sdk"> in each csproj — Sdk.props imports
+      Build/Common/Version.props from the SDK's nupkg before MSBuild evaluates
+      this file. Bump the SDK pin in global.json to pick up new versions.
 
-    <!-- Import local Version.props to override SDK-provided versions (ahead of SDK) -->
-    <Import Project="$(MSBuildThisFileDirectory)Version.props"/>
+      Need to override a single version ahead of an SDK release? Create a
+      local Version.props alongside this file and add an <Import> here. Prune
+      it once the SDK catches up.
+    -->
 
     <PropertyGroup>
         <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
