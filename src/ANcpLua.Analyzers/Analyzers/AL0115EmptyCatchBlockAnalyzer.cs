@@ -19,7 +19,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0115EmptyCatchBlockAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0115.</summary>
-    public const string DiagnosticId = "AL0115";
+    private const string DiagnosticId = "AL0115";
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticId,

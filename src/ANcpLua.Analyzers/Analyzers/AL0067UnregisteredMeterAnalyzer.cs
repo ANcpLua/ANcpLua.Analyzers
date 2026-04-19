@@ -13,7 +13,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0067UnregisteredMeterAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0067.</summary>
-    public const string DiagnosticId = "AL0067";
+    private const string DiagnosticId = "AL0067";
 
     private const string MeterTypeName = "System.Diagnostics.Metrics.Meter";
 

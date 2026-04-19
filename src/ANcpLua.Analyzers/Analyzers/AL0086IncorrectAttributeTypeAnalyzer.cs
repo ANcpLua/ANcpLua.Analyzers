@@ -27,7 +27,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0086IncorrectAttributeTypeAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0086.</summary>
-    public const string DiagnosticId = "AL0086";
+    private const string DiagnosticId = "AL0086";
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticId,

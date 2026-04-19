@@ -26,7 +26,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0006FieldNameConflictWithPrimaryConstructorAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0006.</summary>
-    public const string DiagnosticId = "AL0006";
+    private const string DiagnosticId = "AL0006";
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticId,

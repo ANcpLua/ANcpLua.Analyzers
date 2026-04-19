@@ -29,7 +29,7 @@ public sealed partial class Al0070NonOtlpCollectorEndpointAnalyzer : AlAnalyzer 
     ];
 
     /// <summary>The diagnostic identifier for AL0070.</summary>
-    public const string DiagnosticId = "AL0070";
+    private const string DiagnosticId = "AL0070";
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticId,

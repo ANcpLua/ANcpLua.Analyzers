@@ -19,7 +19,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0095AvoidExpressionCompileAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0095.</summary>
-    public const string DiagnosticId = "AL0095";
+    private const string DiagnosticId = "AL0095";
 
     private const string LambdaExpressionTypeName = "System.Linq.Expressions.LambdaExpression";
 

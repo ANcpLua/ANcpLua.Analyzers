@@ -17,7 +17,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0064GenAiMissingRequiredAttributesAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0064.</summary>
-    public const string DiagnosticId = "AL0064";
+    private const string DiagnosticId = "AL0064";
 
     private static readonly string[] RequiredGenAiAttributes = [
         "gen_ai.provider.name",

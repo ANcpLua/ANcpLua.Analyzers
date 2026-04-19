@@ -30,7 +30,7 @@ public sealed partial class Al0019UndefinedVersionVariableTests : AnalyzerTestBa
                                               </Project>
                                               """;
 
-        var expected = new DiagnosticResult(Al0019UndefinedVersionVariableAnalyzer.DiagnosticId, DiagnosticSeverity.Warning)
+        var expected = new DiagnosticResult("AL0019", DiagnosticSeverity.Warning)
             .WithLocation("Directory.Packages.props", 3, 47)
             .WithArguments("SomePackage", "UndefinedVersion");
 
@@ -110,11 +110,11 @@ public sealed partial class Al0019UndefinedVersionVariableTests : AnalyzerTestBa
                                               </Project>
                                               """;
 
-        var expected1 = new DiagnosticResult(Al0019UndefinedVersionVariableAnalyzer.DiagnosticId, DiagnosticSeverity.Warning)
+        var expected1 = new DiagnosticResult("AL0019", DiagnosticSeverity.Warning)
             .WithLocation("Directory.Packages.props", 3, 44)
             .WithArguments("Package1", "Undefined1");
 
-        var expected2 = new DiagnosticResult(Al0019UndefinedVersionVariableAnalyzer.DiagnosticId, DiagnosticSeverity.Warning)
+        var expected2 = new DiagnosticResult("AL0019", DiagnosticSeverity.Warning)
             .WithLocation("Directory.Packages.props", 4, 44)
             .WithArguments("Package2", "Undefined2");
 
@@ -161,7 +161,7 @@ public sealed partial class Al0019UndefinedVersionVariableTests : AnalyzerTestBa
                                               """;
 
         // When Version.props is missing, all variables are undefined
-        var expected = new DiagnosticResult(Al0019UndefinedVersionVariableAnalyzer.DiagnosticId, DiagnosticSeverity.Warning)
+        var expected = new DiagnosticResult("AL0019", DiagnosticSeverity.Warning)
             .WithLocation("Directory.Packages.props", 3, 47)
             .WithArguments("SomePackage", "AnyVariable");
 

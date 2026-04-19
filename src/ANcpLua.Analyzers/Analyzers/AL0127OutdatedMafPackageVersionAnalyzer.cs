@@ -13,7 +13,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0127OutdatedMafPackageVersionAnalyzer : DiagnosticAnalyzer {
     /// <summary>AL0127: Outdated MAF ecosystem package version.</summary>
-    public const string DiagnosticId = "AL0127";
+    private const string DiagnosticId = "AL0127";
 
     private const string PackageNameKey = "PackageName";
     private const string CurrentVersionKey = "CurrentVersion";
@@ -221,7 +221,7 @@ public sealed partial class Al0127OutdatedMafPackageVersionAnalyzer : Diagnostic
     ///     A stable version (1.0.0) is always >= any prerelease of the same stable part (1.0.0-rc5).
     /// </summary>
     /// <returns><c>true</c> if <paramref name="currentVersion"/> is below <paramref name="minimumVersion"/>.</returns>
-    internal static bool IsVersionBelowMinimum(string currentVersion, string minimumVersion) {
+    private static bool IsVersionBelowMinimum(string currentVersion, string minimumVersion) {
         var current = ParseVersion(currentVersion);
         var minimum = ParseVersion(minimumVersion);
 
@@ -261,14 +261,13 @@ public sealed partial class Al0127OutdatedMafPackageVersionAnalyzer : Diagnostic
     /// </summary>
     /// <returns><c>true</c> if current is below minimum (i.e., outdated).</returns>
     private static bool ComparePrereleaseLabels(string? currentPrerelease, string? minimumPrerelease) {
-        // Both stable - equal
-        if (currentPrerelease is null && minimumPrerelease is null) {
-            return false;
-        }
-
-        // Current is stable, minimum is prerelease - current is >= minimum
-        if (currentPrerelease is null) {
-            return false;
+        switch (currentPrerelease)
+        {
+            // Both stable - equal
+            case null when minimumPrerelease is null:
+            // Current is stable, minimum is prerelease - current is >= minimum
+            case null:
+                return false;
         }
 
         // Current is prerelease, minimum is stable - current is < minimum

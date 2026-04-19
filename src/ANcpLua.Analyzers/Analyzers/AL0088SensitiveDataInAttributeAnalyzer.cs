@@ -91,7 +91,7 @@ public sealed partial class Al0088SensitiveDataInAttributeAnalyzer : AlAnalyzer 
         };
 
     /// <summary>The diagnostic identifier for AL0088.</summary>
-    public const string DiagnosticId = "AL0088";
+    private const string DiagnosticId = "AL0088";
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticId,

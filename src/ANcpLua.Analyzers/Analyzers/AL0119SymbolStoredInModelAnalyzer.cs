@@ -13,7 +13,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0119SymbolStoredInModelAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0119.</summary>
-    public const string DiagnosticId = "AL0119";
+    private const string DiagnosticId = "AL0119";
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticId,
@@ -66,16 +66,19 @@ public sealed partial class Al0119SymbolStoredInModelAnalyzer : AlAnalyzer {
             return true;
         }
 
-        if (type is INamedTypeSymbol { IsGenericType: true } namedType) {
-            foreach (var typeArg in namedType.TypeArguments) {
-                if (IsSymbolType(typeArg, iSymbolType)) {
-                    return true;
+        switch (type)
+        {
+            case INamedTypeSymbol { IsGenericType: true } namedType: {
+                foreach (var typeArg in namedType.TypeArguments) {
+                    if (IsSymbolType(typeArg, iSymbolType)) {
+                        return true;
+                    }
                 }
-            }
-        }
 
-        if (type is IArrayTypeSymbol arrayType) {
-            return IsSymbolType(arrayType.ElementType, iSymbolType);
+                break;
+            }
+            case IArrayTypeSymbol arrayType:
+                return IsSymbolType(arrayType.ElementType, iSymbolType);
         }
 
         return false;

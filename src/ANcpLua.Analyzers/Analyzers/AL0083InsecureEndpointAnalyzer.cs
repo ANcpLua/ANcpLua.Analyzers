@@ -48,7 +48,7 @@ public sealed partial class Al0083InsecureEndpointAnalyzer : AlAnalyzer {
     ];
 
     /// <summary>The diagnostic identifier for AL0083.</summary>
-    public const string DiagnosticId = "AL0083";
+    private const string DiagnosticId = "AL0083";
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticId,

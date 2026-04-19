@@ -27,7 +27,7 @@ public sealed partial class Al0068InvalidMetricNameAnalyzer : AlAnalyzer {
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
     /// <summary>The diagnostic identifier for AL0068.</summary>
-    public const string DiagnosticId = "AL0068";
+    private const string DiagnosticId = "AL0068";
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticId,

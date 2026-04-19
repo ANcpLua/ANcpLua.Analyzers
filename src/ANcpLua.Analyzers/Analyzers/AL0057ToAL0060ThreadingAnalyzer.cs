@@ -31,13 +31,13 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0057ToAl0060ThreadingAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0057.</summary>
-    public const string DiagnosticIdAl0057 = "AL0057";
+    private const string DiagnosticIdAl0057 = "AL0057";
     /// <summary>The diagnostic identifier for AL0058.</summary>
-    public const string DiagnosticIdAl0058 = "AL0058";
+    private const string DiagnosticIdAl0058 = "AL0058";
     /// <summary>The diagnostic identifier for AL0059.</summary>
-    public const string DiagnosticIdAl0059 = "AL0059";
+    private const string DiagnosticIdAl0059 = "AL0059";
     /// <summary>The diagnostic identifier for AL0060.</summary>
-    public const string DiagnosticIdAl0060 = "AL0060";
+    private const string DiagnosticIdAl0060 = "AL0060";
 
     private static readonly DiagnosticDescriptor AsyncVoidRule = CreateRule(
         DiagnosticIdAl0057,

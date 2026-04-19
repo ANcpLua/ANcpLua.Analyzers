@@ -16,27 +16,27 @@ dotnet add package ANcpLua.Analyzers
 
 ## What you get
 
-- **106 diagnostics** spanning design, reliability, performance, OpenTelemetry, ASP.NET Core, AOT, and version management.
-- **42 automatic code fixes** for high-confidence transformations.
+- **127 diagnostics** spanning design, reliability, performance, OpenTelemetry, ASP.NET Core, AOT, and version management.
+- **46 automatic code fixes** for high-confidence transformations.
 - **CI-friendly enforcement** through `.editorconfig` severity configuration.
 
 ## Rule coverage by category
 
 | Category | Rules |
 |:---------|------:|
-| Roslyn Utilities | 20 |
-| OpenTelemetry | 23 |
+| OpenTelemetry | 24 |
+| Roslyn Utilities | 24 |
 | AOT Testing | 10 |
 | ASP.NET Core | 9 |
-| Usage | 8 |
-| VersionManagement | 6 |
-| Configuration | 5 |
-| Design | 5 |
-| Metrics | 5 |
+| GenAI | 9 |
+| Reliability | 9 |
+| Usage | 9 |
+| Design | 7 |
+| VersionManagement | 7 |
 | Threading | 6 |
-| GenAI | 4 |
+| Configuration | 5 |
+| Metrics | 5 |
 | Style | 3 |
-| Reliability | 2 |
 
 ## Full rule catalog
 
@@ -148,6 +148,27 @@ dotnet add package ANcpLua.Analyzers
 | [AL0108](https://ancplua.mintlify.app/analyzers/rules/AL0108) | OpenTelemetry | Info | `Al0108RedundantNoTraceAnalyzer` |
 | [AL0109](https://ancplua.mintlify.app/analyzers/rules/AL0109) | OpenTelemetry | Warning | `Al0109NonInterceptableTracedAnalyzer` |
 | [AL0110](https://ancplua.mintlify.app/analyzers/rules/AL0110) | OpenTelemetry | Error | `Al0110TracedTagOnOutRefParameterAnalyzer` |
+| [AL0111](https://ancplua.mintlify.app/analyzers/rules/AL0111) | Reliability | Warning | `Al0111SqlInterpolationInCommandTextAnalyzer` |
+| [AL0112](https://ancplua.mintlify.app/analyzers/rules/AL0112) | Reliability | Warning | `Al0112FireAndForgetTaskAnalyzer` |
+| [AL0113](https://ancplua.mintlify.app/analyzers/rules/AL0113) | OpenTelemetry | Warning | `Al0113MissingExceptionRecordingOnActivityAnalyzer` |
+| [AL0114](https://ancplua.mintlify.app/analyzers/rules/AL0114) | Reliability | Warning | `Al0114PreferTryParseAnalyzer` |
+| [AL0115](https://ancplua.mintlify.app/analyzers/rules/AL0115) | Reliability | Warning | `Al0115EmptyCatchBlockAnalyzer` |
+| [AL0116](https://ancplua.mintlify.app/analyzers/rules/AL0116) | Reliability | Warning | `Al0116ExceptionLeakedInResponseAnalyzer` |
+| [AL0117](https://ancplua.mintlify.app/analyzers/rules/AL0117) | Usage | Info | `Al0117UnnecessaryLinqMaterializationAnalyzer` |
+| [AL0118](https://ancplua.mintlify.app/analyzers/rules/AL0118) | Reliability | Warning | `Al0118ReadModifyWriteWithoutTransactionAnalyzer` |
+| [AL0119](https://ancplua.mintlify.app/analyzers/rules/AL0119) | Roslyn Utilities | Warning | `Al0119SymbolStoredInModelAnalyzer` |
+| [AL0120](https://ancplua.mintlify.app/analyzers/rules/AL0120) | Roslyn Utilities | Warning | `Al0120UseIncrementalGeneratorAnalyzer` |
+| [AL0121](https://ancplua.mintlify.app/analyzers/rules/AL0121) | Roslyn Utilities | Warning | `Al0121NormalizeWhitespaceAnalyzer` |
+| [AL0122](https://ancplua.mintlify.app/analyzers/rules/AL0122) | Design | Error | `Al0122DuckDbTableMustBePartialAnalyzer` |
+| [AL0123](https://ancplua.mintlify.app/analyzers/rules/AL0123) | Design | Warning | `Al0123DuckDbColumnConflictingOrdinalAnalyzer` |
+| [AL0124](https://ancplua.mintlify.app/analyzers/rules/AL0124) | GenAI | Warning | `Al0124NonInterceptableAgentTracedAnalyzer` |
+| [AL0125](https://ancplua.mintlify.app/analyzers/rules/AL0125) | Roslyn Utilities | Info | `Al0125UseStringComparisonAnyExtensionsAnalyzer` |
+| [AL0126](https://ancplua.mintlify.app/analyzers/rules/AL0126) | Reliability | Info | `Al0126CancellationTokenPropagationAnalyzer` |
+| [AL0127](https://ancplua.mintlify.app/analyzers/rules/AL0127) | VersionManagement | Warning | `Al0127OutdatedMafPackageVersionAnalyzer` |
+| [AL0128](https://ancplua.mintlify.app/analyzers/rules/AL0128) | GenAI | Warning | `Al0128DestructiveToolMustRequireApprovalAnalyzer` |
+| [AL0129](https://ancplua.mintlify.app/analyzers/rules/AL0129) | GenAI | Info | `Al0129ToolMustDeclareSideEffectAnalyzer` |
+| [AL0130](https://ancplua.mintlify.app/analyzers/rules/AL0130) | GenAI | Info | `Al0130ToolMustDeclareCapabilityAnalyzer` |
+| [AL0131](https://ancplua.mintlify.app/analyzers/rules/AL0131) | GenAI | Warning | `Al0131DirectGenAiSdkUsageAnalyzer` |
 
 **Legend:** `Error` = build error, `Warning` = build warning, `Info` = IDE suggestion, `Disabled` = off by default.
 
@@ -155,7 +176,7 @@ dotnet add package ANcpLua.Analyzers
 
 Automatic fixes are currently available for:
 
-AL0002, AL0004, AL0005, AL0008, AL0010, AL0011, AL0012, AL0014, AL0015, AL0016, AL0025, AL0026, AL0027, AL0028, AL0029, AL0030, AL0031, AL0032, AL0033, AL0034, AL0035, AL0036, AL0037, AL0038, AL0039, AL0040, AL0045, AL0046, AL0047, AL0048, AL0049, AL0050, AL0051, AL0071, AL0072, AL0073, AL0074, AL0103, AL0107, AL0108, AL0109, AL0110
+AL0002, AL0004, AL0005, AL0008, AL0010, AL0011, AL0012, AL0014, AL0015, AL0016, AL0025, AL0026, AL0027, AL0028, AL0029, AL0030, AL0031, AL0032, AL0033, AL0034, AL0035, AL0036, AL0037, AL0038, AL0039, AL0040, AL0045, AL0046, AL0047, AL0048, AL0049, AL0050, AL0051, AL0071, AL0072, AL0073, AL0074, AL0103, AL0107, AL0108, AL0109, AL0110, AL0121, AL0122, AL0124, AL0126
 
 ## Configuration
 

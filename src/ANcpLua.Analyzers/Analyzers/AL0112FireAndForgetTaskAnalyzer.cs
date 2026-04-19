@@ -24,7 +24,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0112FireAndForgetTaskAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0112.</summary>
-    public const string DiagnosticId = "AL0112";
+    private const string DiagnosticId = "AL0112";
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticId,

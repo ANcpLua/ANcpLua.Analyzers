@@ -25,7 +25,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0053UnnecessaryAotUnsafeAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0053.</summary>
-    public const string DiagnosticId = "AL0053";
+    private const string DiagnosticId = "AL0053";
 
     private const string AotUnsafeAttributeName = "AotUnsafe";
     private const string RequiresDynamicCodeAttributeName = "RequiresDynamicCode";

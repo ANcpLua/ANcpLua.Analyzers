@@ -43,7 +43,7 @@ public sealed partial class Al0082ConsiderConnectionStringAnalyzer : AlAnalyzer 
     ];
 
     /// <summary>The diagnostic identifier for AL0082.</summary>
-    public const string DiagnosticId = "AL0082";
+    private const string DiagnosticId = "AL0082";
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticId,

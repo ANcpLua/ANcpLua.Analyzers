@@ -41,7 +41,7 @@ public sealed partial class Al0076MissingOTelConfigurationAnalyzer : AlAnalyzer 
     ];
 
     /// <summary>The diagnostic identifier for AL0076.</summary>
-    public const string DiagnosticId = "AL0076";
+    private const string DiagnosticId = "AL0076";
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticId,

@@ -22,7 +22,7 @@ public sealed partial class Al0018VersionPropsNotImportedTests : AnalyzerTestBas
                                            </Project>
                                            """;
 
-        var expected = new DiagnosticResult(Al0018VersionPropsNotImportedAnalyzer.DiagnosticId, DiagnosticSeverity.Warning)
+        var expected = new DiagnosticResult("AL0018", DiagnosticSeverity.Warning)
             .WithLocation("Directory.Build.props", 1, 1);
 
         return VerifyAsync(

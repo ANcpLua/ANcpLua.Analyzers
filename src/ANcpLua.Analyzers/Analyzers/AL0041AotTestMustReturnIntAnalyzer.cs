@@ -18,7 +18,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0041AotTestMustReturnIntAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0041.</summary>
-    public const string DiagnosticId = "AL0041";
+    private const string DiagnosticId = "AL0041";
 
     private const string AotTestAttributeName = "AotTest";
     private const string TrimTestAttributeName = "TrimTest";

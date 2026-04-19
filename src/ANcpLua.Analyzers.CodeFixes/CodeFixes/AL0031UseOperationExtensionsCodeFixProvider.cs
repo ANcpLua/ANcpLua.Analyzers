@@ -114,23 +114,13 @@ public sealed partial class Al0031UseOperationExtensionsCodeFixProvider : AlCode
 
     private static (MemberAccessExpressionSyntax? memberAccess, LiteralExpressionSyntax? literal)
         GetMemberAccessAndLiteral(BinaryExpressionSyntax binary) {
-        if (binary is {
-            Left: MemberAccessExpressionSyntax leftMember,
-            Right: LiteralExpressionSyntax rightLiteral
-        } &&
-            rightLiteral.IsKind(SyntaxKind.StringLiteralExpression)) {
-            return (leftMember, rightLiteral);
-        }
-
-        if (binary is {
-            Right: MemberAccessExpressionSyntax rightMember,
-            Left: LiteralExpressionSyntax leftLiteral
-        } &&
-            leftLiteral.IsKind(SyntaxKind.StringLiteralExpression)) {
-            return (rightMember, leftLiteral);
-        }
-
-        return (null, null);
+        return binary switch {
+            { Left: MemberAccessExpressionSyntax leftMember, Right: LiteralExpressionSyntax rightLiteral } when
+                rightLiteral.IsKind(SyntaxKind.StringLiteralExpression) => (leftMember, rightLiteral),
+            { Right: MemberAccessExpressionSyntax rightMember, Left: LiteralExpressionSyntax leftLiteral } when
+                leftLiteral.IsKind(SyntaxKind.StringLiteralExpression) => (rightMember, leftLiteral),
+            _ => (null, null)
+        };
     }
 
     private static Task<Document> ConvertToIsMethodNamed(
@@ -279,21 +269,21 @@ public sealed partial class Al0031UseOperationExtensionsCodeFixProvider : AlCode
         typeName = null;
         variableName = null;
 
-        // Pattern: is T name (DeclarationPattern)
-        if (pattern is DeclarationPatternSyntax { Type: { } type, Designation: SingleVariableDesignationSyntax { Identifier: { } id } }) {
-            typeName = type.ToString();
-            variableName = id.Text;
-            return true;
+        switch (pattern)
+        {
+            // Pattern: is T name (DeclarationPattern)
+            case DeclarationPatternSyntax { Type: { } type, Designation: SingleVariableDesignationSyntax { Identifier: { } id } }:
+                typeName = type.ToString();
+                variableName = id.Text;
+                return true;
+            // Pattern: is T (without variable) - use "value" as default
+            case TypePatternSyntax { Type: { } typeOnly }:
+                typeName = typeOnly.ToString();
+                variableName = "value";
+                return true;
+            default:
+                return false;
         }
-
-        // Pattern: is T (without variable) - use "value" as default
-        if (pattern is TypePatternSyntax { Type: { } typeOnly }) {
-            typeName = typeOnly.ToString();
-            variableName = "value";
-            return true;
-        }
-
-        return false;
     }
 
     private static Task<Document> ConvertToTryGetConstantValue(

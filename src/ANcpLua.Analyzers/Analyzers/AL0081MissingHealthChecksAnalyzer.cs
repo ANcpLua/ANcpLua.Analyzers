@@ -17,7 +17,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0081MissingHealthChecksAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0081.</summary>
-    public const string DiagnosticId = "AL0081";
+    private const string DiagnosticId = "AL0081";
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticId,

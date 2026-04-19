@@ -22,7 +22,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0091BatchExportDisabledAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0091.</summary>
-    public const string DiagnosticId = "AL0091";
+    private const string DiagnosticId = "AL0091";
 
     private static readonly string[] SimpleProcessorTypeNames = [
         "OpenTelemetry.Trace.SimpleSpanProcessor",

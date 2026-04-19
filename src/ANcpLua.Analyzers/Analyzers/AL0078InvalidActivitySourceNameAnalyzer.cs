@@ -23,7 +23,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0078InvalidActivitySourceNameAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0078.</summary>
-    public const string DiagnosticId = "AL0078";
+    private const string DiagnosticId = "AL0078";
 
     private const string ActivitySourceTypeName = "System.Diagnostics.ActivitySource";
 

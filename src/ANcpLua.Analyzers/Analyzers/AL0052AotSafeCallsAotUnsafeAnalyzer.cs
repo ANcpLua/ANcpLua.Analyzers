@@ -19,7 +19,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0052AotSafeCallsAotUnsafeAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0052.</summary>
-    public const string DiagnosticId = "AL0052";
+    private const string DiagnosticId = "AL0052";
 
     private const string AotSafeAttributeName = "AotSafe";
     private const string AotUnsafeAttributeName = "AotUnsafe";

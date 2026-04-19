@@ -12,7 +12,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0017HardcodedPackageVersionAnalyzer : DiagnosticAnalyzer {
     /// <summary>AL0017: Hardcoded package version in Directory.Packages.props.</summary>
-    public const string DiagnosticId = "AL0017";
+    private const string DiagnosticId = "AL0017";
 
     private const string SuggestedVariableKey = "SuggestedVariable";
     private const string PackageNameKey = "PackageName";

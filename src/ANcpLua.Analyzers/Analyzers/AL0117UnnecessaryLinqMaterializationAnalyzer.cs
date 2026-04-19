@@ -28,7 +28,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0117UnnecessaryLinqMaterializationAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0117.</summary>
-    public const string DiagnosticId = "AL0117";
+    private const string DiagnosticId = "AL0117";
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticId,
@@ -95,9 +95,28 @@ public sealed partial class Al0117UnnecessaryLinqMaterializationAnalyzer : AlAna
             return;
         }
 
+        // Skip when the materialized result is boxed to System.Object (e.g. stored in
+        // Dictionary<,object?>, passed as object?, assigned to an object? field). Consumers
+        // that receive object have no way to know the value is lazy, and common paths
+        // (JSON serializers, diagnostics, logging) re-enumerate, which re-allocates every
+        // projected element. Materialization is the correct choice in that context.
+        if (IsBoxedToObject(invocation)) {
+            return;
+        }
+
         // Report on the materialization method name location
         var location = GetMethodNameLocation(invocation);
         context.ReportDiagnostic(Diagnostic.Create(Rule, location, method.Name, sourceMethod.Name));
+    }
+
+    private static bool IsBoxedToObject(IInvocationOperation materialization) {
+        var parent = materialization.Parent;
+        while (parent is IParenthesizedOperation parenthesized) {
+            parent = parenthesized.Parent;
+        }
+
+        return parent is IConversionOperation conversion
+            && conversion.Type?.SpecialType == SpecialType.System_Object;
     }
 
     private static bool TryGetSourceInvocation(

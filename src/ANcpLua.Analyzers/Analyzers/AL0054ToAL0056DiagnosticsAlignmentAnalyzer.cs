@@ -31,11 +31,11 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0054ToAl0056DiagnosticsAlignmentAnalyzer : DiagnosticAnalyzer {
     /// <summary>The diagnostic identifier for AL0054.</summary>
-    public const string DiagnosticIdAl0054 = "AL0054";
+    private const string DiagnosticIdAl0054 = "AL0054";
     /// <summary>The diagnostic identifier for AL0055.</summary>
-    public const string DiagnosticIdAl0055 = "AL0055";
+    private const string DiagnosticIdAl0055 = "AL0055";
     /// <summary>The diagnostic identifier for AL0056.</summary>
-    public const string DiagnosticIdAl0056 = "AL0056";
+    private const string DiagnosticIdAl0056 = "AL0056";
 
     private const string DescriptorsFileName = "Descriptors.cs";
     private const string DiagnosticsMdFileName = "diagnostics.md";

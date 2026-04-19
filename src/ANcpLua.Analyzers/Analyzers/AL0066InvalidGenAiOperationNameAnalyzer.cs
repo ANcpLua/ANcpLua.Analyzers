@@ -17,7 +17,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0066InvalidGenAiOperationNameAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0066.</summary>
-    public const string DiagnosticId = "AL0066";
+    private const string DiagnosticId = "AL0066";
 
     private static readonly HashSet<string> ValidOperationNames =
         new(StringComparer.OrdinalIgnoreCase) { "chat", "text_completion", "embeddings" };

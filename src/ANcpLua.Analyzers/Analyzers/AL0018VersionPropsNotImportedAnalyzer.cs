@@ -29,7 +29,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0018VersionPropsNotImportedAnalyzer : DiagnosticAnalyzer {
     /// <summary>AL0018: Version.props not imported.</summary>
-    public const string DiagnosticId = "AL0018";
+    private const string DiagnosticId = "AL0018";
 
     /// <summary>Filename for Version.props.</summary>
     private const string VersionPropsFileName = "Version.props";

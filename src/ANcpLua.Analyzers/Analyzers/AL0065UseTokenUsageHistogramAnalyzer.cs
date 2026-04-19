@@ -23,7 +23,7 @@ public sealed partial class Al0065UseTokenUsageHistogramAnalyzer : AlAnalyzer {
     ];
 
     /// <summary>The diagnostic identifier for AL0065.</summary>
-    public const string DiagnosticId = "AL0065";
+    private const string DiagnosticId = "AL0065";
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticId,

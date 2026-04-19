@@ -18,7 +18,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0113MissingExceptionRecordingOnActivityAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0113.</summary>
-    public const string DiagnosticId = "AL0113";
+    private const string DiagnosticId = "AL0113";
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticId,

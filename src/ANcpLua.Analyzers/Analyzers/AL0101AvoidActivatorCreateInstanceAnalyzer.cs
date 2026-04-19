@@ -19,7 +19,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0101AvoidActivatorCreateInstanceAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0101.</summary>
-    public const string DiagnosticId = "AL0101";
+    private const string DiagnosticId = "AL0101";
 
     private const string ActivatorTypeName = "System.Activator";
     private static readonly InvocationMatcher CreateInstanceInvocation = Invoke.Method("CreateInstance");

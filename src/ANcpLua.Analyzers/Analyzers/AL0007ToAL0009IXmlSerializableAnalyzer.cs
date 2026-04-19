@@ -33,11 +33,11 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0007ToAl0009IXmlSerializableAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0007.</summary>
-    public const string DiagnosticIdAl0007 = "AL0007";
+    private const string DiagnosticIdAl0007 = "AL0007";
     /// <summary>The diagnostic identifier for AL0008.</summary>
     public const string DiagnosticIdAl0008 = "AL0008";
     /// <summary>The diagnostic identifier for AL0009.</summary>
-    public const string DiagnosticIdAl0009 = "AL0009";
+    private const string DiagnosticIdAl0009 = "AL0009";
 
     private static readonly LocalizableResourceString TitleAl0007 = new(
         nameof(Resources.AL0007AnalyzerTitle), Resources.ResourceManager, typeof(Resources));

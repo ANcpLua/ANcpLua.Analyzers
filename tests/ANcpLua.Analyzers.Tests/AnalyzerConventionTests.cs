@@ -48,11 +48,13 @@ public sealed partial class AnalyzerConventionTests {
     }
 
     [Fact]
-    public void AllAnalyzersExposePublicDiagnosticIdConsts() {
+    public void AllAnalyzersDeclareDiagnosticIdConsts() {
+        const BindingFlags AnyStatic = BindingFlags.Public | BindingFlags.NonPublic
+                                                           | BindingFlags.Static | BindingFlags.FlattenHierarchy;
         foreach (var (type, analyzer) in GetAllAnalyzers()) {
             var supportedIds = analyzer.SupportedDiagnostics.Select(static d => d.Id).ToHashSet();
 
-            var constFields = type.GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
+            var constFields = type.GetFields(AnyStatic)
                 .Where(static f => f is { IsLiteral: true, FieldType.Name: "String" }
                                    && f.Name.StartsWith("DiagnosticId", StringComparison.Ordinal))
                 .ToList();
@@ -61,7 +63,7 @@ public sealed partial class AnalyzerConventionTests {
 
             foreach (var id in supportedIds) {
                 constValues.Should().Contain(id,
-                    $"{type.Name} supports {id} but has no public const DiagnosticId* = \"{id}\"");
+                    $"{type.Name} supports {id} but has no const DiagnosticId* = \"{id}\"");
             }
         }
     }

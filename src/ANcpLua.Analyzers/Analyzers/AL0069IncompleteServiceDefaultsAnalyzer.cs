@@ -17,7 +17,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0069IncompleteServiceDefaultsAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0069.</summary>
-    public const string DiagnosticId = "AL0069";
+    private const string DiagnosticId = "AL0069";
 
     private static readonly string[] TracingMethods = ["AddOpenTelemetry", "WithTracing", "AddTracing"];
     private static readonly string[] MetricsMethods = ["AddOpenTelemetry", "WithMetrics", "AddMetrics"];

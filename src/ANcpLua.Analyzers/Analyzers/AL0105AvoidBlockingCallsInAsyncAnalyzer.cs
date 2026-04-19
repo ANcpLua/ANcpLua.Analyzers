@@ -30,7 +30,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0105AvoidBlockingCallsInAsyncAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0105.</summary>
-    public const string DiagnosticId = "AL0105";
+    private const string DiagnosticId = "AL0105";
 
     private enum KnownType { Task, TaskOfT, ValueTask, ValueTaskOfT }
 

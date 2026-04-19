@@ -79,7 +79,7 @@ public sealed partial class Al0085InvalidAttributeValueAnalyzer : AlAnalyzer {
     };
 
     /// <summary>The diagnostic identifier for AL0085.</summary>
-    public const string DiagnosticId = "AL0085";
+    private const string DiagnosticId = "AL0085";
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticId,

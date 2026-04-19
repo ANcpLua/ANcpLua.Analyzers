@@ -16,7 +16,9 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al00xxDescriptiveNameAnalyzer : AlAnalyzer {
-    public const string DiagnosticId = "AL00XX";
+    // Visibility: private by default. Switch to public ONLY when a CodeFixProvider
+    // references it as FixableDiagnosticIds => [Al00xxAnalyzer.DiagnosticId].
+    private const string DiagnosticId = "AL00XX";
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticId,
@@ -54,11 +56,15 @@ public sealed partial class Al00xxDescriptiveNameAnalyzer : AlAnalyzer {
 | Modifier | Always `sealed partial class` | |
 | Base | Always `: AlAnalyzer` | |
 | Namespace | `ANcpLua.Analyzers.Analyzers` | |
-| DiagnosticId | `public const string DiagnosticId = "AL00XX"` — local to each analyzer | |
+| DiagnosticId | `const string DiagnosticId = "AL00XX"` — `private` unless a code fix references it | |
 
 ### CRITICAL: No Central DiagnosticIds Class
 
-Each analyzer owns its own `DiagnosticId` as a `public const string`. There is NO shared `DiagnosticIds` class.
+Each analyzer owns its own `DiagnosticId` as a `const string`. There is NO shared `DiagnosticIds` class.
+
+### CRITICAL: DiagnosticId Visibility
+
+Follow the official Roslyn SDK rule: `private` by default, `public` only when a `CodeFixProvider` in the sibling assembly references it via `FixableDiagnosticIds => [Al00xxAnalyzer.DiagnosticId]`. Do not make it `public` preemptively "in case" a fix is added later — the IDE's "can be made private" hint is correct when no fix exists.
 
 ### CRITICAL: Use CreateRule(), NOT new DiagnosticDescriptor()
 
@@ -73,6 +79,8 @@ When one class emits multiple diagnostic IDs (e.g., AL0004 + AL0005):
 ```csharp
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0004ToAl0005SpanComparisonAnalyzer : AlAnalyzer {
+    // Same visibility rule as single-rule analyzers: each constant is `public` only if
+    // a CodeFixProvider references it (AL0004 and AL0005 both have fixes, so both are public).
     public const string DiagnosticIdAl0004 = "AL0004";
     public const string DiagnosticIdAl0005 = "AL0005";
 

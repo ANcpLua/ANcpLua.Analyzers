@@ -23,7 +23,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0093MissingResourceAttributesAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0093.</summary>
-    public const string DiagnosticId = "AL0093";
+    private const string DiagnosticId = "AL0093";
 
     private static readonly string[] OTelSetupMethods = [
         "AddOpenTelemetry",

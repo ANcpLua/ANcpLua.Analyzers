@@ -12,7 +12,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0120UseIncrementalGeneratorAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0120.</summary>
-    public const string DiagnosticId = "AL0120";
+    private const string DiagnosticId = "AL0120";
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticId,

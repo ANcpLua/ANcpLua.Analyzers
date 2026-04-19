@@ -30,7 +30,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0116ExceptionLeakedInResponseAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0116.</summary>
-    public const string DiagnosticId = "AL0116";
+    private const string DiagnosticId = "AL0116";
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticId,

@@ -33,7 +33,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0077DuplicateInstrumentationAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0077.</summary>
-    public const string DiagnosticId = "AL0077";
+    private const string DiagnosticId = "AL0077";
 
     private const string TracedAttributeFullName = "Qyl.Instrumentation.Instrumentation.TracedAttribute";
 

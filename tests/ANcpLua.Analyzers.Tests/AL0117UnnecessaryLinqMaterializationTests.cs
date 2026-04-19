@@ -79,4 +79,63 @@ public sealed partial class Al0117UnnecessaryLinqMaterializationTests : Analyzer
                         }
                     }
                     """);
+
+    [Fact]
+    public Task ShouldNotReportWhenAssignedToObjectVariable() =>
+        VerifyAsync("""
+                    using System.Collections.Generic;
+                    using System.Linq;
+
+                    public class C {
+                        public void M() {
+                            var list = new List<int> { 1, 2, 3 };
+                            object x = list.Where(i => i > 0).ToArray();
+                        }
+                    }
+                    """);
+
+    [Fact]
+    public Task ShouldNotReportWhenBoxedInDictionaryInitializer() =>
+        VerifyAsync("""
+                    using System.Collections.Generic;
+                    using System.Linq;
+
+                    public class C {
+                        public Dictionary<string, object?> M() {
+                            var list = new List<int> { 1, 2, 3 };
+                            return new Dictionary<string, object?> {
+                                ["items"] = list.Select(i => i.ToString()).ToArray()
+                            };
+                        }
+                    }
+                    """);
+
+    [Fact]
+    public Task ShouldNotReportWhenPassedAsObjectArgument() =>
+        VerifyAsync("""
+                    using System.Collections.Generic;
+                    using System.Linq;
+
+                    public class C {
+                        public void Consume(object value) { }
+                        public void M() {
+                            var list = new List<int> { 1, 2, 3 };
+                            Consume(list.Where(i => i > 0).ToList());
+                        }
+                    }
+                    """);
+
+    [Fact]
+    public Task ShouldStillReportWhenAssignedToStronglyTypedCollection() =>
+        VerifyAsync("""
+                    using System.Collections.Generic;
+                    using System.Linq;
+
+                    public class C {
+                        public void M() {
+                            var list = new List<int> { 1, 2, 3 };
+                            IEnumerable<int> x = list.Where(i => i > 0).[|ToArray|]();
+                        }
+                    }
+                    """);
 }

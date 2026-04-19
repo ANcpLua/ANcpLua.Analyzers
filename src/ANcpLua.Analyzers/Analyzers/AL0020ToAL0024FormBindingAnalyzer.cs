@@ -28,15 +28,15 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0020ToAl0024FormBindingAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0020.</summary>
-    public const string DiagnosticIdAl0020 = "AL0020";
+    private const string DiagnosticIdAl0020 = "AL0020";
     /// <summary>The diagnostic identifier for AL0021.</summary>
-    public const string DiagnosticIdAl0021 = "AL0021";
+    private const string DiagnosticIdAl0021 = "AL0021";
     /// <summary>The diagnostic identifier for AL0022.</summary>
-    public const string DiagnosticIdAl0022 = "AL0022";
+    private const string DiagnosticIdAl0022 = "AL0022";
     /// <summary>The diagnostic identifier for AL0023.</summary>
-    public const string DiagnosticIdAl0023 = "AL0023";
+    private const string DiagnosticIdAl0023 = "AL0023";
     /// <summary>The diagnostic identifier for AL0024.</summary>
-    public const string DiagnosticIdAl0024 = "AL0024";
+    private const string DiagnosticIdAl0024 = "AL0024";
 
     private static readonly DiagnosticDescriptor RuleAl0020 = CreateRule(
         DiagnosticIdAl0020, "AL0020");

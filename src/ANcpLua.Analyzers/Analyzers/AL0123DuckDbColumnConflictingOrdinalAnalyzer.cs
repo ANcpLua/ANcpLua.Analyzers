@@ -12,7 +12,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0123DuckDbColumnConflictingOrdinalAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0123.</summary>
-    public const string DiagnosticId = "AL0123";
+    private const string DiagnosticId = "AL0123";
 
     private const string DuckDbColumnAttributeFullName = "Qyl.Collector.Storage.DuckDbColumnAttribute";
 

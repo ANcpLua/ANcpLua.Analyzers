@@ -1,6 +1,6 @@
 # AGENTS.md - ANcpLua.Analyzers
 
-124 Roslyn diagnostic analyzers (AL0001-AL0124) with code fixes, targeting netstandard2.0.
+127 Roslyn diagnostic analyzers (AL0001-AL0131, gaps at AL0097-0100) with 46 code fixes, targeting netstandard2.0.
 
 ## Commands
 
@@ -30,7 +30,7 @@ tests/ANcpLua.Analyzers.Tests/     # Tests both analyzers and code fixes (xunit.
 ```csharp
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al00xxDescriptiveNameAnalyzer : AlAnalyzer {
-    public const string DiagnosticId = "AL00XX";
+    private const string DiagnosticId = "AL00XX";
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticId, DiagnosticCategories.Category, DiagnosticSeverity.Warning);
@@ -42,7 +42,8 @@ public sealed partial class Al00xxDescriptiveNameAnalyzer : AlAnalyzer {
 }
 ```
 
-- Each analyzer owns its own `DiagnosticId` as `public const string` — NO shared DiagnosticIds class
+- Each analyzer owns its own `DiagnosticId` as `const string` — NO shared DiagnosticIds class
+- **Visibility rule:** `public` only if a `CodeFixProvider` references it, otherwise `private` (matches the official Roslyn SDK template)
 - Use `CreateRule()` for single-rule analyzers, manual `new DiagnosticDescriptor(...)` for grouped
 - `HelpLink(id)` appends the ID to the Mintlify docs base URL
 
@@ -123,7 +124,7 @@ LAYER 3: qyl, TourPlanner, etc     <- END USERS (auto-injected by SDK)
 | `Microsoft.NET.Test.Sdk` | `xunit.v3.mtp-v2` |
 | `--filter "FQN~..."` | `--filter-method` (MTP) |
 | `LangVersion` / `Nullable` in csproj | SDK-owned |
-| `DiagnosticIds.XXX` (shared class) | `public const string DiagnosticId` per analyzer |
+| `DiagnosticIds.XXX` (shared class) | `const string DiagnosticId` per analyzer (private unless a fix references it) |
 | `compilation.GetSemanticModel(otherTree)` in hot path | Pre-index via RegisterSyntaxNodeAction |
 | `type.ToDisplayString()` for identity | `type.IsEqualTo(cachedSymbol)` |
 

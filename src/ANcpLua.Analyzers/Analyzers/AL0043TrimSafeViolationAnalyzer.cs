@@ -18,7 +18,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0043TrimSafeViolationAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0043.</summary>
-    public const string DiagnosticId = "AL0043";
+    private const string DiagnosticId = "AL0043";
 
     private const string TrimSafeAttributeName = "TrimSafe";
     private const string RequiresUnreferencedCodeAttributeName = "RequiresUnreferencedCode";

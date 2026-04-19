@@ -22,7 +22,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0129ToolMustDeclareSideEffectAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0129.</summary>
-    public const string DiagnosticId = "AL0129";
+    private const string DiagnosticId = "AL0129";
 
     private const string LoomToolAttributeName = "LoomTool";
     private const string ToolSideEffectAttributeName = "ToolSideEffect";
