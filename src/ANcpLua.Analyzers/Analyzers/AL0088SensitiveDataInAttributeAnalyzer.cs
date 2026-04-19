@@ -201,8 +201,8 @@ public sealed partial class Al0088SensitiveDataInAttributeAnalyzer : AlAnalyzer 
             }
 
             // Handle separator variations (dot vs underscore)
-            if (normalizedName.ContainsOrdinal(normalizedPattern.Replace(".", "_", StringComparison.Ordinal))
-                || normalizedName.ContainsOrdinal(normalizedPattern.Replace("_", ".", StringComparison.Ordinal))) {
+            if (normalizedName.ContainsOrdinal(normalizedPattern.ReplaceOrdinal(".", "_"))
+                || normalizedName.ContainsOrdinal(normalizedPattern.ReplaceOrdinal("_", "."))) {
                 return true;
             }
         }

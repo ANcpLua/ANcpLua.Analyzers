@@ -68,7 +68,7 @@ public sealed partial class Al0073TracedCodeFixProvider : CodeFixProvider {
 
         // Use the fully qualified name without global:: prefix
         var fullName = typeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-        return fullName.Replace("global::", "", StringComparison.Ordinal);
+        return fullName.ReplaceOrdinal("global::", "") ?? fullName;
     }
 
     private static Task<Document> AddActivitySourceNameAsync(

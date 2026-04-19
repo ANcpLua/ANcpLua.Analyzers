@@ -118,7 +118,7 @@ public sealed partial class Al0075HighCardinalityMetricTagAnalyzer : AlAnalyzer 
             }
 
             if (normalizedTag.EndsWithOrdinal("." + normalizedPattern) ||
-                normalizedTag.EndsWithOrdinal("_" + normalizedPattern.Replace(".", "_", StringComparison.Ordinal))) {
+                normalizedTag.EndsWithOrdinal("_" + normalizedPattern.ReplaceOrdinal(".", "_"))) {
                 return true;
             }
 

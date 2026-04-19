@@ -11,8 +11,8 @@ public sealed partial class AnalyzerConventionTests {
     private static IEnumerable<(Type Type, DiagnosticAnalyzer Instance)> GetAllAnalyzers() =>
         typeof(AlAnalyzer).Assembly.GetTypes()
             .Where(static t => typeof(DiagnosticAnalyzer).IsAssignableFrom(t) && !t.IsAbstract)
-            .Select(static t => (t, (DiagnosticAnalyzer)Activator.CreateInstance(t)!))
-            .ToList();
+            .Select(static t => (t, (DiagnosticAnalyzer)(Activator.CreateInstance(t)
+                ?? throw new InvalidOperationException($"Cannot instantiate {t}"))));
 
     [Fact]
     public void AllAnalyzersFollowNamingConvention() {
@@ -54,12 +54,12 @@ public sealed partial class AnalyzerConventionTests {
         foreach (var (type, analyzer) in GetAllAnalyzers()) {
             var supportedIds = analyzer.SupportedDiagnostics.Select(static d => d.Id).ToHashSet();
 
-            var constFields = type.GetFields(AnyStatic)
+            var constValues = type.GetFields(AnyStatic)
                 .Where(static f => f is { IsLiteral: true, FieldType.Name: "String" }
                                    && f.Name.StartsWith("DiagnosticId", StringComparison.Ordinal))
-                .ToList();
-
-            var constValues = constFields.Select(static f => (string)f.GetRawConstantValue()!).ToHashSet();
+                .Select(static f => f.GetRawConstantValue() as string
+                    ?? throw new InvalidOperationException($"DiagnosticId const {f.Name} is not a string"))
+                .ToHashSet();
 
             foreach (var id in supportedIds) {
                 constValues.Should().Contain(id,

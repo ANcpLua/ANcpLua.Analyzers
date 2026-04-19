@@ -238,9 +238,9 @@ public sealed partial class Al0017HardcodedPackageVersionAnalyzer : DiagnosticAn
         }
 
         var cleanName = packageName
-            .Replace(".", string.Empty, StringComparison.Ordinal)
-            .Replace("-", string.Empty, StringComparison.Ordinal)
-            .Replace("_", string.Empty, StringComparison.Ordinal);
+            .ReplaceOrdinal(".", string.Empty)
+            .ReplaceOrdinal("-", string.Empty)
+            .ReplaceOrdinal("_", string.Empty);
         return cleanName + "Version";
     }
 
