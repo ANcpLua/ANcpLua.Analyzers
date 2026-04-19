@@ -122,4 +122,49 @@ public sealed partial class Al0084MissingServiceDiscoveryTests {
                     """);
 
     #endregion
+
+    #region AL0084: Should not report well-known external APIs
+
+    // Aspire service discovery only resolves services in the local registry. Third-party SaaS
+    // APIs (GitHub, OpenAI, Microsoft Entra, etc.) must be addressed by their public hostname —
+    // flagging them as "hardcoded URLs" is a false positive.
+    [Theory]
+    [InlineData("https://api.github.com")]
+    [InlineData("https://api.openai.com")]
+    [InlineData("https://api.anthropic.com")]
+    [InlineData("https://login.microsoftonline.com")]
+    [InlineData("https://graph.microsoft.com")]
+    [InlineData("https://accounts.google.com")]
+    [InlineData("https://generativelanguage.googleapis.com")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1054:URI-like parameters should not be strings")]
+    public Task ShouldNotReport_WellKnownExternalApis(string urlString) =>
+        VerifyAsync($$"""
+                      public class C {
+                          void M(System.Net.Http.HttpClient client) {
+                              client.BaseAddress = new System.Uri("{{urlString}}");
+                          }
+                      }
+                      """);
+
+    [Fact]
+    public Task ShouldNotReport_GitHubApiCaseInsensitive() =>
+        VerifyAsync("""
+                    public class C {
+                        void M(System.Net.Http.HttpClient client) {
+                            client.BaseAddress = new System.Uri("https://API.GITHUB.COM");
+                        }
+                    }
+                    """);
+
+    [Fact]
+    public Task ShouldReport_UnknownExternalApi() =>
+        VerifyAsync("""
+                    public class C {
+                        void M(System.Net.Http.HttpClient client) {
+                            {|AL0084:client.BaseAddress = new System.Uri("https://api.randomsaas.io")|};
+                        }
+                    }
+                    """);
+
+    #endregion
 }

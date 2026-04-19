@@ -135,6 +135,25 @@ public sealed partial class Al0084MissingServiceDiscoveryAnalyzer : AlAnalyzer {
     private static readonly ImmutableArray<string> ReservedDomains =
         ["example.com", "example.net", "example.org"];
 
+    // Well-known third-party API endpoints. Aspire service discovery only resolves services
+    // registered in the local service registry — external SaaS APIs have no registry entry
+    // and MUST be addressed by their public hostname. Flagging them as "hardcoded URLs" is a
+    // false positive.
+    private static readonly ImmutableArray<string> WellKnownExternalApis =
+    [
+        "api.github.com",
+        "api.openai.com",
+        "api.anthropic.com",
+        "api.mistral.ai",
+        "api.cohere.ai",
+        "generativelanguage.googleapis.com",
+        "login.microsoftonline.com",
+        "graph.microsoft.com",
+        "accounts.google.com",
+        "oauth2.googleapis.com",
+        "www.googleapis.com"
+    ];
+
     private static bool IsHardcodedUrl(Uri uri) {
         if (!uri.Scheme.EqualsIgnoreCase("http") && !uri.Scheme.EqualsIgnoreCase("https")) {
             return false;
@@ -143,6 +162,10 @@ public sealed partial class Al0084MissingServiceDiscoveryAnalyzer : AlAnalyzer {
         var host = uri.Host;
 
         if (IsReservedDomain(host)) {
+            return false;
+        }
+
+        if (IsWellKnownExternalApi(host)) {
             return false;
         }
 
@@ -157,6 +180,9 @@ public sealed partial class Al0084MissingServiceDiscoveryAnalyzer : AlAnalyzer {
 
         return !uri.IsDefaultPort || host.ContainsOrdinal(".");
     }
+
+    private static bool IsWellKnownExternalApi(string host) =>
+        WellKnownExternalApis.Any(host.EqualsIgnoreCase);
 
     private static bool IsServiceDiscoveryUrl(Uri uri) {
         var scheme = uri.Scheme;

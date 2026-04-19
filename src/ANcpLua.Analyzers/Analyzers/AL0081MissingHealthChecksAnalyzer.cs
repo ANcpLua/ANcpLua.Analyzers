@@ -60,13 +60,21 @@ public sealed partial class Al0081MissingHealthChecksAnalyzer : AlAnalyzer {
 
     private static bool HasHealthChecksConfigured(SyntaxNode scope) {
         foreach (var inv in scope.DescendantNodes().OfType<InvocationExpressionSyntax>()) {
-            if (GetMethodName(inv) is "AddHealthChecks") {
+            if (GetMethodName(inv) is { } name
+                && (name is "AddHealthChecks" || IsServiceDefaultsWrapper(name))) {
                 return true;
             }
         }
 
         return false;
     }
+
+    // Aspire convention: Add[Prefix]ServiceDefaults wrappers compose AddHealthChecks, OTel, resilience,
+    // and service discovery in one call. The canonical Microsoft template uses "AddServiceDefaults";
+    // forks prefix it (AddQylServiceDefaults, AddMyAppServiceDefaults, etc.). Treat the pattern as
+    // equivalent to a direct AddHealthChecks call.
+    private static bool IsServiceDefaultsWrapper(string name) =>
+        name.StartsWithOrdinal("Add") && name.EndsWithOrdinal("ServiceDefaults");
 
     private static string? GetMethodName(InvocationExpressionSyntax invocation) =>
         invocation.Expression switch {

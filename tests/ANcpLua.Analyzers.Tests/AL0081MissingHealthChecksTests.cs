@@ -133,4 +133,44 @@ public sealed partial class Al0081MissingHealthChecksTests {
                 }
             }
             """);
+
+    // Aspire-style ServiceDefaults wrapper: Add[Prefix]ServiceDefaults composes AddHealthChecks
+    // internally. The analyzer must treat this naming pattern as equivalent to direct registration
+    // to avoid false positives on qyl, Aspire samples, and forked service templates.
+    [Theory]
+    [InlineData("AddServiceDefaults")]
+    [InlineData("AddQylServiceDefaults")]
+    [InlineData("AddMyAppServiceDefaults")]
+    public Task ShouldNotReport_WithServiceDefaultsWrapper(string wrapperName) =>
+        VerifyAsync(
+            $$"""
+            public static class Extensions {
+                public static Microsoft.AspNetCore.Builder.WebApplicationBuilder {{wrapperName}}(
+                    this Microsoft.AspNetCore.Builder.WebApplicationBuilder builder) => builder;
+            }
+            public class Program {
+                public static void Main() {
+                    var builder = WebApplication.CreateBuilder();
+                    builder.{{wrapperName}}();
+                    var app = builder.Build();
+                }
+            }
+            """);
+
+    [Fact]
+    public Task ShouldReport_WhenWrapperNameDoesNotMatchPattern() =>
+        VerifyAsync(
+            """
+            public static class Extensions {
+                public static Microsoft.AspNetCore.Builder.WebApplicationBuilder AddMyDefaults(
+                    this Microsoft.AspNetCore.Builder.WebApplicationBuilder builder) => builder;
+            }
+            public class Program {
+                public static void Main() {
+                    var builder = {|AL0081:WebApplication.CreateBuilder()|};
+                    builder.AddMyDefaults();
+                    var app = builder.Build();
+                }
+            }
+            """);
 }
