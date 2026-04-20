@@ -9,8 +9,11 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///         GenAI operation names should be one of the standard values:
 ///         <list type="bullet">
 ///             <item>chat - for chat completions</item>
+///             <item>generate_content - for content generation APIs</item>
 ///             <item>text_completion - for text completions</item>
 ///             <item>embeddings - for embedding generation</item>
+///             <item>retrieval - for retrieval operations</item>
+///             <item>create_agent, invoke_agent, execute_tool, invoke_workflow - for agent/workflow operations</item>
 ///         </list>
 ///     </para>
 /// </remarks>
@@ -20,7 +23,17 @@ public sealed partial class Al0066InvalidGenAiOperationNameAnalyzer : AlAnalyzer
     private const string DiagnosticId = "AL0066";
 
     private static readonly HashSet<string> ValidOperationNames =
-        new(StringComparer.OrdinalIgnoreCase) { "chat", "text_completion", "embeddings" };
+        new(StringComparer.OrdinalIgnoreCase) {
+            "chat",
+            "generate_content",
+            "text_completion",
+            "embeddings",
+            "retrieval",
+            "create_agent",
+            "invoke_agent",
+            "execute_tool",
+            "invoke_workflow"
+        };
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticId,

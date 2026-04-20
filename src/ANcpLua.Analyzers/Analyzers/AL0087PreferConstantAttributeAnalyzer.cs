@@ -46,7 +46,6 @@ public sealed partial class Al0087PreferConstantAttributeAnalyzer : AlAnalyzer {
     /// </remarks>
     private static readonly Dictionary<string, string> KnownAttributes = new(StringComparer.Ordinal) {
         // GenAI semantic conventions
-        ["gen_ai.system"] = "GenAiAttributes.System",
         ["gen_ai.provider.name"] = "GenAiAttributes.ProviderName",
         ["gen_ai.request.model"] = "GenAiAttributes.RequestModel",
         ["gen_ai.response.model"] = "GenAiAttributes.ResponseModel",
@@ -61,8 +60,6 @@ public sealed partial class Al0087PreferConstantAttributeAnalyzer : AlAnalyzer {
         ["gen_ai.request.frequency_penalty"] = "GenAiAttributes.RequestFrequencyPenalty",
         ["gen_ai.response.finish_reasons"] = "GenAiAttributes.ResponseFinishReasons",
         ["gen_ai.response.id"] = "GenAiAttributes.ResponseId",
-        ["gen_ai.prompt"] = "GenAiAttributes.Prompt",
-        ["gen_ai.completion"] = "GenAiAttributes.Completion",
 
         // HTTP semantic conventions
         ["http.request.method"] = "SemanticConventions.HttpRequestMethod",
@@ -74,7 +71,7 @@ public sealed partial class Al0087PreferConstantAttributeAnalyzer : AlAnalyzer {
         ["server.port"] = "SemanticConventions.ServerPort",
 
         // Database semantic conventions
-        ["db.system"] = "SemanticConventions.DbSystem",
+        ["db.system.name"] = "SemanticConventions.DbSystemName",
         ["db.namespace"] = "SemanticConventions.DbNamespace",
         ["db.operation.name"] = "SemanticConventions.DbOperationName",
         ["db.query.text"] = "SemanticConventions.DbQueryText",

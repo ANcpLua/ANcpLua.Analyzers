@@ -13,7 +13,7 @@ public sealed partial class Al0087PreferConstantAttributeTests : AnalyzerTest<Al
 
                 public class C {
                     void M(Activity activity) {
-                        activity.SetTag([|"gen_ai.system"|], "openai");
+                        activity.SetTag([|"gen_ai.provider.name"|], "openai");
                     }
                 }
                 """)]
@@ -100,7 +100,7 @@ public sealed partial class Al0087PreferConstantAttributeTests : AnalyzerTest<Al
 
                 public class C {
                     void M(Activity activity) {
-                        activity.SetTag([|"db.system"|], "postgresql");
+                        activity.SetTag([|"db.system.name"|], "postgresql");
                     }
                 }
                 """)]
@@ -131,7 +131,7 @@ public sealed partial class Al0087PreferConstantAttributeTests : AnalyzerTest<Al
                 public class C {
                     void M() {
                         var tags = new Dictionary<string, object>();
-                        tags[[|"gen_ai.system"|]] = "anthropic";
+                        tags[[|"gen_ai.provider.name"|]] = "anthropic";
                     }
                 }
                 """)]
@@ -152,7 +152,7 @@ public sealed partial class Al0087PreferConstantAttributeTests : AnalyzerTest<Al
                 public class C {
                     void SetAttribute(string key, object value) { }
                     void M() {
-                        SetAttribute([|"gen_ai.system"|], "openai");
+                        SetAttribute([|"gen_ai.provider.name"|], "openai");
                     }
                 }
                 """)]
@@ -200,7 +200,7 @@ public sealed partial class Al0087PreferConstantAttributeTests : AnalyzerTest<Al
     [InlineData("""
                 public class C {
                     void M() {
-                        var x = "gen_ai.system";
+                        var x = "gen_ai.provider.name";
                     }
                 }
                 """)]
@@ -208,13 +208,13 @@ public sealed partial class Al0087PreferConstantAttributeTests : AnalyzerTest<Al
                 public class C {
                     void Log(string message) { }
                     void M() {
-                        Log("gen_ai.system is the attribute name");
+                        Log("gen_ai.provider.name is the attribute name");
                     }
                 }
                 """)]
     [InlineData("""
                 public class C {
-                    const string Attr = "gen_ai.system";
+                    const string Attr = "gen_ai.provider.name";
                 }
                 """)]
     public Task ShouldNotReportOutsideTelemetryContext(string source) => VerifyAsync(source);
@@ -224,14 +224,26 @@ public sealed partial class Al0087PreferConstantAttributeTests : AnalyzerTest<Al
                 using System.Diagnostics;
 
                 public static class GenAiAttributes {
-                    public const string System = "gen_ai.system";
+                    public const string ProviderName = "gen_ai.provider.name";
                 }
 
                 public class C {
                     void M(Activity activity) {
-                        activity.SetTag(GenAiAttributes.System, "openai");
+                        activity.SetTag(GenAiAttributes.ProviderName, "openai");
                     }
                 }
                 """)]
     public Task ShouldNotReportWhenConstantAlreadyUsed(string source) => VerifyAsync(source);
+
+    [Fact]
+    public Task ShouldNotReportDeprecatedGenAiKeyEvenInTelemetryContext() =>
+        VerifyAsync("""
+            using System.Diagnostics;
+
+            public class C {
+                void M(Activity activity) {
+                    activity.SetTag("gen_ai.system", "openai");
+                }
+            }
+            """);
 }
