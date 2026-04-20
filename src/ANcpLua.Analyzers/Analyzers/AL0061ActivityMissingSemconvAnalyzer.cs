@@ -17,12 +17,12 @@ public sealed partial class Al0061ActivityMissingSemconvAnalyzer : AlAnalyzer {
 
     // Operation types and their expected semantic convention prefixes
     private static readonly Dictionary<string, string[]> OperationTypePrefixes = new(StringComparer.OrdinalIgnoreCase) {
-        ["http"] = ["http.", "url.", "server.", "client."],
+        ["http"] = ["http.", "url.", "server.", "client.", "network.", "user_agent."],
         ["db"] = ["db."],
-        ["rpc"] = ["rpc."],
+        ["rpc"] = ["rpc.", "jsonrpc."],
         ["messaging"] = ["messaging."],
         ["faas"] = ["faas."],
-        ["gen_ai"] = ["gen_ai."]
+        ["gen_ai"] = ["gen_ai.", "openai."]
     };
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
@@ -48,9 +48,29 @@ public sealed partial class Al0061ActivityMissingSemconvAnalyzer : AlAnalyzer {
         }
 
         var setTags = CollectSetTagCalls(invocation);
-        if (!setTags.Any(tag => expectedPrefixes.Any(tag.StartsWithIgnoreCase))) {
+        if (!HasRelevantSemconv(setTags, expectedPrefixes)) {
             context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.Syntax.GetLocation(), activityName, operationType));
         }
+    }
+
+    private static bool HasRelevantSemconv(HashSet<string> tagNames, string[] expectedPrefixes) {
+        foreach (var tagName in tagNames) {
+            if (expectedPrefixes.Any(tagName.StartsWithIgnoreCase)) {
+                return true;
+            }
+
+            if (Al0062DeprecatedSemconvAnalyzer.TryGetDeprecatedAttribute(tagName, out var deprecatedAttribute) &&
+                expectedPrefixes.Any(deprecatedAttribute.Replacement.StartsWithIgnoreCase)) {
+                return true;
+            }
+
+            if (Al0074DeprecatedGenAiAttributeAnalyzer.TryGetDeprecatedAttribute(tagName, out var genAiReplacement) &&
+                expectedPrefixes.Any(genAiReplacement.StartsWithIgnoreCase)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static string? GetActivityName(IInvocationOperation invocation) =>

@@ -70,6 +70,36 @@ public sealed partial class Al0061ActivityMissingSemconvTests : AnalyzerTest<Al0
             """);
 
     [Fact]
+    public Task ShouldNotReport_WhenDeprecatedNetworkSemconvMapsToHttpConvention() =>
+        VerifyAsync($$"""
+            {{ActivityStubs}}
+
+            public class C {
+                private static readonly System.Diagnostics.ActivitySource Source = new("test");
+
+                void M() {
+                    var activity = Source.StartActivity("http.request");
+                    activity?.SetTag("net.host.name", "example.com");
+                }
+            }
+            """);
+
+    [Fact]
+    public Task ShouldNotReport_WhenDeprecatedGenAiAliasMapsToCurrentConvention() =>
+        VerifyAsync($$"""
+            {{ActivityStubs}}
+
+            public class C {
+                private static readonly System.Diagnostics.ActivitySource Source = new("test");
+
+                void M() {
+                    var activity = Source.StartActivity("gen_ai.chat");
+                    activity?.SetTag("model", "gpt-4.1");
+                }
+            }
+            """);
+
+    [Fact]
     public Task ShouldNotReport_WhenSetTagUsesConstField() =>
         VerifyAsync($$"""
             {{ActivityStubs}}

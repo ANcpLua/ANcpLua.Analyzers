@@ -1294,4 +1294,34 @@
     <data name="AL0131AnalyzerDescription" xml:space="preserve">
         <value>Calling a GenAI SDK type directly prevents automatic OpenTelemetry span emission. Wrap the provider client through Microsoft.Extensions.AI.IChatClient so all LLM calls are traced without changes to call sites.</value>
     </data>
+    <!-- AL0132: Deprecated semantic convention value -->
+    <data name="AL0132AnalyzerTitle" xml:space="preserve">
+        <value>Deprecated semantic convention value</value>
+    </data>
+    <data name="AL0132AnalyzerMessageFormat" xml:space="preserve">
+        <value>Value '{1}' for attribute '{0}' is deprecated. {2}</value>
+    </data>
+    <data name="AL0132AnalyzerDescription" xml:space="preserve">
+        <value>Some semantic convention attribute values have been renamed or removed. Using current values keeps telemetry compatible with modern OpenTelemetry tooling and schema expectations.</value>
+    </data>
+    <!-- AL0133: Context-sensitive deprecated semantic convention attribute -->
+    <data name="AL0133AnalyzerTitle" xml:space="preserve">
+        <value>Context-sensitive deprecated semantic convention</value>
+    </data>
+    <data name="AL0133AnalyzerMessageFormat" xml:space="preserve">
+        <value>Attribute '{0}' is deprecated. {1}</value>
+    </data>
+    <data name="AL0133AnalyzerDescription" xml:space="preserve">
+        <value>Some deprecated semantic convention attributes cannot be migrated with a simple 1:1 rename. This analyzer highlights attributes that require context-sensitive migration or have no direct replacement.</value>
+    </data>
+    <!-- AL0134: Unknown telemetry attribute key -->
+    <data name="AL0134AnalyzerTitle" xml:space="preserve">
+        <value>Unknown telemetry attribute key</value>
+    </data>
+    <data name="AL0134AnalyzerMessageFormat" xml:space="preserve">
+        <value>Attribute '{0}' is not part of the official OpenTelemetry semantic conventions</value>
+    </data>
+    <data name="AL0134AnalyzerDescription" xml:space="preserve">
+        <value>Telemetry attribute keys should come from the official OpenTelemetry semantic conventions. Unknown keys often indicate ad-hoc local conventions or accidental schema drift.</value>
+    </data>
 </root>

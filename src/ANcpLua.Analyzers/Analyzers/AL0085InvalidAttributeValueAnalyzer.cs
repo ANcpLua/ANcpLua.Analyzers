@@ -16,26 +16,36 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0085InvalidAttributeValueAnalyzer : AlAnalyzer {
-    /// <summary>Known gen_ai.system provider values from semantic conventions.</summary>
-    private static readonly HashSet<string> ValidGenAiSystems = new(StringComparer.OrdinalIgnoreCase) {
+    /// <summary>Known gen_ai.provider.name values from semantic conventions.</summary>
+    private static readonly HashSet<string> ValidGenAiProviders = new(StringComparer.OrdinalIgnoreCase) {
         "openai",
         "anthropic",
-        "azure_ai_inference",
-        "vertex_ai",
         "cohere",
-        "aws_bedrock",
-        "watsonx",
-        "az.ai.inference"
+        "azure.ai.inference",
+        "azure.ai.openai",
+        "gcp.gen_ai",
+        "gcp.vertex_ai",
+        "gcp.gemini",
+        "ibm.watsonx.ai",
+        "aws.bedrock",
+        "perplexity",
+        "x_ai",
+        "deepseek",
+        "groq",
+        "mistral_ai"
     };
 
     /// <summary>Known gen_ai.operation.name values from semantic conventions.</summary>
     private static readonly HashSet<string> ValidGenAiOperations = new(StringComparer.OrdinalIgnoreCase) {
         "chat",
+        "generate_content",
         "text_completion",
         "embeddings",
+        "retrieval",
         "create_agent",
         "invoke_agent",
-        "execute_tool"
+        "execute_tool",
+        "invoke_workflow"
     };
 
     /// <summary>Attribute validators by attribute name.</summary>
@@ -46,12 +56,12 @@ public sealed partial class Al0085InvalidAttributeValueAnalyzer : AlAnalyzer {
         ["http.request.method"] = new AttributeValidator(
             ValidateHttpMethod,
             "valid HTTP method (GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS, TRACE, CONNECT, _OTHER)"),
-        ["gen_ai.system"] = new AttributeValidator(
-            ValidateGenAiSystem,
-            "one of: openai, anthropic, azure_ai_inference, vertex_ai, cohere, aws_bedrock, watsonx, az.ai.inference"),
+        ["gen_ai.provider.name"] = new AttributeValidator(
+            ValidateGenAiProvider,
+            "one of the official provider names such as openai, anthropic, azure.ai.inference, azure.ai.openai, gcp.vertex_ai, gcp.gemini, cohere, aws.bedrock"),
         ["gen_ai.operation.name"] = new AttributeValidator(
             ValidateGenAiOperation,
-            "one of: chat, text_completion, embeddings, create_agent, invoke_agent, execute_tool"),
+            "one of: chat, generate_content, text_completion, embeddings, retrieval, create_agent, invoke_agent, execute_tool, invoke_workflow"),
         ["gen_ai.request.max_tokens"] = new AttributeValidator(
             ValidatePositiveInteger,
             "positive integer"),
@@ -70,9 +80,9 @@ public sealed partial class Al0085InvalidAttributeValueAnalyzer : AlAnalyzer {
         ["gen_ai.usage.output_tokens"] = new AttributeValidator(
             ValidateNonNegativeInteger,
             "non-negative integer"),
-        ["rpc.grpc.status_code"] = new AttributeValidator(
-            ValidateGrpcStatusCode,
-            "integer between 0-16"),
+        ["rpc.response.status_code"] = new AttributeValidator(
+            ValidateRpcResponseStatusCode,
+            "non-empty status code string such as OK, DEADLINE_EXCEEDED, or -32602"),
         ["url.scheme"] = new AttributeValidator(
             ValidateUrlScheme,
             "one of: http, https, ftp, ws, wss")
@@ -126,8 +136,8 @@ public sealed partial class Al0085InvalidAttributeValueAnalyzer : AlAnalyzer {
         value is "GET" or "POST" or "PUT" or "DELETE" or "PATCH"
             or "HEAD" or "OPTIONS" or "TRACE" or "CONNECT" or "_OTHER";
 
-    private static bool ValidateGenAiSystem(string value) =>
-        ValidGenAiSystems.Contains(value);
+    private static bool ValidateGenAiProvider(string value) =>
+        ValidGenAiProviders.Contains(value);
 
     private static bool ValidateGenAiOperation(string value) =>
         ValidGenAiOperations.Contains(value);
@@ -151,8 +161,8 @@ public sealed partial class Al0085InvalidAttributeValueAnalyzer : AlAnalyzer {
         || value.EqualsIgnoreCase("tool_calls")
         || value.EqualsIgnoreCase("error");
 
-    private static bool ValidateGrpcStatusCode(string value) =>
-        int.TryParse(value, out var code) && code is >= 0 and <= 16;
+    private static bool ValidateRpcResponseStatusCode(string value) =>
+        !string.IsNullOrWhiteSpace(value);
 
     private static bool ValidateUrlScheme(string value) =>
         value.EqualsIgnoreCase("http")

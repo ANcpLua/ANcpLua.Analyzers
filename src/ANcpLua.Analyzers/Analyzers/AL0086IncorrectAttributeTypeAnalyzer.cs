@@ -41,7 +41,6 @@ public sealed partial class Al0086IncorrectAttributeTypeAnalyzer : AlAnalyzer {
         // GenAI token counts (must be integers)
         ["gen_ai.usage.input_tokens"] = ExpectedType.WholeNumber,
         ["gen_ai.usage.output_tokens"] = ExpectedType.WholeNumber,
-        ["gen_ai.usage.total_tokens"] = ExpectedType.WholeNumber,
         ["gen_ai.request.max_tokens"] = ExpectedType.WholeNumber,
         ["gen_ai.response.finish_reasons"] = ExpectedType.CharacterSequenceArray,
 
@@ -59,7 +58,8 @@ public sealed partial class Al0086IncorrectAttributeTypeAnalyzer : AlAnalyzer {
         ["http.request.resend_count"] = ExpectedType.WholeNumber,
 
         // Database attributes
-        ["db.operation.batch_size"] = ExpectedType.WholeNumber,
+        ["db.operation.batch.size"] = ExpectedType.WholeNumber,
+        ["db.response.status_code"] = ExpectedType.CharacterSequence,
 
         // Network attributes
         ["network.peer.port"] = ExpectedType.WholeNumber,
@@ -70,10 +70,7 @@ public sealed partial class Al0086IncorrectAttributeTypeAnalyzer : AlAnalyzer {
         // Thread/process attributes
         ["thread.id"] = ExpectedType.WholeNumber,
         ["process.pid"] = ExpectedType.WholeNumber,
-        ["process.parent_pid"] = ExpectedType.WholeNumber,
-
-        // Error count
-        ["error.count"] = ExpectedType.WholeNumber
+        ["process.parent_pid"] = ExpectedType.WholeNumber
     };
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>

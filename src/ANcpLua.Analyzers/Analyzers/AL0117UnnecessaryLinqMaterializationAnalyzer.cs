@@ -1,3 +1,4 @@
+using MsOperationExtensions = Microsoft.CodeAnalysis.Operations.OperationExtensions;
 
 namespace ANcpLua.Analyzers.Analyzers;
 
@@ -12,17 +13,15 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///         to <c>IEnumerable&lt;T&gt;</c>, deferred execution avoids the allocation entirely.
 ///     </para>
 ///     <para>
-///         Examples of unnecessary materialization:
+///         This analyzer suppresses false positives when materialization is load-bearing:
 ///         <list type="bullet">
-///             <item><c>items.Where(x =&gt; x &gt; 0).ToList()</c></item>
-///             <item><c>items.Select(x =&gt; x.Name).ToArray()</c></item>
-///             <item><c>items.OfType&lt;string&gt;().ToList()</c></item>
+///             <item>Result stored in a local that is read ≥ 2 times (multi-enumeration).</item>
+///             <item>Result passed to an argument whose parameter type is a concrete collection
+///                 (<c>T[]</c>, <c>List&lt;T&gt;</c>, <c>IList&lt;T&gt;</c>, <c>IReadOnlyList&lt;T&gt;</c>,
+///                 <c>ICollection&lt;T&gt;</c>, <c>IReadOnlyCollection&lt;T&gt;</c>).</item>
+///             <item>Result returned from a method whose return type is a concrete collection.</item>
+///             <item>Result boxed to <c>System.Object</c> (original behavior).</item>
 ///         </list>
-///     </para>
-///     <para>
-///         This is an Info-severity diagnostic (IDE-only) because there are legitimate reasons
-///         to materialize, such as avoiding multiple enumeration or capturing a snapshot. The
-///         diagnostic surfaces the pattern for developer review.
 ///     </para>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
@@ -57,17 +56,33 @@ public sealed partial class Al0117UnnecessaryLinqMaterializationAnalyzer : AlAna
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterCompilationStartAction(OnCompilationStart);
 
+    private static readonly string[] StrictCollectionMetadataNames = [
+        "System.Collections.Generic.List`1",
+        "System.Collections.Generic.IList`1",
+        "System.Collections.Generic.IReadOnlyList`1",
+        "System.Collections.Generic.ICollection`1",
+        "System.Collections.Generic.IReadOnlyCollection`1"
+    ];
+
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
         if (context.Compilation.GetTypeByMetadataName("System.Linq.Enumerable") is not { } enumerableType) {
             return;
         }
 
+        var strict = StrictCollectionMetadataNames
+            .Select(name => context.Compilation.GetTypeByMetadataName(name))
+            .OfType<INamedTypeSymbol>()
+            .ToImmutableArray();
+
         context.RegisterOperationAction(
-            ctx => AnalyzeInvocation(ctx, enumerableType),
+            ctx => AnalyzeInvocation(ctx, enumerableType, strict),
             OperationKind.Invocation);
     }
 
-    private static void AnalyzeInvocation(OperationAnalysisContext context, INamedTypeSymbol enumerableType) {
+    private static void AnalyzeInvocation(
+        OperationAnalysisContext context,
+        INamedTypeSymbol enumerableType,
+        ImmutableArray<INamedTypeSymbol> strictCollectionTypes) {
         var invocation = (IInvocationOperation)context.Operation;
         var method = invocation.TargetMethod;
 
@@ -95,12 +110,14 @@ public sealed partial class Al0117UnnecessaryLinqMaterializationAnalyzer : AlAna
             return;
         }
 
-        // Skip when the materialized result is boxed to System.Object (e.g. stored in
-        // Dictionary<,object?>, passed as object?, assigned to an object? field). Consumers
-        // that receive object have no way to know the value is lazy, and common paths
-        // (JSON serializers, diagnostics, logging) re-enumerate, which re-allocates every
-        // projected element. Materialization is the correct choice in that context.
+        // Skip when the materialized result is boxed to System.Object.
         if (IsBoxedToObject(invocation)) {
+            return;
+        }
+
+        // Skip when the materialization is load-bearing (multi-use local, concrete-collection
+        // parameter, or concrete-collection return type).
+        if (IsMaterializationLoadBearing(invocation, context.ContainingSymbol, strictCollectionTypes)) {
             return;
         }
 
@@ -117,6 +134,105 @@ public sealed partial class Al0117UnnecessaryLinqMaterializationAnalyzer : AlAna
 
         return parent is IConversionOperation conversion
             && conversion.Type?.SpecialType == SpecialType.System_Object;
+    }
+
+    private static bool IsMaterializationLoadBearing(
+        IInvocationOperation materialization,
+        ISymbol? containingSymbol,
+        ImmutableArray<INamedTypeSymbol> strictCollectionTypes) {
+        var parent = materialization.Parent;
+        while (parent is IParenthesizedOperation parenthesized) {
+            parent = parenthesized.Parent;
+        }
+
+        // Strip away identity/implicit conversions that don't change the semantic type
+        // (e.g., List<T> -> List<T> nullable-annotation conversions). Keep conversions
+        // that widen (e.g., T[] -> IEnumerable<T>) because those indicate the consumer
+        // really wants the lazy type.
+        if (parent is IConversionOperation conversion
+            && conversion.IsImplicit
+            && conversion.Type is { } convType
+            && IsStrictCollectionType(convType, strictCollectionTypes)) {
+            return true;
+        }
+
+        // Argument to a method: check if parameter type is a concrete collection.
+        if (parent is IArgumentOperation argument
+            && argument.Parameter?.Type is { } paramType
+            && IsStrictCollectionType(paramType, strictCollectionTypes)) {
+            return true;
+        }
+
+        // Return statement: check enclosing method's return type.
+        if (parent is IReturnOperation
+            && containingSymbol is IMethodSymbol enclosingMethod
+            && IsStrictCollectionType(UnwrapTask(enclosingMethod.ReturnType), strictCollectionTypes)) {
+            return true;
+        }
+
+        // Local variable initializer: suppress if the local is read more than once.
+        if (parent is IVariableInitializerOperation { Parent: IVariableDeclaratorOperation declarator }
+            && CountLocalReads(materialization, declarator.Symbol) >= 2) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private static int CountLocalReads(IOperation materialization, ILocalSymbol local) {
+        // Walk up to the root of the operation tree (method body / field initializer / etc.)
+        var root = materialization;
+        while (root.Parent is not null) {
+            root = root.Parent;
+        }
+
+        var count = 0;
+        foreach (var descendant in MsOperationExtensions.DescendantsAndSelf(root)) {
+            if (descendant is ILocalReferenceOperation localRef
+                && SymbolEqualityComparer.Default.Equals(localRef.Local, local)) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    private static ITypeSymbol UnwrapTask(ITypeSymbol type) {
+        // Treat Task<T> / ValueTask<T> / IAsyncEnumerable<T> returns against their T payload.
+        if (type is INamedTypeSymbol { IsGenericType: true } named
+            && named.TypeArguments.Length == 1
+            && named.ConstructedFrom.ToDisplayString() is
+                "System.Threading.Tasks.Task<TResult>" or
+                "System.Threading.Tasks.ValueTask<TResult>") {
+            return named.TypeArguments[0];
+        }
+
+        return type;
+    }
+
+    private static bool IsStrictCollectionType(
+        ITypeSymbol? type,
+        ImmutableArray<INamedTypeSymbol> strictCollectionTypes) {
+        if (type is null) {
+            return false;
+        }
+
+        if (type is IArrayTypeSymbol) {
+            return true;
+        }
+
+        if (type is not INamedTypeSymbol named || !named.IsGenericType) {
+            return false;
+        }
+
+        var definition = named.OriginalDefinition;
+        foreach (var strict in strictCollectionTypes) {
+            if (SymbolEqualityComparer.Default.Equals(definition, strict)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static bool TryGetSourceInvocation(

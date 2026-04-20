@@ -28,8 +28,18 @@ public sealed partial class Al0074DeprecatedGenAiAttributeAnalyzer : AlAnalyzer 
     /// </summary>
 
 #pragma warning disable AL0074 // These strings are the deprecated names we detect — not telemetry usage
-    private static readonly Dictionary<string, string> DeprecatedAttributes = new(StringComparer.Ordinal) {
-        // Old token counting attributes (pre-1.27.0 style)
+    private static readonly Dictionary<string, string> DeprecatedAttributes = new(StringComparer.OrdinalIgnoreCase) {
+        // Official GenAI semantic convention renames
+        ["gen_ai.system"] = "gen_ai.provider.name",
+        ["gen_ai.usage.prompt_tokens"] = "gen_ai.usage.input_tokens",
+        ["gen_ai.usage.completion_tokens"] = "gen_ai.usage.output_tokens",
+        ["gen_ai.openai.request.seed"] = "gen_ai.request.seed",
+        ["gen_ai.openai.request.response_format"] = "gen_ai.output.type",
+        ["gen_ai.openai.request.service_tier"] = "openai.request.service_tier",
+        ["gen_ai.openai.response.service_tier"] = "openai.response.service_tier",
+        ["gen_ai.openai.response.system_fingerprint"] = "openai.response.system_fingerprint",
+
+        // Older legacy aliases still found in codebases
         ["gen_ai.prompt.tokens"] = "gen_ai.usage.input_tokens",
         ["gen_ai.completion.tokens"] = "gen_ai.usage.output_tokens",
         ["gen_ai.response.tokens"] = "gen_ai.usage.output_tokens",
@@ -64,6 +74,9 @@ public sealed partial class Al0074DeprecatedGenAiAttributeAnalyzer : AlAnalyzer 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
+    internal static bool TryGetDeprecatedAttribute(string attributeName, [NotNullWhen(true)] out string? replacement) =>
+        DeprecatedAttributes.TryGetValue(attributeName, out replacement);
+
     /// <summary>Registers syntax node actions to analyze string literals for deprecated GenAI attributes.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterSyntaxNodeAction(AnalyzeStringLiteral, SyntaxKind.StringLiteralExpression);
@@ -73,7 +86,7 @@ public sealed partial class Al0074DeprecatedGenAiAttributeAnalyzer : AlAnalyzer 
         var value = literal.Token.ValueText;
 
         if (string.IsNullOrEmpty(value)
-            || !DeprecatedAttributes.TryGetValue(value, out var replacement)
+            || !TryGetDeprecatedAttribute(value, out var replacement)
             || !IsInTelemetryContext(literal)) {
             return;
         }
