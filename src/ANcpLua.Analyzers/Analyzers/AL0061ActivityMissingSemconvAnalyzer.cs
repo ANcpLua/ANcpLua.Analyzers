@@ -59,12 +59,12 @@ public sealed partial class Al0061ActivityMissingSemconvAnalyzer : AlAnalyzer {
                 return true;
             }
 
-            if (Al0062DeprecatedSemconvAnalyzer.TryGetDeprecatedAttribute(tagName, out var deprecatedAttribute) &&
+            if (OpenTelemetryDeprecatedSemconvCatalog.TryGetDeprecatedAttribute(tagName, out var deprecatedAttribute) &&
                 expectedPrefixes.Any(deprecatedAttribute.Replacement.StartsWithIgnoreCase)) {
                 return true;
             }
 
-            if (Al0074DeprecatedGenAiAttributeAnalyzer.TryGetDeprecatedAttribute(tagName, out var genAiReplacement) &&
+            if (OpenTelemetryDeprecatedSemconvCatalog.TryGetDeprecatedGenAiAttribute(tagName, out var genAiReplacement) &&
                 expectedPrefixes.Any(genAiReplacement.StartsWithIgnoreCase)) {
                 return true;
             }

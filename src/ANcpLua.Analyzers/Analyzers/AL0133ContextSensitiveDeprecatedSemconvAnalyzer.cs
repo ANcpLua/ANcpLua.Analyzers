@@ -8,35 +8,6 @@ public sealed partial class Al0133ContextSensitiveDeprecatedSemconvAnalyzer : Al
     /// <summary>The diagnostic identifier for AL0133.</summary>
     private const string DiagnosticId = "AL0133";
 
-    private static readonly Dictionary<string, string> DeprecatedAttributes = new(StringComparer.OrdinalIgnoreCase) {
-        ["code.function"] = "Include the value in 'code.function.name' as a fully-qualified name.",
-        ["code.namespace"] = "Include the namespace in 'code.function.name' as a fully-qualified name.",
-        ["db.connection_string"] = "Use 'server.address' and 'server.port' instead.",
-        ["db.cosmosdb.operation_type"] = "No replacement exists at this time.",
-        ["db.cosmosdb.status_code"] = "Use 'db.response.status_code' instead.",
-        ["db.instance.id"] = "No general replacement exists; for Elasticsearch use 'db.elasticsearch.node.name' instead.",
-        ["db.jdbc.driver_classname"] = "No replacement exists at this time.",
-        ["db.mssql.instance_name"] = "No replacement exists at this time.",
-        ["db.redis.database_index"] = "Use 'db.namespace' instead.",
-        ["db.user"] = "No replacement exists at this time.",
-        ["enduser.scope"] = "No replacement exists at this time.",
-        ["error.message"] = "Use a domain-specific error message attribute instead.",
-        ["exception.escaped"] = "Avoid recording handled exceptions that do not escape the span scope.",
-        ["gen_ai.completion"] = "Use 'gen_ai.output.messages' or 'gen_ai.client.inference.operation.details' instead.",
-        ["gen_ai.prompt"] = "Use 'gen_ai.input.messages', 'gen_ai.system_instructions', or 'gen_ai.client.inference.operation.details' instead.",
-        ["http.host"] = "Use 'server.address', 'client.address', or 'http.request.header.host' depending on the usage.",
-        ["http.target"] = "Split the value into 'url.path' and 'url.query'.",
-        ["messaging.destination_publish.anonymous"] = "No replacement exists at this time.",
-        ["messaging.destination_publish.name"] = "No replacement exists at this time.",
-        ["messaging.rocketmq.client_group"] = "Use 'messaging.consumer.group.name' on consumer spans; there is no producer replacement.",
-        ["net.sock.family"] = "Split the value into 'network.transport' and 'network.type'.",
-        ["net.sock.peer.name"] = "No replacement exists at this time.",
-        ["rpc.grpc.status_code"] = "Use the string representation on 'rpc.response.status_code' instead.",
-        ["rpc.jsonrpc.error_code"] = "Use the string representation on 'rpc.response.status_code' instead.",
-        ["rpc.jsonrpc.error_message"] = "Use the span status description instead.",
-        ["rpc.service"] = "Include the service in a fully-qualified 'rpc.method' instead."
-    };
-
     private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
@@ -59,7 +30,7 @@ public sealed partial class Al0133ContextSensitiveDeprecatedSemconvAnalyzer : Al
         var value = literal.Token.ValueText;
 
         if (string.IsNullOrEmpty(value)
-            || !DeprecatedAttributes.TryGetValue(value, out var guidance)
+            || !OpenTelemetryDeprecatedSemconvCatalog.TryGetContextSensitiveDeprecatedAttribute(value, out var guidance)
             || !IsInTelemetryContext(literal)) {
             return;
         }

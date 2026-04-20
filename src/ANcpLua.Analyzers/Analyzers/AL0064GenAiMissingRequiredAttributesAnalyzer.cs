@@ -19,11 +19,7 @@ public sealed partial class Al0064GenAiMissingRequiredAttributesAnalyzer : AlAna
     /// <summary>The diagnostic identifier for AL0064.</summary>
     private const string DiagnosticId = "AL0064";
 
-    private static readonly string[] RequiredGenAiAttributes = [
-        "gen_ai.provider.name",
-        "gen_ai.request.model",
-        "gen_ai.operation.name"
-    ];
+    private static readonly string[] RequiredGenAiAttributes = OpenTelemetryGenAiSemconvFacts.RequiredAttributeKeys;
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticId,

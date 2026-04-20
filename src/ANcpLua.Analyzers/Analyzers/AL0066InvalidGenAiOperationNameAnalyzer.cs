@@ -22,19 +22,6 @@ public sealed partial class Al0066InvalidGenAiOperationNameAnalyzer : AlAnalyzer
     /// <summary>The diagnostic identifier for AL0066.</summary>
     private const string DiagnosticId = "AL0066";
 
-    private static readonly HashSet<string> ValidOperationNames =
-        new(StringComparer.OrdinalIgnoreCase) {
-            "chat",
-            "generate_content",
-            "text_completion",
-            "embeddings",
-            "retrieval",
-            "create_agent",
-            "invoke_agent",
-            "execute_tool",
-            "invoke_workflow"
-        };
-
     private static readonly DiagnosticDescriptor Rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.GenAI,
@@ -55,7 +42,7 @@ public sealed partial class Al0066InvalidGenAiOperationNameAnalyzer : AlAnalyzer
             invocation.Arguments[0].Value.ConstantValue is not { HasValue: true, Value: string tagName } ||
             !tagName.EqualsIgnoreCase("gen_ai.operation.name") ||
             invocation.Arguments[1].Value.ConstantValue is not { HasValue: true, Value: string operationName } ||
-            ValidOperationNames.Contains(operationName)) {
+            OpenTelemetryGenAiSemconvFacts.IsValidOperationName(operationName)) {
             return;
         }
 

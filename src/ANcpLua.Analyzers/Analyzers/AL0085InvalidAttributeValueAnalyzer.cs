@@ -16,38 +16,6 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0085InvalidAttributeValueAnalyzer : AlAnalyzer {
-    /// <summary>Known gen_ai.provider.name values from semantic conventions.</summary>
-    private static readonly HashSet<string> ValidGenAiProviders = new(StringComparer.OrdinalIgnoreCase) {
-        "openai",
-        "anthropic",
-        "cohere",
-        "azure.ai.inference",
-        "azure.ai.openai",
-        "gcp.gen_ai",
-        "gcp.vertex_ai",
-        "gcp.gemini",
-        "ibm.watsonx.ai",
-        "aws.bedrock",
-        "perplexity",
-        "x_ai",
-        "deepseek",
-        "groq",
-        "mistral_ai"
-    };
-
-    /// <summary>Known gen_ai.operation.name values from semantic conventions.</summary>
-    private static readonly HashSet<string> ValidGenAiOperations = new(StringComparer.OrdinalIgnoreCase) {
-        "chat",
-        "generate_content",
-        "text_completion",
-        "embeddings",
-        "retrieval",
-        "create_agent",
-        "invoke_agent",
-        "execute_tool",
-        "invoke_workflow"
-    };
-
     /// <summary>Attribute validators by attribute name.</summary>
     private static readonly Dictionary<string, AttributeValidator> Validators = new(StringComparer.OrdinalIgnoreCase) {
         ["http.response.status_code"] = new AttributeValidator(
@@ -137,10 +105,10 @@ public sealed partial class Al0085InvalidAttributeValueAnalyzer : AlAnalyzer {
             or "HEAD" or "OPTIONS" or "TRACE" or "CONNECT" or "_OTHER";
 
     private static bool ValidateGenAiProvider(string value) =>
-        ValidGenAiProviders.Contains(value);
+        OpenTelemetryGenAiSemconvFacts.IsValidProviderName(value);
 
     private static bool ValidateGenAiOperation(string value) =>
-        ValidGenAiOperations.Contains(value);
+        OpenTelemetryGenAiSemconvFacts.IsValidOperationName(value);
 
     private static bool ValidatePositiveInteger(string value) =>
         int.TryParse(value, out var num) && num > 0;
