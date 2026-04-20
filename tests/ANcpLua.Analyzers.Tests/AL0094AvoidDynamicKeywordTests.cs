@@ -1,5 +1,3 @@
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Testing;
 using AnalyzerTestBase = ANcpLua.Roslyn.Utilities.Testing.AnalyzerTest<ANcpLua.Analyzers.Analyzers.Al0094AvoidDynamicKeywordAnalyzer>;
 
 namespace ANcpLua.Analyzers.Tests;
@@ -8,83 +6,44 @@ namespace ANcpLua.Analyzers.Tests;
 ///     Tests for AL0094: Avoid 'dynamic' keyword in AOT-published code.
 /// </summary>
 /// <remarks>
-///     Dynamic method calls generate both a DynamicMemberReference (d.Foo) and a
-///     DynamicInvocation (d.Foo()) operation, so tests must expect both diagnostics.
+///     The analyzer is gated on MSBuild <c>PublishAot=true</c> or <c>IsAotCompatible=true</c>.
+///     In unit tests without a .globalconfig the properties aren't set, so the analyzer correctly
+///     produces no diagnostics. The positive case (AOT project using dynamic) is verified by
+///     build-time integration tests — same pattern as AL0096.
 /// </remarks>
 public sealed partial class Al0094AvoidDynamicKeywordTests : AnalyzerTestBase {
     [Fact]
-    public Task ShouldReportDynamicInvocation() {
-        const string Source = """
-                              public class C {
-                                  public void M() {
-                                      dynamic d = 42;
-                                      d.ToString();
-                                  }
-                              }
-                              """;
-
-        // d.ToString() produces both a DynamicMemberReference and a DynamicInvocation
-        var expected = new[] {
-            new DiagnosticResult("AL0094", DiagnosticSeverity.Warning)
-                .WithSpan(4, 9, 4, 21)
-                .WithArguments("dynamic invocation"),
-            new DiagnosticResult("AL0094", DiagnosticSeverity.Warning)
-                .WithSpan(4, 9, 4, 19)
-                .WithArguments("dynamic member reference")
-        };
-
-        return VerifyAsync(Source, [], expected);
-    }
-
-    [Fact]
-    public Task ShouldReportDynamicMemberReference() =>
+    public Task ShouldNotReportDynamicInvocationOutsideAotContext() =>
         VerifyAsync("""
                     public class C {
                         public void M() {
-                            dynamic d = new object();
-                            var x = {|AL0094:d.Name|};
+                            dynamic d = 42;
+                            d.ToString();
                         }
                     }
                     """);
 
     [Fact]
-    public Task ShouldReportDynamicIndexerAccess() =>
+    public Task ShouldNotReportDynamicMemberReferenceOutsideAotContext() =>
         VerifyAsync("""
                     public class C {
                         public void M() {
                             dynamic d = new object();
-                            var x = {|AL0094:d[0]|};
+                            var x = d.Name;
                         }
                     }
                     """);
 
     [Fact]
-    public Task ShouldReportMultipleDynamicOperations() {
-        const string Source = """
-                              public class C {
-                                  public void M() {
-                                      dynamic d = new object();
-                                      d.Foo();
-                                      var x = d.Bar;
-                                  }
-                              }
-                              """;
-
-        // d.Foo() produces DynamicInvocation + DynamicMemberReference; d.Bar produces DynamicMemberReference
-        var expected = new[] {
-            new DiagnosticResult("AL0094", DiagnosticSeverity.Warning)
-                .WithSpan(4, 9, 4, 16)
-                .WithArguments("dynamic invocation"),
-            new DiagnosticResult("AL0094", DiagnosticSeverity.Warning)
-                .WithSpan(5, 17, 5, 22)
-                .WithArguments("dynamic member reference"),
-            new DiagnosticResult("AL0094", DiagnosticSeverity.Warning)
-                .WithSpan(4, 9, 4, 14)
-                .WithArguments("dynamic member reference")
-        };
-
-        return VerifyAsync(Source, [], expected);
-    }
+    public Task ShouldNotReportDynamicIndexerAccessOutsideAotContext() =>
+        VerifyAsync("""
+                    public class C {
+                        public void M() {
+                            dynamic d = new object();
+                            var x = d[0];
+                        }
+                    }
+                    """);
 
     [Fact]
     public Task ShouldNotReportStaticTypedCode() =>

@@ -36,6 +36,10 @@ public sealed partial class Al0095AvoidExpressionCompileAnalyzer : AlAnalyzer {
         context.RegisterCompilationStartAction(OnCompilationStart);
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
+        if (!AotContext.IsAotTargeting(context.Options.AnalyzerConfigOptionsProvider.GlobalOptions)) {
+            return;
+        }
+
         if (context.Compilation.GetTypeByMetadataName(LambdaExpressionTypeName) is not { } lambdaExpressionType) {
             return;
         }

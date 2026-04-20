@@ -30,14 +30,22 @@ public sealed partial class Al0094AvoidDynamicKeywordAnalyzer : AlAnalyzer {
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
-    /// <summary>Registers operation actions to detect dynamic keyword usage.</summary>
+    /// <summary>Registers operation actions to detect dynamic keyword usage, gated on AOT-targeting projects.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
-        context.RegisterOperationAction(
-            AnalyzeOperation,
-            OperationKind.DynamicMemberReference,
-            OperationKind.DynamicInvocation,
-            OperationKind.DynamicObjectCreation,
-            OperationKind.DynamicIndexerAccess);
+        context.RegisterCompilationStartAction(static compilationContext =>
+        {
+            if (!AotContext.IsAotTargeting(compilationContext.Options.AnalyzerConfigOptionsProvider.GlobalOptions))
+            {
+                return;
+            }
+
+            compilationContext.RegisterOperationAction(
+                AnalyzeOperation,
+                OperationKind.DynamicMemberReference,
+                OperationKind.DynamicInvocation,
+                OperationKind.DynamicObjectCreation,
+                OperationKind.DynamicIndexerAccess);
+        });
 
     private static void AnalyzeOperation(OperationAnalysisContext context) {
         var description = context.Operation.Kind switch {

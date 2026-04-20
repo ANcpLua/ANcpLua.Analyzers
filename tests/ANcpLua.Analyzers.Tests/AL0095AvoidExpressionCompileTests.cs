@@ -6,9 +6,15 @@ namespace ANcpLua.Analyzers.Tests;
 /// <summary>
 ///     Tests for AL0095: Avoid Expression.Compile() in AOT context.
 /// </summary>
+/// <remarks>
+///     The analyzer is gated on MSBuild <c>PublishAot=true</c> or <c>IsAotCompatible=true</c>.
+///     In unit tests without a .globalconfig the properties aren't set, so the analyzer correctly
+///     produces no diagnostics. The positive case (AOT project calling Expression.Compile) is
+///     verified by build-time integration tests — same pattern as AL0096.
+/// </remarks>
 public sealed partial class Al0095AvoidExpressionCompileTests : AnalyzerTest<Al0095AvoidExpressionCompileAnalyzer> {
     [Fact]
-    public Task ShouldReportExpressionCompile() =>
+    public Task ShouldNotReportExpressionCompileOutsideAotContext() =>
         VerifyAsync("""
                     using System;
                     using System.Linq.Expressions;
@@ -16,26 +22,26 @@ public sealed partial class Al0095AvoidExpressionCompileTests : AnalyzerTest<Al0
                     public class C {
                         public void M() {
                             Expression<Func<int, int>> expr = x => x + 1;
-                            var func = {|AL0095:expr.Compile()|};
+                            var func = expr.Compile();
                         }
                     }
                     """);
 
     [Fact]
-    public Task ShouldReportCompileOnLambdaExpressionVariable() =>
+    public Task ShouldNotReportCompileOnLambdaExpressionVariableOutsideAotContext() =>
         VerifyAsync("""
                     using System;
                     using System.Linq.Expressions;
 
                     public class C {
                         public void M(LambdaExpression lambda) {
-                            var d = {|AL0095:lambda.Compile()|};
+                            var d = lambda.Compile();
                         }
                     }
                     """);
 
     [Fact]
-    public Task ShouldReportCompileWithPreferInterpretation() =>
+    public Task ShouldNotReportCompileWithPreferInterpretationOutsideAotContext() =>
         VerifyAsync("""
                     using System;
                     using System.Linq.Expressions;
@@ -43,7 +49,7 @@ public sealed partial class Al0095AvoidExpressionCompileTests : AnalyzerTest<Al0
                     public class C {
                         public void M() {
                             Expression<Func<int, int>> expr = x => x + 1;
-                            var func = {|AL0095:expr.Compile(true)|};
+                            var func = expr.Compile(true);
                         }
                     }
                     """);
