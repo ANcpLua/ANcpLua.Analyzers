@@ -1,6 +1,6 @@
 namespace ANcpLua.Analyzers.Analyzers;
 
-internal static class OpenTelemetryGenAiSemconvFacts {
+internal static partial class OpenTelemetryGenAiSemconvFacts {
     internal static readonly string[] RequiredAttributeKeys = [
         "gen_ai.provider.name",
         "gen_ai.request.model",

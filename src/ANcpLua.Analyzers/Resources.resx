@@ -1314,14 +1314,4 @@
     <data name="AL0133AnalyzerDescription" xml:space="preserve">
         <value>Some deprecated semantic convention attributes cannot be migrated with a simple 1:1 rename. This analyzer highlights attributes that require context-sensitive migration or have no direct replacement.</value>
     </data>
-    <!-- AL0134: Unknown telemetry attribute key -->
-    <data name="AL0134AnalyzerTitle" xml:space="preserve">
-        <value>Unknown telemetry attribute key</value>
-    </data>
-    <data name="AL0134AnalyzerMessageFormat" xml:space="preserve">
-        <value>Attribute '{0}' is not part of the official OpenTelemetry semantic conventions</value>
-    </data>
-    <data name="AL0134AnalyzerDescription" xml:space="preserve">
-        <value>Telemetry attribute keys should come from the official OpenTelemetry semantic conventions. Unknown keys often indicate ad-hoc local conventions or accidental schema drift.</value>
-    </data>
 </root>

@@ -71,6 +71,10 @@ public sealed partial class Al0074DeprecatedGenAiAttributeAnalyzer : AlAnalyzer 
 
         while (current is not null) {
             switch (current) {
+                // Dictionary-initializer key (`["foo"] = value`) is lookup-table data, not a tag write.
+                // Short-circuit before the InitializerExpressionSyntax case below would spuriously match.
+                case ImplicitElementAccessSyntax:
+                    return false;
                 case ElementAccessExpressionSyntax elementAccess
                     when IsLikelyTelemetryContainer(GetIdentifierName(elementAccess.Expression)):
                 case InvocationExpressionSyntax invocation

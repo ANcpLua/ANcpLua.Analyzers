@@ -51,6 +51,39 @@ public sealed partial class Al0133ContextSensitiveDeprecatedSemconvTests : Analy
 
     [Theory]
     [InlineData("""
+                namespace System.Diagnostics {
+                    public readonly struct ActivityEvent {
+                        public ActivityEvent(string name) { }
+                    }
+                }
+
+                public class C {
+                    void M() {
+                        _ = new System.Diagnostics.ActivityEvent([|"event.gen_ai.system.message"|]);
+                    }
+                }
+                """)]
+    [InlineData("""
+                namespace System.Diagnostics {
+                    public readonly struct ActivityEvent {
+                        public ActivityEvent(string name) { }
+                    }
+
+                    public class Activity {
+                        public void AddEvent(ActivityEvent activityEvent) { }
+                    }
+                }
+
+                public class C {
+                    void M(System.Diagnostics.Activity activity) {
+                        activity.AddEvent(new System.Diagnostics.ActivityEvent([|"event.rpc.message"|]));
+                    }
+                }
+                """)]
+    public Task ShouldReportDeprecatedEventNames(string source) => VerifyAsync(source);
+
+    [Theory]
+    [InlineData("""
                 using System.Collections.Generic;
 
                 public class C {
@@ -64,6 +97,19 @@ public sealed partial class Al0133ContextSensitiveDeprecatedSemconvTests : Analy
                 public class C {
                     void M() {
                         var key = "http.host";
+                    }
+                }
+                """)]
+    [InlineData("""
+                namespace System.Diagnostics {
+                    public readonly struct ActivityEvent {
+                        public ActivityEvent(string name) { }
+                    }
+                }
+
+                public class C {
+                    void M() {
+                        _ = new System.Diagnostics.ActivityEvent("model.inference");
                     }
                 }
                 """)]

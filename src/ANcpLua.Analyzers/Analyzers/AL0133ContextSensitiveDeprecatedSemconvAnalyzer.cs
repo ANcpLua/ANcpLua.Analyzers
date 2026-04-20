@@ -30,12 +30,27 @@ public sealed partial class Al0133ContextSensitiveDeprecatedSemconvAnalyzer : Al
         var value = literal.Token.ValueText;
 
         if (string.IsNullOrEmpty(value)
-            || !OpenTelemetryDeprecatedSemconvCatalog.TryGetContextSensitiveDeprecatedAttribute(value, out var guidance)
-            || !IsInTelemetryContext(literal)) {
+            || !TryGetDeprecatedGuidance(literal, value, out var guidance)
+            || guidance is null) {
             return;
         }
 
         context.ReportDiagnostic(Rule, literal.GetLocation(), value, guidance);
+    }
+
+    private static bool TryGetDeprecatedGuidance(LiteralExpressionSyntax literal, string value, out string? guidance) {
+        guidance = null;
+
+        if (!OpenTelemetryDeprecatedSemconvCatalog.TryGetContextSensitiveDeprecatedName(value, out var resolved)) {
+            return false;
+        }
+
+        if (!IsInTelemetryContext(literal) && !IsInTelemetryEventContext(literal)) {
+            return false;
+        }
+
+        guidance = resolved;
+        return true;
     }
 
     private static bool IsInTelemetryContext(SyntaxNode node) {
@@ -50,6 +65,24 @@ public sealed partial class Al0133ContextSensitiveDeprecatedSemconvAnalyzer : Al
             }
 
             current = current.Parent;
+        }
+
+        return false;
+    }
+
+
+    private static bool IsInTelemetryEventContext(SyntaxNode node) {
+        for (var current = node.Parent; current is not null; current = current.Parent) {
+            if (current is ObjectCreationExpressionSyntax creation &&
+                creation.Type.ToString().ContainsOrdinal("ActivityEvent")) {
+                return true;
+            }
+
+            if (current is InvocationExpressionSyntax invocation &&
+                GetMethodName(invocation) is { } methodName &&
+                methodName.EqualsOrdinal("AddEvent")) {
+                return true;
+            }
         }
 
         return false;
