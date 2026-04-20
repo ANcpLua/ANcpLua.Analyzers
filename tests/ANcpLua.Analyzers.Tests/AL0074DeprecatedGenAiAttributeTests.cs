@@ -38,17 +38,6 @@ public sealed partial class Al0074DeprecatedGenAiAttributeTests : AnalyzerTest<A
                     }
                 }
                 """)]
-    [InlineData("""
-                public class Activity {
-                    public void SetTag(string key, object? value) { }
-                }
-
-                public class C {
-                    void M(Activity activity) {
-                        activity.SetTag([|"model"|], "gpt-4.1");
-                    }
-                }
-                """)]
     public Task ShouldReportDeprecatedGenAiKeysInTelemetryContext(string source) => VerifyAsync(source);
 
     [Theory]

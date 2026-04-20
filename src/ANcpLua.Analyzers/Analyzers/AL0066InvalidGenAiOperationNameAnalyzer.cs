@@ -39,9 +39,9 @@ public sealed partial class Al0066InvalidGenAiOperationNameAnalyzer : AlAnalyzer
 
         if (invocation.TargetMethod.Name != "SetTag" ||
             invocation.Arguments.Length < 2 ||
-            invocation.Arguments[0].Value.ConstantValue is not { HasValue: true, Value: string tagName } ||
+            invocation.Arguments[0].Value.UnwrapAllConversions().ConstantValue is not { HasValue: true, Value: string tagName } ||
             !tagName.EqualsIgnoreCase("gen_ai.operation.name") ||
-            invocation.Arguments[1].Value.ConstantValue is not { HasValue: true, Value: string operationName } ||
+            invocation.Arguments[1].Value.UnwrapAllConversions().ConstantValue is not { HasValue: true, Value: string operationName } ||
             OpenTelemetryGenAiSemconvFacts.IsValidOperationName(operationName)) {
             return;
         }

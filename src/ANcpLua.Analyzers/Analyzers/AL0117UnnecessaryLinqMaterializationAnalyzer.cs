@@ -61,7 +61,14 @@ public sealed partial class Al0117UnnecessaryLinqMaterializationAnalyzer : AlAna
         "System.Collections.Generic.IList`1",
         "System.Collections.Generic.IReadOnlyList`1",
         "System.Collections.Generic.ICollection`1",
-        "System.Collections.Generic.IReadOnlyCollection`1"
+        "System.Collections.Generic.IReadOnlyCollection`1",
+        "System.Collections.Generic.HashSet`1",
+        "System.Collections.Generic.IReadOnlySet`1",
+        "System.Collections.Immutable.ImmutableArray`1",
+        "System.Collections.Immutable.ImmutableList`1",
+        "System.Collections.Immutable.IImmutableList`1",
+        "System.Collections.Immutable.ImmutableHashSet`1",
+        "System.Collections.Frozen.FrozenSet`1"
     ];
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {

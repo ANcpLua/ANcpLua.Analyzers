@@ -1736,3 +1736,16 @@ dotnet_diagnostic.AL0041.severity = warning
 dotnet_diagnostic.AL0042.severity = warning
 dotnet_diagnostic.AL0043.severity = warning
 dotnet_diagnostic.AL0044.severity = warning
+
+# =============================================================================
+# Semconv catalog files — they ARE the deprecation source-of-truth for AL0074.
+# The dictionary keys listing deprecated attribute names would cause AL0074 to
+# match its own lookup table (dictionary-initializer keys parse as InitializerExpressionSyntax
+# which the telemetry-context heuristic treats as a tag write). Scoped suppression
+# is the only honest answer — not a code smell to fix, the analyzer can't meaningfully
+# analyze its own catalog.
+# =============================================================================
+[src/ANcpLua.Analyzers/Semconv/*.cs]
+dotnet_diagnostic.AL0074.severity = none
+dotnet_diagnostic.AL0010.severity = none
+dotnet_diagnostic.AL0039.severity = none

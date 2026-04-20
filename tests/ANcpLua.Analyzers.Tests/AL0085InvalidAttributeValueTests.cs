@@ -41,13 +41,14 @@ public sealed partial class Al0085InvalidAttributeValueTests : AnalyzerTest<Al00
     [Theory]
     [InlineData("unknown-provider")]
     [InlineData("gpt4")]
+    // OTel semconv 1.40+ moved the provider attribute from `gen_ai.system` to `gen_ai.provider.name`.
     public Task ShouldReportInvalidGenAiSystem(string invalidValue) =>
         VerifyAsync($$"""
                       {{ActivityPolyfill}}
 
                       public class C {
                           void M(System.Diagnostics.Activity activity) {
-                              activity.SetTag("gen_ai.system", [|"{{invalidValue}}"|]);
+                              activity.SetTag("gen_ai.provider.name", [|"{{invalidValue}}"|]);
                           }
                       }
                       """);
@@ -194,12 +195,15 @@ public sealed partial class Al0085InvalidAttributeValueTests : AnalyzerTest<Al00
         """);
 
     [Fact]
-    public Task ShouldReportInvalidGrpcStatusCode() => VerifyAsync($$"""
+    // OTel semconv 1.40+ moved the gRPC status code into the unified `rpc.response.status_code`
+    // attribute. The replacement is typed as string (e.g. "DEADLINE_EXCEEDED"); AL0085 flags
+    // empty / whitespace-only values.
+    public Task ShouldReportInvalidRpcResponseStatusCode() => VerifyAsync($$"""
         {{ActivityPolyfill}}
 
         public class C {
             void M(System.Diagnostics.Activity activity) {
-                activity.SetTag("rpc.grpc.status_code", [|17|]);
+                activity.SetTag("rpc.response.status_code", [|""|]);
             }
         }
         """);

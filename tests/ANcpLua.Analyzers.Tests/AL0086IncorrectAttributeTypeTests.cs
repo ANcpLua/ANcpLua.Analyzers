@@ -29,7 +29,7 @@ public sealed partial class Al0086IncorrectAttributeTypeTests : AnalyzerTest<Al0
     [InlineData("gen_ai.usage.input_tokens", "\"100\"")]
     [InlineData("gen_ai.usage.output_tokens", "\"50\"")]
     [InlineData("http.response.status_code", "\"200\"")]
-    [InlineData("db.operation.batch_size", "\"10\"")]
+    [InlineData("db.operation.batch.size", "\"10\"")]
     [InlineData("server.port", "\"8080\"")]
     public Task ShouldReportStringInsteadOfInt(string attributeName, string value) =>
         VerifyAsync($$"""
@@ -60,7 +60,7 @@ public sealed partial class Al0086IncorrectAttributeTypeTests : AnalyzerTest<Al0
     [InlineData("gen_ai.usage.input_tokens", "100")]
     [InlineData("gen_ai.usage.output_tokens", "50")]
     [InlineData("http.response.status_code", "200")]
-    [InlineData("db.operation.batch_size", "10")]
+    [InlineData("db.operation.batch.size", "10")]
     [InlineData("server.port", "8080")]
     public Task ShouldNotReportCorrectIntType(string attributeName, string value) =>
         VerifyAsync($$"""

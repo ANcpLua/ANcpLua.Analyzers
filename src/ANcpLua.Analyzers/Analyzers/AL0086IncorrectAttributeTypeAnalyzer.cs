@@ -15,7 +15,8 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///         <list type="bullet">
 ///             <item>gen_ai.usage.input_tokens: should be int, not string</item>
 ///             <item>http.response.status_code: should be int, not string</item>
-///             <item>db.operation.batch_size: should be int, not string</item>
+///             <item>db.operation.batch.size: should be int, not string</item>
+///             <item>rpc.response.status_code: should be string, not int</item>
 ///         </list>
 ///     </para>
 ///     <para>
@@ -60,6 +61,9 @@ public sealed partial class Al0086IncorrectAttributeTypeAnalyzer : AlAnalyzer {
         // Database attributes
         ["db.operation.batch.size"] = ExpectedType.WholeNumber,
         ["db.response.status_code"] = ExpectedType.CharacterSequence,
+
+        // RPC attributes (semconv 1.40 unified gRPC and ConnectRPC into a single string status_code)
+        ["rpc.response.status_code"] = ExpectedType.CharacterSequence,
 
         // Network attributes
         ["network.peer.port"] = ExpectedType.WholeNumber,

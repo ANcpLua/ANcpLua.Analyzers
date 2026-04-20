@@ -48,6 +48,12 @@ public sealed partial class Al0025PreferStaticLambdaAnalyzer : AlAnalyzer {
             return false;
         }
 
+        // Skip lambdas converted to Expression<T> — IQueryable/EF Core providers parse the tree.
+        // 'static' is legal there but adds no runtime value and risks confusing provider-specific visitors.
+        if (IsInExpressionTree(lambda, semanticModel)) {
+            return false;
+        }
+
         // Use data flow analysis to check for captured variables
         var dataFlow = ModelExtensions.AnalyzeDataFlow(semanticModel, lambda);
         if (!dataFlow.Succeeded) {
@@ -61,6 +67,19 @@ public sealed partial class Al0025PreferStaticLambdaAnalyzer : AlAnalyzer {
 
         // Check if the lambda references 'this' implicitly
         return !ReferencesThis(lambda, semanticModel);
+    }
+
+    private static bool IsInExpressionTree(AnonymousFunctionExpressionSyntax lambda, SemanticModel semanticModel) {
+        var converted = semanticModel.GetTypeInfo(lambda).ConvertedType;
+        while (converted is not null) {
+            if (converted is INamedTypeSymbol named
+                && named.ContainingNamespace?.ToDisplayString() == "System.Linq.Expressions"
+                && named.Name == "Expression") {
+                return true;
+            }
+            converted = converted.BaseType;
+        }
+        return false;
     }
 
     private static bool HasStaticModifier(AnonymousFunctionExpressionSyntax lambda) =>

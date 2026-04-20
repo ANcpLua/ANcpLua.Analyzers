@@ -85,6 +85,9 @@ public sealed partial class Al0061ActivityMissingSemconvTests : AnalyzerTest<Al0
             """);
 
     [Fact]
+    // `gen_ai.system` is officially deprecated (→ `gen_ai.provider.name` per semconv 1.40)
+    // but still clearly GenAI semconv. AL0061 shouldn't double-flag it as "missing semconv"
+    // when the author is already migrating — AL0074 owns the migration message.
     public Task ShouldNotReport_WhenDeprecatedGenAiAliasMapsToCurrentConvention() =>
         VerifyAsync($$"""
             {{ActivityStubs}}
@@ -94,7 +97,7 @@ public sealed partial class Al0061ActivityMissingSemconvTests : AnalyzerTest<Al0
 
                 void M() {
                     var activity = Source.StartActivity("gen_ai.chat");
-                    activity?.SetTag("model", "gpt-4.1");
+                    activity?.SetTag("gen_ai.system", "openai");
                 }
             }
             """);

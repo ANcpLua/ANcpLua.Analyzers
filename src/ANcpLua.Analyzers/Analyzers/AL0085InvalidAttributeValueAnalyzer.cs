@@ -76,12 +76,15 @@ public sealed partial class Al0085InvalidAttributeValueAnalyzer : AlAnalyzer {
 
         if (invocation.TargetMethod.Name is not ("SetTag" or "SetAttribute" or "Add")
             || invocation.Arguments.Length < 2
-            || invocation.Arguments[0].Value.ConstantValue is not { HasValue: true, Value: string attributeName }
+            || invocation.Arguments[0].Value.UnwrapAllConversions().ConstantValue is not { HasValue: true, Value: string attributeName }
             || !Validators.TryGetValue(attributeName, out var validator)) {
             return;
         }
 
-        var valueArg = invocation.Arguments[1].Value;
+        // Unwrap implicit conversions (e.g. string -> object? when the Activity overload takes object).
+        // Without this, callers that pass a string literal to a `object?` parameter lose ConstantValue
+        // and the validator never runs.
+        var valueArg = invocation.Arguments[1].Value.UnwrapAllConversions();
 
         if (valueArg.ConstantValue.HasValue) {
             var valueString = valueArg.ConstantValue.Value?.ToString() ?? string.Empty;

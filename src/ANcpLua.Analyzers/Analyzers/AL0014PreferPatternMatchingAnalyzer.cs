@@ -72,6 +72,13 @@ public sealed partial class Al0014PreferPatternMatchingAnalyzer : AlAnalyzer {
             return;
         }
 
+        // Skip when the user has overloaded operator == / != — swapping to 'is' silently changes
+        // semantics (operator bypass → reference/pattern compare). Typed-quantity libraries like
+        // UnitsNet rely on this operator for value semantics; the "fix" would be a real regression.
+        if (operation.OperatorMethod is not null) {
+            return;
+        }
+
         if (!TryGetComparisonInfo(operation, out var isNullCheck, out var expressionIsLeft)) {
             return;
         }
