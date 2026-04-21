@@ -27,7 +27,9 @@ public sealed partial class Al0131DirectGenAiSdkUsageAnalyzer : AlAnalyzer {
 
     /// <summary>
     ///     Direct-SDK type metadata names paired with a short display label. <c>IChatClient</c> is
-    ///     intentionally absent — it is the instrumented abstraction.
+    ///     intentionally absent — it is the instrumented abstraction. Likewise <c>AIAgent</c>,
+    ///     <c>ChatClientAgent</c>, and <c>DelegatingAIAgent</c> are NOT bypasses — they are the
+    ///     Microsoft.Agents.AI abstractions the framework expects consumers to call through.
     /// </summary>
     private static readonly (string MetadataName, string Label)[] SdkTypes = [
         ("OpenAI.Chat.ChatClient", "OpenAI Chat"),
@@ -38,9 +40,6 @@ public sealed partial class Al0131DirectGenAiSdkUsageAnalyzer : AlAnalyzer {
         ("Anthropic.Messaging.MessageClient", "Anthropic Messaging"),
         ("OllamaSharp.OllamaApiClient", "Ollama"),
         ("Azure.AI.OpenAI.OpenAIClient", "Azure.AI.OpenAI"),
-        ("Microsoft.Agents.AI.AIAgent", "Microsoft.Agents.AI"),
-        ("Microsoft.Agents.AI.ChatClientAgent", "Microsoft.Agents.AI"),
-        ("Microsoft.Agents.AI.DelegatingAIAgent", "Microsoft.Agents.AI"),
         ("Cohere.CohereClient", "Cohere")
     ];
 
