@@ -113,5 +113,20 @@ public sealed partial class Al0133ContextSensitiveDeprecatedSemconvTests : Analy
                     }
                 }
                 """)]
+    // Migration-dictionary initializer: deprecated attribute names as KEYS of a plain
+    // Dictionary<string,string> are a legitimate use case (mapping old → new). The rule
+    // must only fire when the containing object-creation is itself a telemetry type.
+    [InlineData("""
+                using System.Collections.Generic;
+
+                public static class SchemaNormalizer {
+                    public static readonly Dictionary<string, string> DeprecatedMappings =
+                        new() {
+                            ["gen_ai.prompt"] = "gen_ai.input.messages",
+                            ["gen_ai.completion"] = "gen_ai.output.messages",
+                            ["rpc.service"] = "rpc.service.name",
+                        };
+                }
+                """)]
     public Task ShouldNotReportCurrentOrNonTelemetryAttributes(string source) => VerifyAsync(source);
 }

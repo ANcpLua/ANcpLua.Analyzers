@@ -60,7 +60,7 @@ public sealed partial class Al0133ContextSensitiveDeprecatedSemconvAnalyzer : Al
             if (IsTelemetryElementAccess(current) ||
                 IsTelemetryInvocation(current) ||
                 IsTelemetryInitializer(current) ||
-                current is AssignmentExpressionSyntax { Parent: InitializerExpressionSyntax }) {
+                IsAssignmentInTelemetryInitializer(current)) {
                 return true;
             }
 
@@ -69,6 +69,15 @@ public sealed partial class Al0133ContextSensitiveDeprecatedSemconvAnalyzer : Al
 
         return false;
     }
+
+    // Dictionary-initializer key assignments (e.g. `["gen_ai.prompt"] = value`) count as a telemetry
+    // context only when the CONTAINING object-creation is itself a telemetry type — otherwise plain
+    // migration maps like `new Dictionary<string,string> { ["gen_ai.prompt"] = "..." }` produce
+    // false positives. The previous check accepted any dictionary initializer unconditionally.
+    private static bool IsAssignmentInTelemetryInitializer(SyntaxNode node) =>
+        node is AssignmentExpressionSyntax {
+            Parent: InitializerExpressionSyntax { Parent: ObjectCreationExpressionSyntax creation }
+        } && IsTelemetryTypeName(creation.Type.ToString());
 
 
     private static bool IsInTelemetryEventContext(SyntaxNode node) {
