@@ -51,7 +51,9 @@
         <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" PrivateAssets="all">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all"/>
+        <!-- Microsoft.CodeAnalysis.CSharp is auto-injected by ANcpLua.NET.Sdk's SourceGenerators.props
+             (detected via project-name pattern "*Analyzer*"), pinned to $(SourceGeneratorRoslynVersion)
+             for IDE host compat. Explicit reference here would duplicate. -->
     </ItemGroup>
 
     <ItemGroup>

@@ -19,7 +19,10 @@
     <!-- Roslyn -->
     <ItemGroup Label="Roslyn">
         <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="$(RoslynAnalyzersVersion)"/>
-        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="$(RoslynVersion)"/>
+        <!-- Microsoft.CodeAnalysis.CSharp is auto-injected by ANcpLua.NET.Sdk's SourceGenerators.props
+             for analyzer/generator projects (IsImplicitlyDefined="true"). CPM forbids a PackageVersion
+             entry for implicit references (NU1009). Version comes from $(SourceGeneratorRoslynVersion),
+             aligned to $(RoslynVersion) in Directory.Build.props. -->
         <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="$(RoslynVersion)"/>
     </ItemGroup>
 
