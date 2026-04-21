@@ -17,6 +17,7 @@ public sealed partial class Al0113MissingExceptionRecordingOnActivityTests
             public class Activity {
                 public void SetStatus(ActivityStatusCode code, string? desc = null) { }
                 public void AddEvent(ActivityEvent e) { }
+                public void AddException(System.Exception ex) { }
             }
         }
         """;
@@ -90,6 +91,25 @@ public sealed partial class Al0113MissingExceptionRecordingOnActivityTests
                     catch (System.Exception ex) {
                         activity.SetStatus(System.Diagnostics.ActivityStatusCode.Error, ex.Message);
                         activity.AddEvent(new System.Diagnostics.ActivityEvent("exception"));
+                    }
+                }
+            }
+            """);
+
+    // AddException is the .NET 9+ counterpart to OTel's RecordException — it records the
+    // exception as an ActivityEvent with the standard "exception" name and captures
+    // type/message/stack as tags. The analyzer must treat it as exception recording.
+    [Fact]
+    public Task ShouldNotReport_WhenAddExceptionCalled() =>
+        VerifyAsync($$"""
+            {{ActivityStubs}}
+
+            public class C {
+                public void M(System.Diagnostics.Activity activity) {
+                    try { throw new System.Exception(); }
+                    catch (System.Exception ex) {
+                        activity.SetStatus(System.Diagnostics.ActivityStatusCode.Error, ex.Message);
+                        activity.AddException(ex);
                     }
                 }
             }

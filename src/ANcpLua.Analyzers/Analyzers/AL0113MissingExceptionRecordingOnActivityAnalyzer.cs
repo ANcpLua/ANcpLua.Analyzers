@@ -150,6 +150,7 @@ public sealed partial class Al0113MissingExceptionRecordingOnActivityAnalyzer : 
 
         switch (methodName) {
             case "RecordException":
+            case "AddException":
                 return activityIdentifier is null || MatchesReceiver(invocation, activityIdentifier);
 
             case "AddEvent":
