@@ -37,6 +37,7 @@
         <Using Include="Microsoft.CodeAnalysis.CSharp.Syntax"/>
         <Using Include="Microsoft.CodeAnalysis.Diagnostics"/>
         <Using Include="Microsoft.CodeAnalysis.Operations"/>
+        <Using Include="System.Collections.Concurrent"/>
         <Using Include="System.Collections.Immutable"/>
         <Using Include="ANcpLua.Roslyn.Utilities"/>
         <Using Include="ANcpLua.Roslyn.Utilities.Analyzers"/>
