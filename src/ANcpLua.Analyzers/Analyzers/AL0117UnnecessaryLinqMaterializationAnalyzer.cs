@@ -139,8 +139,7 @@ public sealed partial class Al0117UnnecessaryLinqMaterializationAnalyzer : AlAna
             parent = parenthesized.Parent;
         }
 
-        return parent is IConversionOperation conversion
-            && conversion.Type?.SpecialType == SpecialType.System_Object;
+        return parent is IConversionOperation { Type.SpecialType: SpecialType.System_Object };
     }
 
     private static bool IsMaterializationLoadBearing(
@@ -152,38 +151,87 @@ public sealed partial class Al0117UnnecessaryLinqMaterializationAnalyzer : AlAna
             parent = parenthesized.Parent;
         }
 
-        // Strip away identity/implicit conversions that don't change the semantic type
-        // (e.g., List<T> -> List<T> nullable-annotation conversions). Keep conversions
-        // that widen (e.g., T[] -> IEnumerable<T>) because those indicate the consumer
-        // really wants the lazy type.
-        if (parent is IConversionOperation conversion
-            && conversion.IsImplicit
-            && conversion.Type is { } convType
-            && IsStrictCollectionType(convType, strictCollectionTypes)) {
-            return true;
+        switch (parent)
+        {
+            // Strip away identity/implicit conversions that don't change the semantic type
+            // (e.g., List<T> -> List<T> nullable-annotation conversions). Keep conversions
+            // that widen (e.g., T[] -> IEnumerable<T>) because those indicate the consumer
+            // really wants the lazy type.
+            case IConversionOperation { IsImplicit: true, Type: { } convType } when IsStrictCollectionType(convType, strictCollectionTypes):
+            // Argument to a method: check if parameter type is a concrete collection.
+            case IArgumentOperation { Parameter.Type: { } paramType } when IsStrictCollectionType(paramType, strictCollectionTypes):
+            // Return statement: check enclosing method's return type.
+            case IReturnOperation
+                when containingSymbol is IMethodSymbol enclosingMethod
+                     && IsStrictCollectionType(UnwrapTask(enclosingMethod.ReturnType), strictCollectionTypes):
+            // Local variable initializer: suppress if the local is read more than once,
+            // or if the single read consumes it in a context that requires a concrete collection.
+            case IVariableInitializerOperation { Parent: IVariableDeclaratorOperation declarator }
+                when CountLocalReads(materialization, declarator.Symbol) >= 2
+                     || IsSingleReadInConcreteCollectionContext(materialization, declarator.Symbol, strictCollectionTypes):
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    /// <summary>
+    ///     Returns true when the local is read exactly once and that read site passes it as an
+    ///     argument to a method or constructor whose parameter requires a concrete collection
+    ///     (e.g. <c>var arr = xs.Select(…).ToArray(); Foo(arr)</c> where <c>Foo</c> accepts
+    ///     <c>IReadOnlyList&lt;T&gt;</c>).  Without this check the analyzer fires even though
+    ///     removing <c>ToArray()</c> would not compile.
+    ///     <para>
+    ///         Deliberately restricted to <see cref="IArgumentOperation"/> as the final
+    ///         consumer so that <c>foreach</c> over a <c>List&lt;T&gt;</c> (which Roslyn
+    ///         models with an implicit <c>List&lt;T&gt;</c> conversion on the collection
+    ///         expression) does not accidentally suppress the diagnostic.
+    ///     </para>
+    /// </summary>
+    private static bool IsSingleReadInConcreteCollectionContext(
+        IOperation materialization,
+        ILocalSymbol local,
+        ImmutableArray<INamedTypeSymbol> strictCollectionTypes) {
+        var root = materialization;
+        while (root.Parent is not null) {
+            root = root.Parent;
         }
 
-        // Argument to a method: check if parameter type is a concrete collection.
-        if (parent is IArgumentOperation argument
-            && argument.Parameter?.Type is { } paramType
-            && IsStrictCollectionType(paramType, strictCollectionTypes)) {
-            return true;
+        ILocalReferenceOperation? singleRead = null;
+        foreach (var descendant in MsOperationExtensions.DescendantsAndSelf(root)) {
+            if (descendant is ILocalReferenceOperation localRef
+                && SymbolEqualityComparer.Default.Equals(localRef.Local, local)) {
+                if (singleRead is not null) {
+                    return false; // more than one read — handled by CountLocalReads >= 2
+                }
+
+                singleRead = localRef;
+            }
         }
 
-        // Return statement: check enclosing method's return type.
-        if (parent is IReturnOperation
-            && containingSymbol is IMethodSymbol enclosingMethod
-            && IsStrictCollectionType(UnwrapTask(enclosingMethod.ReturnType), strictCollectionTypes)) {
-            return true;
+        if (singleRead is null) {
+            return false;
         }
 
-        // Local variable initializer: suppress if the local is read more than once.
-        if (parent is IVariableInitializerOperation { Parent: IVariableDeclaratorOperation declarator }
-            && CountLocalReads(materialization, declarator.Symbol) >= 2) {
-            return true;
+        // Walk up through parentheses and at most one implicit conversion to reach the
+        // argument context.  Checking only IArgumentOperation (not the conversion target
+        // directly) prevents foreach-on-List<T> from being a false negative: Roslyn emits
+        // an implicit List<T>→List<T> conversion on foreach collection expressions, which
+        // would match IsStrictCollectionType if we checked convType alone.
+        var parent = singleRead.Parent;
+        while (parent is IParenthesizedOperation paren) {
+            parent = paren.Parent;
         }
 
-        return false;
+        if (parent is IConversionOperation { IsImplicit: true }) {
+            parent = parent.Parent;
+            while (parent is IParenthesizedOperation paren2) {
+                parent = paren2.Parent;
+            }
+        }
+
+        return parent is IArgumentOperation { Parameter.Type: { } paramType }
+               && IsStrictCollectionType(paramType, strictCollectionTypes);
     }
 
     private static int CountLocalReads(IOperation materialization, ILocalSymbol local) {
@@ -206,8 +254,7 @@ public sealed partial class Al0117UnnecessaryLinqMaterializationAnalyzer : AlAna
 
     private static ITypeSymbol UnwrapTask(ITypeSymbol type) {
         // Treat Task<T> / ValueTask<T> / IAsyncEnumerable<T> returns against their T payload.
-        if (type is INamedTypeSymbol { IsGenericType: true } named
-            && named.TypeArguments.Length == 1
+        if (type is INamedTypeSymbol { IsGenericType: true, TypeArguments.Length: 1 } named
             && named.ConstructedFrom.ToDisplayString() is
                 "System.Threading.Tasks.Task<TResult>" or
                 "System.Threading.Tasks.ValueTask<TResult>") {
@@ -220,15 +267,15 @@ public sealed partial class Al0117UnnecessaryLinqMaterializationAnalyzer : AlAna
     private static bool IsStrictCollectionType(
         ITypeSymbol? type,
         ImmutableArray<INamedTypeSymbol> strictCollectionTypes) {
-        if (type is null) {
-            return false;
+        switch (type)
+        {
+            case null:
+                return false;
+            case IArrayTypeSymbol:
+                return true;
         }
 
-        if (type is IArrayTypeSymbol) {
-            return true;
-        }
-
-        if (type is not INamedTypeSymbol named || !named.IsGenericType) {
+        if (type is not INamedTypeSymbol { IsGenericType: true } named) {
             return false;
         }
 

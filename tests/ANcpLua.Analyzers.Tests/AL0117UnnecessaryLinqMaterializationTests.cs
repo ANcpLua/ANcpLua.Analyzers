@@ -235,4 +235,39 @@ public sealed partial class Al0117UnnecessaryLinqMaterializationTests : Analyzer
                             list.Where(i => i > 0).[|ToArray|]();
                     }
                     """);
+
+    [Fact]
+    public Task ShouldNotReportWhenLocalPassedOnceToIReadOnlyListParameter() =>
+        VerifyAsync("""
+                    using System.Collections.Generic;
+                    using System.Linq;
+
+                    public class C {
+                        public void M() {
+                            var list = new List<int> { 1, 2, 3 };
+                            var items = list.Select(i => i).ToArray();
+                            Consume(items);
+                        }
+                        private static void Consume(IReadOnlyList<int> values) { }
+                    }
+                    """);
+
+    [Fact]
+    public Task ShouldNotReportWhenLocalPassedOnceToConstructorWithConcreteCollectionParameter() =>
+        VerifyAsync("""
+                    using System.Collections.Generic;
+                    using System.Linq;
+
+                    public sealed class Wrapper {
+                        public Wrapper(IReadOnlyList<int> items) { }
+                    }
+
+                    public class C {
+                        public void M() {
+                            var list = new List<int> { 1, 2, 3 };
+                            var items = list.Select(i => i).ToArray();
+                            _ = new Wrapper(items);
+                        }
+                    }
+                    """);
 }
