@@ -149,10 +149,12 @@ Both DLLs are required in the nupkg for IDE code fix integration.
 | Package | Variable | Purpose |
 |---------|----------|---------|
 | Microsoft.CodeAnalysis.CSharp | `$(RoslynVersion)` 5.3.0 | Roslyn APIs |
-| ANcpLua.Roslyn.Utilities.Sources | `$(ANcpLuaRoslynUtilitiesSourcesVersion)` 1.48.0 | Compile-time source package |
-| ANcpLua.Roslyn.Utilities.Testing | `$(ANcpLuaRoslynUtilitiesTestingVersion)` 1.48.0 | Test infrastructure |
+| ANcpLua.Roslyn.Utilities.Sources | `$(ANcpLuaRoslynUtilitiesSourcesVersion)` 1.56.1 | Compile-time source package |
+| ANcpLua.Roslyn.Utilities.Testing | `$(ANcpLuaRoslynUtilitiesTestingVersion)` 1.56.1 | Test infrastructure |
 | xunit.v3.mtp-v2 | `$(XunitV3Version)` 3.2.2 | Test framework |
 | AwesomeAssertions | `$(AwesomeAssertionsVersion)` 9.4.0 | Assertions |
+
+Re-read `Version.props` before trusting these numbers — CI bumps them under you. Roslyn.Utilities sibling repo ships `2.0.2` as of 2026-04-24 but Analyzers has not moved to the v2.x line yet.
 
 ## SDK Integration Note
 
