@@ -1,14 +1,5 @@
 <Project>
-    <!--
-      ═══════════════════════════════════════════════════════════════════════════
-      ANcpLua.Analyzers - Directory.Packages.props
-      ═══════════════════════════════════════════════════════════════════════════
-
-      Local Version.props mirrors the SDK-shipped Build/Common/Version.props.
-      The dogfooded AL0019 analyzer here only inspects the local file — until a
-      newer analyzer ships that walks SDK-imported props, the local copy stays.
-    -->
-
+    <!-- Local Version.props mirrors SDK Build/Common/Version.props; dogfooded AL0019 inspects only the local file -->
     <Import Project="$(MSBuildThisFileDirectory)Version.props"/>
 
     <PropertyGroup>
@@ -19,10 +10,7 @@
     <!-- Roslyn -->
     <ItemGroup Label="Roslyn">
         <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="$(RoslynAnalyzersVersion)"/>
-        <!-- Microsoft.CodeAnalysis.CSharp is auto-injected by ANcpLua.NET.Sdk's SourceGenerators.props
-             for analyzer/generator projects (IsImplicitlyDefined="true"). CPM forbids a PackageVersion
-             entry for implicit references (NU1009). Version comes from $(SourceGeneratorRoslynVersion),
-             aligned to $(RoslynVersion) in Directory.Build.props. -->
+        <!-- Microsoft.CodeAnalysis.CSharp is SDK-injected; NU1009 forbids a PackageVersion entry for implicit references -->
         <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="$(RoslynVersion)"/>
     </ItemGroup>
 
