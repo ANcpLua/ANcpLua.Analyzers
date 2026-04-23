@@ -208,6 +208,7 @@ dotnet pack src/ANcpLua.Analyzers/ANcpLua.Analyzers.csproj -c Release -o artifac
 
 - [ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk) - MSBuild SDK (auto-injects this analyzer package)
 - [ANcpLua.Roslyn.Utilities](https://github.com/ANcpLua/ANcpLua.Roslyn.Utilities) - Shared Roslyn helpers and extensions
+- [ANcpLua.Agents](https://github.com/ANcpLua/ANcpLua.Agents) - MAF runtime helpers + agent test infrastructure
 
 ## License
 
