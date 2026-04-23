@@ -5,7 +5,7 @@ CodeFixProvider and CodeRefactoringProvider implementations.
 ## Target
 
 - **Framework:** netstandard2.0 (required for Roslyn analyzers)
-- **Roslyn:** 5.0.0
+- **Roslyn:** 5.3.0 (pinned via `$(RoslynVersion)` in Version.props)
 
 ## File Structure
 
@@ -27,8 +27,12 @@ The base class handles boilerplate: finding the node, registering the fix, provi
 [ExportCodeFixProvider(LanguageNames.CSharp)]
 [Shared]  // Required - MEF exports are shared instances
 public sealed class Al00XXCodeFixProvider : AlCodeFixProvider<ClassDeclarationSyntax> {
+    // Reference the analyzer's public DiagnosticId directly — there is NO shared
+    // DiagnosticIds class (see src/ANcpLua.Analyzers/CLAUDE.md §1 for the rule).
+    // A CodeFixProvider referencing a DiagnosticId is precisely what flips that
+    // constant from private to public on the analyzer side.
     public override ImmutableArray<string> FixableDiagnosticIds =>
-        [DiagnosticIds.MyRule];
+        [Al00XXAnalyzer.DiagnosticId];
 
     protected override CodeAction? CreateCodeAction(
         Document document,
@@ -39,7 +43,7 @@ public sealed class Al00XXCodeFixProvider : AlCodeFixProvider<ClassDeclarationSy
         return CodeAction.Create(
             title: CodeFixResources.AL00XX_Title,
             createChangedDocument: ct => FixAsync(document, syntax, root, ct),
-            equivalenceKey: DiagnosticIds.MyRule);  // Required for FixAll
+            equivalenceKey: Al00XXAnalyzer.DiagnosticId);  // Required for FixAll
     }
 
     private static Task<Document> FixAsync(

@@ -2,7 +2,7 @@
 
 > **Purpose:** Zero-ambiguity reference so any AI agent produces compilable analyzer code on the first attempt.
 
-**Target:** netstandard2.0 | Roslyn 5.0.0 | C# 13
+**Target:** netstandard2.0 | Roslyn 5.3.0 | C# 13
 
 ---
 
@@ -415,6 +415,6 @@ tests/ANcpLua.Analyzers.Tests/
 
 ## 14. Key Dependencies
 
-- `Microsoft.CodeAnalysis.CSharp` (5.0.0) — Roslyn APIs
+- `Microsoft.CodeAnalysis.CSharp` (5.3.0, pinned via `$(RoslynVersion)` in Version.props) — Roslyn APIs
 - `ANcpLua.Roslyn.Utilities.Sources` — Compile-time source-generated helpers (extensions, categories, severities)
 - `ANcpLua.Roslyn.Utilities.Testing` — Test infrastructure (`AnalyzerTest<T>`, `VerifyAsync`)

@@ -5,9 +5,9 @@ Unit tests for all analyzers and code fixes.
 ## Target
 
 - **Framework:** net10.0
-- **Test Framework:** xunit.v3.mtp-v2 (3.2.2)
-- **Assertions:** AwesomeAssertions (9.3.0)
-- **Test Infrastructure:** ANcpLua.Roslyn.Utilities.Testing
+- **Test Framework:** xunit.v3.mtp-v2 ($(XunitV3Version) = 3.2.2)
+- **Assertions:** AwesomeAssertions ($(AwesomeAssertionsVersion) = 9.4.0)
+- **Test Infrastructure:** ANcpLua.Roslyn.Utilities.Testing ($(ANcpLuaRoslynUtilitiesTestingVersion))
 
 ## Running Tests
 
