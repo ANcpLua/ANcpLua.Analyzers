@@ -134,3 +134,6 @@ AL0130 | GenAI | Info | Al0130ToolMustDeclareCapabilityAnalyzer
 AL0131 | GenAI | Warning | Al0131DirectGenAiSdkUsageAnalyzer
 AL0132 | OpenTelemetry | Warning | Al0132DeprecatedSemconvValueAnalyzer
 AL0133 | OpenTelemetry | Warning | Al0133ContextSensitiveDeprecatedSemconvAnalyzer
+AL0134 | OpenTelemetry | Warning | Al0134UseSemanticConventionConstantAnalyzer
+AL0135 | OpenTelemetry | Warning | Al0135LegacySemanticConventionsAccessorAnalyzer
+AL0136 | OpenTelemetry | Warning | Al0136IncubatingSemanticConventionInLibraryAnalyzer

@@ -203,8 +203,7 @@ public static partial class Al0126CancellationTokenPropagationAnalysis {
         originalParameter.IsParams == candidateParameter.IsParams;
 
     private static bool IsCancellationTokenParameter(IParameterSymbol parameter, INamedTypeSymbol cancellationTokenType) =>
-        parameter.RefKind == RefKind.None &&
-        !parameter.IsParams &&
+        parameter is { RefKind: RefKind.None, IsParams: false } &&
         parameter.Type.IsEqualTo(cancellationTokenType);
 
     private static bool IsObsolete(ISymbol symbol) {

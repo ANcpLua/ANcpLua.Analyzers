@@ -82,15 +82,14 @@ public sealed partial class Al0133ContextSensitiveDeprecatedSemconvAnalyzer : Al
 
     private static bool IsInTelemetryEventContext(SyntaxNode node) {
         for (var current = node.Parent; current is not null; current = current.Parent) {
-            if (current is ObjectCreationExpressionSyntax creation &&
-                creation.Type.ToString().ContainsOrdinal("ActivityEvent")) {
-                return true;
-            }
-
-            if (current is InvocationExpressionSyntax invocation &&
-                GetMethodName(invocation) is { } methodName &&
-                methodName.EqualsOrdinal("AddEvent")) {
-                return true;
+            switch (current)
+            {
+                case ObjectCreationExpressionSyntax creation when
+                    creation.Type.ToString().ContainsOrdinal("ActivityEvent"):
+                case InvocationExpressionSyntax invocation when
+                    GetMethodName(invocation) is { } methodName &&
+                    methodName.EqualsOrdinal("AddEvent"):
+                    return true;
             }
         }
 
@@ -112,8 +111,7 @@ public sealed partial class Al0133ContextSensitiveDeprecatedSemconvAnalyzer : Al
             return true;
         }
 
-        return invocation.Expression is MemberAccessExpressionSyntax memberAccess
-               && memberAccess.Name.Identifier.Text == "Add"
+        return invocation.Expression is MemberAccessExpressionSyntax { Name.Identifier.Text: "Add" } memberAccess
                && GetIdentifierName(memberAccess.Expression) is { } identifier
                && IsLikelyTelemetryContainer(identifier);
     }

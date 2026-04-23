@@ -212,4 +212,11 @@
     <data name="AL0126CodeFixTitle" xml:space="preserve">
         <value>Forward CancellationToken</value>
     </data>
+    <!-- AL0134, AL0135 Code Fix Titles -->
+    <data name="AL0134CodeFixTitle" xml:space="preserve">
+        <value>Use '{0}' instead</value>
+    </data>
+    <data name="AL0135CodeFixTitle" xml:space="preserve">
+        <value>Replace with '{0}'</value>
+    </data>
 </root>

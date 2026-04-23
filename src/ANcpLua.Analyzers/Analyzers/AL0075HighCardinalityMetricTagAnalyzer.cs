@@ -94,8 +94,7 @@ public sealed partial class Al0075HighCardinalityMetricTagAnalyzer : AlAnalyzer 
 
         if (context.SemanticModel.GetDeclaredSymbol(parameter, context.CancellationToken) is not { ContainingSymbol: IMethodSymbol methodSymbol } parameterSymbol
             || (!cache.HasAttribute(methodSymbol, KnownType.CounterAttribute) && !cache.HasAttribute(methodSymbol, KnownType.HistogramAttribute))
-            || cache.GetAttribute(parameterSymbol, KnownType.TagAttribute) is not { } tagAttr
-            || tagAttr.ConstructorArguments is not [{ Value: string tagName }, ..]) {
+            || cache.GetAttribute(parameterSymbol, KnownType.TagAttribute) is not { ConstructorArguments: [{ Value: string tagName }, ..] }) {
             return;
         }
 

@@ -66,7 +66,7 @@ public sealed partial class Al0101AvoidActivatorCreateInstanceAnalyzer : AlAnaly
 
     private static string GetTargetTypeName(IInvocationOperation invocation) {
         var targetMethod = invocation.TargetMethod;
-        if (targetMethod.IsGenericMethod && targetMethod.TypeArguments.Length > 0) {
+        if (targetMethod is { IsGenericMethod: true, TypeArguments.Length: > 0 }) {
             return targetMethod.TypeArguments[0].ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
         }
 

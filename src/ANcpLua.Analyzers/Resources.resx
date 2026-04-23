@@ -1314,4 +1314,34 @@
     <data name="AL0133AnalyzerDescription" xml:space="preserve">
         <value>Some deprecated semantic convention attributes cannot be migrated with a simple 1:1 rename. This analyzer highlights attributes that require context-sensitive migration or have no direct replacement.</value>
     </data>
+    <!-- AL0134: Use semantic convention constant -->
+    <data name="AL0134AnalyzerTitle" xml:space="preserve">
+        <value>Use OpenTelemetry semantic convention constant</value>
+    </data>
+    <data name="AL0134AnalyzerMessageFormat" xml:space="preserve">
+        <value>Hardcoded semantic convention string "{1}". Use the typed constant '{0}' from OpenTelemetry.SemanticConventions instead.</value>
+    </data>
+    <data name="AL0134AnalyzerDescription" xml:space="preserve">
+        <value>OpenTelemetry semantic convention attribute names should reference the typed const fields published by the OpenTelemetry.SemanticConventions package (for example HttpAttributes.AttributeHttpRequestMethod) rather than hand-written string literals. Typed constants protect against typos, stay in sync with the schema version that is actually referenced, and enable tooling to diff telemetry surface area across versions.</value>
+    </data>
+    <!-- AL0135: Legacy SemanticConventions accessor -->
+    <data name="AL0135AnalyzerTitle" xml:space="preserve">
+        <value>Replace legacy SemanticConventions accessor</value>
+    </data>
+    <data name="AL0135AnalyzerMessageFormat" xml:space="preserve">
+        <value>'{0}' is a legacy OpenTelemetry semantic convention accessor. Use the grouped '{1}' constant instead.</value>
+    </data>
+    <data name="AL0135AnalyzerDescription" xml:space="preserve">
+        <value>The aggregated SemanticConventions / TraceSemanticConventions / ResourceSemanticConventions static classes are deprecated in favour of per-domain grouped attribute classes (HttpAttributes, ServerAttributes, DbAttributes, etc.). The new grouping mirrors the upstream OpenTelemetry semantic conventions layout and produces smaller, more navigable diffs on convention upgrades.</value>
+    </data>
+    <!-- AL0136: Incubating semantic convention in library -->
+    <data name="AL0136AnalyzerTitle" xml:space="preserve">
+        <value>Incubating semantic convention referenced from library</value>
+    </data>
+    <data name="AL0136AnalyzerMessageFormat" xml:space="preserve">
+        <value>Instrumentation library references incubating semantic convention '{0}' directly. Copy the definition into a local const to insulate against breaking changes on minor version updates.</value>
+    </data>
+    <data name="AL0136AnalyzerDescription" xml:space="preserve">
+        <value>OpenTelemetry SemanticConventions.Incubating members ship without stability guarantees; their name or value can change across minor versions. Instrumentation libraries that embed incubating references force transitive consumers to upgrade in lockstep. The recommended pattern is to copy the definition into the library's own constants file; see https://opentelemetry.io/docs/specs/semconv/non-normative/code-generation/#stability-and-versioning.</value>
+    </data>
 </root>

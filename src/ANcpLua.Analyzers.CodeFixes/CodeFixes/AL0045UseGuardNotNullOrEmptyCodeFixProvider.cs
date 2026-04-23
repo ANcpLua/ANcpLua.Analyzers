@@ -65,8 +65,7 @@ public sealed partial class Al0045UseGuardNotNullOrEmptyCodeFixProvider
         }
 
         // Get string.IsNullOrEmpty(x) -> x
-        if (condition is InvocationExpressionSyntax invocation &&
-            invocation.ArgumentList.Arguments.Count == 1) {
+        if (condition is InvocationExpressionSyntax { ArgumentList.Arguments.Count: 1 } invocation) {
             return invocation.ArgumentList.Arguments[0].Expression;
         }
 

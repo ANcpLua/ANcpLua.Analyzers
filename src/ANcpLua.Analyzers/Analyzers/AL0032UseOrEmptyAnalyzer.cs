@@ -67,11 +67,10 @@ public sealed partial class Al0032UseOrEmptyAnalyzer : AlAnalyzer {
         switch (operation) {
             case ICollectionExpressionOperation { Elements.Length: 0 }:
                 return true;
-            case IInvocationOperation { TargetMethod: { Name: "Empty", IsStatic: true, Parameters.Length: 0 } method }
-                when method.ContainingType is { } containingType
-                     && containingType.ContainingNamespace?.ToDisplayString() is { } ns
-                     && (containingType.Name == "Array" && ns == "System" ||
-                         containingType.Name == "Enumerable" && ns == "System.Linq"):
+            case IInvocationOperation { TargetMethod: { Name: "Empty", IsStatic: true, Parameters.Length: 0, ContainingType: { } containingType } }
+                when (containingType.ContainingNamespace?.ToDisplayString() is { } ns
+                      && (containingType.Name == "Array" && ns == "System" ||
+                          containingType.Name == "Enumerable" && ns == "System.Linq")):
                 return true;
             case IArrayCreationOperation {
                 DimensionSizes: [{ ConstantValue: { HasValue: true, Value: 0 } }]

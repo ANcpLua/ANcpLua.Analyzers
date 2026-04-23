@@ -78,7 +78,6 @@ public sealed partial class Al0048UseGuardNotNegativeCodeFixProvider
             expression = paren.Expression;
         }
 
-        return expression is LiteralExpressionSyntax literal &&
-               literal.Token.ValueText == "0";
+        return expression is LiteralExpressionSyntax { Token.ValueText: "0" };
     }
 }

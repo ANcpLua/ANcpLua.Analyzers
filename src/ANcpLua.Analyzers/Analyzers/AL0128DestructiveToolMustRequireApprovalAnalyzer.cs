@@ -90,8 +90,7 @@ public sealed partial class Al0128DestructiveToolMustRequireApprovalAnalyzer : A
                 continue;
             }
 
-            if (attribute.ConstructorArguments is [{ Value: int enumValue }, ..] &&
-                enumValue >= DestructiveSideEffectThreshold) {
+            if (attribute.ConstructorArguments is [{ Value: int enumValue and >= DestructiveSideEffectThreshold }, ..]) {
                 return enumValue < DestructiveSideEffectThreshold + DestructiveSideEffectNames.Length
                     ? DestructiveSideEffectNames[enumValue - DestructiveSideEffectThreshold]
                     : enumValue.ToString();

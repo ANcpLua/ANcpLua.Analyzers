@@ -65,8 +65,7 @@ public sealed partial class Al0089MissingOtlpConfigurationAnalyzer : AlAnalyzer 
         var arguments = invocation.ArgumentList.Arguments;
 
         // UseOtlpExporter(OtlpExportProtocol.Grpc, new Uri("...")) pattern
-        if (arguments.Count >= 2
-            && arguments[1].Expression is ObjectCreationExpressionSyntax objCreation
+        if (arguments is [_, { Expression: ObjectCreationExpressionSyntax objCreation }, ..]
             && objCreation.Type.ToString().ContainsOrdinal("Uri")) {
             return true;
         }

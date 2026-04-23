@@ -107,9 +107,7 @@ public sealed partial class Al0105AvoidBlockingCallsInAsyncAnalyzer : AlAnalyzer
                 break;
             }
 
-            case "GetResult" when memberAccess.Expression is InvocationExpressionSyntax innerInvocation &&
-                                  innerInvocation.Expression is MemberAccessExpressionSyntax innerMember &&
-                                  innerMember.Name.Identifier.Text == "GetAwaiter": {
+            case "GetResult" when memberAccess.Expression is InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax { Name.Identifier.Text: "GetAwaiter" } innerMember }: {
                 if (context.SemanticModel.GetTypeInfo(innerMember.Expression, context.CancellationToken).Type is { } expressionType &&
                     IsTaskLike(expressionType, cache)) {
                     context.ReportDiagnostic(Rule, memberAccess.Name.GetLocation(), ".GetAwaiter().GetResult()");
