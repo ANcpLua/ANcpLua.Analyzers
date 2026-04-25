@@ -139,8 +139,15 @@ Both DLLs are required in the nupkg for IDE code fix integration.
 
 ## Version Management
 
-- `Version.props` is a symlink from ANcpLua.NET.Sdk — do not edit directly
+Two `Version.props` files participate, layered via "last wins":
+
+1. **SDK-shipped baseline** — packed inside `ANcpLua.NET.Sdk`, resolved automatically for any project declaring `<Project Sdk="ANcpLua.NET.Sdk">`. Lives at `~/.nuget/packages/ancplua.net.sdk/<ver>/Build/Common/Version.props`.
+2. **Local override** — `./Version.props` at this repo root, imported explicitly by `Directory.Packages.props` AFTER the SDK copy. Used to pin versions AHEAD of the currently-published SDK.
+
+Not a symlink — git cannot symlink cleanly across repos. Prune entries from the local file once the SDK publishes with matching versions; drift means stale local overrides, not a broken link.
+
 - `ANcpLuaAnalyzersVersion` in Version.props must be the last PUBLISHED version on NuGet
+- `ANcpSdkPackageVersion` is `999.9.9` in the local file (dogfooding sentinel); CI stamps the real version at pack time
 - CI uses `-p:Version=X.Y.Z` at build/pack time for new versions
 - Tag format: `v1.21.0` — triggers publish workflow
 
@@ -149,12 +156,14 @@ Both DLLs are required in the nupkg for IDE code fix integration.
 | Package | Variable | Purpose |
 |---------|----------|---------|
 | Microsoft.CodeAnalysis.CSharp | `$(RoslynVersion)` 5.3.0 | Roslyn APIs |
-| ANcpLua.Roslyn.Utilities.Sources | `$(ANcpLuaRoslynUtilitiesSourcesVersion)` 1.56.1 | Compile-time source package |
-| ANcpLua.Roslyn.Utilities.Testing | `$(ANcpLuaRoslynUtilitiesTestingVersion)` 1.56.1 | Test infrastructure |
+| ANcpLua.Roslyn.Utilities | `$(ANcpLuaRoslynUtilitiesVersion)` 2.0.4 | Binary package |
+| ANcpLua.Roslyn.Utilities.Sources | `$(ANcpLuaRoslynUtilitiesSourcesVersion)` 2.0.4 | Compile-time source package |
+| ANcpLua.Roslyn.Utilities.Polyfills | `$(ANcpLuaRoslynUtilitiesPolyfillsVersion)` 2.0.4 | netstandard2.0 polyfills |
+| ANcpLua.Roslyn.Utilities.Testing | `$(ANcpLuaRoslynUtilitiesTestingVersion)` 2.0.4 | Test infrastructure |
 | xunit.v3.mtp-v2 | `$(XunitV3Version)` 3.2.2 | Test framework |
 | AwesomeAssertions | `$(AwesomeAssertionsVersion)` 9.4.0 | Assertions |
 
-Re-read `Version.props` before trusting these numbers — CI bumps them under you. Roslyn.Utilities sibling repo ships `2.0.2` as of 2026-04-24 but Analyzers has not moved to the v2.x line yet.
+Re-read `Version.props` before trusting these numbers — CI bumps them under you. Analyzers is on the v2.x Roslyn.Utilities line.
 
 ## SDK Integration Note
 
