@@ -2,7 +2,7 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
   "mode": "full",
-  "schedule": ["0 */6 * * *"],
+  "schedule": ["* */6 * * *"],
   "timezone": "UTC",
   "dependencyDashboard": true,
   "commitMessagePrefix": "deps:",
