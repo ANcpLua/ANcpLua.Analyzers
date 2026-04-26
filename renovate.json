@@ -35,6 +35,13 @@
       "labels": ["dependencies", "major"]
     },
     {
+      "description": "Block .NET SDK previews — stable channel only",
+      "matchManagers": ["dotnet-sdk"],
+      "matchPackageNames": ["dotnet-sdk"],
+      "ignoreUnstable": true,
+      "allowedVersions": "/^[0-9]+\\.[0-9]+\\.[0-9]+$/"
+    },
+    {
       "description": "Block self-bumps — Analyzers does not auto-bump its own published packages (and Dummy.* are local test samples)",
       "matchPackageNames": ["/^ANcpLua\\.Analyzers/", "/^Dummy/"],
       "enabled": false
