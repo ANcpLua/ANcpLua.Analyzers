@@ -1344,4 +1344,14 @@
     <data name="AL0136AnalyzerDescription" xml:space="preserve">
         <value>OpenTelemetry SemanticConventions.Incubating members ship without stability guarantees; their name or value can change across minor versions. Instrumentation libraries that embed incubating references force transitive consumers to upgrade in lockstep. The recommended pattern is to copy the definition into the library's own constants file; see https://opentelemetry.io/docs/specs/semconv/non-normative/code-generation/#stability-and-versioning.</value>
     </data>
+    <!-- AL0137: Use Guard.* helpers instead of BCL ThrowIf* helpers -->
+    <data name="AL0137AnalyzerTitle" xml:space="preserve">
+        <value>Use Guard.* helpers instead of throw helpers</value>
+    </data>
+    <data name="AL0137AnalyzerMessageFormat" xml:space="preserve">
+        <value>Use '{1}' from ANcpLua.Roslyn.Utilities instead of '{0}'</value>
+    </data>
+    <data name="AL0137AnalyzerDescription" xml:space="preserve">
+        <value>The BCL throw helpers (ArgumentNullException.ThrowIfNull, ArgumentException.ThrowIfNullOrEmpty, ArgumentException.ThrowIfNullOrWhiteSpace) only throw — they don't return the validated value, so they can't be used in expressions, member initialisers, or chained validation. Guard.NotNull / Guard.NotNullOrEmpty / Guard.NotNullOrWhiteSpace from ANcpLua.Roslyn.Utilities return the validated value, share the same [CallerArgumentExpression] parameter-name machinery, and compose. Banned in qyl-aligned projects via BannedSymbols.txt; this analyzer carries the matching auto-fix.</value>
+    </data>
 </root>

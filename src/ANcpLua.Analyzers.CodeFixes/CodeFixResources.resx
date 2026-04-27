@@ -219,4 +219,8 @@
     <data name="AL0135CodeFixTitle" xml:space="preserve">
         <value>Replace with '{0}'</value>
     </data>
+    <!-- AL0137 Code Fix Title -->
+    <data name="AL0137CodeFixTitle" xml:space="preserve">
+        <value>Use Guard.* helpers from ANcpLua.Roslyn.Utilities</value>
+    </data>
 </root>
