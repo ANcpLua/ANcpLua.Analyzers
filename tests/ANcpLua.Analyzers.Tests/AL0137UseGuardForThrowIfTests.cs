@@ -314,4 +314,90 @@ public sealed partial class Al0137UseGuardForThrowIfTests : AnalyzerTest<Al0137U
             }
         }
         """);
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Edge cases — overload disambiguation + unsupported-type rejection
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    ///     MAF Throw.IfMemberNull (parameter pre-validated, only member checked) maps to
+    ///     Guard.MemberNotNull (different from IfNullOrMemberNull → NotNullWithMember).
+    /// </summary>
+    [Fact]
+    public Task ShouldReportForMafThrowIfMemberNull() => VerifyAsync("""
+        #nullable enable
+        using System.Runtime.CompilerServices;
+        namespace Microsoft.Shared.Diagnostics {
+            public static class Throw {
+                public static TMember IfMemberNull<TParam, TMember>(TParam argument, TMember member, [CallerArgumentExpression(nameof(argument))] string paramName = "", [CallerArgumentExpression(nameof(member))] string memberName = "") => member!;
+            }
+        }
+        public class Config { public string? ConnectionString { get; set; } }
+        public class C {
+            void M(Config config) {
+                [|Microsoft.Shared.Diagnostics.Throw.IfMemberNull(config, config.ConnectionString)|];
+            }
+        }
+        """);
+
+    /// <summary>
+    ///     MAF Throw.IfOutOfRange&lt;T&gt;(T) (enum-only, 1 arg + paramName) maps to
+    ///     Guard.DefinedEnum, NOT Guard.InRange (which is the (value, min, max) 3-arg case).
+    /// </summary>
+    [Fact]
+    public Task ShouldReportForMafThrowIfOutOfRangeEnum() => VerifyAsync("""
+        #nullable enable
+        using System;
+        using System.Runtime.CompilerServices;
+        namespace Microsoft.Shared.Diagnostics {
+            public static class Throw {
+                public static T IfOutOfRange<T>(T argument, [CallerArgumentExpression(nameof(argument))] string paramName = "") where T : struct, Enum => argument;
+            }
+        }
+        public enum Status { Active, Inactive }
+        public class C {
+            void M(Status s) {
+                [|Microsoft.Shared.Diagnostics.Throw.IfOutOfRange(s)|];
+            }
+        }
+        """);
+
+    /// <summary>
+    ///     BCL ArgumentOutOfRangeException.ThrowIfX(uint, ...) — Guard.* has no uint overload, so
+    ///     the analyzer must NOT report (auto-fix would emit code that doesn't compile).
+    /// </summary>
+    [Fact]
+    public Task ShouldNotReportForBclThrowIfOnUInt() => VerifyAsync("""
+        #nullable enable
+        using System;
+        public class C {
+            void M(uint n) {
+                ArgumentOutOfRangeException.ThrowIfZero(n);
+                ArgumentOutOfRangeException.ThrowIfGreaterThan(n, 100u);
+            }
+        }
+        """);
+
+    /// <summary>
+    ///     MAF Throw.IfNullOrEmpty&lt;T&gt;(IEnumerable&lt;T&gt;?) — Guard.NotNullOrEmpty requires
+    ///     IReadOnlyCollection&lt;T&gt;, not IEnumerable&lt;T&gt;. The analyzer must NOT report on the
+    ///     collection overload — the auto-fix could produce code that doesn't compile when the
+    ///     argument is a pure IEnumerable.
+    /// </summary>
+    [Fact]
+    public Task ShouldNotReportForMafThrowIfNullOrEmptyOnIEnumerable() => VerifyAsync("""
+        #nullable enable
+        using System.Collections.Generic;
+        using System.Runtime.CompilerServices;
+        namespace Microsoft.Shared.Diagnostics {
+            public static class Throw {
+                public static IEnumerable<T> IfNullOrEmpty<T>(IEnumerable<T>? argument, [CallerArgumentExpression(nameof(argument))] string paramName = "") => argument!;
+            }
+        }
+        public class C {
+            void M(IEnumerable<int>? items) {
+                Microsoft.Shared.Diagnostics.Throw.IfNullOrEmpty(items);
+            }
+        }
+        """);
 }

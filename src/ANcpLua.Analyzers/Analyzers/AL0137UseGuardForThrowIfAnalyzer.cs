@@ -93,46 +93,103 @@ public sealed partial class Al0137UseGuardForThrowIfAnalyzer : AlAnalyzer {
             return null;
         }
 
-        var ns = method.ContainingType.ContainingNamespace?.ToDisplayString();
+        // BCL System.* — ContainingType is one of the three Argument*Exception types.
+        if (OperationHelper.IsArgumentNullException(method.ContainingType)) {
+            return method.Name is "ThrowIfNull" ? "NotNull" : null;
+        }
 
-        return ns switch {
-            "System" => MapBcl(method.ContainingType.Name, method.Name),
-            MafThrowNamespace when method.ContainingType.Name is "Throw" => MapMaf(method.Name),
+        if (OperationHelper.IsArgumentException(method.ContainingType)) {
+            return method.Name switch {
+                "ThrowIfNullOrEmpty" => "NotNullOrEmpty",
+                "ThrowIfNullOrWhiteSpace" => "NotNullOrWhiteSpace",
+                _ => null
+            };
+        }
+
+        if (OperationHelper.IsArgumentOutOfRangeException(method.ContainingType)) {
+            return MapBclOutOfRange(method);
+        }
+
+        // MAF Microsoft.Shared.Diagnostics.Throw — separate detection path.
+        if (method.ContainingType.Name is "Throw" &&
+            method.ContainingType.ContainingNamespace?.ToDisplayString() is MafThrowNamespace) {
+            return MapMaf(method);
+        }
+
+        return null;
+    }
+
+    private static string? MapBclOutOfRange(IMethodSymbol method) {
+        // Guard.* covers int / long / double / decimal / TimeSpan but NOT uint / ulong, so
+        // reject the unsigned BCL overloads — the auto-fix would emit code that doesn't compile.
+        if (HasUnsupportedNumericFirstParam(method)) {
+            return null;
+        }
+
+        return method.Name switch {
+            "ThrowIfZero" => "NotZero",
+            "ThrowIfNegative" => "NotNegative",
+            "ThrowIfNegativeOrZero" => "Positive",
+            "ThrowIfGreaterThan" => "NotGreaterThan",
+            "ThrowIfGreaterThanOrEqual" => "LessThan",
+            "ThrowIfLessThan" => "NotLessThan",
+            "ThrowIfLessThanOrEqual" => "GreaterThan",
             _ => null
         };
     }
 
-    private static string? MapBcl(string typeName, string methodName) =>
-        (typeName, methodName) switch {
-            ("ArgumentNullException", "ThrowIfNull") => "NotNull",
-            ("ArgumentException", "ThrowIfNullOrEmpty") => "NotNullOrEmpty",
-            ("ArgumentException", "ThrowIfNullOrWhiteSpace") => "NotNullOrWhiteSpace",
-            ("ArgumentOutOfRangeException", "ThrowIfZero") => "NotZero",
-            ("ArgumentOutOfRangeException", "ThrowIfNegative") => "NotNegative",
-            ("ArgumentOutOfRangeException", "ThrowIfNegativeOrZero") => "Positive",
-            ("ArgumentOutOfRangeException", "ThrowIfGreaterThan") => "NotGreaterThan",
-            ("ArgumentOutOfRangeException", "ThrowIfGreaterThanOrEqual") => "LessThan",
-            ("ArgumentOutOfRangeException", "ThrowIfLessThan") => "NotLessThan",
-            ("ArgumentOutOfRangeException", "ThrowIfLessThanOrEqual") => "GreaterThan",
-            _ => null
-        };
-
     // MAF Microsoft.Shared.Diagnostics.Throw.* — the validating subset.
-    // The cold-path-only helpers (ArgumentNullException, ArgumentOutOfRangeException,
-    // ArgumentException, InvalidOperationException) are intentionally NOT mapped — those don't
-    // validate, they just throw, and have no Guard.* counterpart.
-    private static string? MapMaf(string methodName) =>
-        methodName switch {
+    // Cold-path-only helpers (ArgumentNullException, ArgumentOutOfRangeException,
+    // ArgumentException, InvalidOperationException) are NOT mapped — they don't validate,
+    // they just throw, and have no Guard.* counterpart.
+    private static string? MapMaf(IMethodSymbol method) {
+        // Reject uint/ulong overloads — Guard.* doesn't cover unsigned numerics.
+        if (HasUnsupportedNumericFirstParam(method)) {
+            return null;
+        }
+
+        // IfOutOfRange has TWO unrelated overloads:
+        //   - Generic enum check:  IfOutOfRange<T>(T arg) where T : struct, Enum  →  Guard.DefinedEnum
+        //   - Numeric range check: IfOutOfRange(int v, int min, int max)          →  Guard.InRange
+        if (method.Name is "IfOutOfRange") {
+            return method.IsGenericMethod && method.Parameters.Length is 2
+                ? "DefinedEnum"
+                : "InRange";
+        }
+
+        // IfNullOrEmpty has TWO overloads:
+        //   - string variant:     IfNullOrEmpty(string? arg)
+        //   - collection variant: IfNullOrEmpty<T>(IEnumerable<T>? arg)
+        // Guard.NotNullOrEmpty covers `string` and `IReadOnlyCollection<T>`. The MAF collection
+        // overload takes `IEnumerable<T>?` — broader than what Guard accepts. Skip if the call
+        // site argument doesn't satisfy IReadOnlyCollection<T> (we can't tell without semantic
+        // model on the argument, so be conservative and only map the string overload here; the
+        // collection case can fall through to "no auto-fix" rather than emit broken code).
+        if (method.Name is "IfNullOrEmpty") {
+            if (method.Parameters.Length >= 1 &&
+                method.Parameters[0].Type.SpecialType is SpecialType.System_String) {
+                return "NotNullOrEmpty";
+            }
+            // Collection overload — Guard requires IReadOnlyCollection<T>; can't safely auto-fix
+            // a generic IEnumerable<T> call without compile-time risk. Leave for human review.
+            return null;
+        }
+
+        return method.Name switch {
             "IfNull" => "NotNull",
             "IfNullOrMemberNull" => "NotNullWithMember",
-            "IfNullOrEmpty" => "NotNullOrEmpty",
+            "IfMemberNull" => "MemberNotNull",
             "IfNullOrWhitespace" => "NotNullOrWhiteSpace",
             "IfZero" => "NotZero",
             "IfLessThan" => "NotLessThan",
             "IfGreaterThan" => "NotGreaterThan",
             "IfLessThanOrEqual" => "GreaterThan",
             "IfGreaterThanOrEqual" => "LessThan",
-            "IfOutOfRange" => "InRange",
             _ => null
         };
+    }
+
+    private static bool HasUnsupportedNumericFirstParam(IMethodSymbol method) =>
+        method.Parameters.Length >= 1 && method.Parameters[0].Type.SpecialType is
+            SpecialType.System_UInt32 or SpecialType.System_UInt64;
 }
