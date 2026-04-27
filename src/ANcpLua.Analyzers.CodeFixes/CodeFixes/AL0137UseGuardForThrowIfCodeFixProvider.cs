@@ -42,7 +42,7 @@ public sealed partial class Al0137UseGuardForThrowIfCodeFixProvider
         Diagnostic diagnostic) {
         if (!diagnostic.Properties.TryGetValue(
                 Al0137UseGuardForThrowIfAnalyzer.PropertyGuardMethod, out var guardMethod) ||
-            string.IsNullOrEmpty(guardMethod)) {
+            guardMethod is not { Length: > 0 } guardName) {
             return Task.FromResult(document);
         }
 
@@ -50,7 +50,7 @@ public sealed partial class Al0137UseGuardForThrowIfCodeFixProvider
                 SyntaxFactory.MemberAccessExpression(
                     SyntaxKind.SimpleMemberAccessExpression,
                     SyntaxFactory.IdentifierName("Guard"),
-                    SyntaxFactory.IdentifierName(guardMethod)),
+                    SyntaxFactory.IdentifierName(guardName)),
                 invocation.ArgumentList)
             .WithTriviaFrom(invocation);
 
