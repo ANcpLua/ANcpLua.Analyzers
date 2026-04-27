@@ -50,7 +50,7 @@ public sealed partial class Al0137UseGuardForThrowIfCodeFixProvider
                 SyntaxFactory.MemberAccessExpression(
                     SyntaxKind.SimpleMemberAccessExpression,
                     SyntaxFactory.IdentifierName("Guard"),
-                    SyntaxFactory.IdentifierName(guardMethod!)),
+                    SyntaxFactory.IdentifierName(guardMethod)),
                 invocation.ArgumentList)
             .WithTriviaFrom(invocation);
 

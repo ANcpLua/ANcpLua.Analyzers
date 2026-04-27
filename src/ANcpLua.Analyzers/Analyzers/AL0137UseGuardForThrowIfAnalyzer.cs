@@ -3,14 +3,21 @@ namespace ANcpLua.Analyzers.Analyzers;
 
 /// <summary>
 ///     AL0137: Suggests using <c>Guard.*</c> helpers from <c>ANcpLua.Roslyn.Utilities</c> instead
-///     of the BCL throw helpers <c>ArgumentNullException.ThrowIfNull</c>,
-///     <c>ArgumentException.ThrowIfNullOrEmpty</c>, and <c>ArgumentException.ThrowIfNullOrWhiteSpace</c>.
+///     of the BCL throw helpers on <c>ArgumentNullException</c>, <c>ArgumentException</c>, and
+///     <c>ArgumentOutOfRangeException</c>.
 /// </summary>
 /// <remarks>
 ///     <list type="bullet">
 ///         <item><c>ArgumentNullException.ThrowIfNull(x)</c> → <c>Guard.NotNull(x)</c></item>
 ///         <item><c>ArgumentException.ThrowIfNullOrEmpty(s)</c> → <c>Guard.NotNullOrEmpty(s)</c></item>
 ///         <item><c>ArgumentException.ThrowIfNullOrWhiteSpace(s)</c> → <c>Guard.NotNullOrWhiteSpace(s)</c></item>
+///         <item><c>ArgumentOutOfRangeException.ThrowIfZero(x)</c> → <c>Guard.NotZero(x)</c></item>
+///         <item><c>ArgumentOutOfRangeException.ThrowIfNegative(x)</c> → <c>Guard.NotNegative(x)</c></item>
+///         <item><c>ArgumentOutOfRangeException.ThrowIfNegativeOrZero(x)</c> → <c>Guard.Positive(x)</c></item>
+///         <item><c>ArgumentOutOfRangeException.ThrowIfGreaterThan(v, max)</c> → <c>Guard.NotGreaterThan(v, max)</c></item>
+///         <item><c>ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(v, max)</c> → <c>Guard.LessThan(v, max)</c></item>
+///         <item><c>ArgumentOutOfRangeException.ThrowIfLessThan(v, min)</c> → <c>Guard.NotLessThan(v, min)</c></item>
+///         <item><c>ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(v, min)</c> → <c>Guard.GreaterThan(v, min)</c></item>
 ///     </list>
 ///     The <c>Guard.*</c> variants return the validated value (so they compose into expressions and
 ///     property initializers) and reuse the same <c>[CallerArgumentExpression]</c> machinery for
@@ -73,6 +80,13 @@ public sealed partial class Al0137UseGuardForThrowIfAnalyzer : AlAnalyzer {
             ("ArgumentNullException", "ThrowIfNull") => "NotNull",
             ("ArgumentException", "ThrowIfNullOrEmpty") => "NotNullOrEmpty",
             ("ArgumentException", "ThrowIfNullOrWhiteSpace") => "NotNullOrWhiteSpace",
+            ("ArgumentOutOfRangeException", "ThrowIfZero") => "NotZero",
+            ("ArgumentOutOfRangeException", "ThrowIfNegative") => "NotNegative",
+            ("ArgumentOutOfRangeException", "ThrowIfNegativeOrZero") => "Positive",
+            ("ArgumentOutOfRangeException", "ThrowIfGreaterThan") => "NotGreaterThan",
+            ("ArgumentOutOfRangeException", "ThrowIfGreaterThanOrEqual") => "LessThan",
+            ("ArgumentOutOfRangeException", "ThrowIfLessThan") => "NotLessThan",
+            ("ArgumentOutOfRangeException", "ThrowIfLessThanOrEqual") => "GreaterThan",
             _ => null
         };
     }

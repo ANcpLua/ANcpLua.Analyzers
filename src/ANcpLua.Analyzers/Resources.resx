@@ -1352,6 +1352,16 @@
         <value>Use '{1}' from ANcpLua.Roslyn.Utilities instead of '{0}'</value>
     </data>
     <data name="AL0137AnalyzerDescription" xml:space="preserve">
-        <value>The BCL throw helpers (ArgumentNullException.ThrowIfNull, ArgumentException.ThrowIfNullOrEmpty, ArgumentException.ThrowIfNullOrWhiteSpace) only throw — they don't return the validated value, so they can't be used in expressions, member initialisers, or chained validation. Guard.NotNull / Guard.NotNullOrEmpty / Guard.NotNullOrWhiteSpace from ANcpLua.Roslyn.Utilities return the validated value, share the same [CallerArgumentExpression] parameter-name machinery, and compose. Banned in qyl-aligned projects via BannedSymbols.txt; this analyzer carries the matching auto-fix.</value>
+        <value>The BCL throw helpers on ArgumentNullException, ArgumentException, and ArgumentOutOfRangeException only throw — they don't return the validated value, so they can't be used in expressions, member initialisers, or chained validation. The Guard.* helpers from ANcpLua.Roslyn.Utilities return the validated value, share the same [CallerArgumentExpression] parameter-name machinery, and compose. Covers ThrowIfNull/NullOrEmpty/NullOrWhiteSpace plus ThrowIfZero/Negative/NegativeOrZero/GreaterThan/GreaterThanOrEqual/LessThan/LessThanOrEqual. Banned in qyl-aligned projects via BannedSymbols.txt; this analyzer carries the matching auto-fix.</value>
+    </data>
+    <!-- AL0138: Use Math.Round / MathF.Round overloads with explicit MidpointRounding -->
+    <data name="AL0138AnalyzerTitle" xml:space="preserve">
+        <value>Use Math.Round/MathF.Round overload with explicit MidpointRounding</value>
+    </data>
+    <data name="AL0138AnalyzerMessageFormat" xml:space="preserve">
+        <value>'{0}' uses banker's rounding by default; pass MidpointRounding.AwayFromZero (or another explicit mode) for predictable behavior</value>
+    </data>
+    <data name="AL0138AnalyzerDescription" xml:space="preserve">
+        <value>Math.Round / MathF.Round overloads without a MidpointRounding argument default to ToEven (banker's rounding), which surprises most callers — 0.5 rounds to 0, not 1. Always pass MidpointRounding.AwayFromZero for the natural "round 0.5 up" behavior, or another mode that matches the domain. Banned in qyl-aligned projects via BannedSymbols.txt; this analyzer carries the matching auto-fix that appends MidpointRounding.AwayFromZero to the call.</value>
     </data>
 </root>

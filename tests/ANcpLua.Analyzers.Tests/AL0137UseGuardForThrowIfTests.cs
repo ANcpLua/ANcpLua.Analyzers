@@ -84,4 +84,74 @@ public sealed partial class Al0137UseGuardForThrowIfTests : AnalyzerTest<Al0137U
             }
         }
         """);
+
+    [Fact]
+    public Task ShouldReportForArgumentOutOfRangeExceptionThrowIfZero() => VerifyAsync("""
+        using System;
+        public class C {
+            void M(int n) {
+                [|ArgumentOutOfRangeException.ThrowIfZero(n)|];
+            }
+        }
+        """);
+
+    [Fact]
+    public Task ShouldReportForArgumentOutOfRangeExceptionThrowIfNegative() => VerifyAsync("""
+        using System;
+        public class C {
+            void M(int n) {
+                [|ArgumentOutOfRangeException.ThrowIfNegative(n)|];
+            }
+        }
+        """);
+
+    [Fact]
+    public Task ShouldReportForArgumentOutOfRangeExceptionThrowIfNegativeOrZero() => VerifyAsync("""
+        using System;
+        public class C {
+            void M(int n) {
+                [|ArgumentOutOfRangeException.ThrowIfNegativeOrZero(n)|];
+            }
+        }
+        """);
+
+    [Fact]
+    public Task ShouldReportForArgumentOutOfRangeExceptionThrowIfGreaterThan() => VerifyAsync("""
+        using System;
+        public class C {
+            void M(int n) {
+                [|ArgumentOutOfRangeException.ThrowIfGreaterThan(n, 100)|];
+            }
+        }
+        """);
+
+    [Fact]
+    public Task ShouldReportForArgumentOutOfRangeExceptionThrowIfGreaterThanOrEqual() => VerifyAsync("""
+        using System;
+        public class C {
+            void M(int n) {
+                [|ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(n, 100)|];
+            }
+        }
+        """);
+
+    [Fact]
+    public Task ShouldReportForArgumentOutOfRangeExceptionThrowIfLessThan() => VerifyAsync("""
+        using System;
+        public class C {
+            void M(int n) {
+                [|ArgumentOutOfRangeException.ThrowIfLessThan(n, 0)|];
+            }
+        }
+        """);
+
+    [Fact]
+    public Task ShouldReportForArgumentOutOfRangeExceptionThrowIfLessThanOrEqual() => VerifyAsync("""
+        using System;
+        public class C {
+            void M(int n) {
+                [|ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(n, 0)|];
+            }
+        }
+        """);
 }

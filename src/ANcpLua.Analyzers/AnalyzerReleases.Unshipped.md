@@ -138,3 +138,4 @@ AL0134 | OpenTelemetry | Warning | Al0134UseSemanticConventionConstantAnalyzer
 AL0135 | OpenTelemetry | Warning | Al0135LegacySemanticConventionsAccessorAnalyzer
 AL0136 | OpenTelemetry | Warning | Al0136IncubatingSemanticConventionInLibraryAnalyzer
 AL0137 | Roslyn Utilities | Warning | Al0137UseGuardForThrowIfAnalyzer
+AL0138 | Reliability | Warning | Al0138UseExplicitMidpointRoundingAnalyzer

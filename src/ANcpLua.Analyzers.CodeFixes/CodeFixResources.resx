@@ -223,4 +223,8 @@
     <data name="AL0137CodeFixTitle" xml:space="preserve">
         <value>Use Guard.* helpers from ANcpLua.Roslyn.Utilities</value>
     </data>
+    <!-- AL0138 Code Fix Title -->
+    <data name="AL0138CodeFixTitle" xml:space="preserve">
+        <value>Add MidpointRounding.AwayFromZero</value>
+    </data>
 </root>

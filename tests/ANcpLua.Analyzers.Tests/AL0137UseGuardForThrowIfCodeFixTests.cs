@@ -20,6 +20,13 @@ public sealed partial class Al0137UseGuardForThrowIfCodeFixTests
                 public static T NotNull<T>(T? value) => value!;
                 public static string NotNullOrEmpty(string? value) => value!;
                 public static string NotNullOrWhiteSpace(string? value) => value!;
+                public static int NotZero(int value) => value;
+                public static int NotNegative(int value) => value;
+                public static int Positive(int value) => value;
+                public static int NotGreaterThan(int value, int max) => value;
+                public static int LessThan(int value, int max) => value;
+                public static int NotLessThan(int value, int min) => value;
+                public static int GreaterThan(int value, int min) => value;
             }
         }
         """;
