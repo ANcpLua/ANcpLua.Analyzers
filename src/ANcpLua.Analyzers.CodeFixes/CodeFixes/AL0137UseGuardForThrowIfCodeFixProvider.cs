@@ -69,14 +69,21 @@ public sealed partial class Al0137UseGuardForThrowIfCodeFixProvider
             return root;
         }
 
-        // Match the EOL of an existing using if present, otherwise default to LineFeed.
-        // Hard-coding CarriageReturnLineFeed produces wrong output on LF-normalized files.
-        var endOfLine = compilationUnit.Usings.LastOrDefault()?.GetTrailingTrivia()
-            .FirstOrDefault(t => t.IsKind(SyntaxKind.EndOfLineTrivia)) ?? SyntaxFactory.LineFeed;
-
         var newUsing = SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(namespaceName))
-            .WithTrailingTrivia(endOfLine);
+            .WithTrailingTrivia(DetectEndOfLine(compilationUnit));
 
         return compilationUnit.AddUsings(newUsing);
+    }
+
+    private static SyntaxTrivia DetectEndOfLine(CompilationUnitSyntax compilationUnit) {
+        // Walk the actual file trivia first so the inserted using preserves the file's CRLF/LF
+        // convention. Falling back to LineFeed corrupts Windows-CRLF files; falling back to
+        // CarriageReturnLineFeed corrupts LF-normalized files. Pick what the file already uses.
+        foreach (var trivia in compilationUnit.DescendantTrivia()) {
+            if (trivia.IsKind(SyntaxKind.EndOfLineTrivia)) {
+                return trivia;
+            }
+        }
+        return SyntaxFactory.LineFeed;
     }
 }
