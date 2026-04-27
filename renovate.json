@@ -1,46 +1,7 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended"],
-  "mode": "full",
-  "timezone": "UTC",
-  "dependencyDashboard": true,
-  "commitMessagePrefix": "deps:",
-  "labels": ["dependencies"],
+  "extends": ["github>ANcpLua/renovate-config"],
   "packageRules": [
-    {
-      "description": "ANcpLua first-party deps (Roslyn.Utilities + NET.Sdk via msbuild-sdks, both cross-repo)",
-      "groupName": "ancplua-sdk",
-      "matchPackageNames": ["/^ANcpLua\\./"],
-      "automerge": true,
-      "automergeType": "pr"
-    },
-    {
-      "description": "Roslyn analyzers",
-      "groupName": "roslyn",
-      "matchPackageNames": ["/^Microsoft\\.CodeAnalysis/"],
-      "automerge": true,
-      "automergeType": "pr"
-    },
-    {
-      "description": "Test frameworks",
-      "groupName": "testing",
-      "matchPackageNames": ["/^xunit/", "/^AwesomeAssertions/"],
-      "automerge": true,
-      "automergeType": "pr"
-    },
-    {
-      "description": "Major bumps require manual review",
-      "matchUpdateTypes": ["major"],
-      "automerge": false,
-      "labels": ["dependencies", "major"]
-    },
-    {
-      "description": "Block .NET SDK previews — stable channel only",
-      "matchManagers": ["dotnet-sdk"],
-      "matchPackageNames": ["dotnet-sdk"],
-      "ignoreUnstable": true,
-      "allowedVersions": "/^[0-9]+\\.[0-9]+\\.[0-9]+$/"
-    },
     {
       "description": "Block self-bumps — Analyzers does not auto-bump its own published packages (and Dummy.* are local test samples)",
       "matchPackageNames": ["/^ANcpLua\\.Analyzers/", "/^Dummy/"],
