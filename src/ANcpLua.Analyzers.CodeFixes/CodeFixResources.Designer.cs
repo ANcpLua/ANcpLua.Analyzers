@@ -201,12 +201,6 @@ namespace ANcpLua.Analyzers.CodeFixes {
             }
         }
 
-        internal static string AL0038CodeFixTitle {
-            get {
-                return ResourceManager.GetString("AL0038CodeFixTitle", resourceCulture);
-            }
-        }
-
         internal static string AL0040CodeFixTitle {
             get {
                 return ResourceManager.GetString("AL0040CodeFixTitle", resourceCulture);

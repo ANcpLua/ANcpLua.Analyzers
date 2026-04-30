@@ -404,16 +404,6 @@
     <data name="AL0037AnalyzerDescription" xml:space="preserve">
     <value>Use TryParse extension methods (TryParseInt32, TryParseGuid, etc.) instead of verbose Type.TryParse ternary patterns.</value>
   </data>
-    <!-- AL0038: Use GetOrNull/GetOrDefault -->
-    <data name="AL0038AnalyzerTitle" xml:space="preserve">
-    <value>Use GetOrNull/GetOrDefault extension</value>
-  </data>
-    <data name="AL0038AnalyzerMessageFormat" xml:space="preserve">
-    <value>Use '{0}' instead of TryGetValue pattern</value>
-  </data>
-    <data name="AL0038AnalyzerDescription" xml:space="preserve">
-    <value>Use GetOrNull() or GetOrDefault() extensions instead of verbose TryGetValue ternary patterns.</value>
-  </data>
     <!-- AL0039: Use StringComparison extensions -->
     <data name="AL0039AnalyzerTitle" xml:space="preserve">
     <value>Use StringComparison extension</value>

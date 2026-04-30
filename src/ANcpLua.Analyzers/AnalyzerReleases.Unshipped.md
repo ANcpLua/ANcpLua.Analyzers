@@ -42,7 +42,6 @@ AL0034 | Roslyn Utilities | Info | Al0034UseWhereNotNullAnalyzer
 AL0035 | Roslyn Utilities | Info | Al0035UseToDisplayStringExtensionsAnalyzer
 AL0036 | Roslyn Utilities | Warning | Al0036UseGuardNotNullAnalyzer
 AL0037 | Roslyn Utilities | Warning | Al0037UseTryParseExtensionsAnalyzer
-AL0038 | Roslyn Utilities | Warning | Al0038UseGetOrNullAnalyzer
 AL0039 | Roslyn Utilities | Warning | Al0039UseStringComparisonExtensionsAnalyzer
 AL0040 | Roslyn Utilities | Warning | Al0040UseAttributeExtensionsAnalyzer
 AL0041 | AOT Testing | Error | Al0041AotTestMustReturnIntAnalyzer

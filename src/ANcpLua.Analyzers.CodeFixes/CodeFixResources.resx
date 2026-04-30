@@ -142,10 +142,7 @@
     <data name="AL0037CodeFixTitle" xml:space="preserve">
     <value>Use TryParse extension</value>
   </data>
-    <data name="AL0038CodeFixTitle" xml:space="preserve">
-    <value>Use GetOrNull extension</value>
-  </data>
-    <data name="AL0040CodeFixTitle" xml:space="preserve">
+<data name="AL0040CodeFixTitle" xml:space="preserve">
     <value>Use GetConstructorArgument extension</value>
   </data>
     <data name="AL0045CodeFixTitle" xml:space="preserve">
