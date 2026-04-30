@@ -213,7 +213,7 @@ public sealed partial class Al0127OutdatedMafPackageVersionAnalyzer : Diagnostic
         }
 
         var variableName = match.Groups[1].Value;
-        return propertyValues.GetOrNull(variableName);
+        return propertyValues.TryGetValue(variableName, out var resolved) ? resolved : null;
     }
 
     /// <summary>
