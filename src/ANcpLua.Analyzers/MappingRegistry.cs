@@ -13,7 +13,7 @@ internal static partial class MappingRegistry
     ///     Supports both fully-qualified names (e.g., "System.Int32") and
     ///     C# keyword aliases (e.g., "int").
     /// </remarks>
-    private static readonly IReadOnlyDictionary<string, string> TryParseMappings =
+    private static readonly Dictionary<string, string> TryParseMappings =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
             ["System.Int32"] = "TryParseInt32",
@@ -59,7 +59,7 @@ internal static partial class MappingRegistry
     /// <summary>
     ///     Maps StringComparison enum values to extension method suffixes.
     /// </summary>
-    private static readonly IReadOnlyDictionary<string, string> StringComparisonSuffixes =
+    private static readonly Dictionary<string, string> StringComparisonSuffixes =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
             ["Ordinal"] = "Ordinal",
@@ -77,7 +77,7 @@ internal static partial class MappingRegistry
     /// <returns>The extension method name, or null if no mapping exists.</returns>
     public static string? GetTryParseExtension(string typeName)
     {
-        return TryParseMappings.GetOrNull(typeName);
+        return TryParseMappings.TryGetValue(typeName, out var ext) ? ext : null;
     }
 
     /// <summary>
@@ -97,6 +97,6 @@ internal static partial class MappingRegistry
     /// <returns>The suffix to append to the method name, or null if not supported.</returns>
     public static string? GetStringComparisonSuffix(string comparisonValue)
     {
-        return StringComparisonSuffixes.GetOrNull(comparisonValue);
+        return StringComparisonSuffixes.TryGetValue(comparisonValue, out var suffix) ? suffix : null;
     }
 }
