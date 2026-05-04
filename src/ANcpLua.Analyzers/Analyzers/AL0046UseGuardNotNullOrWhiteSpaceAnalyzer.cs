@@ -15,13 +15,13 @@ public sealed partial class Al0046UseGuardNotNullOrWhiteSpaceAnalyzer : AlAnalyz
     /// <summary>The diagnostic identifier for AL0046.</summary>
     public const string DiagnosticId = "AL0046";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.RoslynUtilities,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers syntax or operation actions for analysis.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -36,7 +36,7 @@ public sealed partial class Al0046UseGuardNotNullOrWhiteSpaceAnalyzer : AlAnalyz
             return;
         }
 
-        context.ReportDiagnostic(Diagnostic.Create(Rule, ifStatement.GetLocation(), parameterName));
+        context.ReportDiagnostic(Diagnostic.Create(s_rule, ifStatement.GetLocation(), parameterName));
     }
 
     private static bool TryParseIsNullOrWhiteSpaceCheck(ExpressionSyntax condition, out string parameterName) {

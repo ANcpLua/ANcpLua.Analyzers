@@ -32,20 +32,20 @@ public sealed partial class Al0128DestructiveToolMustRequireApprovalAnalyzer : A
     /// <summary>Minimum enum value that is considered destructive (WritesExternalState = 2).</summary>
     private const int DestructiveSideEffectThreshold = 2;
 
-    private static readonly string[] DestructiveSideEffectNames = [
+    private static readonly string[] s_destructiveSideEffectNames = [
         "WritesExternalState",
         "MutatesCode",
         "Deploys",
         "ClosesIssue"
     ];
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.GenAI,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers symbol actions to analyze methods with [LoomTool] for missing [RequiresApproval].</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -67,7 +67,7 @@ public sealed partial class Al0128DestructiveToolMustRequireApprovalAnalyzer : A
         }
 
         context.ReportDiagnostic(Diagnostic.Create(
-            Rule,
+            s_rule,
             method.Locations.FirstOrDefault() ?? Location.None,
             method.Name,
             destructiveSideEffect));
@@ -91,8 +91,8 @@ public sealed partial class Al0128DestructiveToolMustRequireApprovalAnalyzer : A
             }
 
             if (attribute.ConstructorArguments is [{ Value: int enumValue and >= DestructiveSideEffectThreshold }, ..]) {
-                return enumValue < DestructiveSideEffectThreshold + DestructiveSideEffectNames.Length
-                    ? DestructiveSideEffectNames[enumValue - DestructiveSideEffectThreshold]
+                return enumValue < DestructiveSideEffectThreshold + s_destructiveSideEffectNames.Length
+                    ? s_destructiveSideEffectNames[enumValue - DestructiveSideEffectThreshold]
                     : enumValue.ToString();
             }
         }

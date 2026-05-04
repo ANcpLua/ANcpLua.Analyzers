@@ -27,13 +27,13 @@ public sealed partial class Al0084MissingServiceDiscoveryAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0084.</summary>
     private const string DiagnosticId = "AL0084";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.AspNetCore,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers compilation start actions to analyze service discovery configuration.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -76,7 +76,7 @@ public sealed partial class Al0084MissingServiceDiscoveryAnalyzer : AlAnalyzer {
         }
 
         if (IsHardcodedUrl(url) && !IsServiceDiscoveryUrl(url)) {
-            context.ReportDiagnostic(Diagnostic.Create(Rule, assignment.Syntax.GetLocation(), url.OriginalString));
+            context.ReportDiagnostic(Diagnostic.Create(s_rule, assignment.Syntax.GetLocation(), url.OriginalString));
         }
     }
 
@@ -105,7 +105,7 @@ public sealed partial class Al0084MissingServiceDiscoveryAnalyzer : AlAnalyzer {
         }
 
         if (IsHardcodedUrl(url) && !IsServiceDiscoveryUrl(url)) {
-            context.ReportDiagnostic(Diagnostic.Create(Rule, creation.Syntax.GetLocation(), url.OriginalString));
+            context.ReportDiagnostic(Diagnostic.Create(s_rule, creation.Syntax.GetLocation(), url.OriginalString));
         }
     }
 
@@ -128,18 +128,18 @@ public sealed partial class Al0084MissingServiceDiscoveryAnalyzer : AlAnalyzer {
     }
 
     /// <summary>RFC 6761 reserved TLDs — these never resolve in production.</summary>
-    private static readonly ImmutableArray<string> ReservedTlds =
+    private static readonly ImmutableArray<string> s_reservedTlds =
         [".test", ".invalid", ".example", ".localhost"];
 
     /// <summary>RFC 2606 / 6761 reserved second-level domains.</summary>
-    private static readonly ImmutableArray<string> ReservedDomains =
+    private static readonly ImmutableArray<string> s_reservedDomains =
         ["example.com", "example.net", "example.org"];
 
     // Well-known third-party API endpoints. Aspire service discovery only resolves services
     // registered in the local service registry — external SaaS APIs have no registry entry
     // and MUST be addressed by their public hostname. Flagging them as "hardcoded URLs" is a
     // false positive.
-    private static readonly ImmutableArray<string> WellKnownExternalApis =
+    private static readonly ImmutableArray<string> s_wellKnownExternalApis =
     [
         "api.github.com",
         "api.openai.com",
@@ -182,7 +182,7 @@ public sealed partial class Al0084MissingServiceDiscoveryAnalyzer : AlAnalyzer {
     }
 
     private static bool IsWellKnownExternalApi(string host) =>
-        WellKnownExternalApis.Any(host.EqualsIgnoreCase);
+        s_wellKnownExternalApis.Any(host.EqualsIgnoreCase);
 
     private static bool IsServiceDiscoveryUrl(Uri uri) {
         var scheme = uri.Scheme;
@@ -197,8 +197,8 @@ public sealed partial class Al0084MissingServiceDiscoveryAnalyzer : AlAnalyzer {
     }
 
     private static bool IsReservedDomain(string host) =>
-        ReservedTlds.Any(host.EndsWithIgnoreCase) ||
-        ReservedDomains.Any(d => host.EqualsIgnoreCase(d) || host.EndsWithIgnoreCase("." + d));
+        s_reservedTlds.Any(host.EndsWithIgnoreCase) ||
+        s_reservedDomains.Any(d => host.EqualsIgnoreCase(d) || host.EndsWithIgnoreCase("." + d));
 
     private static bool IsLocalhost(string host) =>
         host.EqualsIgnoreCase("localhost") ||

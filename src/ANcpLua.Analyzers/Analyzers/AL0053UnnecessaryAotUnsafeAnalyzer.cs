@@ -30,12 +30,12 @@ public sealed partial class Al0053UnnecessaryAotUnsafeAnalyzer : AlAnalyzer {
     private const string AotUnsafeAttributeName = "AotUnsafe";
     private const string RequiresDynamicCodeAttributeName = "RequiresDynamicCode";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.AotTesting,
         DiagnosticSeverities.Suggestion);
 
-    private static readonly HashSet<string> UnsafeReflectionMethods = new(StringComparer.Ordinal) {
+    private static readonly HashSet<string> s_unsafeReflectionMethods = new(StringComparer.Ordinal) {
         "GetMethod",
         "GetMethods",
         "GetProperty",
@@ -57,7 +57,7 @@ public sealed partial class Al0053UnnecessaryAotUnsafeAnalyzer : AlAnalyzer {
         "CreateDelegate",
     };
 
-    private static readonly HashSet<string> UnsafeReflectionTypes = new(StringComparer.Ordinal) {
+    private static readonly HashSet<string> s_unsafeReflectionTypes = new(StringComparer.Ordinal) {
         "System.Type",
         "System.Reflection.MethodInfo",
         "System.Reflection.MethodBase",
@@ -72,7 +72,7 @@ public sealed partial class Al0053UnnecessaryAotUnsafeAnalyzer : AlAnalyzer {
     };
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers syntax or operation actions for analysis.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -126,7 +126,7 @@ public sealed partial class Al0053UnnecessaryAotUnsafeAnalyzer : AlAnalyzer {
 
                 var attributeLocation = GetAotUnsafeAttributeLocation(kvp.Key);
                 ctx.ReportDiagnostic(Diagnostic.Create(
-                    Rule,
+                    s_rule,
                     attributeLocation ?? kvp.Key.Locations.FirstOrDefault(),
                     kvp.Key.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)));
             }
@@ -178,7 +178,7 @@ public sealed partial class Al0053UnnecessaryAotUnsafeAnalyzer : AlAnalyzer {
     }
 
     private static bool IsKnownReflectionApi(IMethodSymbol method) {
-        if (!UnsafeReflectionMethods.Contains(method.Name)) {
+        if (!s_unsafeReflectionMethods.Contains(method.Name)) {
             return false;
         }
 
@@ -186,12 +186,12 @@ public sealed partial class Al0053UnnecessaryAotUnsafeAnalyzer : AlAnalyzer {
             return false;
         }
 
-        if (UnsafeReflectionTypes.Contains(containingType.ToDisplayString())) {
+        if (s_unsafeReflectionTypes.Contains(containingType.ToDisplayString())) {
             return true;
         }
 
         for (var baseType = containingType.BaseType; baseType is not null; baseType = baseType.BaseType) {
-            if (UnsafeReflectionTypes.Contains(baseType.ToDisplayString())) {
+            if (s_unsafeReflectionTypes.Contains(baseType.ToDisplayString())) {
                 return true;
             }
         }

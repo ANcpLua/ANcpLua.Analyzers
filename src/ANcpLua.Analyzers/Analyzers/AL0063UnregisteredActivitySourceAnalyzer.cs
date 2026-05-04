@@ -23,13 +23,13 @@ public sealed partial class Al0063UnregisteredActivitySourceAnalyzer : AlAnalyze
 
     private const string ActivitySourceTypeName = "System.Diagnostics.ActivitySource";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers compilation-wide analysis for cross-file ActivitySource tracking.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -89,7 +89,7 @@ public sealed partial class Al0063UnregisteredActivitySourceAnalyzer : AlAnalyze
 
             foreach (var (location, sourceName) in activitySourceCreations) {
                 if (!IsRegistered(sourceName, registered)) {
-                    endCtx.ReportDiagnostic(Diagnostic.Create(Rule, location, sourceName));
+                    endCtx.ReportDiagnostic(Diagnostic.Create(s_rule, location, sourceName));
                 }
             }
         });

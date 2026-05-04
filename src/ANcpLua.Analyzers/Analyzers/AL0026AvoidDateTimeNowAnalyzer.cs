@@ -10,7 +10,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 public sealed partial class Al0026AvoidDateTimeNowAnalyzer : AlAnalyzer {
     private enum KnownType { TimeProvider, DateTime, DateTimeOffset }
 
-    private static readonly string[] KnownTypeNames = [
+    private static readonly string[] s_knownTypeNames = [
         "System.TimeProvider",
         "System.DateTime",
         "System.DateTimeOffset"
@@ -22,20 +22,20 @@ public sealed partial class Al0026AvoidDateTimeNowAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0026.</summary>
     public const string DiagnosticId = "AL0026";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.Usage,
         DiagnosticSeverity.Warning);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers compilation start action to analyze DateTime member access.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterCompilationStartAction(OnCompilationStart);
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
-        var cache = new TypeCache<KnownType>(type => context.Compilation.GetTypeByMetadataName(KnownTypeNames[(int)type]));
+        var cache = new TypeCache<KnownType>(type => context.Compilation.GetTypeByMetadataName(s_knownTypeNames[(int)type]));
 
         if (cache.Get(KnownType.TimeProvider) is null) {
             return;
@@ -82,6 +82,6 @@ public sealed partial class Al0026AvoidDateTimeNowAnalyzer : AlAnalyzer {
         var typeName = isDateTime ? "DateTime" : "DateTimeOffset";
         var properties = ImmutableDictionary.CreateBuilder<string, string?>();
         properties.Add(PropertyIsDateTimeOffset, isDateTimeOffset.ToString());
-        context.ReportDiagnostic(Diagnostic.Create(Rule, propertyRef.Syntax.GetLocation(), properties.ToImmutable(), typeName, property.Name, replacement));
+        context.ReportDiagnostic(Diagnostic.Create(s_rule, propertyRef.Syntax.GetLocation(), properties.ToImmutable(), typeName, property.Name, replacement));
     }
 }

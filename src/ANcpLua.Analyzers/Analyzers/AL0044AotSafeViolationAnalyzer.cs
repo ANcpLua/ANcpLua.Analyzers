@@ -23,13 +23,13 @@ public sealed partial class Al0044AotSafeViolationAnalyzer : AlAnalyzer {
     private const string AotSafeAttributeName = "AotSafe";
     private const string RequiresDynamicCodeAttributeName = "RequiresDynamicCode";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.AotTesting,
         DiagnosticSeverity.Warning);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <inheritdoc />
     protected override void RegisterActions(AnalysisContext context) =>
@@ -54,7 +54,7 @@ public sealed partial class Al0044AotSafeViolationAnalyzer : AlAnalyzer {
             return;
         }
 
-        context.ReportDiagnostic(Rule, invocation.Syntax.GetLocation(),
+        context.ReportDiagnostic(s_rule, invocation.Syntax.GetLocation(),
             callingMethod.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat),
             invocation.TargetMethod.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat));
     }

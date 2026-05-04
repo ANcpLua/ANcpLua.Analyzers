@@ -15,7 +15,7 @@ public sealed partial class Al0050UseGuardNotEmptyGuidAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0050.</summary>
     public const string DiagnosticId = "AL0050";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.RoslynUtilities,
         DiagnosticSeverities.Suggestion);
@@ -24,7 +24,7 @@ public sealed partial class Al0050UseGuardNotEmptyGuidAnalyzer : AlAnalyzer {
     public const string PropertyIdentifier = "Id";
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers syntax actions for analysis.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -44,7 +44,7 @@ public sealed partial class Al0050UseGuardNotEmptyGuidAnalyzer : AlAnalyzer {
         properties.Add(PropertyIdentifier, identifier);
 
         context.ReportDiagnostic(Diagnostic.Create(
-            Rule,
+            s_rule,
             ifStatement.GetLocation(),
             properties.ToImmutable(),
             identifier));

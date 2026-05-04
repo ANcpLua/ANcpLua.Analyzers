@@ -14,13 +14,13 @@ public sealed partial class Al0120UseIncrementalGeneratorAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0120.</summary>
     private const string DiagnosticId = "AL0120";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.RoslynUtilities,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers a compilation-start action to resolve ISourceGenerator.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -48,7 +48,7 @@ public sealed partial class Al0120UseIncrementalGeneratorAnalyzer : AlAnalyzer {
         }
 
         context.ReportDiagnostic(Diagnostic.Create(
-            Rule,
+            s_rule,
             namedType.Locations.FirstOrDefault() ?? Location.None,
             namedType.Name));
     }

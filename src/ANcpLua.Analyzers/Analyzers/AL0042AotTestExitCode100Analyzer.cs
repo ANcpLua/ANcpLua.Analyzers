@@ -24,13 +24,13 @@ public sealed partial class Al0042AotTestExitCode100Analyzer : AlAnalyzer {
     private const string TrimTestAttributeName = "TrimTest";
     private const int ExpectedExitCode = 100;
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.AotTesting,
         DiagnosticSeverity.Warning);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers syntax or operation actions for analysis.</summary>
 
@@ -68,7 +68,7 @@ public sealed partial class Al0042AotTestExitCode100Analyzer : AlAnalyzer {
                 CheckSingleReturnValue(context, expressionBody.Expression);
             } else {
                 context.ReportDiagnostic(
-                    Rule, methodDeclaration.Identifier.GetLocation(),
+                    s_rule, methodDeclaration.Identifier.GetLocation(),
                     $"Method ends without explicit 'return {ExpectedExitCode};' statement");
             }
 
@@ -80,7 +80,7 @@ public sealed partial class Al0042AotTestExitCode100Analyzer : AlAnalyzer {
         }
 
         context.ReportDiagnostic(
-            Rule, methodDeclaration.Identifier.GetLocation(),
+            s_rule, methodDeclaration.Identifier.GetLocation(),
             $"Method has no 'return {ExpectedExitCode};' statement to indicate success");
     }
 
@@ -94,14 +94,14 @@ public sealed partial class Al0042AotTestExitCode100Analyzer : AlAnalyzer {
         switch (constantValue) {
             case { HasValue: false }:
                 context.ReportDiagnostic(
-                    Rule, expression.GetLocation(),
+                    s_rule, expression.GetLocation(),
                     $"Consider returning {ExpectedExitCode} for success instead of a computed value");
                 break;
             case { Value: ExpectedExitCode }:
                 break;
             default:
                 context.ReportDiagnostic(
-                    Rule, expression.GetLocation(),
+                    s_rule, expression.GetLocation(),
                     $"Return value should be {ExpectedExitCode} for success, not {constantValue.Value?.ToString() ?? "null"}");
                 break;
         }

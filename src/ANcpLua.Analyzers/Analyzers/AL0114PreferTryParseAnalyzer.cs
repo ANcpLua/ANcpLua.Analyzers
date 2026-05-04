@@ -25,13 +25,13 @@ public sealed partial class Al0114PreferTryParseAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0114.</summary>
     private const string DiagnosticId = "AL0114";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.Reliability,
         DiagnosticSeverity.Warning);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers an operation action to detect Parse invocations on known types.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -64,7 +64,7 @@ public sealed partial class Al0114PreferTryParseAnalyzer : AlAnalyzer {
             _ => containingType.Name
         };
 
-        context.ReportDiagnostic(Rule, invocation.Syntax.GetLocation(), typeName);
+        context.ReportDiagnostic(s_rule, invocation.Syntax.GetLocation(), typeName);
     }
 
     private static bool IsKnownParseType(INamedTypeSymbol type) =>

@@ -28,13 +28,13 @@ public sealed partial class Al0013MissingSchemaUrlAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0013.</summary>
     private const string DiagnosticId = "AL0013";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverity.Info);
 
     /// <summary>Set of method names that configure OTel resources.</summary>
-    private static readonly HashSet<string> ResourceConfigMethods = [
+    private static readonly HashSet<string> s_resourceConfigMethods = [
         "ConfigureResource",
         "SetResourceBuilder",
         "AddResource",
@@ -43,7 +43,7 @@ public sealed partial class Al0013MissingSchemaUrlAnalyzer : AlAnalyzer {
     ];
 
     /// <summary>Array of known OTel builder type names to check for resource configuration.</summary>
-    private static readonly string[] OtelBuilderTypeNames = [
+    private static readonly string[] s_otelBuilderTypeNames = [
         "OpenTelemetry.Trace.TracerProviderBuilder",
         "OpenTelemetry.Metrics.MeterProviderBuilder",
         "OpenTelemetry.Logs.LoggerProviderBuilder",
@@ -52,14 +52,14 @@ public sealed partial class Al0013MissingSchemaUrlAnalyzer : AlAnalyzer {
     ];
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers compilation start action to analyze OTel resource configurations.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterCompilationStartAction(OnCompilationStart);
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
-        var otelBuilderTypes = OtelBuilderTypeNames
+        var otelBuilderTypes = s_otelBuilderTypeNames
             .Select(context.Compilation.GetTypeByMetadataName)
             .WhereNotNull()
             .ToImmutableArray();
@@ -79,7 +79,7 @@ public sealed partial class Al0013MissingSchemaUrlAnalyzer : AlAnalyzer {
         var invocation = (InvocationExpressionSyntax)context.Node;
 
         var methodName = GetMethodName(invocation);
-        if (methodName is null || !ResourceConfigMethods.Contains(methodName)) {
+        if (methodName is null || !s_resourceConfigMethods.Contains(methodName)) {
             return;
         }
 
@@ -92,7 +92,7 @@ public sealed partial class Al0013MissingSchemaUrlAnalyzer : AlAnalyzer {
         }
 
         var location = GetMethodLocation(invocation);
-        context.ReportDiagnostic(Rule, location);
+        context.ReportDiagnostic(s_rule, location);
     }
 
     private static bool IsOtelBuilderCall(

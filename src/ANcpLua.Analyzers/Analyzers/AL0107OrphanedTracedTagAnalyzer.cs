@@ -33,13 +33,13 @@ public sealed partial class Al0107OrphanedTracedTagAnalyzer : AlAnalyzer {
     private const string TracedAttributeFullName = "Qyl.Instrumentation.Instrumentation.TracedAttribute";
     private const string TracedTagAttributeFullName = "Qyl.Instrumentation.Instrumentation.TracedTagAttribute";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers symbol actions to analyze method parameters for orphaned [TracedTag].</summary>
     protected override void RegisterActions(AnalysisContext context) {
@@ -70,7 +70,7 @@ public sealed partial class Al0107OrphanedTracedTagAnalyzer : AlAnalyzer {
         foreach (var param in method.Parameters) {
             if (param.HasAttribute(tracedTagType)) {
                 context.ReportDiagnostic(Diagnostic.Create(
-                    Rule,
+                    s_rule,
                     param.Locations.FirstOrDefault() ?? Location.None,
                     param.Name));
             }

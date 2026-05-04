@@ -19,29 +19,29 @@ public sealed partial class Al0127OutdatedMafPackageVersionAnalyzer : Diagnostic
     private const string CurrentVersionKey = "CurrentVersion";
     private const string MinimumVersionKey = "MinimumVersion";
 
-    private static readonly LocalizableResourceString Title = new(
+    private static readonly LocalizableResourceString s_title = new(
         nameof(Resources.AL0127AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly LocalizableResourceString MessageFormat = new(
+    private static readonly LocalizableResourceString s_messageFormat = new(
         nameof(Resources.AL0127AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly LocalizableResourceString Description = new(
+    private static readonly LocalizableResourceString s_description = new(
         nameof(Resources.AL0127AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly DiagnosticDescriptor Rule = new(
-        DiagnosticId, Title, MessageFormat, DiagnosticCategories.VersionManagement,
-        DiagnosticSeverity.Warning, true, Description,
+    private static readonly DiagnosticDescriptor s_rule = new(
+        DiagnosticId, s_title, s_messageFormat, DiagnosticCategories.VersionManagement,
+        DiagnosticSeverity.Warning, true, s_description,
         AlAnalyzer.HelpLink(DiagnosticId),
         WellKnownDiagnosticTags.CompilationEnd);
 
     /// <summary>Pattern to detect MSBuild property references like $(VariableName).</summary>
-    private static readonly Regex MsBuildPropertyPattern = MsBuildPropertyRegex();
+    private static readonly Regex s_msBuildPropertyPattern = MsBuildPropertyRegex();
 
     /// <summary>
     ///     Package version requirements for MAF ecosystem packages.
     ///     Key: package name (case-insensitive). Value: minimum required version and reason.
     /// </summary>
-    private static readonly Dictionary<string, VersionRequirement> PackageRequirements = new(StringComparer.OrdinalIgnoreCase) {
+    private static readonly Dictionary<string, VersionRequirement> s_packageRequirements = new(StringComparer.OrdinalIgnoreCase) {
         // MAF Core — GA 1.0.0 (was rc5)
         ["Microsoft.Agents.AI"] = new("1.0.0", "GA — https://nuget.org/packages/Microsoft.Agents.AI"),
         ["Microsoft.Agents.AI.Abstractions"] = new("1.0.0", "GA — https://nuget.org/packages/Microsoft.Agents.AI.Abstractions"),
@@ -92,7 +92,7 @@ public sealed partial class Al0127OutdatedMafPackageVersionAnalyzer : Diagnostic
     };
 
     /// <inheritdoc />
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <inheritdoc />
     public override void Initialize(AnalysisContext context) {
@@ -182,7 +182,7 @@ public sealed partial class Al0127OutdatedMafPackageVersionAnalyzer : Diagnostic
                 var packageName = includeAttr.Value;
                 var versionValue = versionAttr.Value;
 
-                if (!PackageRequirements.TryGetValue(packageName, out var requirement)) {
+                if (!s_packageRequirements.TryGetValue(packageName, out var requirement)) {
                     continue;
                 }
 
@@ -206,7 +206,7 @@ public sealed partial class Al0127OutdatedMafPackageVersionAnalyzer : Diagnostic
     /// </summary>
     /// <returns>The resolved version string, or <c>null</c> if a variable could not be resolved.</returns>
     private static string? ResolveVersion(string versionValue, IReadOnlyDictionary<string, string> propertyValues) {
-        var match = MsBuildPropertyPattern.Match(versionValue);
+        var match = s_msBuildPropertyPattern.Match(versionValue);
 
         if (!match.Success) {
             return versionValue; // Hardcoded version
@@ -343,7 +343,7 @@ public sealed partial class Al0127OutdatedMafPackageVersionAnalyzer : Diagnostic
         properties.Add(MinimumVersionKey, requirement.MinimumVersion);
 
         var diagnostic = Diagnostic.Create(
-            Rule,
+            s_rule,
             location,
             properties.ToImmutable(),
             packageName,

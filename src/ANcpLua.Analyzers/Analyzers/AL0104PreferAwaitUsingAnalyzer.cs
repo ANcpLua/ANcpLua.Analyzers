@@ -32,13 +32,13 @@ public sealed partial class Al0104PreferAwaitUsingAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0104.</summary>
     private const string DiagnosticId = "AL0104";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.Reliability,
         DiagnosticSeverity.Warning);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers compilation start action to resolve IAsyncDisposable type.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -88,7 +88,7 @@ public sealed partial class Al0104PreferAwaitUsingAnalyzer : AlAnalyzer {
         }
 
         if (declaredType.Implements(asyncDisposableType)) {
-            context.ReportDiagnostic(Rule, localDeclaration.UsingKeyword.GetLocation(), declaredType.Name);
+            context.ReportDiagnostic(s_rule, localDeclaration.UsingKeyword.GetLocation(), declaredType.Name);
         }
     }
 
@@ -121,7 +121,7 @@ public sealed partial class Al0104PreferAwaitUsingAnalyzer : AlAnalyzer {
         }
 
         if (disposedType is not null && disposedType.Implements(asyncDisposableType)) {
-            context.ReportDiagnostic(Rule, usingStatement.UsingKeyword.GetLocation(), disposedType.Name);
+            context.ReportDiagnostic(s_rule, usingStatement.UsingKeyword.GetLocation(), disposedType.Name);
         }
     }
 }

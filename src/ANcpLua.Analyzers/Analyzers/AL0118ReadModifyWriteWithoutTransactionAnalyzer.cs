@@ -28,13 +28,13 @@ public sealed partial class Al0118ReadModifyWriteWithoutTransactionAnalyzer : Al
     /// <summary>The diagnostic identifier for AL0118.</summary>
     private const string DiagnosticId = "AL0118";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.Reliability,
         DiagnosticSeverity.Warning);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers syntax node action on method declarations and local functions.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -81,7 +81,7 @@ public sealed partial class Al0118ReadModifyWriteWithoutTransactionAnalyzer : Al
         }
 
         if (hasRead && hasWrite) {
-            context.ReportDiagnostic(Rule, identifier.GetLocation(), identifier.Text);
+            context.ReportDiagnostic(s_rule, identifier.GetLocation(), identifier.Text);
         }
     }
 

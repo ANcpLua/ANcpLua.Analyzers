@@ -32,26 +32,26 @@ public sealed partial class Al0106AvoidTaskRunInAspNetCoreAnalyzer : AlAnalyzer 
 
     private enum KnownType { Task, ControllerBase, PageModel }
 
-    private static readonly string[] KnownTypeNames = [
+    private static readonly string[] s_knownTypeNames = [
         "System.Threading.Tasks.Task",
         "Microsoft.AspNetCore.Mvc.ControllerBase",
         "Microsoft.AspNetCore.Mvc.RazorPages.PageModel"
     ];
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.AspNetCore,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers compilation start action to resolve ASP.NET Core types.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterCompilationStartAction(OnCompilationStart);
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
-        var cache = new TypeCache<KnownType>(type => context.Compilation.GetTypeByMetadataName(KnownTypeNames[(int)type]));
+        var cache = new TypeCache<KnownType>(type => context.Compilation.GetTypeByMetadataName(s_knownTypeNames[(int)type]));
 
         if (cache.Get(KnownType.Task) is null) {
             return;
@@ -82,7 +82,7 @@ public sealed partial class Al0106AvoidTaskRunInAspNetCoreAnalyzer : AlAnalyzer 
         }
 
         if (IsInsideAspNetCoreHandler(invocation, context.SemanticModel, cache, context.CancellationToken)) {
-            context.ReportDiagnostic(Rule, invocation.GetLocation());
+            context.ReportDiagnostic(s_rule, invocation.GetLocation());
         }
     }
 

@@ -8,13 +8,13 @@ public sealed partial class Al0133ContextSensitiveDeprecatedSemconvAnalyzer : Al
     /// <summary>The diagnostic identifier for AL0133.</summary>
     private const string DiagnosticId = "AL0133";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverity.Warning);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers syntax node actions to analyze string literals in telemetry contexts.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -35,7 +35,7 @@ public sealed partial class Al0133ContextSensitiveDeprecatedSemconvAnalyzer : Al
             return;
         }
 
-        context.ReportDiagnostic(Rule, literal.GetLocation(), value, guidance);
+        context.ReportDiagnostic(s_rule, literal.GetLocation(), value, guidance);
     }
 
     private static bool TryGetDeprecatedGuidance(LiteralExpressionSyntax literal, string value, out string? guidance) {

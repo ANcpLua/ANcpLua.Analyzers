@@ -16,13 +16,13 @@ public sealed partial class Al0123DuckDbColumnConflictingOrdinalAnalyzer : AlAna
 
     private const string DuckDbColumnAttributeFullName = "Qyl.Collector.Storage.DuckDbColumnAttribute";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.Design,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers a compilation-start action to resolve DuckDbColumnAttribute.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -67,7 +67,7 @@ public sealed partial class Al0123DuckDbColumnConflictingOrdinalAnalyzer : AlAna
 
                     if (ordinalMap.TryGetValue(ordinal, out var existing)) {
                         context.ReportDiagnostic(Diagnostic.Create(
-                            Rule,
+                            s_rule,
                             location,
                             existing.Name,
                             property.Name,

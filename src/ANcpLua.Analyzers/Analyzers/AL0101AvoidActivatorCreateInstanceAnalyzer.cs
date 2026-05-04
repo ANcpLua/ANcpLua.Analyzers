@@ -22,15 +22,15 @@ public sealed partial class Al0101AvoidActivatorCreateInstanceAnalyzer : AlAnaly
     private const string DiagnosticId = "AL0101";
 
     private const string ActivatorTypeName = "System.Activator";
-    private static readonly InvocationMatcher CreateInstanceInvocation = Invoke.Method("CreateInstance");
+    private static readonly InvocationMatcher s_createInstanceInvocation = Invoke.Method("CreateInstance");
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.AotTesting,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers a compilation start action to resolve the Activator type once.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -49,7 +49,7 @@ public sealed partial class Al0101AvoidActivatorCreateInstanceAnalyzer : AlAnaly
 
     private static void AnalyzeInvocation(OperationAnalysisContext context, INamedTypeSymbol activatorType) {
         if (context.Operation is not IInvocationOperation invocation ||
-            !CreateInstanceInvocation.Matches(invocation)) {
+            !s_createInstanceInvocation.Matches(invocation)) {
             return;
         }
 
@@ -59,7 +59,7 @@ public sealed partial class Al0101AvoidActivatorCreateInstanceAnalyzer : AlAnaly
         }
 
         context.ReportDiagnostic(Diagnostic.Create(
-            Rule,
+            s_rule,
             invocation.Syntax.GetLocation(),
             GetTargetTypeName(invocation)));
     }

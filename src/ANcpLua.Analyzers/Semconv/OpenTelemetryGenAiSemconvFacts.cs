@@ -1,13 +1,13 @@
 namespace ANcpLua.Analyzers.Analyzers;
 
 internal static partial class OpenTelemetryGenAiSemconvFacts {
-    internal static readonly string[] RequiredAttributeKeys = [
+    internal static readonly string[] s_requiredAttributeKeys = [
         "gen_ai.provider.name",
         "gen_ai.request.model",
         "gen_ai.operation.name"
     ];
 
-    private static readonly HashSet<string> ValidProviderNames = new(StringComparer.OrdinalIgnoreCase) {
+    private static readonly HashSet<string> s_validProviderNames = new(StringComparer.OrdinalIgnoreCase) {
         "openai",
         "anthropic",
         "cohere",
@@ -25,7 +25,7 @@ internal static partial class OpenTelemetryGenAiSemconvFacts {
         "mistral_ai"
     };
 
-    private static readonly HashSet<string> ValidOperationNames = new(StringComparer.OrdinalIgnoreCase) {
+    private static readonly HashSet<string> s_validOperationNames = new(StringComparer.OrdinalIgnoreCase) {
         "chat",
         "generate_content",
         "text_completion",
@@ -37,7 +37,7 @@ internal static partial class OpenTelemetryGenAiSemconvFacts {
         "invoke_workflow"
     };
 
-    internal static bool IsValidProviderName(string value) => ValidProviderNames.Contains(value);
+    internal static bool IsValidProviderName(string value) => s_validProviderNames.Contains(value);
 
-    internal static bool IsValidOperationName(string value) => ValidOperationNames.Contains(value);
+    internal static bool IsValidOperationName(string value) => s_validOperationNames.Contains(value);
 }

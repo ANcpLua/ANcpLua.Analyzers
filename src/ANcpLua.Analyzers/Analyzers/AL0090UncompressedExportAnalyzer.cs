@@ -31,33 +31,33 @@ public sealed partial class Al0090UncompressedExportAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0090.</summary>
     private const string DiagnosticId = "AL0090";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverity.Warning);
 
     /// <summary>Method names that configure OTLP exporters.</summary>
-    private static readonly HashSet<string> OtlpExporterMethods = [
+    private static readonly HashSet<string> s_otlpExporterMethods = [
         "AddOtlpExporter",
         "UseOtlpExporter",
         "WithOtlpExporter"
     ];
 
     /// <summary>Type names for OTLP exporter options.</summary>
-    private static readonly string[] OtlpOptionsTypeNames = [
+    private static readonly string[] s_otlpOptionsTypeNames = [
         "OpenTelemetry.Exporter.OtlpExporterOptions",
         "OpenTelemetry.Exporter.OtlpExporterOptionsBase"
     ];
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers compilation start action to analyze OTLP exporter configurations.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterCompilationStartAction(OnCompilationStart);
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
-        var otlpOptionsTypes = OtlpOptionsTypeNames
+        var otlpOptionsTypes = s_otlpOptionsTypeNames
             .Select(context.Compilation.GetTypeByMetadataName)
             .WhereNotNull()
             .ToImmutableArray();
@@ -80,7 +80,7 @@ public sealed partial class Al0090UncompressedExportAnalyzer : AlAnalyzer {
         INamedTypeSymbol? httpProtobufType) {
         var invocation = (InvocationExpressionSyntax)context.Node;
 
-        if (GetMethodName(invocation) is not { } methodName || !OtlpExporterMethods.Contains(methodName)) {
+        if (GetMethodName(invocation) is not { } methodName || !s_otlpExporterMethods.Contains(methodName)) {
             return;
         }
 
@@ -92,7 +92,7 @@ public sealed partial class Al0090UncompressedExportAnalyzer : AlAnalyzer {
         if (lambdaArg is not null) {
             if (!HasCompressionConfiguration(lambdaArg)
                 && HasHttpProtobufConfiguration(lambdaArg, httpProtobufType, context.SemanticModel, context.CancellationToken)) {
-                context.ReportDiagnostic(Rule, GetMethodLocation(invocation));
+                context.ReportDiagnostic(s_rule, GetMethodLocation(invocation));
             }
 
             return;
@@ -110,7 +110,7 @@ public sealed partial class Al0090UncompressedExportAnalyzer : AlAnalyzer {
 
             if (otlpOptionsTypes.Any(optionsType => argType.InheritsFrom(optionsType) || argType.IsEqualTo(optionsType))
                 && IsHttpProtobufOptionsWithoutCompression(arg.Expression)) {
-                context.ReportDiagnostic(Rule, GetMethodLocation(invocation));
+                context.ReportDiagnostic(s_rule, GetMethodLocation(invocation));
             }
         }
     }

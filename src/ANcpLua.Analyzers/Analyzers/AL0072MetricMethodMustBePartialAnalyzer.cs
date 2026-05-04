@@ -32,13 +32,13 @@ public sealed partial class Al0072MetricMethodMustBePartialAnalyzer : AlAnalyzer
     private const string CounterAttributeFullName = "Qyl.Instrumentation.Instrumentation.CounterAttribute";
     private const string HistogramAttributeFullName = "Qyl.Instrumentation.Instrumentation.HistogramAttribute";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.Metrics,
         DiagnosticSeverities.RequiredFix);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers syntax node actions to analyze method declarations with metric attributes.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -58,7 +58,7 @@ public sealed partial class Al0072MetricMethodMustBePartialAnalyzer : AlAnalyzer
 
         if (!methodDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword)) {
             context.ReportDiagnostic(Diagnostic.Create(
-                Rule,
+                s_rule,
                 methodDeclaration.Identifier.GetLocation(),
                 methodSymbol.Name,
                 metricAttributeName));

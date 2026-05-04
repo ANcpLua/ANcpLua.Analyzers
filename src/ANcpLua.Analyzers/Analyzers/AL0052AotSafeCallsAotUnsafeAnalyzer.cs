@@ -24,13 +24,13 @@ public sealed partial class Al0052AotSafeCallsAotUnsafeAnalyzer : AlAnalyzer {
     private const string AotSafeAttributeName = "AotSafe";
     private const string AotUnsafeAttributeName = "AotUnsafe";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.AotTesting,
         DiagnosticSeverities.RequiredFix);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers syntax or operation actions for analysis.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -49,7 +49,7 @@ public sealed partial class Al0052AotSafeCallsAotUnsafeAnalyzer : AlAnalyzer {
         }
 
         context.ReportDiagnostic(Diagnostic.Create(
-            Rule,
+            s_rule,
             invocation.Syntax.GetLocation(),
             callingMethod.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat),
             invocation.TargetMethod.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)));

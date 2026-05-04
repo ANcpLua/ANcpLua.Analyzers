@@ -29,7 +29,7 @@ public sealed partial class Al0016CombineDeclarationWithNullCheckAnalyzer : AlAn
     /// <summary>AL0016: Combine declaration with subsequent null-check.</summary>
     public const string DiagnosticId = "AL0016";
 
-    private static readonly DiagnosticDescriptor Rule = new(
+    private static readonly DiagnosticDescriptor s_rule = new(
         DiagnosticId,
         "Combine declaration with subsequent null-check",
         "Combine declaration of '{0}' with subsequent null-check",
@@ -40,7 +40,7 @@ public sealed partial class Al0016CombineDeclarationWithNullCheckAnalyzer : AlAn
         HelpLink(DiagnosticId));
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers syntax node actions to analyze local variable declarations.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -98,7 +98,7 @@ public sealed partial class Al0016CombineDeclarationWithNullCheckAnalyzer : AlAn
             return;
         }
 
-        context.ReportDiagnostic(Diagnostic.Create(Rule, declaration.GetLocation(), variableName));
+        context.ReportDiagnostic(Diagnostic.Create(s_rule, declaration.GetLocation(), variableName));
     }
 
     private static bool IsNullCheck(ExpressionSyntax condition, string name, SemanticModel semanticModel) {

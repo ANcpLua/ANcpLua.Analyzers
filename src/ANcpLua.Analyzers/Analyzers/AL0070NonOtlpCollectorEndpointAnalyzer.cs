@@ -15,7 +15,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0070NonOtlpCollectorEndpointAnalyzer : AlAnalyzer {
-    private static readonly string[] OtlpPatterns = [
+    private static readonly string[] s_otlpPatterns = [
         "4317", // gRPC default port
         "4318", // HTTP default port
         "/v1/traces",
@@ -24,20 +24,20 @@ public sealed partial class Al0070NonOtlpCollectorEndpointAnalyzer : AlAnalyzer 
         "otlp"
     ];
 
-    private static readonly string[] EndpointPropertyNames = [
+    private static readonly string[] s_endpointPropertyNames = [
         "Endpoint", "CollectorEndpoint", "OtlpEndpoint", "ExporterEndpoint"
     ];
 
     /// <summary>The diagnostic identifier for AL0070.</summary>
     private const string DiagnosticId = "AL0070";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.Configuration,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers operation actions to analyze endpoint assignments.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -47,13 +47,13 @@ public sealed partial class Al0070NonOtlpCollectorEndpointAnalyzer : AlAnalyzer 
         var assignment = (ISimpleAssignmentOperation)context.Operation;
 
         if (GetPropertyName(assignment.Target) is not { } propertyName ||
-            !EndpointPropertyNames.Contains(propertyName, StringComparer.OrdinalIgnoreCase) ||
+            !s_endpointPropertyNames.Contains(propertyName, StringComparer.OrdinalIgnoreCase) ||
             assignment.Value.ConstantValue is not { HasValue: true, Value: string endpoint } ||
             IsOtlpEndpoint(endpoint)) {
             return;
         }
 
-        context.ReportDiagnostic(Diagnostic.Create(Rule, assignment.Syntax.GetLocation(), endpoint));
+        context.ReportDiagnostic(Diagnostic.Create(s_rule, assignment.Syntax.GetLocation(), endpoint));
     }
 
     private static string? GetPropertyName(IOperation target) =>
@@ -64,5 +64,5 @@ public sealed partial class Al0070NonOtlpCollectorEndpointAnalyzer : AlAnalyzer 
         };
 
     private static bool IsOtlpEndpoint(string endpoint) =>
-        OtlpPatterns.Any(endpoint.ContainsIgnoreCase);
+        s_otlpPatterns.Any(endpoint.ContainsIgnoreCase);
 }

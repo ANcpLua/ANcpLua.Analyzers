@@ -19,15 +19,15 @@ public sealed partial class Al0064GenAiMissingRequiredAttributesAnalyzer : AlAna
     /// <summary>The diagnostic identifier for AL0064.</summary>
     private const string DiagnosticId = "AL0064";
 
-    private static readonly string[] RequiredGenAiAttributes = OpenTelemetryGenAiSemconvFacts.RequiredAttributeKeys;
+    private static readonly string[] s_requiredGenAiAttributes = OpenTelemetryGenAiSemconvFacts.s_requiredAttributeKeys;
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.GenAI,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers operation actions to analyze Activity.StartActivity calls.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -44,9 +44,9 @@ public sealed partial class Al0064GenAiMissingRequiredAttributesAnalyzer : AlAna
 
         var setTags = CollectSetTagCalls(invocation);
 
-        foreach (var requiredAttribute in RequiredGenAiAttributes) {
+        foreach (var requiredAttribute in s_requiredGenAiAttributes) {
             if (!setTags.Contains(requiredAttribute, StringComparer.OrdinalIgnoreCase)) {
-                context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.Syntax.GetLocation(), activityName, requiredAttribute));
+                context.ReportDiagnostic(Diagnostic.Create(s_rule, invocation.Syntax.GetLocation(), activityName, requiredAttribute));
             }
         }
     }

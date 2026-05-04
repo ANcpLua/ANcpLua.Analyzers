@@ -18,13 +18,13 @@ public sealed partial class Al0049UseGuardPositiveAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0049.</summary>
     public const string DiagnosticId = "AL0049";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.RoslynUtilities,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers syntax actions for if statement analysis.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -49,7 +49,7 @@ public sealed partial class Al0049UseGuardPositiveAnalyzer : AlAnalyzer {
             return;
         }
 
-        context.ReportDiagnostic(Diagnostic.Create(Rule, ifStatement.IfKeyword.GetLocation(), identifier));
+        context.ReportDiagnostic(Diagnostic.Create(s_rule, ifStatement.IfKeyword.GetLocation(), identifier));
     }
 
     private static bool TryParseLessThanOrEqualZeroCheck(ExpressionSyntax condition, out string identifier) {

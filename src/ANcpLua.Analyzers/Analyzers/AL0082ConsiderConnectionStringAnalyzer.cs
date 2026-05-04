@@ -8,7 +8,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0082ConsiderConnectionStringAnalyzer : AlAnalyzer {
     /// <summary>Connection string prefixes that indicate a hardcoded connection string (case-insensitive).</summary>
-    private static readonly string[] ConnectionStringPrefixes = [
+    private static readonly string[] s_connectionStringPrefixes = [
         "Server=",
         "Host=",
         "Data Source=",
@@ -26,7 +26,7 @@ public sealed partial class Al0082ConsiderConnectionStringAnalyzer : AlAnalyzer 
     ];
 
     /// <summary>Type names that typically accept connection strings in constructors.</summary>
-    private static readonly string[] ConnectionClientTypes = [
+    private static readonly string[] s_connectionClientTypes = [
         "NpgsqlConnection",
         "NpgsqlDataSource",
         "NpgsqlDataSourceBuilder",
@@ -45,13 +45,13 @@ public sealed partial class Al0082ConsiderConnectionStringAnalyzer : AlAnalyzer 
     /// <summary>The diagnostic identifier for AL0082.</summary>
     private const string DiagnosticId = "AL0082";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.Configuration,
         DiagnosticSeverities.HiddenByDefault);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers operation action to analyze object creation and invocation operations.</summary>
     protected override void RegisterActions(AnalysisContext context) {
@@ -67,7 +67,7 @@ public sealed partial class Al0082ConsiderConnectionStringAnalyzer : AlAnalyzer 
 
         foreach (var argument in creation.Arguments) {
             if (IsHardcodedConnectionString(argument.Value)) {
-                context.ReportDiagnostic(Rule, argument.Syntax.GetLocation());
+                context.ReportDiagnostic(s_rule, argument.Syntax.GetLocation());
                 return;
             }
         }
@@ -81,7 +81,7 @@ public sealed partial class Al0082ConsiderConnectionStringAnalyzer : AlAnalyzer 
 
         foreach (var argument in invocation.Arguments) {
             if (IsHardcodedConnectionString(argument.Value)) {
-                context.ReportDiagnostic(Rule, argument.Syntax.GetLocation());
+                context.ReportDiagnostic(s_rule, argument.Syntax.GetLocation());
                 return;
             }
         }
@@ -89,7 +89,7 @@ public sealed partial class Al0082ConsiderConnectionStringAnalyzer : AlAnalyzer 
 
     private static bool IsConnectionClientType(INamedTypeSymbol type) {
         var typeName = type.Name;
-        foreach (var clientType in ConnectionClientTypes) {
+        foreach (var clientType in s_connectionClientTypes) {
             if (typeName.EqualsOrdinal(clientType)) {
                 return true;
             }
@@ -145,7 +145,7 @@ public sealed partial class Al0082ConsiderConnectionStringAnalyzer : AlAnalyzer 
             return false;
         }
 
-        foreach (var prefix in ConnectionStringPrefixes) {
+        foreach (var prefix in s_connectionStringPrefixes) {
             if (value.StartsWithIgnoreCase(prefix)) {
                 return true;
             }

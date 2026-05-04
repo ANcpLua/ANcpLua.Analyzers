@@ -38,23 +38,23 @@ public sealed partial class Al0018VersionPropsNotImportedAnalyzer : DiagnosticAn
     /// <summary>Filename for Directory.Packages.props.</summary>
     private const string DirectoryPackagesPropsFileName = "Directory.Packages.props";
 
-    private static readonly LocalizableResourceString Title = new(
+    private static readonly LocalizableResourceString s_title = new(
         nameof(Resources.AL0018AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly LocalizableResourceString MessageFormat = new(
+    private static readonly LocalizableResourceString s_messageFormat = new(
         nameof(Resources.AL0018AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly LocalizableResourceString Description = new(
+    private static readonly LocalizableResourceString s_description = new(
         nameof(Resources.AL0018AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly DiagnosticDescriptor Rule = new(
-        DiagnosticId, Title, MessageFormat, DiagnosticCategories.VersionManagement,
-        DiagnosticSeverity.Warning, true, Description,
+    private static readonly DiagnosticDescriptor s_rule = new(
+        DiagnosticId, s_title, s_messageFormat, DiagnosticCategories.VersionManagement,
+        DiagnosticSeverity.Warning, true, s_description,
         AlAnalyzer.HelpLink(DiagnosticId),
         WellKnownDiagnosticTags.CompilationEnd);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Initializes the analyzer and registers compilation-level actions.</summary>
     public override void Initialize(AnalysisContext context) {
@@ -184,7 +184,7 @@ public sealed partial class Al0018VersionPropsNotImportedAnalyzer : DiagnosticAn
                         new LinePosition(0, 0),
                         new LinePosition(0, 0)));
 
-                var diagnostic = Diagnostic.Create(Rule, location);
+                var diagnostic = Diagnostic.Create(s_rule, location);
                 context.ReportDiagnostic(diagnostic);
             }
         } catch (Exception) {

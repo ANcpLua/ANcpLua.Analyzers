@@ -39,54 +39,54 @@ public sealed partial class Al0007ToAl0009IXmlSerializableAnalyzer : AlAnalyzer 
     /// <summary>The diagnostic identifier for AL0009.</summary>
     private const string DiagnosticIdAl0009 = "AL0009";
 
-    private static readonly LocalizableResourceString TitleAl0007 = new(
+    private static readonly LocalizableResourceString s_titleAl0007 = new(
         nameof(Resources.AL0007AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly LocalizableResourceString MessageFormatAl0007 = new(
+    private static readonly LocalizableResourceString s_messageFormatAl0007 = new(
         nameof(Resources.AL0007AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly LocalizableResourceString DescriptionAl0007 = new(
+    private static readonly LocalizableResourceString s_descriptionAl0007 = new(
         nameof(Resources.AL0007AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly LocalizableResourceString TitleAl0008 = new(
+    private static readonly LocalizableResourceString s_titleAl0008 = new(
         nameof(Resources.AL0008AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly LocalizableResourceString MessageFormatAl0008 = new(
+    private static readonly LocalizableResourceString s_messageFormatAl0008 = new(
         nameof(Resources.AL0008AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly LocalizableResourceString DescriptionAl0008 = new(
+    private static readonly LocalizableResourceString s_descriptionAl0008 = new(
         nameof(Resources.AL0008AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly LocalizableResourceString TitleAl0009 = new(
+    private static readonly LocalizableResourceString s_titleAl0009 = new(
         nameof(Resources.AL0009AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly LocalizableResourceString MessageFormatAl0009 = new(
+    private static readonly LocalizableResourceString s_messageFormatAl0009 = new(
         nameof(Resources.AL0009AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly LocalizableResourceString DescriptionAl0009 = new(
+    private static readonly LocalizableResourceString s_descriptionAl0009 = new(
         nameof(Resources.AL0009AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly DiagnosticDescriptor RuleAl0007 = new(
+    private static readonly DiagnosticDescriptor s_ruleAl0007 = new(
         DiagnosticIdAl0007,
-        TitleAl0007, MessageFormatAl0007, DiagnosticCategories.Usage,
-        DiagnosticSeverity.Error, true, DescriptionAl0007,
+        s_titleAl0007, s_messageFormatAl0007, DiagnosticCategories.Usage,
+        DiagnosticSeverity.Error, true, s_descriptionAl0007,
         HelpLink(DiagnosticIdAl0007));
 
-    private static readonly DiagnosticDescriptor RuleAl0008 = new(
+    private static readonly DiagnosticDescriptor s_ruleAl0008 = new(
         DiagnosticIdAl0008,
-        TitleAl0008, MessageFormatAl0008, DiagnosticCategories.Usage,
-        DiagnosticSeverity.Error, true, DescriptionAl0008,
+        s_titleAl0008, s_messageFormatAl0008, DiagnosticCategories.Usage,
+        DiagnosticSeverity.Error, true, s_descriptionAl0008,
         HelpLink(DiagnosticIdAl0008));
 
-    private static readonly DiagnosticDescriptor RuleAl0009 = new(
+    private static readonly DiagnosticDescriptor s_ruleAl0009 = new(
         DiagnosticIdAl0009,
-        TitleAl0009, MessageFormatAl0009, DiagnosticCategories.Usage,
-        DiagnosticSeverity.Error, true, DescriptionAl0009,
+        s_titleAl0009, s_messageFormatAl0009, DiagnosticCategories.Usage,
+        DiagnosticSeverity.Error, true, s_descriptionAl0009,
         HelpLink(DiagnosticIdAl0009));
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics (AL0007, AL0008, AL0009).</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-        [RuleAl0007, RuleAl0008, RuleAl0009];
+        [s_ruleAl0007, s_ruleAl0008, s_ruleAl0009];
 
     /// <summary>Registers compilation start action to analyze IXmlSerializable implementations.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -128,7 +128,7 @@ public sealed partial class Al0007ToAl0009IXmlSerializableAnalyzer : AlAnalyzer 
 
         if (!methodSymbol.ExplicitInterfaceImplementations.Any(i =>
                 i.IsEqualTo(interfaceGetSchema))) {
-            context.ReportDiagnostic(RuleAl0007, methodSymbol.Locations[0]);
+            context.ReportDiagnostic(s_ruleAl0007, methodSymbol.Locations[0]);
         }
 
         if (methodSymbol.IsAbstract || ReturnsNonNullValue(methodDeclaration, context.SemanticModel)) {
@@ -137,7 +137,7 @@ public sealed partial class Al0007ToAl0009IXmlSerializableAnalyzer : AlAnalyzer 
                                ?.GetLocation()
                            ?? methodDeclaration.GetLocation();
 
-            context.ReportDiagnostic(RuleAl0008, location);
+            context.ReportDiagnostic(s_ruleAl0008, location);
         }
     }
 
@@ -150,7 +150,7 @@ public sealed partial class Al0007ToAl0009IXmlSerializableAnalyzer : AlAnalyzer 
 
         if (targetMethod.IsEqualTo(interfaceGetSchema) ||
             IsGetSchemaImplementation(targetMethod, ixmlSerializable)) {
-            context.ReportDiagnostic(RuleAl0009, invocation.Syntax.GetLocation());
+            context.ReportDiagnostic(s_ruleAl0009, invocation.Syntax.GetLocation());
         }
     }
 

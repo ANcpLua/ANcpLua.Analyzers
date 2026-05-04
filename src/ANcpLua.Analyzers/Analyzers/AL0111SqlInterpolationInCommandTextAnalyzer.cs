@@ -22,13 +22,13 @@ public sealed partial class Al0111SqlInterpolationInCommandTextAnalyzer : AlAnal
     /// <summary>The diagnostic identifier for AL0111.</summary>
     private const string DiagnosticId = "AL0111";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.Reliability,
         DiagnosticSeverity.Warning);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers a syntax node action on simple assignment expressions.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -47,6 +47,6 @@ public sealed partial class Al0111SqlInterpolationInCommandTextAnalyzer : AlAnal
             return;
         }
 
-        context.ReportDiagnostic(Rule, interpolatedString.GetLocation());
+        context.ReportDiagnostic(s_rule, interpolatedString.GetLocation());
     }
 }

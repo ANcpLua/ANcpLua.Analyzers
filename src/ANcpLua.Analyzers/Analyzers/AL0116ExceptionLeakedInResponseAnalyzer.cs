@@ -32,14 +32,14 @@ public sealed partial class Al0116ExceptionLeakedInResponseAnalyzer : AlAnalyzer
     /// <summary>The diagnostic identifier for AL0116.</summary>
     private const string DiagnosticId = "AL0116";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.Reliability,
         DiagnosticSeverity.Warning);
 
-    private static readonly string[] LeakedMembers = ["Message", "StackTrace"];
+    private static readonly string[] s_leakedMembers = ["Message", "StackTrace"];
 
-    private static readonly string[] ResultFactoryMethods = [
+    private static readonly string[] s_resultFactoryMethods = [
         "BadRequest",
         "Problem",
         "StatusCode",
@@ -47,7 +47,7 @@ public sealed partial class Al0116ExceptionLeakedInResponseAnalyzer : AlAnalyzer
     ];
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers syntax node action for member access expressions.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -59,7 +59,7 @@ public sealed partial class Al0116ExceptionLeakedInResponseAnalyzer : AlAnalyzer
 
         // Check for ex.Message, ex.StackTrace (property access)
         // or ex.ToString() (invocation on member access -- handled below via parent check)
-        var isLeakedProperty = LeakedMembers.Contains(memberName);
+        var isLeakedProperty = s_leakedMembers.Contains(memberName);
         var isToString = memberName == "ToString";
 
         if (!isLeakedProperty && !isToString) {
@@ -82,7 +82,7 @@ public sealed partial class Al0116ExceptionLeakedInResponseAnalyzer : AlAnalyzer
         }
 
         var displayText = isToString ? $"{memberAccess.Expression}.ToString()" : memberAccess.ToString();
-        context.ReportDiagnostic(Rule, memberAccess.GetLocation(), displayText);
+        context.ReportDiagnostic(s_rule, memberAccess.GetLocation(), displayText);
     }
 
     /// <summary>Determines if the expression references a variable declared in a catch clause.</summary>
@@ -142,7 +142,7 @@ public sealed partial class Al0116ExceptionLeakedInResponseAnalyzer : AlAnalyzer
             return false;
         }
 
-        if (!ResultFactoryMethods.Contains(methodName.Identifier.Text)) {
+        if (!s_resultFactoryMethods.Contains(methodName.Identifier.Text)) {
             return false;
         }
 

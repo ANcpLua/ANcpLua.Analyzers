@@ -27,13 +27,13 @@ public sealed partial class Al0080MissingResilienceConfigurationAnalyzer : AlAna
     /// <summary>The diagnostic identifier for AL0080.</summary>
     private const string DiagnosticId = "AL0080";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.AspNetCore,
         DiagnosticSeverity.Warning);
 
     /// <summary>Gets the diagnostic descriptor for AL0080.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers operation actions to analyze HTTP client registrations.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -48,7 +48,7 @@ public sealed partial class Al0080MissingResilienceConfigurationAnalyzer : AlAna
         }
 
         context.ReportDiagnostic(Diagnostic.Create(
-            Rule,
+            s_rule,
             invocation.Syntax.GetLocation(),
             GetHttpClientName(invocation)));
     }

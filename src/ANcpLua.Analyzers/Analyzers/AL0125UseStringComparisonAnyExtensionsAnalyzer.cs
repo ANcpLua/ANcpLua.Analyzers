@@ -9,13 +9,13 @@ public sealed partial class Al0125UseStringComparisonAnyExtensionsAnalyzer : AlA
     /// <summary>The diagnostic identifier for AL0125.</summary>
     private const string DiagnosticId = "AL0125";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.RoslynUtilities,
         DiagnosticSeverities.Suggestion);
 
     /// <inheritdoc />
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <inheritdoc />
     protected override void RegisterActions(AnalysisContext context) =>
@@ -40,7 +40,7 @@ public sealed partial class Al0125UseStringComparisonAnyExtensionsAnalyzer : AlA
         }
 
         var args = string.Join(", ", constants);
-        context.ReportDiagnostic(Rule, topOr.Syntax.GetLocation(),
+        context.ReportDiagnostic(s_rule, topOr.Syntax.GetLocation(),
             $"{receiver}.EqualsAnyOrdinal({args})");
     }
 

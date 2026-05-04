@@ -35,36 +35,36 @@ public sealed partial class Al0004ToAl0005SpanComparisonAnalyzer : AlAnalyzer {
     /// <summary>AL0005: Use SequenceEqual when comparing Span and a non-constant.</summary>
     public const string DiagnosticIdAl0005 = "AL0005";
 
-    private static readonly LocalizableResourceString TitleAl0004 = new(
+    private static readonly LocalizableResourceString s_titleAl0004 = new(
         nameof(Resources.AL0004AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly LocalizableResourceString MessageFormatAl0004 = new(
+    private static readonly LocalizableResourceString s_messageFormatAl0004 = new(
         nameof(Resources.AL0004AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly LocalizableResourceString DescriptionAl0004 = new(
+    private static readonly LocalizableResourceString s_descriptionAl0004 = new(
         nameof(Resources.AL0004AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly LocalizableResourceString TitleAl0005 = new(
+    private static readonly LocalizableResourceString s_titleAl0005 = new(
         nameof(Resources.AL0005AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly LocalizableResourceString MessageFormatAl0005 = new(
+    private static readonly LocalizableResourceString s_messageFormatAl0005 = new(
         nameof(Resources.AL0005AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly LocalizableResourceString DescriptionAl0005 = new(
+    private static readonly LocalizableResourceString s_descriptionAl0005 = new(
         nameof(Resources.AL0005AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly DiagnosticDescriptor RuleAl0004 = new(
-        DiagnosticIdAl0004, TitleAl0004, MessageFormatAl0004, DiagnosticCategories.Usage,
-        DiagnosticSeverity.Warning, true, DescriptionAl0004,
+    private static readonly DiagnosticDescriptor s_ruleAl0004 = new(
+        DiagnosticIdAl0004, s_titleAl0004, s_messageFormatAl0004, DiagnosticCategories.Usage,
+        DiagnosticSeverity.Warning, true, s_descriptionAl0004,
         HelpLink(DiagnosticIdAl0004));
 
-    private static readonly DiagnosticDescriptor RuleAl0005 = new(
-        DiagnosticIdAl0005, TitleAl0005, MessageFormatAl0005, DiagnosticCategories.Usage,
-        DiagnosticSeverity.Warning, true, DescriptionAl0005,
+    private static readonly DiagnosticDescriptor s_ruleAl0005 = new(
+        DiagnosticIdAl0005, s_titleAl0005, s_messageFormatAl0005, DiagnosticCategories.Usage,
+        DiagnosticSeverity.Warning, true, s_descriptionAl0005,
         HelpLink(DiagnosticIdAl0005));
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics (AL0004 and AL0005).</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [RuleAl0004, RuleAl0005];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_ruleAl0004, s_ruleAl0005];
 
     /// <summary>Registers compilation start action to analyze Span comparison operations.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -108,7 +108,7 @@ public sealed partial class Al0004ToAl0005SpanComparisonAnalyzer : AlAnalyzer {
         var start = node.OperatorToken.Span.Start;
         var end = node.Right.Span.End;
 
-        context.ReportDiagnostic(hasNonConstant ? RuleAl0005 : RuleAl0004,
+        context.ReportDiagnostic(hasNonConstant ? s_ruleAl0005 : s_ruleAl0004,
             Location.Create(node.SyntaxTree, TextSpan.FromBounds(start, end)));
     }
 

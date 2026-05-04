@@ -27,13 +27,13 @@ public sealed partial class Al0001ProhibitPrimaryConstructorParameterReassignmen
     /// <summary>The diagnostic identifier for AL0001.</summary>
     private const string DiagnosticId = "AL0001";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.Design,
         DiagnosticSeverity.Error);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers syntax and operation actions to analyze primary constructor parameter reassignments.</summary>
     protected override void RegisterActions(AnalysisContext context) {
@@ -86,6 +86,6 @@ public sealed partial class Al0001ProhibitPrimaryConstructorParameterReassignmen
             return;
         }
 
-        context.ReportDiagnostic(Rule, target.Syntax.GetLocation(), parameterRef.Parameter.Name);
+        context.ReportDiagnostic(s_rule, target.Syntax.GetLocation(), parameterRef.Parameter.Name);
     }
 }

@@ -28,13 +28,13 @@ public sealed partial class Al0130ToolMustDeclareCapabilityAnalyzer : AlAnalyzer
     private const string LoomToolAttributeName = "LoomTool";
     private const string RequiresCapabilityAttributeName = "RequiresCapability";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.GenAI,
         DiagnosticSeverities.HiddenByDefault);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers symbol actions to analyze methods with [LoomTool] for missing [RequiresCapability].</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -52,7 +52,7 @@ public sealed partial class Al0130ToolMustDeclareCapabilityAnalyzer : AlAnalyzer
         }
 
         context.ReportDiagnostic(Diagnostic.Create(
-            Rule,
+            s_rule,
             method.Locations.FirstOrDefault() ?? Location.None,
             method.Name));
     }

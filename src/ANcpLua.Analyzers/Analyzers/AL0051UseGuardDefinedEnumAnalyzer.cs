@@ -16,13 +16,13 @@ public sealed partial class Al0051UseGuardDefinedEnumAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0051.</summary>
     public const string DiagnosticId = "AL0051";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.RoslynUtilities,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers syntax or operation actions for analysis.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -42,7 +42,7 @@ public sealed partial class Al0051UseGuardDefinedEnumAnalyzer : AlAnalyzer {
             return;
         }
 
-        context.ReportDiagnostic(Diagnostic.Create(Rule, conditional.Syntax.GetLocation(), operandName));
+        context.ReportDiagnostic(Diagnostic.Create(s_rule, conditional.Syntax.GetLocation(), operandName));
     }
 
     private static (bool isMatch, string? operandName) IsNegatedEnumIsDefinedCheck(IOperation? condition) {

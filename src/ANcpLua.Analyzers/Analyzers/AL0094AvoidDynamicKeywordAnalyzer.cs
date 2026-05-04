@@ -22,13 +22,13 @@ public sealed partial class Al0094AvoidDynamicKeywordAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0094.</summary>
     private const string DiagnosticId = "AL0094";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.AotTesting,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers operation actions to detect dynamic keyword usage, gated on AOT-targeting projects.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -56,6 +56,6 @@ public sealed partial class Al0094AvoidDynamicKeywordAnalyzer : AlAnalyzer {
             _ => "dynamic"
         };
 
-        context.ReportDiagnostic(Diagnostic.Create(Rule, context.Operation.Syntax.GetLocation(), description));
+        context.ReportDiagnostic(Diagnostic.Create(s_rule, context.Operation.Syntax.GetLocation(), description));
     }
 }

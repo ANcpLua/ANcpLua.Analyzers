@@ -18,20 +18,20 @@ public sealed partial class Al0065UseTokenUsageHistogramAnalyzer : AlAnalyzer {
     private const string CorrectMetricName = "gen_ai.client.token.usage";
     private const string HistogramAttributeFullName = "Qyl.Instrumentation.Instrumentation.HistogramAttribute";
 
-    private static readonly string[] TokenRelatedPatterns = [
+    private static readonly string[] s_tokenRelatedPatterns = [
         "token", "input_token", "output_token", "prompt_token", "completion_token"
     ];
 
     /// <summary>The diagnostic identifier for AL0065.</summary>
     private const string DiagnosticId = "AL0065";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.GenAI,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers symbol actions to analyze methods with histogram attributes.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -57,11 +57,11 @@ public sealed partial class Al0065UseTokenUsageHistogramAnalyzer : AlAnalyzer {
                 .GetLocation() ?? method.Locations.FirstOrDefault();
 
             if (location is not null) {
-                context.ReportDiagnostic(Diagnostic.Create(Rule, location, metricName));
+                context.ReportDiagnostic(Diagnostic.Create(s_rule, location, metricName));
             }
         }
     }
 
     private static bool IsTokenRelatedMetric(string metricName) =>
-        TokenRelatedPatterns.Any(metricName.ContainsIgnoreCase);
+        s_tokenRelatedPatterns.Any(metricName.ContainsIgnoreCase);
 }

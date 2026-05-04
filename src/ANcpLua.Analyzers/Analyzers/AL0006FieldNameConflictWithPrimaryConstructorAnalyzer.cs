@@ -28,13 +28,13 @@ public sealed partial class Al0006FieldNameConflictWithPrimaryConstructorAnalyze
     /// <summary>The diagnostic identifier for AL0006.</summary>
     private const string DiagnosticId = "AL0006";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.Design,
         DiagnosticSeverity.Warning);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers syntax node actions to analyze field declarations for naming conflicts.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -54,7 +54,7 @@ public sealed partial class Al0006FieldNameConflictWithPrimaryConstructorAnalyze
         foreach (var variable in member.Declaration.Variables) {
             var identifier = variable.Identifier;
             if (parameterNames.Contains(identifier.ValueText)) {
-                context.ReportDiagnostic(Rule, identifier.GetLocation(), identifier);
+                context.ReportDiagnostic(s_rule, identifier.GetLocation(), identifier);
             }
         }
     }

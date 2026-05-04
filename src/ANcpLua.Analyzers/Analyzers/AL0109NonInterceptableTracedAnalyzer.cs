@@ -35,13 +35,13 @@ public sealed partial class Al0109NonInterceptableTracedAnalyzer : AlAnalyzer {
 
     private const string TracedAttributeFullName = "Qyl.Instrumentation.Instrumentation.TracedAttribute";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers symbol actions to analyze methods with [Traced] for interceptability.</summary>
     protected override void RegisterActions(AnalysisContext context) {
@@ -65,7 +65,7 @@ public sealed partial class Al0109NonInterceptableTracedAnalyzer : AlAnalyzer {
 
         if (method.HasAttribute(tracedType)) {
             context.ReportDiagnostic(Diagnostic.Create(
-                Rule,
+                s_rule,
                 method.Locations.FirstOrDefault() ?? Location.None,
                 method.Name));
         }

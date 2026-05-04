@@ -16,7 +16,7 @@ public sealed partial class Al0061ActivityMissingSemconvAnalyzer : AlAnalyzer {
     private const string DiagnosticId = "AL0061";
 
     // Operation types and their expected semantic convention prefixes
-    private static readonly Dictionary<string, string[]> OperationTypePrefixes = new(StringComparer.OrdinalIgnoreCase) {
+    private static readonly Dictionary<string, string[]> s_operationTypePrefixes = new(StringComparer.OrdinalIgnoreCase) {
         ["http"] = ["http.", "url.", "server.", "client.", "network.", "user_agent."],
         ["db"] = ["db."],
         ["rpc"] = ["rpc.", "jsonrpc."],
@@ -25,13 +25,13 @@ public sealed partial class Al0061ActivityMissingSemconvAnalyzer : AlAnalyzer {
         ["gen_ai"] = ["gen_ai.", "openai."]
     };
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers operation actions to analyze Activity.StartActivity calls.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -43,13 +43,13 @@ public sealed partial class Al0061ActivityMissingSemconvAnalyzer : AlAnalyzer {
         if (invocation.TargetMethod.Name != "StartActivity" ||
             GetActivityName(invocation) is not { } activityName ||
             InferOperationType(activityName) is not { } operationType ||
-            !OperationTypePrefixes.TryGetValue(operationType, out var expectedPrefixes)) {
+            !s_operationTypePrefixes.TryGetValue(operationType, out var expectedPrefixes)) {
             return;
         }
 
         var setTags = CollectSetTagCalls(invocation);
         if (!HasRelevantSemconv(setTags, expectedPrefixes)) {
-            context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.Syntax.GetLocation(), activityName, operationType));
+            context.ReportDiagnostic(Diagnostic.Create(s_rule, invocation.Syntax.GetLocation(), activityName, operationType));
         }
     }
 
@@ -80,7 +80,7 @@ public sealed partial class Al0061ActivityMissingSemconvAnalyzer : AlAnalyzer {
             : null;
 
     private static string? InferOperationType(string activityName) {
-        foreach (var kvp in OperationTypePrefixes) {
+        foreach (var kvp in s_operationTypePrefixes) {
             if (activityName.ContainsIgnoreCase(kvp.Key)) {
                 return kvp.Key;
             }

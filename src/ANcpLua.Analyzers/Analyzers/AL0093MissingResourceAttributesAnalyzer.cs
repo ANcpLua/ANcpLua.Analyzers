@@ -25,26 +25,26 @@ public sealed partial class Al0093MissingResourceAttributesAnalyzer : AlAnalyzer
     /// <summary>The diagnostic identifier for AL0093.</summary>
     private const string DiagnosticId = "AL0093";
 
-    private static readonly string[] OTelSetupMethods = [
+    private static readonly string[] s_oTelSetupMethods = [
         "AddOpenTelemetry",
         "UseOpenTelemetry",
         "ConfigureOpenTelemetry"
     ];
 
-    private static readonly string[] ResourceConfigMethods = [
+    private static readonly string[] s_resourceConfigMethods = [
         "ConfigureResource",
         "AddResource",
         "AddService",
         "SetResourceBuilder"
     ];
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers syntax node actions to analyze OpenTelemetry configuration.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -54,7 +54,7 @@ public sealed partial class Al0093MissingResourceAttributesAnalyzer : AlAnalyzer
         var invocation = (InvocationExpressionSyntax)context.Node;
 
         var methodName = GetMethodName(invocation);
-        if (methodName is null || !OTelSetupMethods.Contains(methodName)) {
+        if (methodName is null || !s_oTelSetupMethods.Contains(methodName)) {
             return;
         }
 
@@ -69,8 +69,8 @@ public sealed partial class Al0093MissingResourceAttributesAnalyzer : AlAnalyzer
             }
         }
 
-        if (!ResourceConfigMethods.Any(allInvocations.Contains)) {
-            context.ReportDiagnostic(Diagnostic.Create(Rule, GetMethodNameLocation(invocation), "service.name/service.version"));
+        if (!s_resourceConfigMethods.Any(allInvocations.Contains)) {
+            context.ReportDiagnostic(Diagnostic.Create(s_rule, GetMethodNameLocation(invocation), "service.name/service.version"));
         }
     }
 

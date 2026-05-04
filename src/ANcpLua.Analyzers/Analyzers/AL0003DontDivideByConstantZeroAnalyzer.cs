@@ -28,13 +28,13 @@ public sealed partial class Al0003DontDivideByConstantZeroAnalyzer : AlAnalyzer 
     /// <summary>The diagnostic identifier for AL0003.</summary>
     private const string DiagnosticId = "AL0003";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.Reliability,
         DiagnosticSeverity.Error);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers operation actions to analyze binary operations for division by zero.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -56,7 +56,7 @@ public sealed partial class Al0003DontDivideByConstantZeroAnalyzer : AlAnalyzer 
             return;
         }
 
-        context.ReportDiagnostic(Rule, operation.Syntax.GetLocation());
+        context.ReportDiagnostic(s_rule, operation.Syntax.GetLocation());
     }
 
     private static bool IsZeroConstant(IOperation operation) {
