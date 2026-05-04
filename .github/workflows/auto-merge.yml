@@ -5,6 +5,7 @@
 # 1b. Renovate PRs: Auto-approve + auto-merge
 # 2.  AI Agent fix PRs (copilot/, jules/, claude/): Auto-merge when CI passes
 # 3.  CodeRabbit approved PRs: Auto-merge when CI passes
+# 4.  Owner PRs: Auto-merge when CI passes
 
 name: Auto-merge
 
@@ -132,6 +133,20 @@ jobs:
 
     steps:
       - name: Enable auto-merge for CodeRabbit approved PRs
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh pr merge --auto --squash "$PR_URL"
+
+  owner-auto-merge:
+    name: Owner auto-merge
+    runs-on: ubuntu-latest
+    if: |
+      github.event.pull_request.user.login == github.event.repository.owner.login &&
+      github.event.pull_request.draft == false
+
+    steps:
+      - name: Enable auto-merge for owner PRs
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
