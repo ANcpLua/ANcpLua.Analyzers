@@ -23,26 +23,26 @@ namespace ANcpLua.Analyzers.Analyzers;
 public sealed partial class Al0136IncubatingSemanticConventionInLibraryAnalyzer : AlAnalyzer {
     private const string DiagnosticId = "AL0136";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverity.Warning);
 
     private const string IncubatingNamespaceFragment = ".Incubating";
 
-    private static readonly string[] IncubatingRootNamespaces = [
+    private static readonly string[] s_incubatingRootNamespaces = [
         "OpenTelemetry.SemanticConventions",
         "OpenTelemetry.SemConv"
     ];
 
-    private static readonly string[] TestAssemblyAttributes = [
+    private static readonly string[] s_testAssemblyAttributes = [
         "Xunit.TestFrameworkAttribute",
         "Xunit.Sdk.TestFrameworkAttribute",
         "Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute"
     ];
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers a compilation-start action that gates analysis on project shape.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -86,7 +86,7 @@ public sealed partial class Al0136IncubatingSemanticConventionInLibraryAnalyzer 
         };
 
         context.ReportDiagnostic(
-            Rule,
+            s_rule,
             context.Operation.Syntax.GetLocation(),
             $"{containingType.ToDisplayString()}.{memberName}");
     }
@@ -110,7 +110,7 @@ public sealed partial class Al0136IncubatingSemanticConventionInLibraryAnalyzer 
             return true;
         }
 
-        foreach (var attributeTypeName in TestAssemblyAttributes) {
+        foreach (var attributeTypeName in s_testAssemblyAttributes) {
             if (compilation.GetTypeByMetadataName(attributeTypeName) is not null) {
                 return true;
             }
@@ -128,7 +128,7 @@ public sealed partial class Al0136IncubatingSemanticConventionInLibraryAnalyzer 
             return false;
         }
 
-        foreach (var root in IncubatingRootNamespaces) {
+        foreach (var root in s_incubatingRootNamespaces) {
             if (ns.StartsWithOrdinal(root)) {
                 return true;
             }

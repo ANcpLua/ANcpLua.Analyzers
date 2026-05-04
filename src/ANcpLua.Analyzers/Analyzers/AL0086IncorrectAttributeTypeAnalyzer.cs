@@ -30,7 +30,7 @@ public sealed partial class Al0086IncorrectAttributeTypeAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0086.</summary>
     private const string DiagnosticId = "AL0086";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverity.Warning);
@@ -38,7 +38,7 @@ public sealed partial class Al0086IncorrectAttributeTypeAnalyzer : AlAnalyzer {
     /// <summary>
     ///     Maps attribute names to their expected types per OTel semantic conventions.
     /// </summary>
-    private static readonly Dictionary<string, ExpectedType> AttributeTypeMap = new(StringComparer.Ordinal) {
+    private static readonly Dictionary<string, ExpectedType> s_attributeTypeMap = new(StringComparer.Ordinal) {
         // GenAI token counts (must be integers)
         ["gen_ai.usage.input_tokens"] = ExpectedType.WholeNumber,
         ["gen_ai.usage.output_tokens"] = ExpectedType.WholeNumber,
@@ -78,7 +78,7 @@ public sealed partial class Al0086IncorrectAttributeTypeAnalyzer : AlAnalyzer {
     };
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers operation actions to analyze invocation expressions.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -91,7 +91,7 @@ public sealed partial class Al0086IncorrectAttributeTypeAnalyzer : AlAnalyzer {
             || invocation.Arguments.Length < 2
             || !invocation.Arguments[0].Value.TryGetConstantValue(out string? attributeName)
             || attributeName is null
-            || !AttributeTypeMap.TryGetValue(attributeName, out var expectedType)) {
+            || !s_attributeTypeMap.TryGetValue(attributeName, out var expectedType)) {
             return;
         }
 
@@ -102,7 +102,7 @@ public sealed partial class Al0086IncorrectAttributeTypeAnalyzer : AlAnalyzer {
             return;
         }
 
-        context.ReportDiagnostic(Rule, valueArg.Syntax.GetLocation(), attributeName,
+        context.ReportDiagnostic(s_rule, valueArg.Syntax.GetLocation(), attributeName,
             GetTypeName(expectedType), valueType.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat));
     }
 

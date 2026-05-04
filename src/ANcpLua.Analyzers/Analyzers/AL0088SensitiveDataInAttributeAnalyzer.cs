@@ -28,7 +28,7 @@ public sealed partial class Al0088SensitiveDataInAttributeAnalyzer : AlAnalyzer 
     /// <summary>
     ///     Patterns in attribute names that indicate sensitive data.
     /// </summary>
-    private static readonly string[] SensitiveAttributeNamePatterns = [
+    private static readonly string[] s_sensitiveAttributeNamePatterns = [
         // Credentials
         "password",
         "passwd",
@@ -81,7 +81,7 @@ public sealed partial class Al0088SensitiveDataInAttributeAnalyzer : AlAnalyzer 
     /// <summary>
     ///     Known telemetry method patterns.
     /// </summary>
-    private static readonly HashSet<string> TelemetryMethodPatterns =
+    private static readonly HashSet<string> s_telemetryMethodPatterns =
         new(StringComparer.OrdinalIgnoreCase) {
             "SetTag",
             "AddTag",
@@ -93,13 +93,13 @@ public sealed partial class Al0088SensitiveDataInAttributeAnalyzer : AlAnalyzer 
     /// <summary>The diagnostic identifier for AL0088.</summary>
     private const string DiagnosticId = "AL0088";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverity.Warning);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers syntax node actions to analyze string literals for sensitive attribute names.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -116,7 +116,7 @@ public sealed partial class Al0088SensitiveDataInAttributeAnalyzer : AlAnalyzer 
             return;
         }
 
-        context.ReportDiagnostic(Rule, literal.GetLocation(), value);
+        context.ReportDiagnostic(s_rule, literal.GetLocation(), value);
     }
 
     private static bool IsLikelyAttributeName(LiteralExpressionSyntax literal) =>
@@ -155,7 +155,7 @@ public sealed partial class Al0088SensitiveDataInAttributeAnalyzer : AlAnalyzer 
     private static bool IsTelemetryInvocation(SyntaxNode node) =>
         node is InvocationExpressionSyntax invocation
         && GetMethodName(invocation) is { } methodName
-        && (TelemetryMethodPatterns.Contains(methodName)
+        && (s_telemetryMethodPatterns.Contains(methodName)
             || methodName.ContainsIgnoreCase("ATTRIBUTE")
             || methodName.ContainsIgnoreCase("TAG"));
 
@@ -193,7 +193,7 @@ public sealed partial class Al0088SensitiveDataInAttributeAnalyzer : AlAnalyzer 
     private static bool ContainsSensitivePattern(string attributeName) {
         var normalizedName = attributeName.ToUpperInvariant();
 
-        foreach (var pattern in SensitiveAttributeNamePatterns) {
+        foreach (var pattern in s_sensitiveAttributeNamePatterns) {
             var normalizedPattern = pattern.ToUpperInvariant();
 
             if (normalizedName == normalizedPattern || normalizedName.ContainsOrdinal(normalizedPattern)) {

@@ -43,13 +43,13 @@ public sealed partial class Al0131DirectGenAiSdkUsageAnalyzer : AlAnalyzer {
         ("Cohere.CohereClient", "Cohere")
     ];
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.GenAI,
         DiagnosticSeverities.Suggestion);
 
     /// <inheritdoc />
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <inheritdoc />
     protected override void RegisterActions(AnalysisContext context) {
@@ -89,7 +89,7 @@ public sealed partial class Al0131DirectGenAiSdkUsageAnalyzer : AlAnalyzer {
         foreach (var (sdkType, label) in knownSdkTypes) {
             if (sdkType is not null && containingType.IsEqualTo(sdkType)) {
                 context.ReportDiagnostic(Diagnostic.Create(
-                    Rule,
+                    s_rule,
                     invocation.Syntax.GetLocation(),
                     label));
                 return;

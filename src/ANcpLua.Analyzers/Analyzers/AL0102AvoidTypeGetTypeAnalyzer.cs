@@ -21,15 +21,15 @@ public sealed partial class Al0102AvoidTypeGetTypeAnalyzer : AlAnalyzer {
     private const string DiagnosticId = "AL0102";
 
     private const string TypeTypeName = "System.Type";
-    private static readonly InvocationMatcher GetTypeInvocation = Invoke.Method("GetType");
+    private static readonly InvocationMatcher s_getTypeInvocation = Invoke.Method("GetType");
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.AotTesting,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers a compilation start action to resolve the Type type once.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -47,7 +47,7 @@ public sealed partial class Al0102AvoidTypeGetTypeAnalyzer : AlAnalyzer {
 
     private static void AnalyzeInvocation(OperationAnalysisContext context, INamedTypeSymbol typeType) {
         if (context.Operation is not IInvocationOperation invocation ||
-            !GetTypeInvocation.Matches(invocation) ||
+            !s_getTypeInvocation.Matches(invocation) ||
             !invocation.TargetMethod.ContainingType.IsEqualTo(typeType)) {
             return;
         }
@@ -61,10 +61,10 @@ public sealed partial class Al0102AvoidTypeGetTypeAnalyzer : AlAnalyzer {
         var ignoreCaseArgument = GetArgumentValue(invocation, "ignoreCase");
 
         if (!isLiteralTypeName) {
-            context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.Syntax.GetLocation(), "a dynamic type name"));
+            context.ReportDiagnostic(Diagnostic.Create(s_rule, invocation.Syntax.GetLocation(), "a dynamic type name"));
         }
         else if (ignoreCaseArgument is not null && IsPotentiallyTrue(ignoreCaseArgument)) {
-            context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.Syntax.GetLocation(), "case-insensitive search"));
+            context.ReportDiagnostic(Diagnostic.Create(s_rule, invocation.Syntax.GetLocation(), "case-insensitive search"));
         }
     }
 

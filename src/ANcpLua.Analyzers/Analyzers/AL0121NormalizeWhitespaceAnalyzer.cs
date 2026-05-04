@@ -15,13 +15,13 @@ public sealed partial class Al0121NormalizeWhitespaceAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0121.</summary>
     public const string DiagnosticId = "AL0121";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.RoslynUtilities,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers an operation action to analyze method invocations.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -50,10 +50,10 @@ public sealed partial class Al0121NormalizeWhitespaceAnalyzer : AlAnalyzer {
         // Narrow the span to just NormalizeWhitespace() rather than the full receiver chain
         if (invocation.Syntax is InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax memberAccess } invocationSyntax) {
             var span = Microsoft.CodeAnalysis.Text.TextSpan.FromBounds(memberAccess.Name.SpanStart, invocationSyntax.Span.End);
-            context.ReportDiagnostic(Diagnostic.Create(Rule,
+            context.ReportDiagnostic(Diagnostic.Create(s_rule,
                 Location.Create(invocationSyntax.SyntaxTree, span)));
         } else {
-            context.ReportDiagnostic(Rule, invocation.Syntax.GetLocation());
+            context.ReportDiagnostic(s_rule, invocation.Syntax.GetLocation());
         }
     }
 }

@@ -13,13 +13,13 @@ public sealed partial class Al0011LockKeywordAnalyzer : AlAnalyzer {
     /// <summary>Metadata name for the System.Threading.Lock type (.NET 9+).</summary>
     private const string LockTypeMetadataName = "System.Threading.Lock";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.Threading,
         DiagnosticSeverity.Warning);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers compilation start action to analyze lock statements.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -47,6 +47,6 @@ public sealed partial class Al0011LockKeywordAnalyzer : AlAnalyzer {
             return;
         }
 
-        context.ReportDiagnostic(Rule, lockStatement.LockKeyword.GetLocation());
+        context.ReportDiagnostic(s_rule, lockStatement.LockKeyword.GetLocation());
     }
 }

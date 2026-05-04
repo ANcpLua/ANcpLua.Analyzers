@@ -17,7 +17,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0085InvalidAttributeValueAnalyzer : AlAnalyzer {
     /// <summary>Attribute validators by attribute name.</summary>
-    private static readonly Dictionary<string, AttributeValidator> Validators = new(StringComparer.OrdinalIgnoreCase) {
+    private static readonly Dictionary<string, AttributeValidator> s_validators = new(StringComparer.OrdinalIgnoreCase) {
         ["http.response.status_code"] = new AttributeValidator(
             ValidateHttpStatusCode,
             "integer between 100-599"),
@@ -59,13 +59,13 @@ public sealed partial class Al0085InvalidAttributeValueAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0085.</summary>
     private const string DiagnosticId = "AL0085";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverities.RequiredFix);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers operation actions to analyze SetTag and SetAttribute calls.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -77,7 +77,7 @@ public sealed partial class Al0085InvalidAttributeValueAnalyzer : AlAnalyzer {
         if (invocation.TargetMethod.Name is not ("SetTag" or "SetAttribute" or "Add")
             || invocation.Arguments.Length < 2
             || invocation.Arguments[0].Value.UnwrapAllConversions().ConstantValue is not { HasValue: true, Value: string attributeName }
-            || !Validators.TryGetValue(attributeName, out var validator)) {
+            || !s_validators.TryGetValue(attributeName, out var validator)) {
             return;
         }
 
@@ -91,7 +91,7 @@ public sealed partial class Al0085InvalidAttributeValueAnalyzer : AlAnalyzer {
 
             if (!validator.Validate(valueString)) {
                 context.ReportDiagnostic(Diagnostic.Create(
-                    Rule,
+                    s_rule,
                     invocation.Arguments[1].Syntax.GetLocation(),
                     attributeName,
                     valueString,

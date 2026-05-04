@@ -42,19 +42,19 @@ public sealed partial class Al0054ToAl0056DiagnosticsAlignmentAnalyzer : Diagnos
     private const string ShippedFileName = "AnalyzerReleases.Shipped.md";
     private const string UnshippedFileName = "AnalyzerReleases.Unshipped.md";
 
-    private static readonly Regex DocHeadingRegex = new(
+    private static readonly Regex s_docHeadingRegex = new(
         @"^###\s+(?<id>[A-Z]+\d+)\s+-\s+(?<title>.+)$",
         RegexOptions.Compiled | RegexOptions.Multiline);
 
-    private static readonly Regex DocSeverityRegex = new(
+    private static readonly Regex s_docSeverityRegex = new(
         @"^\*\*Severity:\*\*\s+(?<severity>\w+)",
         RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.IgnoreCase);
 
-    private static readonly Regex RuleIdRegex = new(
+    private static readonly Regex s_ruleIdRegex = new(
         @"^[A-Z]+\d+$",
         RegexOptions.Compiled);
 
-    private static readonly DiagnosticDescriptor RuleMissingDocs = new(
+    private static readonly DiagnosticDescriptor s_ruleMissingDocs = new(
         DiagnosticIdAl0054,
         "Diagnostic missing from documentation",
         "{0}",
@@ -65,7 +65,7 @@ public sealed partial class Al0054ToAl0056DiagnosticsAlignmentAnalyzer : Diagnos
         AlAnalyzer.HelpLink(DiagnosticIdAl0054),
         WellKnownDiagnosticTags.CompilationEnd);
 
-    private static readonly DiagnosticDescriptor RuleMissingRelease = new(
+    private static readonly DiagnosticDescriptor s_ruleMissingRelease = new(
         DiagnosticIdAl0055,
         "Diagnostic missing from release notes",
         "{0}",
@@ -76,7 +76,7 @@ public sealed partial class Al0054ToAl0056DiagnosticsAlignmentAnalyzer : Diagnos
         AlAnalyzer.HelpLink(DiagnosticIdAl0055),
         WellKnownDiagnosticTags.CompilationEnd);
 
-    private static readonly DiagnosticDescriptor RuleMismatch = new(
+    private static readonly DiagnosticDescriptor s_ruleMismatch = new(
         DiagnosticIdAl0056,
         "Diagnostic documentation mismatch",
         "{0}",
@@ -89,7 +89,7 @@ public sealed partial class Al0054ToAl0056DiagnosticsAlignmentAnalyzer : Diagnos
 
     /// <inheritdoc />
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-        [RuleMissingDocs, RuleMissingRelease, RuleMismatch];
+        [s_ruleMissingDocs, s_ruleMissingRelease, s_ruleMismatch];
 
     /// <inheritdoc />
     public override void Initialize(AnalysisContext context) {
@@ -122,15 +122,15 @@ public sealed partial class Al0054ToAl0056DiagnosticsAlignmentAnalyzer : Diagnos
         foreach (var descriptor in descriptors.Values) {
             if (docsFile is not null) {
                 if (!docs.TryGetValue(descriptor.Id, out var docInfo)) {
-                    ReportDiagnostic(context, RuleMissingDocs, descriptorsFile,
+                    ReportDiagnostic(context, s_ruleMissingDocs, descriptorsFile,
                         $"{descriptor.Id} is missing from {DiagnosticsMdFileName}");
                 } else {
                     if (!descriptor.Title.EqualsOrdinal(docInfo.Title)) {
-                        ReportDiagnostic(context, RuleMismatch, descriptorsFile,
+                        ReportDiagnostic(context, s_ruleMismatch, descriptorsFile,
                             $"{descriptor.Id} title mismatch: Descriptors='{descriptor.Title}' Docs='{docInfo.Title}'");
                     }
                     if (!descriptor.Severity.EqualsIgnoreCase(docInfo.Severity)) {
-                        ReportDiagnostic(context, RuleMismatch, descriptorsFile,
+                        ReportDiagnostic(context, s_ruleMismatch, descriptorsFile,
                             $"{descriptor.Id} severity mismatch: Descriptors='{descriptor.Severity}' Docs='{docInfo.Severity}'");
                     }
                 }
@@ -138,15 +138,15 @@ public sealed partial class Al0054ToAl0056DiagnosticsAlignmentAnalyzer : Diagnos
 
             if (shippedFile is not null || unshippedFile is not null) {
                 if (!releases.TryGetValue(descriptor.Id, out var releaseInfo)) {
-                    ReportDiagnostic(context, RuleMissingRelease, descriptorsFile,
+                    ReportDiagnostic(context, s_ruleMissingRelease, descriptorsFile,
                         $"{descriptor.Id} is missing from AnalyzerReleases.*.md");
                 } else {
                     if (!descriptor.Category.EqualsOrdinal(releaseInfo.Category)) {
-                        ReportDiagnostic(context, RuleMismatch, descriptorsFile,
+                        ReportDiagnostic(context, s_ruleMismatch, descriptorsFile,
                             $"{descriptor.Id} category mismatch: Descriptors='{descriptor.Category}' Release='{releaseInfo.Category}'");
                     }
                     if (!descriptor.Severity.EqualsIgnoreCase(releaseInfo.Severity)) {
-                        ReportDiagnostic(context, RuleMismatch, descriptorsFile,
+                        ReportDiagnostic(context, s_ruleMismatch, descriptorsFile,
                             $"{descriptor.Id} severity mismatch: Descriptors='{descriptor.Severity}' Release='{releaseInfo.Severity}'");
                     }
                 }
@@ -155,14 +155,14 @@ public sealed partial class Al0054ToAl0056DiagnosticsAlignmentAnalyzer : Diagnos
 
         foreach (var docId in docs.Keys) {
             if (!descriptors.ContainsKey(docId)) {
-                ReportDiagnostic(context, RuleMismatch, docsFile!,
+                ReportDiagnostic(context, s_ruleMismatch, docsFile!,
                     $"{docId} in {DiagnosticsMdFileName} has no corresponding descriptor");
             }
         }
 
         foreach (var releaseId in releases.Keys) {
             if (!descriptors.ContainsKey(releaseId)) {
-                ReportDiagnostic(context, RuleMismatch, shippedFile ?? unshippedFile!,
+                ReportDiagnostic(context, s_ruleMismatch, shippedFile ?? unshippedFile!,
                     $"{releaseId} in release notes has no corresponding descriptor");
             }
         }
@@ -217,7 +217,7 @@ public sealed partial class Al0054ToAl0056DiagnosticsAlignmentAnalyzer : Diagnos
                     continue;
                 }
 
-                if (!RuleIdRegex.IsMatch(id)) {
+                if (!s_ruleIdRegex.IsMatch(id)) {
                     continue;
                 }
 
@@ -299,14 +299,14 @@ public sealed partial class Al0054ToAl0056DiagnosticsAlignmentAnalyzer : Diagnos
         }
 
         var content = text.ToString();
-        var headings = DocHeadingRegex.Matches(content);
+        var headings = s_docHeadingRegex.Matches(content);
 
         for (var i = 0; i < headings.Count; i++) {
             var match = headings[i];
             var id = match.Groups["id"].Value.Trim();
             var title = match.Groups["title"].Value.Trim();
 
-            if (!RuleIdRegex.IsMatch(id)) {
+            if (!s_ruleIdRegex.IsMatch(id)) {
                 continue;
             }
 
@@ -314,7 +314,7 @@ public sealed partial class Al0054ToAl0056DiagnosticsAlignmentAnalyzer : Diagnos
             var end = i + 1 < headings.Count ? headings[i + 1].Index : content.Length;
             var block = content.Substring(start, end - start);
 
-            var severityMatch = DocSeverityRegex.Match(block);
+            var severityMatch = s_docSeverityRegex.Match(block);
             var severity = severityMatch.Success ? NormalizeSeverity(severityMatch.Groups["severity"].Value) : "Unknown";
 
             // netstandard2.0 compatible: use ContainsKey + Add instead of TryAdd
@@ -388,7 +388,7 @@ public sealed partial class Al0054ToAl0056DiagnosticsAlignmentAnalyzer : Diagnos
             }
 
             var id = parts[0].Trim();
-            if (!RuleIdRegex.IsMatch(id)) {
+            if (!s_ruleIdRegex.IsMatch(id)) {
                 continue;
             }
 

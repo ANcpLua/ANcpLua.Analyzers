@@ -28,7 +28,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 public sealed partial class Al0075HighCardinalityMetricTagAnalyzer : AlAnalyzer {
     private enum KnownType { TagAttribute, CounterAttribute, HistogramAttribute }
 
-    private static readonly string[] KnownTypeNames = [
+    private static readonly string[] s_knownTypeNames = [
         "Qyl.Instrumentation.Instrumentation.TagAttribute",
         "Qyl.Instrumentation.Instrumentation.CounterAttribute",
         "Qyl.Instrumentation.Instrumentation.HistogramAttribute"
@@ -37,7 +37,7 @@ public sealed partial class Al0075HighCardinalityMetricTagAnalyzer : AlAnalyzer 
     /// <summary>
     ///     Known high-cardinality tag patterns that should be avoided on metrics.
     /// </summary>
-    private static readonly string[] HighCardinalityPatterns = [
+    private static readonly string[] s_highCardinalityPatterns = [
         "user.id", "user_id", "userId",
         "request.id", "request_id", "requestId",
         "session.id", "session_id", "sessionId",
@@ -57,20 +57,20 @@ public sealed partial class Al0075HighCardinalityMetricTagAnalyzer : AlAnalyzer 
     /// <summary>The diagnostic identifier for AL0075.</summary>
     private const string DiagnosticId = "AL0075";
 
-    private static readonly DiagnosticDescriptor HighCardinalityMetricTagRule = CreateRule(
+    private static readonly DiagnosticDescriptor s_highCardinalityMetricTagRule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.Metrics,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [HighCardinalityMetricTagRule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_highCardinalityMetricTagRule];
 
     /// <summary>Registers compilation start action to resolve metric attribute types once.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterCompilationStartAction(OnCompilationStart);
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
-        var cache = new TypeCache<KnownType>(type => context.Compilation.GetTypeByMetadataName(KnownTypeNames[(int)type]));
+        var cache = new TypeCache<KnownType>(type => context.Compilation.GetTypeByMetadataName(s_knownTypeNames[(int)type]));
 
         if (cache.Get(KnownType.TagAttribute) is null) {
             return;
@@ -100,7 +100,7 @@ public sealed partial class Al0075HighCardinalityMetricTagAnalyzer : AlAnalyzer 
 
         if (MatchesHighCardinalityPattern(tagName)) {
             context.ReportDiagnostic(Diagnostic.Create(
-                HighCardinalityMetricTagRule,
+                s_highCardinalityMetricTagRule,
                 parameter.GetLocation(),
                 tagName));
         }
@@ -109,7 +109,7 @@ public sealed partial class Al0075HighCardinalityMetricTagAnalyzer : AlAnalyzer 
     private static bool MatchesHighCardinalityPattern(string tagName) {
         var normalizedTag = tagName.ToUpperInvariant();
 
-        foreach (var pattern in HighCardinalityPatterns) {
+        foreach (var pattern in s_highCardinalityPatterns) {
             var normalizedPattern = pattern.ToUpperInvariant();
 
             if (normalizedTag == normalizedPattern) {

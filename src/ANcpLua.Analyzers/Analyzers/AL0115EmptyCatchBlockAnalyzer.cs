@@ -22,13 +22,13 @@ public sealed partial class Al0115EmptyCatchBlockAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0115.</summary>
     private const string DiagnosticId = "AL0115";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.Reliability,
         DiagnosticSeverity.Warning);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers syntax node action to analyze catch clauses.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -48,7 +48,7 @@ public sealed partial class Al0115EmptyCatchBlockAnalyzer : AlAnalyzer {
             return;
         }
 
-        context.ReportDiagnostic(Rule, catchClause.CatchKeyword.GetLocation());
+        context.ReportDiagnostic(s_rule, catchClause.CatchKeyword.GetLocation());
     }
 
     private static bool HasExplanatoryComment(BlockSyntax block) {

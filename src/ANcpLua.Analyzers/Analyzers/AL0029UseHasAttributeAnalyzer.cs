@@ -22,13 +22,13 @@ public sealed partial class Al0029UseHasAttributeAnalyzer : AlAnalyzer {
     /// <summary>Metadata name for ISymbol.</summary>
     private const string ISymbolTypeName = "Microsoft.CodeAnalysis.ISymbol";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.RoslynUtilities,
         DiagnosticSeverity.Info);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers compilation start action to analyze GetAttributes usage patterns.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -49,7 +49,7 @@ public sealed partial class Al0029UseHasAttributeAnalyzer : AlAnalyzer {
         }
 
         if (IsAttributeLinqCheck(invocation)) {
-            context.ReportDiagnostic(Rule, invocation.Syntax.GetLocation(),
+            context.ReportDiagnostic(s_rule, invocation.Syntax.GetLocation(),
                 "symbol.HasAttribute(name)", "GetAttributes() LINQ query");
         }
     }
@@ -63,7 +63,7 @@ public sealed partial class Al0029UseHasAttributeAnalyzer : AlAnalyzer {
         if (collectionName is "GetAttributes" &&
             ContainsAttributeClassComparison(forEachLoop.Body) &&
             !ExtractsAttributeData(forEachLoop.Body)) {
-            context.ReportDiagnostic(Rule, forEachLoop.Syntax.GetLocation(),
+            context.ReportDiagnostic(s_rule, forEachLoop.Syntax.GetLocation(),
                 "symbol.HasAttribute(name)", "foreach over GetAttributes()");
         }
     }

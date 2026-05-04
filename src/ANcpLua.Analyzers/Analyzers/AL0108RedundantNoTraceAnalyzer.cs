@@ -34,13 +34,13 @@ public sealed partial class Al0108RedundantNoTraceAnalyzer : AlAnalyzer {
     private const string TracedAttributeFullName = "Qyl.Instrumentation.Instrumentation.TracedAttribute";
     private const string NoTraceAttributeFullName = "Qyl.Instrumentation.Instrumentation.NoTraceAttribute";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverities.HiddenByDefault);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers symbol actions to analyze methods for redundant [NoTrace].</summary>
     protected override void RegisterActions(AnalysisContext context) {
@@ -66,7 +66,7 @@ public sealed partial class Al0108RedundantNoTraceAnalyzer : AlAnalyzer {
 
         if (method.HasAttribute(noTraceType) && !HasTracedOnType(method.ContainingType, tracedType)) {
             context.ReportDiagnostic(Diagnostic.Create(
-                Rule,
+                s_rule,
                 method.Locations.FirstOrDefault() ?? Location.None,
                 method.Name));
         }

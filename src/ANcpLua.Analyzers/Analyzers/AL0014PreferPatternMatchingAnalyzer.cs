@@ -31,7 +31,7 @@ public sealed partial class Al0014PreferPatternMatchingAnalyzer : AlAnalyzer {
     /// <summary>Property key indicating whether the expression is on the left side.</summary>
     private const string PropertyExpressionIsLeft = "ExpressionIsLeft";
 
-    private static readonly DiagnosticDescriptor Rule = new(
+    private static readonly DiagnosticDescriptor s_rule = new(
         DiagnosticId,
         "Prefer pattern matching for null and zero comparisons",
         "Use '{0}' instead of '{1}'",
@@ -43,7 +43,7 @@ public sealed partial class Al0014PreferPatternMatchingAnalyzer : AlAnalyzer {
         HelpLink(DiagnosticId));
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers compilation start action to analyze binary operations for null/zero comparisons.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -97,7 +97,7 @@ public sealed partial class Al0014PreferPatternMatchingAnalyzer : AlAnalyzer {
         properties.Add(PropertyExpressionIsLeft, expressionIsLeft.ToString());
 
         context.ReportDiagnostic(Diagnostic.Create(
-            Rule,
+            s_rule,
             operation.Syntax.GetLocation(),
             properties.ToImmutable(),
             suggestedText,

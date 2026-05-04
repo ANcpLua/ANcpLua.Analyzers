@@ -18,22 +18,22 @@ public sealed partial class Al0017HardcodedPackageVersionAnalyzer : DiagnosticAn
     private const string PackageNameKey = "PackageName";
     private const string HardcodedVersionKey = "HardcodedVersion";
 
-    private static readonly LocalizableResourceString Title = new(
+    private static readonly LocalizableResourceString s_title = new(
         nameof(Resources.AL0017AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly LocalizableResourceString MessageFormat = new(
+    private static readonly LocalizableResourceString s_messageFormat = new(
         nameof(Resources.AL0017AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly LocalizableResourceString Description = new(
+    private static readonly LocalizableResourceString s_description = new(
         nameof(Resources.AL0017AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly DiagnosticDescriptor Rule = new(
-        DiagnosticId, Title, MessageFormat, DiagnosticCategories.VersionManagement,
-        DiagnosticSeverity.Warning, true, Description,
+    private static readonly DiagnosticDescriptor s_rule = new(
+        DiagnosticId, s_title, s_messageFormat, DiagnosticCategories.VersionManagement,
+        DiagnosticSeverity.Warning, true, s_description,
         AlAnalyzer.HelpLink(DiagnosticId),
         WellKnownDiagnosticTags.CompilationEnd);
 
-    private static readonly Dictionary<string, string> PackageToVariableMap = new(StringComparer.OrdinalIgnoreCase) {
+    private static readonly Dictionary<string, string> s_packageToVariableMap = new(StringComparer.OrdinalIgnoreCase) {
         ["Microsoft.CodeAnalysis.CSharp"] = "RoslynVersion",
         ["Microsoft.CodeAnalysis.CSharp.Workspaces"] = "RoslynVersion",
         ["Microsoft.CodeAnalysis.Common"] = "RoslynVersion",
@@ -130,10 +130,10 @@ public sealed partial class Al0017HardcodedPackageVersionAnalyzer : DiagnosticAn
         ["System.Threading.Tasks.Extensions"] = "TasksExtensionsVersion"
     };
 
-    private static readonly Regex MsBuildPropertyPattern = MyRegex();
+    private static readonly Regex s_msBuildPropertyPattern = MyRegex();
 
     /// <inheritdoc />
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <inheritdoc />
     public override void Initialize(AnalysisContext context) {
@@ -196,7 +196,7 @@ public sealed partial class Al0017HardcodedPackageVersionAnalyzer : DiagnosticAn
                 var packageName = includeAttr.Value;
                 var versionValue = versionAttr.Value;
 
-                if (MsBuildPropertyPattern.IsMatch(versionValue)) {
+                if (s_msBuildPropertyPattern.IsMatch(versionValue)) {
                     continue;
                 }
 
@@ -218,7 +218,7 @@ public sealed partial class Al0017HardcodedPackageVersionAnalyzer : DiagnosticAn
                 properties.Add(HardcodedVersionKey, versionValue);
 
                 var diagnostic = Diagnostic.Create(
-                    Rule,
+                    s_rule,
                     location,
                     properties.ToImmutable(),
                     packageName,
@@ -233,7 +233,7 @@ public sealed partial class Al0017HardcodedPackageVersionAnalyzer : DiagnosticAn
     }
 
     private static string GetSuggestedVariableName(string packageName) {
-        if (PackageToVariableMap.TryGetValue(packageName, out var variable)) {
+        if (s_packageToVariableMap.TryGetValue(packageName, out var variable)) {
             return variable;
         }
 

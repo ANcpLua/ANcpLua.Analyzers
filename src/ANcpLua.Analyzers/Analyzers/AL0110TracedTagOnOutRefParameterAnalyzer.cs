@@ -32,13 +32,13 @@ public sealed partial class Al0110TracedTagOnOutRefParameterAnalyzer : AlAnalyze
 
     private const string TracedTagAttributeFullName = "Qyl.Instrumentation.Instrumentation.TracedTagAttribute";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverities.RequiredFix);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers symbol actions to analyze method parameters for [TracedTag] on out/ref.</summary>
     protected override void RegisterActions(AnalysisContext context) {
@@ -60,7 +60,7 @@ public sealed partial class Al0110TracedTagOnOutRefParameterAnalyzer : AlAnalyze
             if (param.RefKind is RefKind.Out or RefKind.Ref &&
                 param.GetAttributes().Any(a => a.AttributeClass.IsEqualTo(tracedTagType))) {
                 context.ReportDiagnostic(Diagnostic.Create(
-                    Rule,
+                    s_rule,
                     param.Locations.FirstOrDefault() ?? Location.None,
                     param.Name));
             }

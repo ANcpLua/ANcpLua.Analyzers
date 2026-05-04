@@ -18,7 +18,7 @@ public sealed partial class Al0015NormalizeNullGuardStyleAnalyzer : AlAnalyzer {
     /// <summary>Property key for the target null-guard style.</summary>
     public const string PropertyStyle = "Style";
 
-    private static readonly DiagnosticDescriptor Rule = new(
+    private static readonly DiagnosticDescriptor s_rule = new(
         DiagnosticId,
         "Normalize null-guard style",
         "Normalize null-guard to '{0}' style",
@@ -29,7 +29,7 @@ public sealed partial class Al0015NormalizeNullGuardStyleAnalyzer : AlAnalyzer {
         HelpLink(DiagnosticId));
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers compilation start action to analyze if statements with null-guards.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -93,7 +93,7 @@ public sealed partial class Al0015NormalizeNullGuardStyleAnalyzer : AlAnalyzer {
         properties.Add(PropertyStyle, targetStyle);
 
         context.ReportDiagnostic(Diagnostic.Create(
-            Rule,
+            s_rule,
             ifStatement.IfKeyword.GetLocation(),
             properties.ToImmutable(),
             targetStyle));

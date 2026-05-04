@@ -16,7 +16,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 public sealed partial class Al0037UseTryParseExtensionsCodeFixProvider
     : AlCodeFixProvider<ConditionalExpressionSyntax> {
     // Mapping from type name to extension method name
-    private static readonly Dictionary<string, string> TypeToExtension = new(StringComparer.Ordinal) {
+    private static readonly Dictionary<string, string> s_typeToExtension = new(StringComparer.Ordinal) {
         ["int"] = "TryParseInt32",
         ["Int32"] = "TryParseInt32",
         ["long"] = "TryParseInt64",
@@ -101,7 +101,7 @@ public sealed partial class Al0037UseTryParseExtensionsCodeFixProvider
             _ => null
         };
 
-        if (typeName is null || !TypeToExtension.TryGetValue(typeName, out var extensionName)) {
+        if (typeName is null || !s_typeToExtension.TryGetValue(typeName, out var extensionName)) {
             return (null, null);
         }
 

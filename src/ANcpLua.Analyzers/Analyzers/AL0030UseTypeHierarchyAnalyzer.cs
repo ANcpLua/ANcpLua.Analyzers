@@ -24,25 +24,25 @@ public sealed partial class Al0030UseTypeHierarchyAnalyzer : AlAnalyzer {
 
     private enum KnownType { ITypeSymbol, SymbolEqualityComparer }
 
-    private static readonly string[] KnownTypeNames = [
+    private static readonly string[] s_knownTypeNames = [
         "Microsoft.CodeAnalysis.ITypeSymbol",
         "Microsoft.CodeAnalysis.SymbolEqualityComparer"
     ];
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.RoslynUtilities,
         DiagnosticSeverity.Info);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers compilation start action to analyze type hierarchy iteration patterns.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterCompilationStartAction(OnCompilationStart);
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
-        var cache = new TypeCache<KnownType>(type => context.Compilation.GetTypeByMetadataName(KnownTypeNames[(int)type]));
+        var cache = new TypeCache<KnownType>(type => context.Compilation.GetTypeByMetadataName(s_knownTypeNames[(int)type]));
 
         if (cache.Get(KnownType.ITypeSymbol) is null) {
             return;
@@ -59,7 +59,7 @@ public sealed partial class Al0030UseTypeHierarchyAnalyzer : AlAnalyzer {
 
             if (collectionName is "AllInterfaces" &&
                 ContainsSymbolEqualityComparison(forEachLoop.Body, cache)) {
-                context.ReportDiagnostic(Rule, forEachLoop.Syntax.GetLocation(),
+                context.ReportDiagnostic(s_rule, forEachLoop.Syntax.GetLocation(),
                     "type.Implements(interfaceType)", "foreach over AllInterfaces");
                 return;
             }
@@ -67,7 +67,7 @@ public sealed partial class Al0030UseTypeHierarchyAnalyzer : AlAnalyzer {
 
         if (context.Operation is IWhileLoopOperation whileLoop &&
             IsBaseTypeWalkingLoop(whileLoop, cache)) {
-            context.ReportDiagnostic(Rule, whileLoop.Syntax.GetLocation(),
+            context.ReportDiagnostic(s_rule, whileLoop.Syntax.GetLocation(),
                 "type.InheritsFrom(baseType)", "while loop walking BaseType");
         }
     }

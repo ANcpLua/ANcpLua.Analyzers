@@ -31,18 +31,18 @@ public sealed partial class Al0089MissingOtlpConfigurationAnalyzer : AlAnalyzer 
     /// <summary>The diagnostic identifier for AL0089.</summary>
     private const string DiagnosticId = "AL0089";
 
-    private static readonly string[] OtlpExporterMethods = [
+    private static readonly string[] s_otlpExporterMethods = [
         "UseOtlpExporter",
         "AddOtlpExporter"
     ];
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers syntax tree actions to analyze OTLP exporter configuration.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -52,13 +52,13 @@ public sealed partial class Al0089MissingOtlpConfigurationAnalyzer : AlAnalyzer 
         var invocation = (InvocationExpressionSyntax)context.Node;
 
         if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess
-            || !OtlpExporterMethods.Contains(memberAccess.Name.Identifier.Text)
+            || !s_otlpExporterMethods.Contains(memberAccess.Name.Identifier.Text)
             || HasExplicitEndpointConfiguration(invocation)
             || HasEnvironmentVariableSet(invocation)) {
             return;
         }
 
-        context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.GetLocation()));
+        context.ReportDiagnostic(Diagnostic.Create(s_rule, invocation.GetLocation()));
     }
 
     private static bool HasExplicitEndpointConfiguration(InvocationExpressionSyntax invocation) {

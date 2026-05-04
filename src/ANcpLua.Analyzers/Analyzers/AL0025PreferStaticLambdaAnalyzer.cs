@@ -11,13 +11,13 @@ public sealed partial class Al0025PreferStaticLambdaAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0025.</summary>
     public const string DiagnosticId = "AL0025";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.Usage,
         DiagnosticSeverity.Warning);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers syntax node actions to analyze lambdas and anonymous methods.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -35,7 +35,7 @@ public sealed partial class Al0025PreferStaticLambdaAnalyzer : AlAnalyzer {
         }
 
         // Report diagnostic on the entire lambda for proper Fix All support
-        context.ReportDiagnostic(Diagnostic.Create(Rule, lambda.GetLocation()));
+        context.ReportDiagnostic(Diagnostic.Create(s_rule, lambda.GetLocation()));
     }
 
     /// <summary>

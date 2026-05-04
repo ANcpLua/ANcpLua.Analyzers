@@ -22,13 +22,13 @@ public sealed partial class Al0066InvalidGenAiOperationNameAnalyzer : AlAnalyzer
     /// <summary>The diagnostic identifier for AL0066.</summary>
     private const string DiagnosticId = "AL0066";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.GenAI,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers operation actions to analyze string literals used as operation names.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -46,6 +46,6 @@ public sealed partial class Al0066InvalidGenAiOperationNameAnalyzer : AlAnalyzer
             return;
         }
 
-        context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.Arguments[1].Syntax.GetLocation(), operationName));
+        context.ReportDiagnostic(Diagnostic.Create(s_rule, invocation.Arguments[1].Syntax.GetLocation(), operationName));
     }
 }

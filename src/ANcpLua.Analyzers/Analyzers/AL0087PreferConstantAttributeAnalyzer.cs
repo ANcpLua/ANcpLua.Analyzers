@@ -33,7 +33,7 @@ public sealed partial class Al0087PreferConstantAttributeAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0087.</summary>
     private const string DiagnosticId = "AL0087";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverities.HiddenByDefault);
@@ -44,7 +44,7 @@ public sealed partial class Al0087PreferConstantAttributeAnalyzer : AlAnalyzer {
     /// <remarks>
     ///     Keys are snake_case attribute names, values are the suggested constant expression.
     /// </remarks>
-    private static readonly Dictionary<string, string> KnownAttributes = new(StringComparer.Ordinal) {
+    private static readonly Dictionary<string, string> s_knownAttributes = new(StringComparer.Ordinal) {
         // GenAI semantic conventions
         ["gen_ai.provider.name"] = "GenAiAttributes.ProviderName",
         ["gen_ai.request.model"] = "GenAiAttributes.RequestModel",
@@ -91,7 +91,7 @@ public sealed partial class Al0087PreferConstantAttributeAnalyzer : AlAnalyzer {
     /// <summary>
     ///     Method names that indicate a telemetry context where attribute constants should be used.
     /// </summary>
-    private static readonly HashSet<string> TelemetryMethodNames = new(StringComparer.Ordinal) {
+    private static readonly HashSet<string> s_telemetryMethodNames = new(StringComparer.Ordinal) {
         "SetTag",
         "SetAttribute",
         "AddTag",
@@ -99,7 +99,7 @@ public sealed partial class Al0087PreferConstantAttributeAnalyzer : AlAnalyzer {
     };
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers syntax node actions to analyze string literals for known attribute names.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -110,12 +110,12 @@ public sealed partial class Al0087PreferConstantAttributeAnalyzer : AlAnalyzer {
         var value = literal.Token.ValueText;
 
         if (string.IsNullOrEmpty(value)
-            || !KnownAttributes.TryGetValue(value, out var suggestedConstant)
+            || !s_knownAttributes.TryGetValue(value, out var suggestedConstant)
             || !IsInTelemetryContext(literal)) {
             return;
         }
 
-        context.ReportDiagnostic(Rule, literal.GetLocation(), suggestedConstant, value);
+        context.ReportDiagnostic(s_rule, literal.GetLocation(), suggestedConstant, value);
     }
 
     private static bool IsInTelemetryContext(SyntaxNode node) {
@@ -138,7 +138,7 @@ public sealed partial class Al0087PreferConstantAttributeAnalyzer : AlAnalyzer {
     }
 
     private static bool IsLikelyTelemetryMethod(string? methodName) =>
-        methodName is not null && TelemetryMethodNames.Contains(methodName);
+        methodName is not null && s_telemetryMethodNames.Contains(methodName);
 
     private static bool IsLikelyTelemetryContainer(string? identifier) =>
         identifier is not null &&

@@ -17,13 +17,13 @@ public sealed partial class Al0039UseStringComparisonExtensionsAnalyzer : AlAnal
     /// <summary>The diagnostic identifier for AL0039.</summary>
     public const string DiagnosticId = "AL0039";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.RoslynUtilities,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers syntax or operation actions for analysis.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -67,7 +67,7 @@ public sealed partial class Al0039UseStringComparisonExtensionsAnalyzer : AlAnal
         var extensionName = $"{method.Name}{suffix}";
         var argName = GetFirstStringArgument(invocation);
 
-        context.ReportDiagnostic(Rule, invocation.Syntax.GetLocation(),
+        context.ReportDiagnostic(s_rule, invocation.Syntax.GetLocation(),
             $"{receiverName}.{extensionName}({argName})");
     }
 

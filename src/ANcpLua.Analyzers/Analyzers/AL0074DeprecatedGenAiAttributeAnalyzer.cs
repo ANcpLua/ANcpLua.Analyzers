@@ -30,13 +30,13 @@ public sealed partial class Al0074DeprecatedGenAiAttributeAnalyzer : AlAnalyzer 
     /// <summary>The diagnostic identifier for AL0074.</summary>
     public const string DiagnosticId = "AL0074";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.GenAI,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     internal static bool TryGetDeprecatedAttribute(string attributeName, [NotNullWhen(true)] out string? replacement) =>
         OpenTelemetryDeprecatedSemconvCatalog.TryGetDeprecatedGenAiAttribute(attributeName, out replacement);
@@ -59,7 +59,7 @@ public sealed partial class Al0074DeprecatedGenAiAttributeAnalyzer : AlAnalyzer 
         properties.Add("Replacement", replacement);
 
         context.ReportDiagnostic(Diagnostic.Create(
-            Rule,
+            s_rule,
             literal.GetLocation(),
             properties.ToImmutable(),
             value,

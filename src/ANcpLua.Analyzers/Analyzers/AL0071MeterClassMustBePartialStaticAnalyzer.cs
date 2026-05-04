@@ -32,13 +32,13 @@ public sealed partial class Al0071MeterClassMustBePartialStaticAnalyzer : AlAnal
 
     private const string MeterAttributeFullName = "Qyl.Instrumentation.Instrumentation.MeterAttribute";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.Metrics,
         DiagnosticSeverities.RequiredFix);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers syntax node actions to analyze class declarations with [Meter] attribute.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -59,7 +59,7 @@ public sealed partial class Al0071MeterClassMustBePartialStaticAnalyzer : AlAnal
         if (!classDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword)
             || !classDeclaration.Modifiers.Any(SyntaxKind.StaticKeyword)) {
             context.ReportDiagnostic(Diagnostic.Create(
-                Rule,
+                s_rule,
                 classDeclaration.Identifier.GetLocation(),
                 classSymbol.Name));
         }

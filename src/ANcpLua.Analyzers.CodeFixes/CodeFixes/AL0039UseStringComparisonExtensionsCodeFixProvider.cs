@@ -18,7 +18,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 public sealed partial class Al0039UseStringComparisonExtensionsCodeFixProvider
     : AlCodeFixProvider<InvocationExpressionSyntax> {
     // Mapping from StringComparison value to extension suffix
-    private static readonly Dictionary<string, string> ComparisonToSuffix = new(StringComparer.Ordinal) {
+    private static readonly Dictionary<string, string> s_comparisonToSuffix = new(StringComparer.Ordinal) {
         ["Ordinal"] = "Ordinal",
         ["OrdinalIgnoreCase"] = "IgnoreCase",
         ["CurrentCulture"] = "CurrentCulture",
@@ -66,7 +66,7 @@ public sealed partial class Al0039UseStringComparisonExtensionsCodeFixProvider
         }
 
         // If we couldn't find a valid comparison, bail out
-        if (comparisonValue is null || !ComparisonToSuffix.TryGetValue(comparisonValue, out var suffix)) {
+        if (comparisonValue is null || !s_comparisonToSuffix.TryGetValue(comparisonValue, out var suffix)) {
             return Task.FromResult(document);
         }
 

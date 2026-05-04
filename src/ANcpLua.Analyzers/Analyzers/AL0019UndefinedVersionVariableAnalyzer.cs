@@ -40,26 +40,26 @@ public sealed partial class Al0019UndefinedVersionVariableAnalyzer : DiagnosticA
     /// <summary>Property key for the package name.</summary>
     private const string PackageNameKey = "PackageName";
 
-    private static readonly LocalizableResourceString Title = new(
+    private static readonly LocalizableResourceString s_title = new(
         nameof(Resources.AL0019AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly LocalizableResourceString MessageFormat = new(
+    private static readonly LocalizableResourceString s_messageFormat = new(
         nameof(Resources.AL0019AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly LocalizableResourceString Description = new(
+    private static readonly LocalizableResourceString s_description = new(
         nameof(Resources.AL0019AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
 
-    private static readonly DiagnosticDescriptor Rule = new(
-        DiagnosticId, Title, MessageFormat, DiagnosticCategories.VersionManagement,
-        DiagnosticSeverity.Warning, true, Description,
+    private static readonly DiagnosticDescriptor s_rule = new(
+        DiagnosticId, s_title, s_messageFormat, DiagnosticCategories.VersionManagement,
+        DiagnosticSeverity.Warning, true, s_description,
         AlAnalyzer.HelpLinkBase,
         WellKnownDiagnosticTags.CompilationEnd);
 
     /// <summary>Pattern to extract MSBuild property name from $(VariableName) syntax.</summary>
-    private static readonly Regex MsBuildPropertyPattern = MyRegex();
+    private static readonly Regex s_msBuildPropertyPattern = MyRegex();
 
     /// <summary>Well-known variables commonly provided by MSBuild SDKs (not flagged as undefined).</summary>
-    private static readonly HashSet<string> SdkProvidedVariables = new(StringComparer.OrdinalIgnoreCase) {
+    private static readonly HashSet<string> s_sdkProvidedVariables = new(StringComparer.OrdinalIgnoreCase) {
         // Roslyn
         "RoslynVersion",
         "RoslynAnalyzersVersion",
@@ -132,7 +132,7 @@ public sealed partial class Al0019UndefinedVersionVariableAnalyzer : DiagnosticA
     };
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Initializes the analyzer and registers compilation-level actions.</summary>
     public override void Initialize(AnalysisContext context) {
@@ -217,7 +217,7 @@ public sealed partial class Al0019UndefinedVersionVariableAnalyzer : DiagnosticA
                 var versionValue = versionAttr.Value;
 
                 // Check if this is a $(VariableName) reference
-                var match = MsBuildPropertyPattern.Match(versionValue);
+                var match = s_msBuildPropertyPattern.Match(versionValue);
                 if (!match.Success) {
                     continue; // Not a variable reference (AL0017 handles hardcoded versions)
                 }
@@ -231,7 +231,7 @@ public sealed partial class Al0019UndefinedVersionVariableAnalyzer : DiagnosticA
 
                 // Skip if the variable is a well-known SDK-provided variable
                 // This supports the layering pattern where SDK provides base versions
-                if (SdkProvidedVariables.Contains(variableName)) {
+                if (s_sdkProvidedVariables.Contains(variableName)) {
                     continue;
                 }
 
@@ -243,7 +243,7 @@ public sealed partial class Al0019UndefinedVersionVariableAnalyzer : DiagnosticA
                 properties.Add(PackageNameKey, packageName);
 
                 var diagnostic = Diagnostic.Create(
-                    Rule,
+                    s_rule,
                     location,
                     properties.ToImmutable(),
                     packageName,

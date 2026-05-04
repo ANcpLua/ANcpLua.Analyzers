@@ -25,7 +25,7 @@ public sealed partial class Al0134UseSemanticConventionConstantAnalyzer : AlAnal
     /// <summary>The diagnostic identifier for AL0134.</summary>
     public const string DiagnosticId = "AL0134";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverity.Warning);
@@ -38,7 +38,7 @@ public sealed partial class Al0134UseSemanticConventionConstantAnalyzer : AlAnal
     ///     semantic convention attribute name constants. Each anchor is resolved per
     ///     compilation; missing anchors are silently skipped.
     /// </summary>
-    private static readonly string[] CatalogAnchors = [
+    private static readonly string[] s_catalogAnchors = [
         // Legacy aggregator type (shipped since v1.0.0)
         "OpenTelemetry.SemanticConventions.SemanticConventions",
         "OpenTelemetry.Trace.TraceSemanticConventions",
@@ -74,11 +74,11 @@ public sealed partial class Al0134UseSemanticConventionConstantAnalyzer : AlAnal
         "OpenTelemetry.SemanticConventions.Attributes.UserAttributes"
     ];
 
-    private static readonly HashSet<string> TelemetryMethodNames = new(StringComparer.Ordinal) {
+    private static readonly HashSet<string> s_telemetryMethodNames = new(StringComparer.Ordinal) {
         "SetTag", "AddTag", "SetAttribute", "AddAttribute", "SetCustomProperty"
     };
 
-    private static readonly HashSet<string> TestAttributeNames = new(StringComparer.Ordinal) {
+    private static readonly HashSet<string> s_testAttributeNames = new(StringComparer.Ordinal) {
         "Fact", "FactAttribute",
         "Theory", "TheoryAttribute",
         "Test", "TestAttribute",
@@ -88,7 +88,7 @@ public sealed partial class Al0134UseSemanticConventionConstantAnalyzer : AlAnal
     };
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers a compilation-start action that resolves the per-compilation catalog.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -108,7 +108,7 @@ public sealed partial class Al0134UseSemanticConventionConstantAnalyzer : AlAnal
     private static ImmutableDictionary<string, string> BuildCatalog(Compilation compilation) {
         var builder = ImmutableDictionary.CreateBuilder<string, string>(StringComparer.Ordinal);
 
-        foreach (var anchor in CatalogAnchors) {
+        foreach (var anchor in s_catalogAnchors) {
             if (compilation.GetTypeByMetadataName(anchor) is not { } type) {
                 continue;
             }
@@ -152,7 +152,7 @@ public sealed partial class Al0134UseSemanticConventionConstantAnalyzer : AlAnal
         }
 
         var properties = ImmutableDictionary<string, string?>.Empty.Add(ConstantPropertyKey, qualified);
-        context.ReportDiagnostic(Diagnostic.Create(Rule, literal.GetLocation(), properties, qualified, value));
+        context.ReportDiagnostic(Diagnostic.Create(s_rule, literal.GetLocation(), properties, qualified, value));
     }
 
     private static bool IsInGeneratedFile(SyntaxTree tree) {
@@ -185,7 +185,7 @@ public sealed partial class Al0134UseSemanticConventionConstantAnalyzer : AlAnal
     private static bool HasTestAttribute(MemberDeclarationSyntax member) {
         foreach (var list in member.AttributeLists) {
             foreach (var attr in list.Attributes) {
-                if (GetAttributeName(attr) is { } name && TestAttributeNames.Contains(name)) {
+                if (GetAttributeName(attr) is { } name && s_testAttributeNames.Contains(name)) {
                     return true;
                 }
             }
@@ -223,7 +223,7 @@ public sealed partial class Al0134UseSemanticConventionConstantAnalyzer : AlAnal
             return false;
         }
 
-        if (TelemetryMethodNames.Contains(name)) {
+        if (s_telemetryMethodNames.Contains(name)) {
             return true;
         }
 

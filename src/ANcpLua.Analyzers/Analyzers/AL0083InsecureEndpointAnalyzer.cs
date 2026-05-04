@@ -26,13 +26,13 @@ public sealed partial class Al0083InsecureEndpointAnalyzer : AlAnalyzer {
     private const string HttpPrefix = "http://";
     private const string HttpsPrefix = "https://";
 
-    private static readonly string[] LocalhostPatterns = [
+    private static readonly string[] s_localhostPatterns = [
         "localhost",
         "127.0.0.1",
         "[::1]"
     ];
 
-    private static readonly string[] EndpointPropertyNames = [
+    private static readonly string[] s_endpointPropertyNames = [
         "Endpoint",
         "BaseAddress",
         "Url",
@@ -50,13 +50,13 @@ public sealed partial class Al0083InsecureEndpointAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0083.</summary>
     private const string DiagnosticId = "AL0083";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.Configuration,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers operation actions to analyze endpoint assignments and constructor arguments.</summary>
     protected override void RegisterActions(AnalysisContext context) {
@@ -106,7 +106,7 @@ public sealed partial class Al0083InsecureEndpointAnalyzer : AlAnalyzer {
         var value = operation.UnwrapAllConversions();
 
         if (value.ConstantValue is { HasValue: true, Value: string endpoint } && IsInsecureEndpoint(endpoint)) {
-            context.ReportDiagnostic(Diagnostic.Create(Rule, operation.Syntax.GetLocation(), endpoint));
+            context.ReportDiagnostic(Diagnostic.Create(s_rule, operation.Syntax.GetLocation(), endpoint));
         }
     }
 
@@ -118,7 +118,7 @@ public sealed partial class Al0083InsecureEndpointAnalyzer : AlAnalyzer {
         };
 
     private static bool IsEndpointProperty(string name) {
-        foreach (var pattern in EndpointPropertyNames) {
+        foreach (var pattern in s_endpointPropertyNames) {
             if (name.ContainsIgnoreCase(pattern)) {
                 return true;
             }
@@ -134,7 +134,7 @@ public sealed partial class Al0083InsecureEndpointAnalyzer : AlAnalyzer {
 
         // Exclude localhost patterns (development use), but not "localhost-prod" style prefixes
         var hostPart = endpoint.Substring(HttpPrefix.Length);
-        foreach (var localhost in LocalhostPatterns) {
+        foreach (var localhost in s_localhostPatterns) {
             if (hostPart.StartsWithIgnoreCase(localhost)
                 && (hostPart.Length == localhost.Length || hostPart[localhost.Length] is ':' or '/' or '?')) {
                 return false;

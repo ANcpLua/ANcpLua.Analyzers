@@ -22,7 +22,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 public sealed partial class Al0035UseToDisplayStringExtensionsCodeFixProvider
     : AlCodeFixProvider<InvocationExpressionSyntax> {
     // Mapping from format name to extension method name
-    private static readonly Dictionary<string, string> FormatToExtension = new(StringComparer.Ordinal) {
+    private static readonly Dictionary<string, string> s_formatToExtension = new(StringComparer.Ordinal) {
         ["FullyQualifiedFormat"] = "GetFullyQualifiedName",
         ["CSharpErrorMessageFormat"] = "GetMetadataName"
     };
@@ -75,7 +75,7 @@ public sealed partial class Al0035UseToDisplayStringExtensionsCodeFixProvider
             if (arg.Expression is MemberAccessExpressionSyntax { Name: IdentifierNameSyntax formatName } formatAccess) {
                 var expressionText = formatAccess.Expression.ToString();
                 if (expressionText is "SymbolDisplayFormat" or "Microsoft.CodeAnalysis.SymbolDisplayFormat") {
-                    if (FormatToExtension.TryGetValue(formatName.Identifier.Text, out var extension)) {
+                    if (s_formatToExtension.TryGetValue(formatName.Identifier.Text, out var extension)) {
                         return extension;
                     }
                 }

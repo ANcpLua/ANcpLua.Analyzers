@@ -31,13 +31,13 @@ public sealed partial class Al0073TracedActivitySourceNameAnalyzer : AlAnalyzer 
 
     private const string TracedAttributeFullName = "Qyl.Instrumentation.Instrumentation.TracedAttribute";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverities.RequiredFix);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers symbol actions to analyze types and methods with [Traced] attribute.</summary>
     protected override void RegisterActions(AnalysisContext context) {
@@ -78,7 +78,7 @@ public sealed partial class Al0073TracedActivitySourceNameAnalyzer : AlAnalyzer 
                 var location = attribute.ApplicationSyntaxReference?.GetSyntax(context.CancellationToken).GetLocation()
                                ?? Location.None;
 
-                context.ReportDiagnostic(Diagnostic.Create(Rule, location, symbol.Name));
+                context.ReportDiagnostic(Diagnostic.Create(s_rule, location, symbol.Name));
             }
         }
     }

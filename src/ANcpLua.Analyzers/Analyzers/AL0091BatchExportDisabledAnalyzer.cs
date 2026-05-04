@@ -24,20 +24,20 @@ public sealed partial class Al0091BatchExportDisabledAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0091.</summary>
     private const string DiagnosticId = "AL0091";
 
-    private static readonly string[] SimpleProcessorTypeNames = [
+    private static readonly string[] s_simpleProcessorTypeNames = [
         "OpenTelemetry.Trace.SimpleSpanProcessor",
         "OpenTelemetry.Trace.SimpleActivityExportProcessor",
         "SimpleSpanProcessor",
         "SimpleActivityExportProcessor"
     ];
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers operation actions to analyze object creation.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -49,10 +49,10 @@ public sealed partial class Al0091BatchExportDisabledAnalyzer : AlAnalyzer {
         }
 
         if (IsSimpleProcessor(type.ToDisplayString())) {
-            context.ReportDiagnostic(Diagnostic.Create(Rule, context.Operation.Syntax.GetLocation()));
+            context.ReportDiagnostic(Diagnostic.Create(s_rule, context.Operation.Syntax.GetLocation()));
         }
     }
 
     private static bool IsSimpleProcessor(string typeName) =>
-        SimpleProcessorTypeNames.Any(s => typeName.EndsWithOrdinal(s) || typeName.EqualsOrdinal(s));
+        s_simpleProcessorTypeNames.Any(s => typeName.EndsWithOrdinal(s) || typeName.EqualsOrdinal(s));
 }

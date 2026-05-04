@@ -22,20 +22,20 @@ public sealed partial class Al0068InvalidMetricNameAnalyzer : AlAnalyzer {
 
     // Pattern: lowercase letters, numbers, dots, and underscores only
     // Should have at least one dot (namespace separator)
-    private static readonly Regex ValidNamePattern = new(
+    private static readonly Regex s_validNamePattern = new(
         @"^[a-z][a-z0-9_.]*\.[a-z][a-z0-9_.]*$",
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
     /// <summary>The diagnostic identifier for AL0068.</summary>
     private const string DiagnosticId = "AL0068";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.Metrics,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers symbol actions to analyze methods with metric attributes.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -56,7 +56,7 @@ public sealed partial class Al0068InvalidMetricNameAnalyzer : AlAnalyzer {
             if (attribute.ConstructorArguments.Length is 0 ||
                 attribute.ConstructorArguments[0].Value is not string metricName ||
                 string.IsNullOrWhiteSpace(metricName) ||
-                ValidNamePattern.IsMatch(metricName)) {
+                s_validNamePattern.IsMatch(metricName)) {
                 continue;
             }
 
@@ -64,7 +64,7 @@ public sealed partial class Al0068InvalidMetricNameAnalyzer : AlAnalyzer {
                 .GetLocation() ?? method.Locations.FirstOrDefault();
 
             if (location is not null) {
-                context.ReportDiagnostic(Diagnostic.Create(Rule, location, metricName));
+                context.ReportDiagnostic(Diagnostic.Create(s_rule, location, metricName));
             }
         }
     }

@@ -8,13 +8,13 @@ public sealed partial class Al0126CancellationTokenPropagationAnalyzer : AlAnaly
     /// <summary>The diagnostic identifier for AL0126.</summary>
     public const string DiagnosticId = "AL0126";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.Reliability,
         DiagnosticSeverity.Info);
 
     /// <summary>Gets the diagnostic descriptors supported by this analyzer.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers analysis actions for AL0126.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -52,6 +52,6 @@ public sealed partial class Al0126CancellationTokenPropagationAnalyzer : AlAnaly
             return;
         }
 
-        context.ReportDiagnostic(Rule, invocation.Syntax.GetLocation(), invocation.TargetMethod.Name);
+        context.ReportDiagnostic(s_rule, invocation.Syntax.GetLocation(), invocation.TargetMethod.Name);
     }
 }

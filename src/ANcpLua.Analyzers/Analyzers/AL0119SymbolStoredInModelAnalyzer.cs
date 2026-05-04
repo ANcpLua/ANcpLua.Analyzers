@@ -15,13 +15,13 @@ public sealed partial class Al0119SymbolStoredInModelAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0119.</summary>
     private const string DiagnosticId = "AL0119";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.RoslynUtilities,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers a compilation-start action to resolve ISymbol and scan type members.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -53,7 +53,7 @@ public sealed partial class Al0119SymbolStoredInModelAnalyzer : AlAnalyzer {
 
             if (IsOrContainsSymbolType(memberType, iSymbolType)) {
                 context.ReportDiagnostic(Diagnostic.Create(
-                    Rule,
+                    s_rule,
                     member.Locations.FirstOrDefault() ?? Location.None,
                     member.Name,
                     memberType.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)));

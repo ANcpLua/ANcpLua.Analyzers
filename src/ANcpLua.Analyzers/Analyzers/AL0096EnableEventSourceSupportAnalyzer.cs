@@ -24,13 +24,13 @@ public sealed partial class Al0096EnableEventSourceSupportAnalyzer : AlAnalyzer 
     private const string PublishAotProperty = "build_property.PublishAot";
     private const string EventSourceSupportProperty = "build_property.EventSourceSupport";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.Configuration,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers a compilation action to check MSBuild properties.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -49,6 +49,6 @@ public sealed partial class Al0096EnableEventSourceSupportAnalyzer : AlAnalyzer 
             return;
         }
 
-        context.ReportDiagnostic(Diagnostic.Create(Rule, Location.None));
+        context.ReportDiagnostic(Diagnostic.Create(s_rule, Location.None));
     }
 }

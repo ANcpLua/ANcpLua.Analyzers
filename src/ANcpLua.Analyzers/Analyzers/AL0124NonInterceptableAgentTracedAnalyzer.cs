@@ -22,13 +22,13 @@ public sealed partial class Al0124NonInterceptableAgentTracedAnalyzer : AlAnalyz
 
     private const string AgentTracedAttributeFullName = "Qyl.Instrumentation.Instrumentation.AgentTracedAttribute";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.GenAI,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers symbol actions to analyze methods with [AgentTraced] for interceptability.</summary>
     protected override void RegisterActions(AnalysisContext context) {
@@ -52,7 +52,7 @@ public sealed partial class Al0124NonInterceptableAgentTracedAnalyzer : AlAnalyz
 
         if (method.HasAttribute(agentTracedType)) {
             context.ReportDiagnostic(Diagnostic.Create(
-                Rule,
+                s_rule,
                 method.Locations.FirstOrDefault() ?? Location.None,
                 method.Name));
         }

@@ -23,13 +23,13 @@ public sealed partial class Al0041AotTestMustReturnIntAnalyzer : AlAnalyzer {
     private const string AotTestAttributeName = "AotTest";
     private const string TrimTestAttributeName = "TrimTest";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.AotTesting,
         DiagnosticSeverity.Error);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <inheritdoc />
     protected override void RegisterActions(AnalysisContext context) =>
@@ -58,6 +58,6 @@ public sealed partial class Al0041AotTestMustReturnIntAnalyzer : AlAnalyzer {
             return;
         }
 
-        context.ReportDiagnostic(Rule, method.Locations[0], method.Name, attributeName, method.ReturnType.ToDisplayString());
+        context.ReportDiagnostic(s_rule, method.Locations[0], method.Name, attributeName, method.ReturnType.ToDisplayString());
     }
 }

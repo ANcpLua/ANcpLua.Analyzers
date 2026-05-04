@@ -15,13 +15,13 @@ public sealed partial class Al0062DeprecatedSemconvAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0062.</summary>
     private const string DiagnosticId = "AL0062";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     internal static bool TryGetDeprecatedAttribute(string attributeName, out (string Replacement, string Version) info) =>
         OpenTelemetryDeprecatedSemconvCatalog.TryGetDeprecatedAttribute(attributeName, out info);
@@ -42,7 +42,7 @@ public sealed partial class Al0062DeprecatedSemconvAnalyzer : AlAnalyzer {
         }
 
         context.ReportDiagnostic(Diagnostic.Create(
-            Rule,
+            s_rule,
             invocation.Arguments[0].Syntax.GetLocation(),
             attributeName,
             info.Version,

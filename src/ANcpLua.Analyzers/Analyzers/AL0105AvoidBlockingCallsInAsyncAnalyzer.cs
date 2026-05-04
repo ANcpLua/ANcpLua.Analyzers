@@ -34,27 +34,27 @@ public sealed partial class Al0105AvoidBlockingCallsInAsyncAnalyzer : AlAnalyzer
 
     private enum KnownType { Task, TaskOfT, ValueTask, ValueTaskOfT }
 
-    private static readonly string[] KnownTypeNames = [
+    private static readonly string[] s_knownTypeNames = [
         "System.Threading.Tasks.Task",
         "System.Threading.Tasks.Task`1",
         "System.Threading.Tasks.ValueTask",
         "System.Threading.Tasks.ValueTask`1"
     ];
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.Threading,
         DiagnosticSeverity.Warning);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers compilation start action to resolve Task types.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterCompilationStartAction(OnCompilationStart);
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
-        var cache = new TypeCache<KnownType>(type => context.Compilation.GetTypeByMetadataName(KnownTypeNames[(int)type]));
+        var cache = new TypeCache<KnownType>(type => context.Compilation.GetTypeByMetadataName(s_knownTypeNames[(int)type]));
 
         if (cache.Get(KnownType.Task) is null && cache.Get(KnownType.TaskOfT) is null) {
             return;
@@ -82,7 +82,7 @@ public sealed partial class Al0105AvoidBlockingCallsInAsyncAnalyzer : AlAnalyzer
 
         if (context.SemanticModel.GetTypeInfo(memberAccess.Expression, context.CancellationToken).Type is { } expressionType &&
             IsTaskLike(expressionType, cache)) {
-            context.ReportDiagnostic(Rule, memberAccess.Name.GetLocation(), ".Result");
+            context.ReportDiagnostic(s_rule, memberAccess.Name.GetLocation(), ".Result");
         }
     }
 
@@ -101,7 +101,7 @@ public sealed partial class Al0105AvoidBlockingCallsInAsyncAnalyzer : AlAnalyzer
             case "Wait": {
                 if (context.SemanticModel.GetTypeInfo(memberAccess.Expression, context.CancellationToken).Type is { } expressionType &&
                     IsTaskLike(expressionType, cache)) {
-                    context.ReportDiagnostic(Rule, memberAccess.Name.GetLocation(), ".Wait()");
+                    context.ReportDiagnostic(s_rule, memberAccess.Name.GetLocation(), ".Wait()");
                 }
 
                 break;
@@ -110,7 +110,7 @@ public sealed partial class Al0105AvoidBlockingCallsInAsyncAnalyzer : AlAnalyzer
             case "GetResult" when memberAccess.Expression is InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax { Name.Identifier.Text: "GetAwaiter" } innerMember }: {
                 if (context.SemanticModel.GetTypeInfo(innerMember.Expression, context.CancellationToken).Type is { } expressionType &&
                     IsTaskLike(expressionType, cache)) {
-                    context.ReportDiagnostic(Rule, memberAccess.Name.GetLocation(), ".GetAwaiter().GetResult()");
+                    context.ReportDiagnostic(s_rule, memberAccess.Name.GetLocation(), ".GetAwaiter().GetResult()");
                 }
 
                 break;

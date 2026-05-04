@@ -17,13 +17,13 @@ public sealed partial class Al0122DuckDbTableMustBePartialAnalyzer : AlAnalyzer 
 
     private const string DuckDbTableAttributeFullName = "Qyl.Collector.Storage.DuckDbTableAttribute";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.Design,
         DiagnosticSeverities.RequiredFix);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers a compilation-start action to resolve DuckDbTableAttribute.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -58,7 +58,7 @@ public sealed partial class Al0122DuckDbTableMustBePartialAnalyzer : AlAnalyzer 
             return;
         }
 
-        context.ReportDiagnostic(Rule,
+        context.ReportDiagnostic(s_rule,
             typeDeclaration.Identifier.GetLocation(),
             typeSymbol.Name);
     }

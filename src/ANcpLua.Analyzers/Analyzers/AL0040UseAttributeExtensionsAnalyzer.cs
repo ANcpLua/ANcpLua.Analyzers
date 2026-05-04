@@ -16,13 +16,13 @@ public sealed partial class Al0040UseAttributeExtensionsAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0040.</summary>
     public const string DiagnosticId = "AL0040";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.RoslynUtilities,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers syntax or operation actions for analysis.</summary>
 
@@ -69,7 +69,7 @@ public sealed partial class Al0040UseAttributeExtensionsAnalyzer : AlAnalyzer {
         var attrName = arrayProp.Instance.GetOperandName("attr");
         var suggestion = $"{attrName}.GetConstructorArgument<T>({indexStr})";
 
-        context.ReportDiagnostic(Diagnostic.Create(Rule, valueAccess.Syntax.GetLocation(), suggestion));
+        context.ReportDiagnostic(Diagnostic.Create(s_rule, valueAccess.Syntax.GetLocation(), suggestion));
     }
 
     private static void AnalyzeConstructorArgumentsIndexing(
@@ -88,7 +88,7 @@ public sealed partial class Al0040UseAttributeExtensionsAnalyzer : AlAnalyzer {
         var attrName = propRef.Instance.GetOperandName("attr");
         var suggestion = $"{attrName}.GetConstructorArgument<T>({indexStr})";
 
-        context.ReportDiagnostic(Diagnostic.Create(Rule, arrayElementRef.Syntax.GetLocation(), suggestion));
+        context.ReportDiagnostic(Diagnostic.Create(s_rule, arrayElementRef.Syntax.GetLocation(), suggestion));
     }
 
     private static bool IsTypedConstantType(ITypeSymbol? type) {

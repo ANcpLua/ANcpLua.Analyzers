@@ -8,13 +8,13 @@ public sealed partial class Al0132DeprecatedSemconvValueAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0132.</summary>
     private const string DiagnosticId = "AL0132";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverity.Warning);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers operation actions to analyze telemetry attribute setter invocations.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -37,7 +37,7 @@ public sealed partial class Al0132DeprecatedSemconvValueAnalyzer : AlAnalyzer {
             return;
         }
 
-        context.ReportDiagnostic(Rule, invocation.Arguments[1].Syntax.GetLocation(), attributeName, attributeValue, guidance);
+        context.ReportDiagnostic(s_rule, invocation.Arguments[1].Syntax.GetLocation(), attributeName, attributeValue, guidance);
     }
 
     private static bool IsAttributeSetterMethod(IMethodSymbol method) =>

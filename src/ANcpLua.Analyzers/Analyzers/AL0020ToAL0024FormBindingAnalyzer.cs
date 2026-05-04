@@ -38,24 +38,24 @@ public sealed partial class Al0020ToAl0024FormBindingAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0024.</summary>
     private const string DiagnosticIdAl0024 = "AL0024";
 
-    private static readonly DiagnosticDescriptor RuleAl0020 = CreateRule(
+    private static readonly DiagnosticDescriptor s_ruleAl0020 = CreateRule(
         DiagnosticIdAl0020, "AL0020");
 
-    private static readonly DiagnosticDescriptor RuleAl0021 = CreateRule(
+    private static readonly DiagnosticDescriptor s_ruleAl0021 = CreateRule(
         DiagnosticIdAl0021, "AL0021");
 
-    private static readonly DiagnosticDescriptor RuleAl0022 = CreateRule(
+    private static readonly DiagnosticDescriptor s_ruleAl0022 = CreateRule(
         DiagnosticIdAl0022, "AL0022");
 
-    private static readonly DiagnosticDescriptor RuleAl0023 = CreateRule(
+    private static readonly DiagnosticDescriptor s_ruleAl0023 = CreateRule(
         DiagnosticIdAl0023, "AL0023");
 
-    private static readonly DiagnosticDescriptor RuleAl0024 = CreateRule(
+    private static readonly DiagnosticDescriptor s_ruleAl0024 = CreateRule(
         DiagnosticIdAl0024, "AL0024");
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics (AL0020-AL0024).</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-        [RuleAl0020, RuleAl0021, RuleAl0022, RuleAl0023, RuleAl0024];
+        [s_ruleAl0020, s_ruleAl0021, s_ruleAl0022, s_ruleAl0023, s_ruleAl0024];
 
     /// <summary>Creates a diagnostic descriptor for form binding rules.</summary>
     private static DiagnosticDescriptor CreateRule(string id, string ruleNumber) => new(
@@ -107,7 +107,7 @@ public sealed partial class Al0020ToAl0024FormBindingAnalyzer : AlAnalyzer {
 
             if (isFormCollection && !hasFromFormAttr) {
                 context.ReportDiagnostic(Diagnostic.Create(
-                    RuleAl0020,
+                    s_ruleAl0020,
                     param.Locations.FirstOrDefault() ?? Location.None,
                     param.Name,
                     method.Name));
@@ -127,7 +127,7 @@ public sealed partial class Al0020ToAl0024FormBindingAnalyzer : AlAnalyzer {
                     var reason = GetUnsupportedFormTypeReason(param.Type);
                     if (reason is not null) {
                         context.ReportDiagnostic(Diagnostic.Create(
-                            RuleAl0023,
+                            s_ruleAl0023,
                             param.Locations.FirstOrDefault() ?? Location.None,
                             param.Name,
                             method.Name,
@@ -139,21 +139,21 @@ public sealed partial class Al0020ToAl0024FormBindingAnalyzer : AlAnalyzer {
 
         if (hasFromBody && hasFromForm) {
             context.ReportDiagnostic(Diagnostic.Create(
-                RuleAl0024,
+                s_ruleAl0024,
                 fromBodyParam?.Locations.FirstOrDefault() ?? method.Locations.FirstOrDefault() ?? Location.None,
                 method.Name));
         }
 
         if (fromFormDtoCount > 1) {
             context.ReportDiagnostic(Diagnostic.Create(
-                RuleAl0021,
+                s_ruleAl0021,
                 firstFromFormParam?.Locations.FirstOrDefault() ?? method.Locations.FirstOrDefault() ?? Location.None,
                 method.Name));
         }
 
         if (hasFromFormCollection && hasFromFormDto) {
             context.ReportDiagnostic(Diagnostic.Create(
-                RuleAl0022,
+                s_ruleAl0022,
                 firstFromFormParam?.Locations.FirstOrDefault() ?? method.Locations.FirstOrDefault() ?? Location.None,
                 method.Name));
         }
@@ -193,7 +193,7 @@ public sealed partial class Al0020ToAl0024FormBindingAnalyzer : AlAnalyzer {
     }
 
     private static partial class WellKnownTypeNames {
-        private static readonly string[] Names = [
+        private static readonly string[] s_names = [
             "Microsoft.AspNetCore.Mvc.FromFormAttribute",
             "Microsoft.AspNetCore.Mvc.FromBodyAttribute",
             "Microsoft.AspNetCore.Http.IFormFile",
@@ -209,7 +209,7 @@ public sealed partial class Al0020ToAl0024FormBindingAnalyzer : AlAnalyzer {
             "Microsoft.CodeAnalysis.TypedConstant"
         ];
 
-        public static string GetName(WellKnownType type) => Names[(int)type];
+        public static string GetName(WellKnownType type) => s_names[(int)type];
     }
 
     private static string? GetUnsupportedFormTypeReason(ITypeSymbol type) {

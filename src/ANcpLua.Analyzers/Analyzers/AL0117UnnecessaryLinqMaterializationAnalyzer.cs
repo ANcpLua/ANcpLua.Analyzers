@@ -29,15 +29,15 @@ public sealed partial class Al0117UnnecessaryLinqMaterializationAnalyzer : AlAna
     /// <summary>The diagnostic identifier for AL0117.</summary>
     private const string DiagnosticId = "AL0117";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.Usage,
         DiagnosticSeverities.HiddenByDefault);
 
-    private static readonly ImmutableHashSet<string> MaterializationMethods =
+    private static readonly ImmutableHashSet<string> s_materializationMethods =
         ImmutableHashSet.Create(StringComparer.Ordinal, "ToList", "ToArray");
 
-    private static readonly ImmutableHashSet<string> LinqOperators =
+    private static readonly ImmutableHashSet<string> s_linqOperators =
         ImmutableHashSet.Create(StringComparer.Ordinal,
             "Where", "Select", "SelectMany",
             "OfType", "Cast",
@@ -50,13 +50,13 @@ public sealed partial class Al0117UnnecessaryLinqMaterializationAnalyzer : AlAna
             "DefaultIfEmpty");
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers a compilation start action to resolve System.Linq.Enumerable.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
         context.RegisterCompilationStartAction(OnCompilationStart);
 
-    private static readonly string[] StrictCollectionMetadataNames = [
+    private static readonly string[] s_strictCollectionMetadataNames = [
         "System.Collections.Generic.List`1",
         "System.Collections.Generic.IList`1",
         "System.Collections.Generic.IReadOnlyList`1",
@@ -76,7 +76,7 @@ public sealed partial class Al0117UnnecessaryLinqMaterializationAnalyzer : AlAna
             return;
         }
 
-        var strict = StrictCollectionMetadataNames
+        var strict = s_strictCollectionMetadataNames
             .Select(name => context.Compilation.GetTypeByMetadataName(name))
             .OfType<INamedTypeSymbol>()
             .ToImmutableArray();
@@ -94,7 +94,7 @@ public sealed partial class Al0117UnnecessaryLinqMaterializationAnalyzer : AlAna
         var method = invocation.TargetMethod;
 
         // Must be ToList() or ToArray()
-        if (!MaterializationMethods.Contains(method.Name)) {
+        if (!s_materializationMethods.Contains(method.Name)) {
             return;
         }
 
@@ -109,7 +109,7 @@ public sealed partial class Al0117UnnecessaryLinqMaterializationAnalyzer : AlAna
         }
 
         // The source must also be a LINQ operator from System.Linq.Enumerable
-        if (!LinqOperators.Contains(sourceMethod.Name)) {
+        if (!s_linqOperators.Contains(sourceMethod.Name)) {
             return;
         }
 
@@ -130,7 +130,7 @@ public sealed partial class Al0117UnnecessaryLinqMaterializationAnalyzer : AlAna
 
         // Report on the materialization method name location
         var location = GetMethodNameLocation(invocation);
-        context.ReportDiagnostic(Diagnostic.Create(Rule, location, method.Name, sourceMethod.Name));
+        context.ReportDiagnostic(Diagnostic.Create(s_rule, location, method.Name, sourceMethod.Name));
     }
 
     private static bool IsBoxedToObject(IInvocationOperation materialization) {

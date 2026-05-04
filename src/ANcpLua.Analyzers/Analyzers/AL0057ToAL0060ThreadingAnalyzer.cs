@@ -39,29 +39,29 @@ public sealed partial class Al0057ToAl0060ThreadingAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0060.</summary>
     private const string DiagnosticIdAl0060 = "AL0060";
 
-    private static readonly DiagnosticDescriptor AsyncVoidRule = CreateRule(
+    private static readonly DiagnosticDescriptor s_asyncVoidRule = CreateRule(
         DiagnosticIdAl0057,
         DiagnosticCategories.Threading,
         DiagnosticSeverity.Warning);
 
-    private static readonly DiagnosticDescriptor LockOnThisRule = CreateRule(
+    private static readonly DiagnosticDescriptor s_lockOnThisRule = CreateRule(
         DiagnosticIdAl0058,
         DiagnosticCategories.Threading,
         DiagnosticSeverity.Warning);
 
-    private static readonly DiagnosticDescriptor LockOnTypeRule = CreateRule(
+    private static readonly DiagnosticDescriptor s_lockOnTypeRule = CreateRule(
         DiagnosticIdAl0059,
         DiagnosticCategories.Threading,
         DiagnosticSeverity.Warning);
 
-    private static readonly DiagnosticDescriptor LockOnStringRule = CreateRule(
+    private static readonly DiagnosticDescriptor s_lockOnStringRule = CreateRule(
         DiagnosticIdAl0060,
         DiagnosticCategories.Threading,
         DiagnosticSeverity.Warning);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics (AL0057-AL0060).</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-        [AsyncVoidRule, LockOnThisRule, LockOnTypeRule, LockOnStringRule];
+        [s_asyncVoidRule, s_lockOnThisRule, s_lockOnTypeRule, s_lockOnStringRule];
 
     /// <summary>Registers syntax node actions for method declarations and lock statements.</summary>
     protected override void RegisterActions(AnalysisContext context) {
@@ -79,7 +79,7 @@ public sealed partial class Al0057ToAl0060ThreadingAnalyzer : AlAnalyzer {
             return;
         }
 
-        context.ReportDiagnostic(AsyncVoidRule, method.Identifier.GetLocation(), methodSymbol.Name);
+        context.ReportDiagnostic(s_asyncVoidRule, method.Identifier.GetLocation(), methodSymbol.Name);
     }
 
     private static void AnalyzeLockStatement(SyntaxNodeAnalysisContext context) {
@@ -88,18 +88,18 @@ public sealed partial class Al0057ToAl0060ThreadingAnalyzer : AlAnalyzer {
 
         switch (expression) {
             case ThisExpressionSyntax:
-                context.ReportDiagnostic(LockOnThisRule, expression.GetLocation());
+                context.ReportDiagnostic(s_lockOnThisRule, expression.GetLocation());
                 return;
             case TypeOfExpressionSyntax typeOfExpression:
-                context.ReportDiagnostic(LockOnTypeRule, expression.GetLocation(), typeOfExpression.Type.ToString());
+                context.ReportDiagnostic(s_lockOnTypeRule, expression.GetLocation(), typeOfExpression.Type.ToString());
                 return;
             case LiteralExpressionSyntax { RawKind: (int)SyntaxKind.StringLiteralExpression }:
-                context.ReportDiagnostic(LockOnStringRule, expression.GetLocation());
+                context.ReportDiagnostic(s_lockOnStringRule, expression.GetLocation());
                 return;
         }
 
         if (IsConstantStringExpression(expression, context.SemanticModel, context.CancellationToken)) {
-            context.ReportDiagnostic(LockOnStringRule, expression.GetLocation());
+            context.ReportDiagnostic(s_lockOnStringRule, expression.GetLocation());
         }
     }
 

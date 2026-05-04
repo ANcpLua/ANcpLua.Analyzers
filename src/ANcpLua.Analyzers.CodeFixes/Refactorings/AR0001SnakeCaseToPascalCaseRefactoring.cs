@@ -11,7 +11,7 @@ namespace ANcpLua.Analyzers.CodeFixes.Refactorings;
 [ExportCodeRefactoringProvider(LanguageNames.CSharp, Name = nameof(Ar0001SnakeCaseToPascalCaseRefactoring))]
 [Shared]
 public sealed partial class Ar0001SnakeCaseToPascalCaseRefactoring : CodeRefactoringProvider {
-    private static readonly Regex ScreamingSnakeCasePattern = new("^[A-Z0-9_]+$", RegexOptions.Compiled);
+    private static readonly Regex s_screamingSnakeCasePattern = new("^[A-Z0-9_]+$", RegexOptions.Compiled);
 
     public override async Task ComputeRefactoringsAsync(CodeRefactoringContext context) {
         var document = context.Document;
@@ -73,7 +73,7 @@ public sealed partial class Ar0001SnakeCaseToPascalCaseRefactoring : CodeRefacto
 
     private static bool IsScreamingSnakeCase(string identifier) =>
 #pragma warning disable AL0039 // CodeFixes project doesn't reference ANcpLua.Roslyn.Utilities
-        ScreamingSnakeCasePattern.IsMatch(identifier) && identifier.Contains('_', StringComparison.Ordinal);
+        s_screamingSnakeCasePattern.IsMatch(identifier) && identifier.Contains('_', StringComparison.Ordinal);
 #pragma warning restore AL0039
 
     private static string ToPascalCase(string screamingSnake) =>

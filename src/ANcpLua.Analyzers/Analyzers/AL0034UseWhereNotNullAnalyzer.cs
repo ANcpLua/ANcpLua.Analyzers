@@ -15,13 +15,13 @@ public sealed partial class Al0034UseWhereNotNullAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0034.</summary>
     public const string DiagnosticId = "AL0034";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.RoslynUtilities,
         DiagnosticSeverity.Info);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers syntax or operation actions for analysis.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -63,7 +63,7 @@ public sealed partial class Al0034UseWhereNotNullAnalyzer : AlAnalyzer {
         }
 
         if (predicateValue is IAnonymousFunctionOperation lambda && IsNullCheckLambda(lambda)) {
-            context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.Syntax.GetLocation(),
+            context.ReportDiagnostic(Diagnostic.Create(s_rule, invocation.Syntax.GetLocation(),
                 ".WhereNotNull()", ".Where(x => x != null)"));
         }
     }

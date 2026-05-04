@@ -17,13 +17,13 @@ public sealed partial class Al0028UseIsEqualToAnalyzer : AlAnalyzer {
     /// <summary>Metadata name for ISymbol.</summary>
     private const string ISymbolTypeName = "Microsoft.CodeAnalysis.ISymbol";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.RoslynUtilities,
         DiagnosticSeverity.Info);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers compilation start action to analyze SymbolEqualityComparer usage.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -59,7 +59,7 @@ public sealed partial class Al0028UseIsEqualToAnalyzer : AlAnalyzer {
 
         var arg0 = GetArgumentDisplayName(invocation, 0);
         var arg1 = GetArgumentDisplayName(invocation, 1);
-        context.ReportDiagnostic(Rule, invocation.Syntax.GetLocation(),
+        context.ReportDiagnostic(s_rule, invocation.Syntax.GetLocation(),
             $"{arg0}.IsEqualTo({arg1})", "SymbolEqualityComparer.Default.Equals()");
     }
 

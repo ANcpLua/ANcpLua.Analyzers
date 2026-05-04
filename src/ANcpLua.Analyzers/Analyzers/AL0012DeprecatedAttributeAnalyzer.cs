@@ -30,13 +30,13 @@ public sealed partial class Al0012DeprecatedAttributeAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0012.</summary>
     public const string DiagnosticId = "AL0012";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverity.Warning);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers syntax node actions to analyze string literals for deprecated OTel attributes.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -64,7 +64,7 @@ public sealed partial class Al0012DeprecatedAttributeAnalyzer : AlAnalyzer {
             return;
         }
 
-        context.ReportDiagnostic(Rule, literal.GetLocation(), value, replacement.Version, replacement.Replacement);
+        context.ReportDiagnostic(s_rule, literal.GetLocation(), value, replacement.Version, replacement.Replacement);
     }
 
     private static bool IsInTelemetryContext(SyntaxNode node) {

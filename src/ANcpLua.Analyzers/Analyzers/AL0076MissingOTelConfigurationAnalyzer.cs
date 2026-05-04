@@ -28,13 +28,13 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al0076MissingOTelConfigurationAnalyzer : AlAnalyzer {
-    private static readonly string[] ServiceDefaultsMethods = [
+    private static readonly string[] s_serviceDefaultsMethods = [
         "AddServiceDefaults",
         "AddQylServiceDefaults",
         "ConfigureOpenTelemetry"
     ];
 
-    private static readonly string[] OTelConfigurationMethods = [
+    private static readonly string[] s_oTelConfigurationMethods = [
         "AddOpenTelemetry",
         "WithTracing",
         "UseOpenTelemetry"
@@ -43,13 +43,13 @@ public sealed partial class Al0076MissingOTelConfigurationAnalyzer : AlAnalyzer 
     /// <summary>The diagnostic identifier for AL0076.</summary>
     private const string DiagnosticId = "AL0076";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers syntax tree actions to analyze OpenTelemetry configuration.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -59,7 +59,7 @@ public sealed partial class Al0076MissingOTelConfigurationAnalyzer : AlAnalyzer 
         var invocation = (InvocationExpressionSyntax)context.Node;
 
         if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess
-            || !ServiceDefaultsMethods.Contains(memberAccess.Name.Identifier.Text)) {
+            || !s_serviceDefaultsMethods.Contains(memberAccess.Name.Identifier.Text)) {
             return;
         }
 
@@ -74,8 +74,8 @@ public sealed partial class Al0076MissingOTelConfigurationAnalyzer : AlAnalyzer 
             }
         }
 
-        if (!OTelConfigurationMethods.Any(allInvocations.Contains)) {
-            context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.GetLocation()));
+        if (!s_oTelConfigurationMethods.Any(allInvocations.Contains)) {
+            context.ReportDiagnostic(Diagnostic.Create(s_rule, invocation.GetLocation()));
         }
     }
 

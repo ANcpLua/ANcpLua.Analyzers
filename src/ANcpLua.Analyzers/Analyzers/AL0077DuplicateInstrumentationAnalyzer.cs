@@ -37,13 +37,13 @@ public sealed partial class Al0077DuplicateInstrumentationAnalyzer : AlAnalyzer 
 
     private const string TracedAttributeFullName = "Qyl.Instrumentation.Instrumentation.TracedAttribute";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.OpenTelemetry,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers actions to analyze methods with [Traced] attribute.</summary>
     protected override void RegisterActions(AnalysisContext context) {
@@ -73,7 +73,7 @@ public sealed partial class Al0077DuplicateInstrumentationAnalyzer : AlAnalyzer 
                 var location = method.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax(context.CancellationToken).GetLocation()
                                ?? Location.None;
 
-                context.ReportDiagnostic(Diagnostic.Create(Rule, location, method.Name));
+                context.ReportDiagnostic(Diagnostic.Create(s_rule, location, method.Name));
                 return;
             }
         }

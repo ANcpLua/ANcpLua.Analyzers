@@ -16,13 +16,13 @@ public sealed partial class Al0032UseOrEmptyAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0032.</summary>
     public const string DiagnosticId = "AL0032";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.RoslynUtilities,
         DiagnosticSeverity.Info);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers syntax or operation actions for analysis.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -53,7 +53,7 @@ public sealed partial class Al0032UseOrEmptyAnalyzer : AlAnalyzer {
         }
 
         var leftName = GetOperandDisplayName(coalesce.Value);
-        context.ReportDiagnostic(Diagnostic.Create(Rule, coalesce.Syntax.GetLocation(),
+        context.ReportDiagnostic(Diagnostic.Create(s_rule, coalesce.Syntax.GetLocation(),
             $"{leftName}.OrEmpty()", "null-coalescing with empty collection"));
     }
 

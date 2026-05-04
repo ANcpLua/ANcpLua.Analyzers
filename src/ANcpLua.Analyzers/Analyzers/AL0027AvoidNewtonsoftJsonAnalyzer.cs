@@ -17,13 +17,13 @@ public sealed partial class Al0027AvoidNewtonsoftJsonAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0027.</summary>
     public const string DiagnosticId = "AL0027";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.Usage,
         DiagnosticSeverity.Warning);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers compilation start action to analyze type symbol references.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -44,7 +44,7 @@ public sealed partial class Al0027AvoidNewtonsoftJsonAnalyzer : AlAnalyzer {
         }
 
         if (IsLegacyJsonType(invocation.TargetMethod.ContainingType)) {
-            context.ReportDiagnostic(Rule, invocation.Syntax.GetLocation(), invocation.TargetMethod.ContainingType.Name);
+            context.ReportDiagnostic(s_rule, invocation.Syntax.GetLocation(), invocation.TargetMethod.ContainingType.Name);
         }
     }
 
@@ -54,7 +54,7 @@ public sealed partial class Al0027AvoidNewtonsoftJsonAnalyzer : AlAnalyzer {
         }
 
         if (IsLegacyJsonType(type)) {
-            context.ReportDiagnostic(Rule, context.Operation.Syntax.GetLocation(), type.Name);
+            context.ReportDiagnostic(s_rule, context.Operation.Syntax.GetLocation(), type.Name);
         }
     }
 

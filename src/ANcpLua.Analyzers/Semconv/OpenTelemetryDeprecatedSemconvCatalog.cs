@@ -110,7 +110,7 @@ internal static class OpenTelemetryDeprecatedSemconvCatalog {
             ["db.elasticsearch.path_parts."] = ("db.operation.parameter.", "1.30.0"),
         };
 
-    private static readonly Dictionary<string, string> DeprecatedGenAiAttributes = new(StringComparer.OrdinalIgnoreCase) {
+    private static readonly Dictionary<string, string> s_deprecatedGenAiAttributes = new(StringComparer.OrdinalIgnoreCase) {
         ["gen_ai.openai.request.response_format"] = "gen_ai.output.type",
         ["gen_ai.openai.request.seed"] = "gen_ai.request.seed",
         ["gen_ai.openai.request.service_tier"] = "openai.request.service_tier",
@@ -121,7 +121,7 @@ internal static class OpenTelemetryDeprecatedSemconvCatalog {
         ["gen_ai.usage.prompt_tokens"] = "gen_ai.usage.input_tokens",
     };
 
-    private static readonly Dictionary<string, Dictionary<string, string>> DeprecatedAttributeValues =
+    private static readonly Dictionary<string, Dictionary<string, string>> s_deprecatedAttributeValues =
         new(StringComparer.OrdinalIgnoreCase) {
             ["cloud.platform"] = new(StringComparer.OrdinalIgnoreCase) {
                 ["azure_aks"] = "Use 'azure.aks' instead.",
@@ -160,7 +160,7 @@ internal static class OpenTelemetryDeprecatedSemconvCatalog {
             },
         };
 
-    private static readonly Dictionary<string, string> ContextSensitiveDeprecatedNames = new(StringComparer.OrdinalIgnoreCase) {
+    private static readonly Dictionary<string, string> s_contextSensitiveDeprecatedNames = new(StringComparer.OrdinalIgnoreCase) {
         ["code.function"] = "Value should be included in `code.function.name` which is expected to be a fully-qualified name.",
         ["code.namespace"] = "Value should be included in `code.function.name` which is expected to be a fully-qualified name.",
         ["db.connection_string"] = "Replaced by `server.address` and `server.port`.",
@@ -233,13 +233,13 @@ internal static class OpenTelemetryDeprecatedSemconvCatalog {
     }
 
     internal static bool TryGetDeprecatedGenAiAttribute(string attributeName, [NotNullWhen(true)] out string? replacement) =>
-        DeprecatedGenAiAttributes.TryGetValue(attributeName, out replacement);
+        s_deprecatedGenAiAttributes.TryGetValue(attributeName, out replacement);
 
     internal static bool TryGetDeprecatedAttributeValue(
         string attributeName,
         string attributeValue,
         [NotNullWhen(true)] out string? guidance) {
-        if (DeprecatedAttributeValues.TryGetValue(attributeName, out var values)
+        if (s_deprecatedAttributeValues.TryGetValue(attributeName, out var values)
             && values.TryGetValue(attributeValue, out guidance)) {
             return true;
         }
@@ -249,5 +249,5 @@ internal static class OpenTelemetryDeprecatedSemconvCatalog {
     }
 
     internal static bool TryGetContextSensitiveDeprecatedName(string name, [NotNullWhen(true)] out string? guidance) =>
-        ContextSensitiveDeprecatedNames.TryGetValue(name, out guidance);
+        s_contextSensitiveDeprecatedNames.TryGetValue(name, out guidance);
 }

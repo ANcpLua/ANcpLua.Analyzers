@@ -19,13 +19,13 @@ public sealed partial class Al0081MissingHealthChecksAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL0081.</summary>
     private const string DiagnosticId = "AL0081";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.AspNetCore,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers syntax tree actions to analyze web application configuration.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -47,14 +47,14 @@ public sealed partial class Al0081MissingHealthChecksAnalyzer : AlAnalyzer {
         if (invocation.Ancestors().OfType<MethodDeclarationSyntax>().FirstOrDefault() is not { } containingMethod) {
             if (invocation.Ancestors().OfType<CompilationUnitSyntax>().FirstOrDefault() is { } compilationUnit
                 && !HasHealthChecksConfigured(compilationUnit)) {
-                context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.GetLocation()));
+                context.ReportDiagnostic(Diagnostic.Create(s_rule, invocation.GetLocation()));
             }
 
             return;
         }
 
         if (!HasHealthChecksConfigured(containingMethod)) {
-            context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.GetLocation()));
+            context.ReportDiagnostic(Diagnostic.Create(s_rule, invocation.GetLocation()));
         }
     }
 

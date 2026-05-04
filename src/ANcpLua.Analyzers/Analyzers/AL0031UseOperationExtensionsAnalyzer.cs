@@ -21,13 +21,13 @@ public sealed partial class Al0031UseOperationExtensionsAnalyzer : AlAnalyzer {
 
     private const string IInvocationOperationTypeName = "Microsoft.CodeAnalysis.Operations.IInvocationOperation";
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.RoslynUtilities,
         DiagnosticSeverity.Info);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers syntax or operation actions for analysis.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -51,12 +51,12 @@ public sealed partial class Al0031UseOperationExtensionsAnalyzer : AlAnalyzer {
             var suggestion = binary.OperatorKind == BinaryOperatorKind.Equals
                 ? $"invocation.IsMethodNamed(containingType, \"{methodName}\")"
                 : $"!invocation.IsMethodNamed(containingType, \"{methodName}\")";
-            context.ReportDiagnostic(Rule, binary.Syntax.GetLocation(),
+            context.ReportDiagnostic(s_rule, binary.Syntax.GetLocation(),
                 suggestion, "TargetMethod.Name == comparison");
         }
 
         if (binary.OperatorKind == BinaryOperatorKind.ConditionalAnd && IsConstantValueHasValueCheck(binary)) {
-            context.ReportDiagnostic(Rule, binary.Syntax.GetLocation(),
+            context.ReportDiagnostic(s_rule, binary.Syntax.GetLocation(),
                 "operation.TryGetConstantValue<T>(out value)", "ConstantValue.HasValue check");
         }
     }

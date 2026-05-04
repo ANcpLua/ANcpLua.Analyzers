@@ -19,16 +19,16 @@ public sealed partial class Al0069IncompleteServiceDefaultsAnalyzer : AlAnalyzer
     /// <summary>The diagnostic identifier for AL0069.</summary>
     private const string DiagnosticId = "AL0069";
 
-    private static readonly string[] TracingMethods = ["AddOpenTelemetry", "WithTracing", "AddTracing"];
-    private static readonly string[] MetricsMethods = ["AddOpenTelemetry", "WithMetrics", "AddMetrics"];
+    private static readonly string[] s_tracingMethods = ["AddOpenTelemetry", "WithTracing", "AddTracing"];
+    private static readonly string[] s_metricsMethods = ["AddOpenTelemetry", "WithMetrics", "AddMetrics"];
 
-    private static readonly DiagnosticDescriptor Rule = CreateRule(
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.Configuration,
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers syntax tree actions to analyze ServiceDefaults configuration.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
@@ -58,13 +58,13 @@ public sealed partial class Al0069IncompleteServiceDefaultsAnalyzer : AlAnalyzer
         }
 
         // Check for tracing configuration
-        var hasTracing = TracingMethods.Any(allInvocations.Contains);
-        var hasMetrics = MetricsMethods.Any(allInvocations.Contains);
+        var hasTracing = s_tracingMethods.Any(allInvocations.Contains);
+        var hasMetrics = s_metricsMethods.Any(allInvocations.Contains);
 
         // Report missing components
         if (!hasTracing) {
             context.ReportDiagnostic(Diagnostic.Create(
-                Rule,
+                s_rule,
                 invocation.GetLocation(),
                 "tracing",
                 "WithTracing() or AddTracing()"));
@@ -72,7 +72,7 @@ public sealed partial class Al0069IncompleteServiceDefaultsAnalyzer : AlAnalyzer
 
         if (!hasMetrics) {
             context.ReportDiagnostic(Diagnostic.Create(
-                Rule,
+                s_rule,
                 invocation.GetLocation(),
                 "metrics",
                 "WithMetrics() or AddMetrics()"));
