@@ -5,7 +5,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///     <c>semantic-conventions/model/**/*.yaml</c>.
 /// </summary>
 internal static class OpenTelemetryDeprecatedSemconvCatalog {
-    private static readonly Dictionary<string, (string Replacement, string Version)> DeprecatedAttributes =
+    private static readonly Dictionary<string, (string Replacement, string Version)> s_deprecatedAttributes =
         new(StringComparer.OrdinalIgnoreCase) {
             ["android.state"] = ("android.app.state", "1.31.0"),
             ["az.namespace"] = ("azure.resource_provider.namespace", "1.35.0"),
@@ -105,7 +105,7 @@ internal static class OpenTelemetryDeprecatedSemconvCatalog {
             ["vcs.repository.ref.type"] = ("vcs.ref.head.type", "1.29.0"),
         };
 
-    private static readonly Dictionary<string, (string ReplacementPrefix, string Version)> DeprecatedAttributePrefixes =
+    private static readonly Dictionary<string, (string ReplacementPrefix, string Version)> s_deprecatedAttributePrefixes =
         new(StringComparer.OrdinalIgnoreCase) {
             ["db.elasticsearch.path_parts."] = ("db.operation.parameter.", "1.30.0"),
         };
@@ -216,11 +216,11 @@ internal static class OpenTelemetryDeprecatedSemconvCatalog {
     internal static bool TryGetDeprecatedAttribute(
         string attributeName,
         out (string Replacement, string Version) info) {
-        if (DeprecatedAttributes.TryGetValue(attributeName, out info)) {
+        if (s_deprecatedAttributes.TryGetValue(attributeName, out info)) {
             return true;
         }
 
-        foreach (var prefix in DeprecatedAttributePrefixes) {
+        foreach (var prefix in s_deprecatedAttributePrefixes) {
             if (attributeName.StartsWith(prefix.Key, StringComparison.OrdinalIgnoreCase)) {
                 var suffix = attributeName[prefix.Key.Length..];
                 info = ($"{prefix.Value.ReplacementPrefix}{suffix}", prefix.Value.Version);
