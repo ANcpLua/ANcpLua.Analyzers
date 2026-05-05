@@ -31,7 +31,7 @@ public sealed partial class Al0131DirectGenAiSdkUsageAnalyzer : AlAnalyzer {
     ///     <c>ChatClientAgent</c>, and <c>DelegatingAIAgent</c> are NOT bypasses — they are the
     ///     Microsoft.Agents.AI abstractions the framework expects consumers to call through.
     /// </summary>
-    private static readonly (string MetadataName, string Label)[] SdkTypes = [
+    private static readonly (string MetadataName, string Label)[] s_sdkTypes = [
         ("OpenAI.Chat.ChatClient", "OpenAI Chat"),
         ("OpenAI.Embeddings.EmbeddingClient", "OpenAI Embeddings"),
         ("OpenAI.Images.ImageClient", "OpenAI Images"),
@@ -56,7 +56,7 @@ public sealed partial class Al0131DirectGenAiSdkUsageAnalyzer : AlAnalyzer {
         context.RegisterCompilationStartAction(compilationContext => {
             var iChatClientType = compilationContext.Compilation.GetTypeByMetadataName(IChatClientMetadataName);
 
-            var knownSdkTypes = SdkTypes
+            var knownSdkTypes = s_sdkTypes
                 .Select(entry => (
                     Type: compilationContext.Compilation.GetTypeByMetadataName(entry.MetadataName),
                     entry.Label))

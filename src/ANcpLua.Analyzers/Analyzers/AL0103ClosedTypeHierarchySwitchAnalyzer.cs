@@ -23,7 +23,7 @@ public sealed partial class Al0103ClosedTypeHierarchySwitchAnalyzer : AlAnalyzer
     /// <summary>Diagnostic property key for pipe-separated missing type names.</summary>
     public const string MissingTypesProperty = "MissingTypes";
 
-    static readonly DiagnosticDescriptor Rule = new(
+    static readonly DiagnosticDescriptor s_rule = new(
         DiagnosticId,
         "Closed hierarchy match is not exhaustive",
         "Closed hierarchy '{0}' does not handle: {1}",
@@ -34,10 +34,10 @@ public sealed partial class Al0103ClosedTypeHierarchySwitchAnalyzer : AlAnalyzer
         "switch statements, and Match<T> calls.",
         HelpLink(DiagnosticId));
 
-    static readonly InvocationMatcher MatchInvocation = Invoke.Method("Match").Generic();
+    static readonly InvocationMatcher s_matchInvocation = Invoke.Method("Match").Generic();
 
     /// <inheritdoc />
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <inheritdoc />
     protected override void RegisterActions(AnalysisContext context) =>
@@ -84,7 +84,7 @@ public sealed partial class Al0103ClosedTypeHierarchySwitchAnalyzer : AlAnalyzer
         ConcurrentDictionary<string, ImmutableArray<INamedTypeSymbol>> cache,
         Compilation compilation) {
         if (context.Operation is not IInvocationOperation invocation ||
-            !MatchInvocation.Matches(invocation)) {
+            !s_matchInvocation.Matches(invocation)) {
             return;
         }
 
@@ -137,7 +137,7 @@ public sealed partial class Al0103ClosedTypeHierarchySwitchAnalyzer : AlAnalyzer
         ]);
 
         context.ReportDiagnostic(Diagnostic.Create(
-            Rule,
+            s_rule,
             location,
             properties,
             rootType.ToDisplayString(displayFormat),
