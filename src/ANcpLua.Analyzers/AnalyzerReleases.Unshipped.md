@@ -14,9 +14,7 @@ AL0006 | Design | Warning | Al0006FieldNameConflictWithPrimaryConstructorAnalyze
 AL0007 | Usage | Error | Al0007ToAl0009IXmlSerializableAnalyzer
 AL0008 | Usage | Error | Al0007ToAl0009IXmlSerializableAnalyzer
 AL0009 | Usage | Error | Al0007ToAl0009IXmlSerializableAnalyzer
-AL0010 | Design | Disabled | Al0010PartialTypeAnalyzer
 AL0011 | Threading | Warning | Al0011LockKeywordAnalyzer
-AL0012 | OpenTelemetry | Warning | Al0012DeprecatedAttributeAnalyzer
 AL0013 | OpenTelemetry | Info | Al0013MissingSchemaUrlAnalyzer
 AL0014 | Style | Warning | Al0014PreferPatternMatchingAnalyzer
 AL0015 | Style | Info | Al0015NormalizeNullGuardStyleAnalyzer
@@ -65,7 +63,6 @@ AL0058 | Threading | Warning | Al0057ToAl0060ThreadingAnalyzer
 AL0059 | Threading | Warning | Al0057ToAl0060ThreadingAnalyzer
 AL0060 | Threading | Warning | Al0057ToAl0060ThreadingAnalyzer
 AL0061 | OpenTelemetry | Warning | Al0061ActivityMissingSemconvAnalyzer
-AL0062 | OpenTelemetry | Warning | Al0062DeprecatedSemconvAnalyzer
 AL0063 | OpenTelemetry | Warning | Al0063UnregisteredActivitySourceAnalyzer
 AL0064 | GenAI | Warning | Al0064GenAiMissingRequiredAttributesAnalyzer
 AL0065 | GenAI | Warning | Al0065UseTokenUsageHistogramAnalyzer
@@ -90,7 +87,6 @@ AL0083 | Configuration | Warning | Al0083InsecureEndpointAnalyzer
 AL0084 | ASP.NET Core | Warning | Al0084MissingServiceDiscoveryAnalyzer
 AL0085 | OpenTelemetry | Error | Al0085InvalidAttributeValueAnalyzer
 AL0086 | OpenTelemetry | Warning | Al0086IncorrectAttributeTypeAnalyzer
-AL0087 | OpenTelemetry | Info | Al0087PreferConstantAttributeAnalyzer
 AL0088 | OpenTelemetry | Warning | Al0088SensitiveDataInAttributeAnalyzer
 AL0089 | OpenTelemetry | Warning | Al0089MissingOtlpConfigurationAnalyzer
 AL0090 | OpenTelemetry | Warning | Al0090UncompressedExportAnalyzer
@@ -131,10 +127,6 @@ AL0128 | GenAI | Warning | Al0128DestructiveToolMustRequireApprovalAnalyzer
 AL0129 | GenAI | Info | Al0129ToolMustDeclareSideEffectAnalyzer
 AL0130 | GenAI | Info | Al0130ToolMustDeclareCapabilityAnalyzer
 AL0131 | GenAI | Warning | Al0131DirectGenAiSdkUsageAnalyzer
-AL0132 | OpenTelemetry | Warning | Al0132DeprecatedSemconvValueAnalyzer
-AL0133 | OpenTelemetry | Warning | Al0133ContextSensitiveDeprecatedSemconvAnalyzer
-AL0134 | OpenTelemetry | Warning | Al0134UseSemanticConventionConstantAnalyzer
 AL0135 | OpenTelemetry | Warning | Al0135LegacySemanticConventionsAccessorAnalyzer
-AL0136 | OpenTelemetry | Warning | Al0136IncubatingSemanticConventionInLibraryAnalyzer
 AL0137 | Roslyn Utilities | Warning | Al0137UseGuardForThrowIfAnalyzer
 AL0138 | Reliability | Warning | Al0138UseExplicitMidpointRoundingAnalyzer
