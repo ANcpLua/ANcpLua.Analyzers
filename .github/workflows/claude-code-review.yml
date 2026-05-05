@@ -1,6 +1,12 @@
 name: Claude Code Review
 
 on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number to review'
+        required: true
+        type: string
   pull_request:
     types: [opened, synchronize, ready_for_review, reopened]
     paths-ignore:
@@ -17,18 +23,30 @@ permissions:
 jobs:
   claude-review:
     if: |
-      github.actor != 'coderabbitai[bot]' &&
-      !contains(github.event.pull_request.title, '[skip review]') &&
-      !contains(github.event.pull_request.labels.*.name, 'skip-review')
+      github.event_name == 'workflow_dispatch' || (
+        github.actor != 'coderabbitai[bot]' &&
+        !contains(github.event.pull_request.title, '[skip review]') &&
+        !contains(github.event.pull_request.labels.*.name, 'skip-review')
+      )
     concurrency:
-      group: claude-review-${{ github.event.pull_request.number }}
+      group: claude-review-${{ github.event.pull_request.number || inputs.pr_number }}
       cancel-in-progress: true
     runs-on: ubuntu-latest
     steps:
+      - name: Resolve PR
+        id: pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
+        run: |
+          HEAD_REF=$(gh pr view "$PR_NUMBER" --repo "${{ github.repository }}" --json headRefName -q .headRefName)
+          echo "number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+          echo "head_ref=$HEAD_REF" >> "$GITHUB_OUTPUT"
+
       - name: Checkout PR head
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
-          ref: ${{ github.event.pull_request.head.ref }}
+          ref: ${{ steps.pr.outputs.head_ref }}
           fetch-depth: 20
 
       - name: Run Claude Code Review (agentic)
@@ -42,7 +60,7 @@ jobs:
           plugins: 'code-review@claude-code-plugins'
           claude_args: '--model claude-opus-4-7 --max-turns 25'
           prompt: |
-            /code-review:code-review ${{ github.repository }}/pull/${{ github.event.pull_request.number }}
+            /code-review:code-review ${{ github.repository }}/pull/${{ steps.pr.outputs.number }}
 
             Operating mode: **agentic**. You have write access to this PR branch.
 
