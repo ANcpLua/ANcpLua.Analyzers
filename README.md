@@ -51,9 +51,7 @@ dotnet add package ANcpLua.Analyzers
 | [AL0007](https://ancplua.mintlify.app/analyzers/rules/AL0007) | Usage | Error | `Al0007ToAl0009IXmlSerializableAnalyzer` |
 | [AL0008](https://ancplua.mintlify.app/analyzers/rules/AL0008) | Usage | Error | `Al0007ToAl0009IXmlSerializableAnalyzer` |
 | [AL0009](https://ancplua.mintlify.app/analyzers/rules/AL0009) | Usage | Error | `Al0007ToAl0009IXmlSerializableAnalyzer` |
-| [AL0010](https://ancplua.mintlify.app/analyzers/rules/AL0010) | Design | Disabled | `Al0010PartialTypeAnalyzer` |
 | [AL0011](https://ancplua.mintlify.app/analyzers/rules/AL0011) | Threading | Warning | `Al0011LockKeywordAnalyzer` |
-| [AL0012](https://ancplua.mintlify.app/analyzers/rules/AL0012) | OpenTelemetry | Warning | `Al0012DeprecatedAttributeAnalyzer` |
 | [AL0013](https://ancplua.mintlify.app/analyzers/rules/AL0013) | OpenTelemetry | Info | `Al0013MissingSchemaUrlAnalyzer` |
 | [AL0014](https://ancplua.mintlify.app/analyzers/rules/AL0014) | Style | Warning | `Al0014PreferPatternMatchingAnalyzer` |
 | [AL0015](https://ancplua.mintlify.app/analyzers/rules/AL0015) | Style | Info | `Al0015NormalizeNullGuardStyleAnalyzer` |
@@ -103,7 +101,6 @@ dotnet add package ANcpLua.Analyzers
 | [AL0059](https://ancplua.mintlify.app/analyzers/rules/AL0059) | Threading | Warning | `Al0057ToAl0060ThreadingAnalyzer` |
 | [AL0060](https://ancplua.mintlify.app/analyzers/rules/AL0060) | Threading | Warning | `Al0057ToAl0060ThreadingAnalyzer` |
 | [AL0061](https://ancplua.mintlify.app/analyzers/rules/AL0061) | OpenTelemetry | Warning | `Al0061ActivityMissingSemconvAnalyzer` |
-| [AL0062](https://ancplua.mintlify.app/analyzers/rules/AL0062) | OpenTelemetry | Warning | `Al0062DeprecatedSemconvAnalyzer` |
 | [AL0063](https://ancplua.mintlify.app/analyzers/rules/AL0063) | OpenTelemetry | Warning | `Al0063UnregisteredActivitySourceAnalyzer` |
 | [AL0064](https://ancplua.mintlify.app/analyzers/rules/AL0064) | GenAI | Warning | `Al0064GenAiMissingRequiredAttributesAnalyzer` |
 | [AL0065](https://ancplua.mintlify.app/analyzers/rules/AL0065) | GenAI | Warning | `Al0065UseTokenUsageHistogramAnalyzer` |
@@ -128,7 +125,6 @@ dotnet add package ANcpLua.Analyzers
 | [AL0084](https://ancplua.mintlify.app/analyzers/rules/AL0084) | ASP.NET Core | Warning | `Al0084MissingServiceDiscoveryAnalyzer` |
 | [AL0085](https://ancplua.mintlify.app/analyzers/rules/AL0085) | OpenTelemetry | Error | `Al0085InvalidAttributeValueAnalyzer` |
 | [AL0086](https://ancplua.mintlify.app/analyzers/rules/AL0086) | OpenTelemetry | Warning | `Al0086IncorrectAttributeTypeAnalyzer` |
-| [AL0087](https://ancplua.mintlify.app/analyzers/rules/AL0087) | OpenTelemetry | Info | `Al0087PreferConstantAttributeAnalyzer` |
 | [AL0088](https://ancplua.mintlify.app/analyzers/rules/AL0088) | OpenTelemetry | Warning | `Al0088SensitiveDataInAttributeAnalyzer` |
 | [AL0089](https://ancplua.mintlify.app/analyzers/rules/AL0089) | OpenTelemetry | Warning | `Al0089MissingOtlpConfigurationAnalyzer` |
 | [AL0090](https://ancplua.mintlify.app/analyzers/rules/AL0090) | OpenTelemetry | Warning | `Al0090UncompressedExportAnalyzer` |
@@ -176,7 +172,7 @@ dotnet add package ANcpLua.Analyzers
 
 Automatic fixes are currently available for:
 
-AL0002, AL0004, AL0005, AL0008, AL0010, AL0011, AL0012, AL0014, AL0015, AL0016, AL0025, AL0026, AL0027, AL0028, AL0029, AL0030, AL0031, AL0032, AL0033, AL0034, AL0035, AL0036, AL0037, AL0038, AL0039, AL0040, AL0045, AL0046, AL0047, AL0048, AL0049, AL0050, AL0051, AL0071, AL0072, AL0073, AL0074, AL0103, AL0107, AL0108, AL0109, AL0110, AL0121, AL0122, AL0124, AL0126
+AL0002, AL0004, AL0005, AL0008, AL0011, AL0014, AL0015, AL0016, AL0025, AL0026, AL0027, AL0028, AL0029, AL0030, AL0031, AL0032, AL0033, AL0034, AL0035, AL0036, AL0037, AL0038, AL0039, AL0040, AL0045, AL0046, AL0047, AL0048, AL0049, AL0050, AL0051, AL0071, AL0072, AL0073, AL0074, AL0103, AL0107, AL0108, AL0109, AL0110, AL0121, AL0122, AL0124, AL0126
 
 ## Configuration
 
