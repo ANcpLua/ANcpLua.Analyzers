@@ -1,11 +1,9 @@
-# Auto-merge workflow for trusted PRs
+# Thin caller — delegates to the reusable workflow at
+# ANcpLua/renovate-config (single source of truth across the framework).
 #
-# Tiers:
-# 1a. Dependabot PRs: Auto-approve + auto-merge for patch/minor
-# 1b. Renovate PRs: Auto-approve + auto-merge
-# 2.  AI Agent fix PRs (copilot/, jules/, claude/): Auto-merge when CI passes
-# 3.  CodeRabbit approved PRs: Auto-merge when CI passes
-# 4.  Owner PRs: Auto-merge when CI passes
+# Required secrets in this repo:
+#   AUTOMERGE_APP_ID, AUTOMERGE_APP_PRIVATE_KEY
+# See https://github.com/ANcpLua/renovate-config#auto-merge-reusable-workflow
 
 name: Auto-merge
 
@@ -20,134 +18,6 @@ permissions:
   pull-requests: write
 
 jobs:
-  dependabot-auto-merge:
-    name: Dependabot auto-merge
-    runs-on: ubuntu-latest
-    if: github.actor == 'dependabot[bot]'
-
-    steps:
-      - name: Fetch Dependabot metadata
-        id: metadata
-        uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98 # v3
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Auto-approve patch and minor updates
-        if: steps.metadata.outputs.update-type != 'version-update:semver-major'
-        env:
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh pr review --approve "$PR_URL"
-
-      - name: Enable auto-merge for patch and minor
-        if: steps.metadata.outputs.update-type != 'version-update:semver-major'
-        env:
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh pr merge --auto --squash "$PR_URL"
-
-      - name: Request Claude review for major updates
-        if: steps.metadata.outputs.update-type == 'version-update:semver-major'
-        env:
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DEP_NAMES: ${{ steps.metadata.outputs.dependency-names }}
-          PREV_VERSION: ${{ steps.metadata.outputs.previous-version }}
-          NEW_VERSION: ${{ steps.metadata.outputs.new-version }}
-        run: |
-          gh pr comment "$PR_URL" --body "## ⚠️ Major Version Update
-
-          @claude Please review this major version update for breaking changes and merge if safe.
-
-          | Dependency | Update |
-          |------------|--------|
-          | \`$DEP_NAMES\` | \`$PREV_VERSION\` → \`$NEW_VERSION\` |
-
-          Check the changelog and verify compatibility."
-
-  renovate-auto-merge:
-    name: Renovate auto-merge
-    runs-on: ubuntu-latest
-    if: github.actor == 'renovate[bot]'
-
-    steps:
-      - name: Auto-approve Renovate PRs
-        env:
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh pr review --approve "$PR_URL"
-
-      - name: Enable auto-merge for Renovate
-        env:
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh pr merge --auto --squash "$PR_URL"
-
-  ai-agent-auto-merge:
-    name: AI Agent auto-merge
-    runs-on: ubuntu-latest
-    if: |
-      (github.actor == 'copilot[bot]' || github.actor == 'jules[bot]' || github.actor == 'claude-code[bot]') &&
-      (
-        startsWith(github.event.pull_request.head.ref, 'copilot/') ||
-        startsWith(github.event.pull_request.head.ref, 'jules/') ||
-        startsWith(github.event.pull_request.head.ref, 'claude/')
-      )
-
-    steps:
-      - name: Identify AI agent
-        id: agent
-        env:
-          BRANCH: ${{ github.event.pull_request.head.ref }}
-        run: |
-          if [[ "$BRANCH" == copilot/* ]]; then
-            echo "agent=Copilot" >> "$GITHUB_OUTPUT"
-          elif [[ "$BRANCH" == jules/* ]]; then
-            echo "agent=Jules" >> "$GITHUB_OUTPUT"
-          elif [[ "$BRANCH" == claude/* ]]; then
-            echo "agent=Claude" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Auto-approve AI agent PRs
-        env:
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          AGENT: ${{ steps.agent.outputs.agent }}
-        run: |
-          echo "Auto-approving $AGENT PR"
-          gh pr review --approve "$PR_URL" --body "✅ Auto-approved: $AGENT autonomous fix PR"
-
-      - name: Enable auto-merge for AI agent PRs
-        env:
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh pr merge --auto --squash "$PR_URL"
-
-  coderabbit-auto-merge:
-    name: CodeRabbit auto-merge
-    runs-on: ubuntu-latest
-    if: |
-      github.event_name == 'pull_request_review' &&
-      github.event.review.state == 'approved' &&
-      github.event.review.user.login == 'coderabbitai[bot]'
-
-    steps:
-      - name: Enable auto-merge for CodeRabbit approved PRs
-        env:
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh pr merge --auto --squash "$PR_URL"
-
-  owner-auto-merge:
-    name: Owner auto-merge
-    runs-on: ubuntu-latest
-    if: |
-      github.event.pull_request.user.login == github.event.repository.owner.login &&
-      github.event.pull_request.draft == false
-
-    steps:
-      - name: Enable auto-merge for owner PRs
-        env:
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh pr merge --auto --squash "$PR_URL"
+  auto-merge:
+    uses: ANcpLua/renovate-config/.github/workflows/auto-merge-reusable.yml@main
+    secrets: inherit
