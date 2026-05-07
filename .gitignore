@@ -498,3 +498,5 @@ docs/_site/
 nupkgs/
 pp.txt
 .serena/
+
+package-lock.json
