@@ -18,7 +18,6 @@ All notable changes to ANcpLua.Analyzers will be documented in this file.
 - AL0109: `[Traced]` on non-interceptable methods (non-partial, private, static non-partial)
 - AL0110: `[TracedTag]` on `out`/`ref` parameters (cannot be captured for span attributes)
 - Code fixes for AL0107, AL0108, AL0109, AL0110
-- Pre-commit documentation sync guard (`.claude/hooks/pre-commit-guard.sh`)
 - GitHub Actions workflow to remind about .NET 11 GA adoption on 2026-12-01
 - Dependabot ignore rule for .NET 11 SDK previews/RCs
 
