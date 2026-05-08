@@ -4,7 +4,7 @@
 
 # ANcpLua.Analyzers
 
-Roslyn analyzers for modern C# patterns, AOT safety, ASP.NET Core, reliability, and ANcpLua ecosystem conventions.
+Roslyn analyzers for modern C# patterns, AOT safety, ASP.NET Core, reliability, GenAI tool governance, and ANcpLua ecosystem conventions.
 
 ## Installation
 
@@ -16,7 +16,7 @@ dotnet add package ANcpLua.Analyzers
 
 ## What you get
 
-- **85 diagnostics** spanning design, reliability, usage, Roslyn utilities, ASP.NET Core, AOT, threading, style, configuration, and version management.
+- **88 diagnostics** spanning design, reliability, usage, Roslyn utilities, ASP.NET Core, AOT, threading, style, configuration, GenAI, and version management.
 - **36 automatic code fixes** for high-confidence transformations.
 - **CI-friendly enforcement** through `.editorconfig` severity configuration.
 
@@ -32,6 +32,7 @@ dotnet add package ANcpLua.Analyzers
 | VersionManagement | 7 |
 | Design | 6 |
 | Threading | 6 |
+| GenAI | 3 |
 | Style | 3 |
 | Configuration | 1 |
 
@@ -122,6 +123,9 @@ dotnet add package ANcpLua.Analyzers
 | [AL0125](https://ancplua.mintlify.app/analyzers/rules/AL0125) | Roslyn Utilities | Info | `Al0125UseStringComparisonAnyExtensionsAnalyzer` |
 | [AL0126](https://ancplua.mintlify.app/analyzers/rules/AL0126) | Reliability | Info | `Al0126CancellationTokenPropagationAnalyzer` |
 | [AL0127](https://ancplua.mintlify.app/analyzers/rules/AL0127) | VersionManagement | Warning | `Al0127OutdatedMafPackageVersionAnalyzer` |
+| [AL0128](https://ancplua.mintlify.app/analyzers/rules/AL0128) | GenAI | Warning | `Al0128DestructiveToolMustRequireApprovalAnalyzer` |
+| [AL0129](https://ancplua.mintlify.app/analyzers/rules/AL0129) | GenAI | Info | `Al0129ToolMustDeclareSideEffectAnalyzer` |
+| [AL0130](https://ancplua.mintlify.app/analyzers/rules/AL0130) | GenAI | Info | `Al0130ToolMustDeclareCapabilityAnalyzer` |
 | [AL0137](https://ancplua.mintlify.app/analyzers/rules/AL0137) | Roslyn Utilities | Warning | `Al0137UseGuardForThrowIfAnalyzer` |
 | [AL0138](https://ancplua.mintlify.app/analyzers/rules/AL0138) | Reliability | Warning | `Al0138UseExplicitMidpointRoundingAnalyzer` |
 
