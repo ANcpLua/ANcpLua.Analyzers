@@ -93,3 +93,5 @@ AL0129 | GenAI | Info | Al0129ToolMustDeclareSideEffectAnalyzer
 AL0130 | GenAI | Info | Al0130ToolMustDeclareCapabilityAnalyzer
 AL0137 | Roslyn Utilities | Warning | Al0137UseGuardForThrowIfAnalyzer
 AL0138 | Reliability | Warning | Al0138UseExplicitMidpointRoundingAnalyzer
+AL0139 | Style | Warning | Al0139ToAl0140UseImplicitOrExplicitTypeAnalyzer
+AL0140 | Style | Warning | Al0139ToAl0140UseImplicitOrExplicitTypeAnalyzer
