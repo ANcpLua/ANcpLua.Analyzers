@@ -1,0 +1,49 @@
+name: sdk-hardening
+
+# Audits SDK adoption + held-back surface 4x/day so drift surfaces within hours.
+# Held-back paths and the allowlist are configured via the env block below —
+# keep them next to the audit script invocation so a reader has all context
+# in one file.
+
+on:
+  schedule:
+    # 01:37, 07:37, 13:37, 19:37 UTC — offset minute to dodge the cron herd.
+    - cron: '37 1,7,13,19 * * *'
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '**/*.csproj'
+      - 'global.json'
+      - 'Directory.Packages.props'
+      - '.github/workflows/sdk-hardening.yml'
+      - '.github/scripts/sdk-hardening.sh'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sdk-hardening-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Audit SDK adoption
+        env:
+          SDK_NAME: ANcpLua.NET.Sdk
+          # No exemptions — every csproj in this repo is on the SDK.
+          ALLOW_MICROSOFT_NET_SDK: ''
+          # No held-back surface as of the SDK migration that landed in #131.
+          HELD_BACK: ''
+          BANNED_PACKAGES: |
+            PolySharp
+            FluentAssertions
+            Microsoft.NET.Test.Sdk
+          SDK_PIN_PACKAGES: |
+            ANcpLua.NET.Sdk
+            ANcpLua.NET.Sdk.Web
+            ANcpLua.NET.Sdk.Test
+        run: bash .github/scripts/sdk-hardening.sh
