@@ -1,9 +1,11 @@
-# Thin caller — delegates to the reusable workflow at
-# ANcpLua/renovate-config (single source of truth across the framework).
+# Auto-merge workflow for trusted PRs
 #
-# Required secrets in this repo:
-#   AUTOMERGE_APP_ID, AUTOMERGE_APP_PRIVATE_KEY
-# See https://github.com/ANcpLua/renovate-config#auto-merge-reusable-workflow
+# Tiers:
+# 1a. Dependabot PRs: Auto-approve + auto-merge for patch/minor
+# 1b. Renovate PRs: Auto-approve + auto-merge
+# 2.  AI Agent fix PRs (copilot/, jules/, claude/): Auto-merge when CI passes
+# 3.  CodeRabbit approved PRs: Auto-merge when CI passes
+# 4.  Owner PRs: Auto-merge when CI passes
 
 name: Auto-merge
 
