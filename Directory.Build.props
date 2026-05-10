@@ -5,8 +5,16 @@
         <BaseOutputPath>$(ArtifactsPath)bin/$(MSBuildProjectName)/</BaseOutputPath>
         <BaseIntermediateOutputPath>$(ArtifactsPath)obj/$(MSBuildProjectName)/</BaseIntermediateOutputPath>
 
-        <!-- Version - single source for all packages -->
-        <Version>1.17.0</Version>
+        <!-- Version: CI stamps via -p:Version=$VERSION at pack time from the v* tag (a global
+             property, beats anything set here). Locally we compose a placeholder so packs
+             still produce a valid .nupkg; matches the Roslyn.Utilities / Agents convention.
+             The self-referenced last-PUBLISHED $(ANcpLuaAnalyzersVersion) lives in Version.props
+             (imported via Directory.Packages.props, which loads AFTER this file) and is what
+             restore-time PackageReferences resolve against — keep it separate from this dev pin. -->
+        <VersionPrefix Condition="'$(VersionPrefix)' == ''">0.0.1</VersionPrefix>
+        <VersionSuffix Condition="'$(VersionSuffix)' == ''">local</VersionSuffix>
+        <Version Condition="'$(VersionSuffix)' != ''">$(VersionPrefix)-$(VersionSuffix)</Version>
+        <Version Condition="'$(VersionSuffix)' == ''">$(VersionPrefix)</Version>
 
         <!-- Package metadata -->
         <Authors>Alexander Nachtmann</Authors>

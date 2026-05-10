@@ -22,28 +22,28 @@
        ROSLYN.UTILITIES (Runtime package)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Roslyn.Utilities">
-    <ANcpLuaRoslynUtilitiesVersion>2.2.0</ANcpLuaRoslynUtilitiesVersion>
+    <ANcpLuaRoslynUtilitiesVersion>2.2.5</ANcpLuaRoslynUtilitiesVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
        ROSLYN.UTILITIES.SOURCES (Source-only package for generators)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Roslyn.Utilities.Sources">
-    <ANcpLuaRoslynUtilitiesSourcesVersion>2.2.0</ANcpLuaRoslynUtilitiesSourcesVersion>
+    <ANcpLuaRoslynUtilitiesSourcesVersion>2.2.5</ANcpLuaRoslynUtilitiesSourcesVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
        ROSLYN.UTILITIES.POLYFILLS (Source-only polyfills for netstandard2.0)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Roslyn.Utilities.Polyfills">
-    <ANcpLuaRoslynUtilitiesPolyfillsVersion>2.2.0</ANcpLuaRoslynUtilitiesPolyfillsVersion>
+    <ANcpLuaRoslynUtilitiesPolyfillsVersion>2.2.5</ANcpLuaRoslynUtilitiesPolyfillsVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
        ROSLYN.UTILITIES.TESTING (Analyzer/CodeFix/Generator test infrastructure)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Roslyn.Utilities.Testing">
-    <ANcpLuaRoslynUtilitiesTestingVersion>2.2.0</ANcpLuaRoslynUtilitiesTestingVersion>
+    <ANcpLuaRoslynUtilitiesTestingVersion>2.2.5</ANcpLuaRoslynUtilitiesTestingVersion>
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
@@ -58,7 +58,7 @@
        ANALYZERS (SDK-injected)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Analyzers">
-    <ANcpLuaAnalyzersVersion>1.29.0</ANcpLuaAnalyzersVersion>
+    <ANcpLuaAnalyzersVersion>1.29.1</ANcpLuaAnalyzersVersion>
     <JonSkeetAnalyzersVersion>1.0.0-beta.6</JonSkeetAnalyzersVersion>
   </PropertyGroup>
 
