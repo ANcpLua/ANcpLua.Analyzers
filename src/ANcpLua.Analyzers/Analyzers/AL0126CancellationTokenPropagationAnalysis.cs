@@ -5,7 +5,8 @@ public readonly partial record struct Al0126Suggestion(
     string ParameterName,
     int ParameterIndex,
     ImmutableArray<string> TargetParameterNames,
-    string ExpressionText);
+    string ExpressionText,
+    bool ReplaceExistingArgument = false);
 
 /// <summary>
 ///     Shared analysis helpers for AL0126.
@@ -36,6 +37,18 @@ public static partial class Al0126CancellationTokenPropagationAnalysis {
             return false;
         }
 
+        if (TryFindDefaultCancellationTokenArgument(invocation, cancellationTokenType, out var defaultArgumentMatch) &&
+            FindAvailableTokenExpression(invocation, cancellationTokenType, cancellationToken) is { } replacementText &&
+            !ShouldSuppressForContainingContract(invocation, cancellationTokenType, cancellationToken)) {
+            suggestion = new Al0126Suggestion(
+                defaultArgumentMatch.ParameterName,
+                defaultArgumentMatch.ParameterIndex,
+                defaultArgumentMatch.TargetParameterNames,
+                replacementText,
+                ReplaceExistingArgument: true);
+            return true;
+        }
+
         if (!TryFindTargetParameter(
                 invocation,
                 cancellationTokenType,
@@ -52,6 +65,44 @@ public static partial class Al0126CancellationTokenPropagationAnalysis {
             parameterMatch.TargetParameterNames,
             expressionText);
         return true;
+    }
+
+    private static bool TryFindDefaultCancellationTokenArgument(
+        IInvocationOperation invocation,
+        INamedTypeSymbol cancellationTokenType,
+        out ParameterMatch parameterMatch) {
+        foreach (var argument in invocation.Arguments) {
+            if (argument.ArgumentKind == ArgumentKind.DefaultValue ||
+                argument.Parameter is not { } parameter ||
+                !IsCancellationTokenParameter(parameter, cancellationTokenType) ||
+                !IsDefaultCancellationTokenArgument(argument.Value, cancellationTokenType)) {
+                continue;
+            }
+
+            parameterMatch = new ParameterMatch(
+                parameter.Name,
+                parameter.Ordinal,
+                [.. invocation.TargetMethod.Parameters.Select(static parameter => parameter.Name)]);
+            return true;
+        }
+
+        parameterMatch = default;
+        return false;
+    }
+
+    private static bool IsDefaultCancellationTokenArgument(
+        IOperation operation,
+        INamedTypeSymbol cancellationTokenType) {
+        operation = operation.UnwrapAllConversions().UnwrapParenthesized();
+
+        if (operation.Syntax.IsKind(SyntaxKind.DefaultExpression) ||
+            operation.Syntax.IsKind(SyntaxKind.DefaultLiteralExpression)) {
+            return true;
+        }
+
+        return operation is IPropertyReferenceOperation {
+            Property: { Name: "None", ContainingType: { } containingType }
+        } && containingType.IsEqualTo(cancellationTokenType);
     }
 
     private static bool TryFindTargetParameter(

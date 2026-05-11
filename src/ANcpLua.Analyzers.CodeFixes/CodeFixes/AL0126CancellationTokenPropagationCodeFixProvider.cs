@@ -67,6 +67,18 @@ public sealed partial class Al0126CancellationTokenPropagationCodeFixProvider
             argumentsByOriginalOrdinal.Add(parameter.Ordinal, invocation.ArgumentList.Arguments[index]);
         }
 
+        if (suggestion.ReplaceExistingArgument) {
+            if (!argumentsByOriginalOrdinal.TryGetValue(suggestion.ParameterIndex, out var sourceArgument)) {
+                return document;
+            }
+
+            var replacement = sourceArgument.WithExpression(SyntaxFactory.ParseExpression(suggestion.ExpressionText));
+            var replacementInvocation = invocation.ReplaceNode(sourceArgument, replacement)
+                .WithAdditionalAnnotations(Formatter.Annotation);
+
+            return document.WithSyntaxRoot(root.ReplaceNode(invocation, replacementInvocation));
+        }
+
         var updatedArguments = new List<ArgumentSyntax>();
         for (var targetIndex = 0; targetIndex < suggestion.TargetParameterNames.Length; targetIndex++) {
             var targetParameterName = suggestion.TargetParameterNames[targetIndex];

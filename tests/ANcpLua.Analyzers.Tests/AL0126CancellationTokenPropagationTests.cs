@@ -273,6 +273,8 @@ public sealed partial class Al0126CancellationTokenPropagationCodeFixTests
 
     private const string XunitStub = """
                                      namespace Xunit {
+                                         public sealed class FactAttribute : System.Attribute { }
+
                                          public sealed class TestContext {
                                              public static TestContext Current { get; } = new();
                                              public System.Threading.CancellationToken CancellationToken => default;
@@ -406,6 +408,35 @@ public sealed partial class Al0126CancellationTokenPropagationCodeFixTests
 
                   public Task M() =>
                       _service.FetchAsync(42, cancellationToken: global::Xunit.TestContext.Current.CancellationToken);
+              }
+              """);
+
+    [Fact]
+    public Task ShouldReplaceDefaultCancellationTokenWithXunitTestContext() =>
+        VerifyAsync($$"""
+                      {{CommonStubs}}
+                      {{XunitStub}}
+
+                      public sealed class C {
+                          [Xunit.Fact]
+                          public Task M() =>
+                              {|AL0126:DoThingAsync(default)|};
+
+                          private static Task DoThingAsync(CancellationToken cancellationToken) =>
+                              Task.CompletedTask;
+                      }
+                      """,
+            $$"""
+              {{CommonStubs}}
+              {{XunitStub}}
+
+              public sealed class C {
+                  [Xunit.Fact]
+                  public Task M() =>
+                      DoThingAsync(global::Xunit.TestContext.Current.CancellationToken);
+
+                  private static Task DoThingAsync(CancellationToken cancellationToken) =>
+                      Task.CompletedTask;
               }
               """);
 
