@@ -16,6 +16,10 @@ public sealed partial class AlAnalyzerDocsGenerator : DocsGenerator
     /// from any directory works, not just from the project folder.</summary>
     protected override Assembly ScenariosAssembly { get; } = typeof(Al0028UseIsEqualToDocs).Assembly;
 
+    // Null-forgiving operator is safe: the assembly (Al0028UseIsEqualToDocs) is loaded from disk
+    // in our build/runtime scenario, so Assembly.Location is guaranteed non-null by the pipeline.
+    // Path.GetDirectoryName will return a non-null directory path for loaded assemblies.
+    // Intentional to satisfy static analysis/pipeline check.
     protected override string ScenariosSourceFile { get; } =
         Path.Combine(
             Path.GetDirectoryName(typeof(Al0028UseIsEqualToDocs).Assembly.Location)!,

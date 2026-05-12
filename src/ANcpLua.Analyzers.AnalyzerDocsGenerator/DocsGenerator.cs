@@ -121,6 +121,9 @@ public abstract partial class DocsGenerator
         docs.AppendLine(scenarios.ToString());
 
         var docsPath = Path.Combine(ResolveDocsRoot(), docsName);
+        // Null-forgiving operator is safe: docsPath is constructed from ResolveDocsRoot() + docsName,
+        // which always produces a path with at least one directory component, guaranteeing
+        // Path.GetDirectoryName returns a non-null directory path.
         Directory.CreateDirectory(Path.GetDirectoryName(docsPath)!);
         await File.WriteAllTextAsync(docsPath, docs.ToString()).ConfigureAwait(false);
         Console.WriteLine($"Wrote: {Path.GetFullPath(docsPath)}");

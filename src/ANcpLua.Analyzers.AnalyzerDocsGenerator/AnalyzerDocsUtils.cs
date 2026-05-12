@@ -25,6 +25,12 @@ public static partial class AnalyzerDocsUtils
     ///     Rewrites OS-specific path separators and line endings to their Unix forms so that
     ///     macOS, Windows, and Linux CI all produce the same byte sequence in <c>docs/*.md</c>.
     /// </summary>
+    /// <remarks>
+    ///     Null-forgiving operators are safe: ReplaceOrdinal returns non-null when the input
+    ///     (messageIncludingStacktrace) is non-null. The chained calls replace
+    ///     Path.DirectorySeparatorChar with UnixDirectorySeparator and Environment.NewLine
+    ///     with UnixNewLine, preserving non-null through the entire chain.
+    /// </remarks>
     public static string ReplaceStackTrace(string messageIncludingStacktrace) =>
         messageIncludingStacktrace
             .ReplaceOrdinal(Path.DirectorySeparatorChar.ToString(), UnixDirectorySeparator)!
