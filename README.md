@@ -174,6 +174,21 @@ dotnet pack src/ANcpLua.Analyzers/ANcpLua.Analyzers.csproj -c Release -o artifac
 - Overview: [ancplua.mintlify.app/analyzers/overview](https://ancplua.mintlify.app/analyzers/overview)
 - Rule docs: [ancplua.mintlify.app/analyzers/rules](https://ancplua.mintlify.app/analyzers/rules)
 
+### Generated analyzer scenario docs
+
+Per-analyzer scenario catalogs auto-generated from the test scenarios in
+`src/ANcpLua.Analyzers.AnalyzerDocs/` — each file shows the before/after
+example and the analyzer's real diagnostic message (regression-gated by
+CI via `scripts/generate-docs.ps1 -ValidateNoChanges`):
+
+- [AL0028 — Use IsEqualTo extension](docs/Al0028UseIsEqualTo.md)
+
+To regenerate after touching scenarios or a diagnostic message:
+
+```bash
+pwsh ./scripts/generate-docs.ps1
+```
+
 ## Related projects
 
 - [ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk) - MSBuild SDK (auto-injects this analyzer package)

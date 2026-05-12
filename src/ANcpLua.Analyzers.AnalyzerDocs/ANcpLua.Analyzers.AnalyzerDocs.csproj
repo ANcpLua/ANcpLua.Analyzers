@@ -1,0 +1,28 @@
+<Project Sdk="ANcpLua.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <OutputType>Exe</OutputType>
+        <IsPackable>false</IsPackable>
+        <!-- Generator-input project; not under analyzer enforcement (scenarios contain "bad" code on purpose) -->
+        <EnforceExtendedAnalyzerRules>false</EnforceExtendedAnalyzerRules>
+        <NoWarn>$(NoWarn);CA1031;CA1303;CA1305;CA1707;CA1822;CA1859;CA2007;IDE0055;IDE0058;IDE1006;RS1041;AL0028</NoWarn>
+
+        <!-- Copy the scenario .cs files next to the binary so the generator can parse them at runtime
+             (DocsGenerator.ScenariosSourceFile = Path.Combine(CurrentDirectory, "<File>.cs")). -->
+        <CopyDocumentationFilesFromPackages>false</CopyDocumentationFilesFromPackages>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\ANcpLua.Analyzers.AnalyzerDocsGenerator\ANcpLua.Analyzers.AnalyzerDocsGenerator.csproj"/>
+        <!-- Reference for type access (Al0028UseIsEqualToAnalyzer). The SDK already injects the
+             published ANcpLua.Analyzers package as an analyzer on this project; do NOT add
+             OutputItemType="Analyzer" here or the analyzer registration would double up. -->
+        <ProjectReference Include="..\ANcpLua.Analyzers\ANcpLua.Analyzers.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <!-- Make scenario .cs files available next to the executable so the generator's
+             Path.Combine(CurrentDirectory, "<File>.cs") resolves at runtime. -->
+        <None Update="*Docs.cs" CopyToOutputDirectory="PreserveNewest"/>
+    </ItemGroup>
+</Project>
