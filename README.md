@@ -133,6 +133,15 @@ dotnet add package ANcpLua.Analyzers
 
 **Legend:** `Error` = build error, `Warning` = build warning, `Info` = IDE suggestion, `Disabled` = off by default.
 
+## Notable rules
+
+**`AL0126` — `CancellationToken` propagation (Reliability, Info).** Forwards an available cancellation token into async calls. The rule and its code fix cover two patterns:
+
+- Calls that **omit** a `CancellationToken` overload argument when a suitable token is available in scope.
+- Calls that explicitly pass a **default/no-op** token — `default`, `default(CancellationToken)`, or `CancellationToken.None` — and should use the available real token instead.
+
+Both paths use the same token-selection logic: nearest useful token expression first. In xUnit v3 tests, when no closer token is available, the fix can use `global::Xunit.TestContext.Current.CancellationToken`.
+
 ## Code fixes
 
 Automatic fixes are currently available for:
@@ -164,6 +173,21 @@ dotnet pack src/ANcpLua.Analyzers/ANcpLua.Analyzers.csproj -c Release -o artifac
 
 - Overview: [ancplua.mintlify.app/analyzers/overview](https://ancplua.mintlify.app/analyzers/overview)
 - Rule docs: [ancplua.mintlify.app/analyzers/rules](https://ancplua.mintlify.app/analyzers/rules)
+
+### Generated analyzer scenario docs
+
+Per-analyzer scenario catalogs auto-generated from the test scenarios in
+`src/ANcpLua.Analyzers.AnalyzerDocs/` — each file shows the before/after
+example and the analyzer's real diagnostic message (regression-gated by
+CI via `scripts/generate-docs.ps1 -ValidateNoChanges`):
+
+- [AL0028 — Use IsEqualTo extension](docs/Al0028UseIsEqualTo.md)
+
+To regenerate after touching scenarios or a diagnostic message:
+
+```bash
+pwsh ./scripts/generate-docs.ps1
+```
 
 ## Related projects
 
