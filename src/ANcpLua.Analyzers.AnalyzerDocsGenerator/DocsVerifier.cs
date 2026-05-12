@@ -35,9 +35,11 @@ public abstract partial class DocsVerifier
         var issues = new List<string>();
         foreach (var method in root.DescendantNodes().OfType<MethodDeclarationSyntax>())
         {
+            // Match by simple name (last `.`-segment) so both [Scenario] and fully-qualified
+            // writes like [ANcpLua.Analyzers.AnalyzerDocsGenerator.Scenario] resolve.
             var hasScenarioAttribute = method.AttributeLists
                 .SelectMany(static l => l.Attributes)
-                .Any(static a => a.Name.ToString() is "Scenario" or "ScenarioAttribute");
+                .Any(DocsGenerator.IsScenarioAttribute);
             if (!hasScenarioAttribute) continue;
 
             Console.WriteLine($"### scenario: {method.Identifier}");

@@ -48,7 +48,10 @@ public abstract partial class DocsGenerator
             ? fileBaseName[..^DocsSuffix.Length] + ".md"
             : fileBaseName + ".md";
 
-        var classDef = root.DescendantNodes().OfType<ClassDeclarationSyntax>().First();
+        var classDef = root.DescendantNodes().OfType<ClassDeclarationSyntax>().FirstOrDefault()
+            ?? throw new InvalidOperationException(
+                $"No class declaration found in {ScenariosSourceFile} — every scenarios source file must declare exactly one Docs class.");
+
         var namespaceName = ResolveNamespace(root);
         var classFullName = string.IsNullOrEmpty(namespaceName)
             ? classDef.Identifier.Text
@@ -83,7 +86,15 @@ public abstract partial class DocsGenerator
 
         foreach (var method in methods.Where(IsScenarioMethod))
         {
-            var bodyLines = method.Body!.ToFullString().Split(Environment.NewLine)[1..^2];
+            // Success scenarios MUST have a block body — that body IS the markdown source.
+            // Expression-bodied success scenarios would have nothing to extract, so warn + skip.
+            if (method.Body is null)
+            {
+                Console.WriteLine($"  skipping '{method.Identifier}' — success scenarios need a block body (its contents become the markdown).");
+                continue;
+            }
+
+            var bodyLines = method.Body.ToFullString().Split(Environment.NewLine)[1..^2];
             if (bodyLines.Length is 0) continue;
 
             var paddingToRemove = bodyLines[0].IndexOfOrdinal(bodyLines[0].TrimStart());
@@ -102,14 +113,14 @@ public abstract partial class DocsGenerator
             toc.AppendLine($"- [{method.Identifier}](#scenario-{method.Identifier.Text.ToLowerInvariant()}) - `{lastNonEmpty}`");
 
             if (methodsMap.TryGetValue($"{method.Identifier.Text}{FailureSuffix}", out var failureMethod))
-                AppendFailureScenario(scenarios, failureMethod, classType, classInstance);
+                await AppendFailureScenarioAsync(scenarios, failureMethod, classType, classInstance).ConfigureAwait(false);
         }
 
         docs.AppendLine(toc.ToString());
         docs.AppendLine();
         docs.AppendLine(scenarios.ToString());
 
-        var docsPath = Path.Combine(Environment.CurrentDirectory, "..", "..", "docs", docsName);
+        var docsPath = Path.Combine(ResolveDocsRoot(), docsName);
         Directory.CreateDirectory(Path.GetDirectoryName(docsPath)!);
         await File.WriteAllTextAsync(docsPath, docs.ToString()).ConfigureAwait(false);
         Console.WriteLine($"Wrote: {Path.GetFullPath(docsPath)}");
@@ -117,20 +128,31 @@ public abstract partial class DocsGenerator
 
     private static bool IsScenarioMethod(MethodDeclarationSyntax method) =>
         !method.Identifier.Text.EndsWithOrdinal(FailureSuffix)
-        && method.AttributeLists.SelectMany(static l => l.Attributes)
-            .Any(static a => a.Name.ToString() is "Scenario" or "ScenarioAttribute");
+        && method.AttributeLists.SelectMany(static l => l.Attributes).Any(IsScenarioAttribute);
 
-    private static void AppendFailureScenario(
+    /// <summary>
+    ///     Matches the attribute by simple name (last segment after <c>.</c>) so both
+    ///     <c>[Scenario]</c> and fully-qualified writes like
+    ///     <c>[ANcpLua.Analyzers.AnalyzerDocsGenerator.Scenario]</c> resolve.
+    /// </summary>
+    internal static bool IsScenarioAttribute(AttributeSyntax attribute)
+    {
+        var simpleName = attribute.Name.ToString().Split('.')[^1];
+        return simpleName is "Scenario" or "ScenarioAttribute";
+    }
+
+    private static async Task AppendFailureScenarioAsync(
         StringBuilder scenarios,
         MethodDeclarationSyntax failureMethod,
         Type classType,
         object classInstance)
     {
-        var diagnosticMessage = InvokeAndCaptureMessage(
+        var diagnosticMessage = await InvokeAndCaptureMessageAsync(
             classInstance,
             classType.GetMethod(failureMethod.Identifier.Text)
                 ?? throw new InvalidOperationException(
-                    $"Could not find runtime method {failureMethod.Identifier.Text} on {classType.FullName}."));
+                    $"Could not find runtime method {failureMethod.Identifier.Text} on {classType.FullName}."))
+            .ConfigureAwait(false);
 
         if (string.IsNullOrEmpty(diagnosticMessage)) return;
 
@@ -143,12 +165,12 @@ public abstract partial class DocsGenerator
         scenarios.AppendLine();
     }
 
-    private static string InvokeAndCaptureMessage(object instance, MethodInfo method)
+    private static async Task<string> InvokeAndCaptureMessageAsync(object instance, MethodInfo method)
     {
         try
         {
             var result = method.Invoke(instance, parameters: null);
-            if (result is Task task) task.GetAwaiter().GetResult();
+            if (result is Task task) await task.ConfigureAwait(false);
             return string.Empty;
         }
         catch (TargetInvocationException ex) when (ex.InnerException is not null)
@@ -159,6 +181,33 @@ public abstract partial class DocsGenerator
         {
             return AnalyzerDocsUtils.ReplaceStackTrace(ex.Message);
         }
+    }
+
+    /// <summary>
+    ///     Resolves the absolute path of the repo's <c>docs/</c> folder by walking up from CWD
+    ///     looking for <c>.git</c> or <c>.github</c>. Falls back to the legacy CWD-relative path
+    ///     (<c>../../docs</c>) only if neither marker is found — keeps the script-driven invocation
+    ///     working while making ad-hoc <c>dotnet run --project</c> from any CWD also work.
+    /// </summary>
+    private static string ResolveDocsRoot()
+    {
+        var repoRoot = FindRepoRoot(Environment.CurrentDirectory);
+        return repoRoot is not null
+            ? Path.Combine(repoRoot, "docs")
+            : Path.Combine(Environment.CurrentDirectory, "..", "..", "docs");
+    }
+
+    private static string? FindRepoRoot(string startPath)
+    {
+        var dir = new DirectoryInfo(startPath);
+        while (dir is not null)
+        {
+            if (Directory.Exists(Path.Combine(dir.FullName, ".git"))
+                || Directory.Exists(Path.Combine(dir.FullName, ".github")))
+                return dir.FullName;
+            dir = dir.Parent;
+        }
+        return null;
     }
 
     private static string ResolveNamespace(SyntaxNode root) =>

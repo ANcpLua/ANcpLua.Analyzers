@@ -37,6 +37,11 @@ public static partial class AnalyzerDocsUtils
     ///     <c>{id}: {message}</c> line per diagnostic. The DocsGenerator catches that exception and
     ///     inlines the lines into the markdown, so the docs always reflect the analyzer's
     ///     current diagnostic text rather than a hand-curated copy.
+    ///
+    ///     Compilation errors in <paramref name="source" /> are surfaced too — a typoed polyfill
+    ///     that prevented the analyzer from firing would otherwise silently produce a docs file
+    ///     with no diagnostic, which is the exact silent-failure mode that breaks docs/source drift
+    ///     guarantees.
     /// </summary>
     public static async Task RunAndCaptureDiagnosticAsync<TAnalyzer>(string source)
         where TAnalyzer : DiagnosticAnalyzer, new()
@@ -47,16 +52,31 @@ public static partial class AnalyzerDocsUtils
             references: Net100.References.All,
             options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
+        var compilationErrors = compilation.GetDiagnostics()
+            .Where(static d => d.Severity is DiagnosticSeverity.Error)
+            .ToImmutableArray();
+
         var withAnalyzers = compilation.WithAnalyzers(
             ImmutableArray.Create<DiagnosticAnalyzer>(new TAnalyzer()));
 
-        var diagnostics = await withAnalyzers.GetAnalyzerDiagnosticsAsync().ConfigureAwait(false);
+        var analyzerDiagnostics = await withAnalyzers.GetAnalyzerDiagnosticsAsync().ConfigureAwait(false);
 
-        if (diagnostics.IsDefaultOrEmpty)
+        if (compilationErrors.IsEmpty && analyzerDiagnostics.IsDefaultOrEmpty)
             return;
 
         var sb = new StringBuilder();
-        foreach (var diagnostic in diagnostics.OrderBy(static d => d.Location.SourceSpan.Start))
+
+        // Stable ordering: span start → severity (Error before Warning before Info) → Id → message.
+        // Defensive against multi-rule analyzers, multiple diagnostics at one span, and any
+        // future change to GetAnalyzerDiagnosticsAsync's internal ordering.
+        var ordered = compilationErrors
+            .Concat(analyzerDiagnostics)
+            .OrderBy(static d => d.Location.SourceSpan.Start)
+            .ThenByDescending(static d => d.Severity)
+            .ThenBy(static d => d.Id, StringComparer.Ordinal)
+            .ThenBy(static d => d.GetMessage(), StringComparer.Ordinal);
+
+        foreach (var diagnostic in ordered)
             sb.AppendLine($"{diagnostic.Id}: {diagnostic.GetMessage()}");
 
         throw new InvalidOperationException(sb.ToString().TrimEnd());

@@ -6,10 +6,6 @@
         <!-- Generator-input project; not under analyzer enforcement (scenarios contain "bad" code on purpose) -->
         <EnforceExtendedAnalyzerRules>false</EnforceExtendedAnalyzerRules>
         <NoWarn>$(NoWarn);CA1031;CA1303;CA1305;CA1707;CA1822;CA1859;CA2007;IDE0055;IDE0058;IDE1006;RS1041;AL0028</NoWarn>
-
-        <!-- Copy the scenario .cs files next to the binary so the generator can parse them at runtime
-             (DocsGenerator.ScenariosSourceFile = Path.Combine(CurrentDirectory, "<File>.cs")). -->
-        <CopyDocumentationFilesFromPackages>false</CopyDocumentationFilesFromPackages>
     </PropertyGroup>
 
     <ItemGroup>
@@ -20,9 +16,16 @@
         <ProjectReference Include="..\ANcpLua.Analyzers\ANcpLua.Analyzers.csproj"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <!-- Make scenario .cs files available next to the executable so the generator's
-             Path.Combine(CurrentDirectory, "<File>.cs") resolves at runtime. -->
-        <None Update="*Docs.cs" CopyToOutputDirectory="PreserveNewest"/>
-    </ItemGroup>
+    <!-- Copy *Docs.cs files next to the assembly so DocsGenerator can re-read its source via
+         Path.GetDirectoryName(Assembly.Location). The default SDK already classifies these as
+         <Compile>; <None Update> wouldn't add a copy directive on top of that, so we run an
+         explicit Copy after Build. -->
+    <Target Name="_CopyScenarioSourcesToOutput" AfterTargets="Build">
+        <ItemGroup>
+            <_ScenarioSources Include="$(MSBuildProjectDirectory)/*Docs.cs"/>
+        </ItemGroup>
+        <Copy SourceFiles="@(_ScenarioSources)"
+              DestinationFolder="$(OutDir)"
+              SkipUnchangedFiles="true"/>
+    </Target>
 </Project>

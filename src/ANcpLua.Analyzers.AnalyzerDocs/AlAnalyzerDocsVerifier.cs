@@ -9,6 +9,10 @@ namespace ANcpLua.Analyzers.AnalyzerDocs;
 /// </summary>
 public sealed partial class AlAnalyzerDocsVerifier : DocsVerifier
 {
+    /// <summary>Resolved from the assembly location (matches <see cref="AlAnalyzerDocsGenerator" />)
+    /// so the path is stable regardless of CWD.</summary>
     protected override string ScenariosSourceFile { get; } =
-        Path.Combine(Environment.CurrentDirectory, "Al0028UseIsEqualToDocs.cs");
+        Path.Combine(
+            Path.GetDirectoryName(typeof(Al0028UseIsEqualToDocs).Assembly.Location)!,
+            "Al0028UseIsEqualToDocs.cs");
 }
