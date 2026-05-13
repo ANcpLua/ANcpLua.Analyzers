@@ -1,6 +1,7 @@
 # AGENTS.md - ANcpLua.Analyzers
 
-127 Roslyn diagnostic analyzers (AL0001-AL0131, gaps at AL0097-0100) with 46 code fixes, targeting netstandard2.0.
+90 diagnostics (AL0001–AL0140 with gaps; full list in `AnalyzerReleases.Unshipped.md`) with 38 automatic code fixes, targeting netstandard2.0. The authoritative rule catalog lives in [`README.md`](README.md#full-rule-catalog) — when these counts drift again, trust `AnalyzerReleases.Unshipped.md` and `src/ANcpLua.Analyzers.CodeFixes/CodeFixes/AL*.cs` over any prose in this file.
+
 ## Framework conventions
 
 Branch protection, auto-merge, CodeRabbit posture, release flow, dependency
