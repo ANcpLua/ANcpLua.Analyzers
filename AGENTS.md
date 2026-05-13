@@ -1,6 +1,14 @@
 # AGENTS.md - ANcpLua.Analyzers
 
 127 Roslyn diagnostic analyzers (AL0001-AL0131, gaps at AL0097-0100) with 46 code fixes, targeting netstandard2.0.
+## Framework conventions
+
+Branch protection, auto-merge, CodeRabbit posture, release flow, dependency
+graph, and the cross-repo bootstrap rules for the four ANcpLua framework
+repos are documented in one place at
+[ANcpLua/renovate-config](https://github.com/ANcpLua/renovate-config#ancplua-framework-conventions--renovate-config).
+This file documents conventions specific to this repo only.
+
 
 ## Commands
 
@@ -188,48 +196,3 @@ The SDK auto-injects this analyzer package. To prevent build cycle during develo
 - Use `PackageId=Dummy` in local csproj
 - CI workflow passes `-p:PackageId=ANcpLua.Analyzers`
 
-## ANcpLua Ecosystem
-
-| Repo | Purpose | NuGet | CI checks required |
-|---|---|---|---|
-| [ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk) | Opinionated MSBuild SDK — standardized defaults, policy enforcement, analyzer injection | [nuget.org](https://www.nuget.org/packages/ANcpLua.NET.Sdk) | `compute_version`, `lint_config`, `test (ubuntu/windows/macos)`, `create_nuget` |
-| [ANcpLua.Analyzers](https://github.com/ANcpLua/ANcpLua.Analyzers) | Custom Roslyn analyzers (auto-injected by the SDK) | [nuget.org](https://www.nuget.org/packages/ANcpLua.Analyzers) | `build`, `test (ubuntu/windows/macos)` |
-| [ANcpLua.Roslyn.Utilities](https://github.com/ANcpLua/ANcpLua.Roslyn.Utilities) | Source generator utilities, TryParse extensions, polyfills | [nuget.org](https://www.nuget.org/packages/ANcpLua.Roslyn.Utilities) | `build (ubuntu/windows)`, `version` |
-| [ANcpLua.Agents](https://github.com/ANcpLua/ANcpLua.Agents) | MAF runtime helpers + agent test infrastructure | [nuget.org](https://www.nuget.org/packages/ANcpLua.Agents) | `build (ubuntu/windows/macos)`, `version` |
-
-### Branch protection (all 4 repos)
-
-- PR required to merge into `main` (0 approvals, squash preferred)
-- Required status checks must pass (CI jobs listed above)
-- Branch must be up-to-date with `main` before merge
-- Force push and branch deletion blocked on `main`
-- Optional checks (CodeRabbit, GitGuardian, Copilot review, auto-merge) do not block merges
-
-### Dependency graph
-
-```
-ANcpLua.NET.Sdk
-  ├── injects ANcpLua.Analyzers (compile-time)
-  └── ships Version.props (version truth for all consumers)
-
-ANcpLua.Analyzers
-  └── consumes ANcpLua.Roslyn.Utilities.Sources (source-only, internal)
-
-ANcpLua.Roslyn.Utilities
-  └── standalone (no first-party deps)
-
-ANcpLua.Agents
-  └── standalone (no first-party deps)
-```
-
-### Release flow
-
-Manual-tag-triggers-publish. The workflow ignores `push: main` for publishing — only `push: tags v*` (or `workflow_dispatch`) runs the publish job.
-
-1. PR to `main` via squash merge — `ci.yml` runs build + test; `nuget-publish.yml` does **not** run
-2. After merge: `git tag vX.Y.Z && git push --tags` — version comes from `${GITHUB_REF_NAME#v}`
-3. Workflow restores, builds, packs, and pushes to NuGet via trusted publishing
-4. **No GH release is auto-created** (workflow doesn't call `gh release create`); the tag itself is the marker — create the release manually if needed
-5. NuGet indexes in ~4-8 minutes — downstream repos pick up via Renovate
-
-Note: ANcpLua.NET.Sdk uses a different pattern (auto-bump-on-merge + auto-tag); Roslyn.Utilities and Agents use the same manual-tag pattern as this repo, but additionally auto-create the GH release.
