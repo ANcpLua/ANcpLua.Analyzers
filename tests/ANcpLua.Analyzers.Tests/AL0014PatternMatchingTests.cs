@@ -22,6 +22,7 @@ public sealed partial class Al0014PatternMatchingTests : AnalyzerTest<Al0014Pref
     [InlineData("int x", "[|0 == x|]")]
     [InlineData("int x", "[|0 != x|]")]
     [InlineData("double x", "[|x == 0.0|]")]
+    [InlineData("double x", "[|0.0 == x|]")]
     [InlineData("double x", "[|x != 0.0|]")]
     [InlineData("float x", "[|x == 0.0f|]")]
     [InlineData("decimal x", "[|x == 0.0m|]")]
@@ -219,6 +220,23 @@ public sealed partial class Al0014PatternMatchingCodeFixTests : CodeFixTest<Al00
         public class C {
             void M(int x) {
                 _ = x is 0;
+            }
+        }
+        """);
+
+    [Fact]
+    public Task ShouldConvertLeftZeroDoubleEqualsToIsZero() => VerifyAsync(
+        """
+        public class C {
+            void M(double x) {
+                _ = [|0.0 == x|];
+            }
+        }
+        """,
+        """
+        public class C {
+            void M(double x) {
+                _ = x is 0.0;
             }
         }
         """);

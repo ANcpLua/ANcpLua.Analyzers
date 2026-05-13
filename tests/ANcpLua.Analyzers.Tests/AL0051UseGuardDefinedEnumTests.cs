@@ -66,6 +66,35 @@ public sealed partial class Al0051UseGuardDefinedEnumTests : AnalyzerTest<Al0051
         """);
 
     [Fact]
+    public Task ShouldNotReportForBlockStatementWithExtraStatements() => VerifyAsync("""
+        using System;
+        public enum MyEnum { A, B, C }
+        public class C {
+            void M(MyEnum value) {
+                if (!Enum.IsDefined(typeof(MyEnum), value)) {
+                    throw new ArgumentException("Invalid enum value.");
+                    Console.WriteLine(value);
+                }
+            }
+        }
+        """);
+
+    [Fact]
+    public Task ShouldNotReportWhenElsePresent() => VerifyAsync("""
+        using System;
+        public enum MyEnum { A, B, C }
+        public class C {
+            void M(MyEnum value) {
+                if (!Enum.IsDefined(typeof(MyEnum), value)) {
+                    throw new ArgumentException("Invalid enum value.");
+                } else {
+                    Console.WriteLine(value);
+                }
+            }
+        }
+        """);
+
+    [Fact]
     public Task ShouldNotReportWithoutNegation() => VerifyAsync("""
         using System;
         public enum MyEnum { A, B, C }

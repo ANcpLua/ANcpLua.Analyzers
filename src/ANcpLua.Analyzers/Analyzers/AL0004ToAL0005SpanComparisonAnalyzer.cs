@@ -117,8 +117,8 @@ public sealed partial class Al0004ToAl0005SpanComparisonAnalyzer : AlAnalyzer {
             SyntaxKind.StringLiteralExpression => true,
             SyntaxKind.CollectionExpression => IsConstantCollectionExpression(
                 (CollectionExpressionSyntax)syntax, model, token),
-            SyntaxKind.ArrayCreationExpression => ((ArrayCreationExpressionSyntax)syntax).Initializer?.Expressions
-                .All(e => model.GetConstantValue(e, token).HasValue) ?? true,
+            SyntaxKind.ArrayCreationExpression => IsConstantArrayCreation(
+                (ArrayCreationExpressionSyntax)syntax, model, token),
             SyntaxKind.ImplicitArrayCreationExpression => ((ImplicitArrayCreationExpressionSyntax)syntax).Initializer
                 .Expressions
                 .All(e => model.GetConstantValue(e, token).HasValue),
@@ -140,5 +140,16 @@ public sealed partial class Al0004ToAl0005SpanComparisonAnalyzer : AlAnalyzer {
         }
 
         return true;
+    }
+
+    private static bool IsConstantArrayCreation(
+        ArrayCreationExpressionSyntax arrayCreation,
+        SemanticModel model,
+        CancellationToken token) {
+        if (arrayCreation.Initializer is not { } initializer) {
+            return false;
+        }
+
+        return initializer.Expressions.All(e => model.GetConstantValue(e, token).HasValue);
     }
 }

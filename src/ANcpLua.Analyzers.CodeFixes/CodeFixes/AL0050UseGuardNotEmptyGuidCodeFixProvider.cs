@@ -14,6 +14,8 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 [Shared]
 public sealed partial class Al0050UseGuardNotEmptyGuidCodeFixProvider
     : AlCodeFixProvider<IfStatementSyntax> {
+    private const string PropertyExpression = "Expression";
+
     /// <summary>Gets the diagnostic IDs this code fix can fix.</summary>
     public override ImmutableArray<string> FixableDiagnosticIds => [Al0050UseGuardNotEmptyGuidAnalyzer.DiagnosticId];
 
@@ -23,23 +25,21 @@ public sealed partial class Al0050UseGuardNotEmptyGuidCodeFixProvider
         IfStatementSyntax ifStatement,
         SyntaxNode root,
         Diagnostic diagnostic) {
-        if (!diagnostic.Properties.TryGetValue(
-                Al0050UseGuardNotEmptyGuidAnalyzer.PropertyIdentifier,
-                out var identifier) ||
-            identifier is null) {
+        if (!diagnostic.Properties.TryGetValue(PropertyExpression, out var expressionText) ||
+            expressionText is null or "") {
             return null;
         }
 
         return CodeAction.Create(
             CodeFixResources.AL0050CodeFixTitle,
-            ct => ConvertToGuardNotEmpty(document, ifStatement, identifier, ct),
+            ct => ConvertToGuardNotEmpty(document, ifStatement, expressionText, ct),
             nameof(Al0050UseGuardNotEmptyGuidCodeFixProvider));
     }
 
     private static Task<Document> ConvertToGuardNotEmpty(
         Document document,
         CSharpSyntaxNode ifStatement,
-        string identifier,
+        string expression,
         CancellationToken ct) {
         // Create: Guard.NotEmpty(identifier);
         var newStatement = SyntaxFactory.ExpressionStatement(
@@ -50,7 +50,7 @@ public sealed partial class Al0050UseGuardNotEmptyGuidCodeFixProvider
                         SyntaxFactory.IdentifierName("NotEmpty")),
                     SyntaxFactory.ArgumentList(
                         SyntaxFactory.SingletonSeparatedList(
-                            SyntaxFactory.Argument(SyntaxFactory.IdentifierName(identifier))))))
+                            SyntaxFactory.Argument(SyntaxFactory.ParseExpression(expression))))))
             .WithLeadingTrivia(ifStatement.GetLeadingTrivia())
             .WithTrailingTrivia(ifStatement.GetTrailingTrivia());
 

@@ -48,13 +48,13 @@ public sealed partial class Al0121NormalizeWhitespaceTests : AnalyzerTest<Al0121
                       """);
 
     [Fact]
-    public Task ShouldReportInCallChain() =>
+    public Task ShouldNotReportInCallChainToFullString() =>
         VerifyAsync($$"""
                       {{SyntaxStubs}}
 
                       public class Generator {
                           public void Generate() {
-                              var text = Microsoft.CodeAnalysis.SyntaxFactory.ParseExpression("x").[|NormalizeWhitespace()|].ToFullString();
+                              var text = Microsoft.CodeAnalysis.SyntaxFactory.ParseExpression("x").NormalizeWhitespace().ToFullString();
                           }
                       }
                       """);

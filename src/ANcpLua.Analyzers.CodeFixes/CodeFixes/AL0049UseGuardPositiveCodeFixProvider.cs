@@ -15,6 +15,8 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 [Shared]
 public sealed partial class Al0049UseGuardPositiveCodeFixProvider
     : AlCodeFixProvider<IfStatementSyntax> {
+    private const string PropertyExpression = "Expression";
+
     /// <summary>Gets the diagnostic IDs this code fix can fix.</summary>
     public override ImmutableArray<string> FixableDiagnosticIds => [Al0049UseGuardPositiveAnalyzer.DiagnosticId];
 
@@ -26,17 +28,15 @@ public sealed partial class Al0049UseGuardPositiveCodeFixProvider
         Diagnostic diagnostic) =>
         CodeAction.Create(
             CodeFixResources.AL0049CodeFixTitle,
-            _ => ConvertToGuardPositive(document, ifStatement, root),
+            _ => ConvertToGuardPositive(document, ifStatement, root, GetExpressionFromDiagnostic(diagnostic, ifStatement)),
             nameof(Al0049UseGuardPositiveCodeFixProvider));
 
     private static Task<Document> ConvertToGuardPositive(
         Document document,
         IfStatementSyntax ifStatement,
-        SyntaxNode root) {
-        // Extract the identifier from the condition
-        var identifier = GetIdentifierFromCondition(ifStatement.Condition);
-
-        // Create: Guard.Positive(identifier);
+        SyntaxNode root,
+        ExpressionSyntax expression) {
+        // Create: Guard.Positive(expression);
         var guardCall = SyntaxFactory.ExpressionStatement(
                 SyntaxFactory.InvocationExpression(
                         SyntaxFactory.MemberAccessExpression(
@@ -47,7 +47,7 @@ public sealed partial class Al0049UseGuardPositiveCodeFixProvider
                         SyntaxFactory.ArgumentList(
                             SyntaxFactory.SingletonSeparatedList(
                                 SyntaxFactory.Argument(
-                                    SyntaxFactory.IdentifierName(identifier))))))
+                                    expression)))))
             .WithLeadingTrivia(ifStatement.GetLeadingTrivia())
             .WithTrailingTrivia(ifStatement.GetTrailingTrivia());
 
@@ -55,38 +55,43 @@ public sealed partial class Al0049UseGuardPositiveCodeFixProvider
         return Task.FromResult(document.WithSyntaxRoot(newRoot));
     }
 
-    private static string GetIdentifierFromCondition(ExpressionSyntax condition) {
-        // Handle x <= 0
+    private static ExpressionSyntax GetExpressionFromDiagnostic(
+        Diagnostic diagnostic,
+        IfStatementSyntax ifStatement) {
+        if (diagnostic.Properties.TryGetValue(PropertyExpression, out var expressionText) &&
+            expressionText is { } text &&
+            !string.IsNullOrWhiteSpace(text)) {
+            return SyntaxFactory.ParseExpression(text.Trim());
+        }
+
+        return TryGetCheckedExpression(ifStatement.Condition)
+            ?? SyntaxFactory.IdentifierName("value");
+    }
+
+    private static ExpressionSyntax? TryGetCheckedExpression(ExpressionSyntax condition) {
         if (condition is BinaryExpressionSyntax { Left: var left, Right: var right } bin
-            && bin.IsKind(SyntaxKind.LessThanOrEqualExpression)) {
-            if (TryGetIdentifierName(left, out var name)) {
-                return name;
-            }
+            && bin.IsKind(SyntaxKind.LessThanOrEqualExpression)
+            && IsZeroLiteral(right)) {
+            return left;
         }
 
-        // Handle 0 >= x
         if (condition is BinaryExpressionSyntax { Left: var leftGe, Right: var rightGe } binGe
-            && binGe.IsKind(SyntaxKind.GreaterThanOrEqualExpression)) {
-            if (TryGetIdentifierName(rightGe, out var name)) {
-                return name;
-            }
+            && binGe.IsKind(SyntaxKind.GreaterThanOrEqualExpression)
+            && IsZeroLiteral(leftGe)) {
+            return rightGe;
         }
 
-        return "value";
+        return null;
     }
 
-    private static bool TryGetIdentifierName(ExpressionSyntax expression, out string name) {
-        name = "";
-
-        switch (expression) {
-            case IdentifierNameSyntax id:
-                name = id.Identifier.Text;
-                return true;
-            case MemberAccessExpressionSyntax { Name: IdentifierNameSyntax memberId }:
-                name = memberId.Identifier.Text;
-                return true;
-            default:
-                return false;
-        }
-    }
+    private static bool IsZeroLiteral(ExpressionSyntax expression) =>
+        expression switch {
+            LiteralExpressionSyntax lit when lit.IsKind(SyntaxKind.NumericLiteralExpression) =>
+                lit.Token.Value is 0 or 0L or 0.0 or 0.0f or 0m or (short)0 or (byte)0,
+            PrefixUnaryExpressionSyntax { Operand: LiteralExpressionSyntax innerLit } prefix
+                when prefix.IsKind(SyntaxKind.UnaryMinusExpression)
+                     && innerLit.IsKind(SyntaxKind.NumericLiteralExpression) =>
+                innerLit.Token.Value is 0 or 0L or 0.0 or 0.0f or 0m,
+            _ => false
+        };
 }

@@ -5,7 +5,7 @@ using ANcpLua.Roslyn.Utilities.Testing;
 namespace ANcpLua.Analyzers.Tests;
 
 /// <summary>
-///     Code fix tests for AL0138: Math.Round / MathF.Round → overload with MidpointRounding.AwayFromZero.
+///     Code fix tests for AL0138: Math.Round / MathF.Round → overload with MidpointRounding.ToEven.
 /// </summary>
 public sealed partial class Al0138UseExplicitMidpointRoundingCodeFixTests
     : CodeFixTest<Al0138UseExplicitMidpointRoundingAnalyzer, Al0138UseExplicitMidpointRoundingCodeFixProvider> {
@@ -21,7 +21,7 @@ public sealed partial class Al0138UseExplicitMidpointRoundingCodeFixTests
             """
             using System;
             public class C {
-                double M(double x) => Math.Round(x, MidpointRounding.AwayFromZero);
+                double M(double x) => Math.Round(x, MidpointRounding.ToEven);
             }
             """);
 
@@ -37,7 +37,7 @@ public sealed partial class Al0138UseExplicitMidpointRoundingCodeFixTests
             """
             using System;
             public class C {
-                double M(double x) => Math.Round(x, 2, MidpointRounding.AwayFromZero);
+                double M(double x) => Math.Round(x, 2, MidpointRounding.ToEven);
             }
             """);
 
@@ -53,7 +53,7 @@ public sealed partial class Al0138UseExplicitMidpointRoundingCodeFixTests
             """
             using System;
             public class C {
-                decimal M(decimal x) => Math.Round(x, MidpointRounding.AwayFromZero);
+                decimal M(decimal x) => Math.Round(x, MidpointRounding.ToEven);
             }
             """);
 
@@ -69,7 +69,7 @@ public sealed partial class Al0138UseExplicitMidpointRoundingCodeFixTests
             """
             using System;
             public class C {
-                float M(float x) => MathF.Round(x, MidpointRounding.AwayFromZero);
+                float M(float x) => MathF.Round(x, MidpointRounding.ToEven);
             }
             """);
 
@@ -84,7 +84,7 @@ public sealed partial class Al0138UseExplicitMidpointRoundingCodeFixTests
             """
             using System;
             public class C {
-                double M(double x) => System.Math.Round(x, MidpointRounding.AwayFromZero);
+                double M(double x) => System.Math.Round(x, MidpointRounding.ToEven);
             }
             """);
 }

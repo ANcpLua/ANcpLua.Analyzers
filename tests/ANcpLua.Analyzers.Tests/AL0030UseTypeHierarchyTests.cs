@@ -95,4 +95,38 @@ public sealed partial class Al0030UseTypeHierarchyTests : AnalyzerTest<Al0030Use
                           }
                       }
                       """);
+
+    [Fact]
+    public Task ShouldNotReportInvertedForeachReturnValue() =>
+        VerifyAsync($$"""
+                      {{RoslynPolyfill}}
+
+                      public class C {
+                          bool M(Microsoft.CodeAnalysis.ITypeSymbol type, Microsoft.CodeAnalysis.INamedTypeSymbol target) {
+                              foreach (var iface in type.AllInterfaces) {
+                                  if (Microsoft.CodeAnalysis.SymbolEqualityComparer.Default.Equals(iface, target)) {
+                                      return false;
+                                  }
+                              }
+                              return false;
+                          }
+                      }
+                      """);
+
+    [Fact]
+    public Task ShouldNotReportWhenFollowedByVoidReturn() =>
+        VerifyAsync($$"""
+                      {{RoslynPolyfill}}
+
+                      public class C {
+                          void M(Microsoft.CodeAnalysis.ITypeSymbol type, Microsoft.CodeAnalysis.INamedTypeSymbol target) {
+                              foreach (var iface in type.AllInterfaces) {
+                                  if (Microsoft.CodeAnalysis.SymbolEqualityComparer.Default.Equals(iface, target)) {
+                                      return;
+                                  }
+                              }
+                              return;
+                          }
+                      }
+                      """);
 }

@@ -50,7 +50,12 @@ public sealed partial class Al0014PatternMatchingCodeFixProvider : AlCodeFixProv
 
     private static bool IsLiteral(SyntaxNode expression) =>
         expression.IsKind(SyntaxKind.NullLiteralExpression) ||
-        expression is LiteralExpressionSyntax { Token.ValueText: "0" };
+        expression is LiteralExpressionSyntax { Token.Value: var value } &&
+        IsZeroValue(value);
+
+    private static bool IsZeroValue(object? value) =>
+        value is 0 or 0L or 0U or 0UL or (short)0 or (ushort)0 or (byte)0 or (sbyte)0
+            or 0f or 0d or 0m;
 
     private static PatternSyntax CreatePattern(ExpressionSyntax literal, bool isNegated) {
         PatternSyntax constantPattern = SyntaxFactory.ConstantPattern(literal);

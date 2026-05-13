@@ -49,6 +49,10 @@ public sealed partial class Al0117UnnecessaryLinqMaterializationAnalyzer : AlAna
             "Zip", "Reverse", "Append", "Prepend",
             "DefaultIfEmpty");
 
+    private static readonly ImmutableHashSet<string> s_sourceMutationMethods =
+        ImmutableHashSet.Create(StringComparer.Ordinal, "Clear", "Add", "AddRange", "Insert", "InsertRange",
+            "Remove", "RemoveAt", "RemoveRange", "RemoveAll", "TrimExcess");
+
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
@@ -109,11 +113,11 @@ public sealed partial class Al0117UnnecessaryLinqMaterializationAnalyzer : AlAna
         }
 
         // The source must also be a LINQ operator from System.Linq.Enumerable
-        if (!s_linqOperators.Contains(sourceMethod.Name)) {
+        if (!s_linqOperators.Contains(sourceMethod.TargetMethod.Name)) {
             return;
         }
 
-        if (!sourceMethod.ContainingType.IsEqualTo(enumerableType)) {
+        if (!sourceMethod.TargetMethod.ContainingType.IsEqualTo(enumerableType)) {
             return;
         }
 
@@ -124,13 +128,13 @@ public sealed partial class Al0117UnnecessaryLinqMaterializationAnalyzer : AlAna
 
         // Skip when the materialization is load-bearing (multi-use local, concrete-collection
         // parameter, or concrete-collection return type).
-        if (IsMaterializationLoadBearing(invocation, context.ContainingSymbol, strictCollectionTypes)) {
+        if (IsMaterializationLoadBearing(invocation, sourceMethod, context.ContainingSymbol, strictCollectionTypes)) {
             return;
         }
 
         // Report on the materialization method name location
         var location = GetMethodNameLocation(invocation);
-        context.ReportDiagnostic(Diagnostic.Create(s_rule, location, method.Name, sourceMethod.Name));
+        context.ReportDiagnostic(Diagnostic.Create(s_rule, location, method.Name, sourceMethod.TargetMethod.Name));
     }
 
     private static bool IsBoxedToObject(IInvocationOperation materialization) {
@@ -144,6 +148,7 @@ public sealed partial class Al0117UnnecessaryLinqMaterializationAnalyzer : AlAna
 
     private static bool IsMaterializationLoadBearing(
         IInvocationOperation materialization,
+        IInvocationOperation sourceMethod,
         ISymbol? containingSymbol,
         ImmutableArray<INamedTypeSymbol> strictCollectionTypes) {
         var parent = materialization.Parent;
@@ -168,6 +173,7 @@ public sealed partial class Al0117UnnecessaryLinqMaterializationAnalyzer : AlAna
             // or if the single read consumes it in a context that requires a concrete collection.
             case IVariableInitializerOperation { Parent: IVariableDeclaratorOperation declarator }
                 when CountLocalReads(materialization, declarator.Symbol) >= 2
+                     || IsSourceMutatedAfterMaterialization(materialization, declarator.Symbol, sourceMethod)
                      || IsSingleReadInConcreteCollectionContext(materialization, declarator.Symbol, strictCollectionTypes):
                 return true;
             default:
@@ -234,9 +240,128 @@ public sealed partial class Al0117UnnecessaryLinqMaterializationAnalyzer : AlAna
                && IsStrictCollectionType(paramType, strictCollectionTypes);
     }
 
+    private static bool IsSourceMutatedAfterMaterialization(
+        IInvocationOperation materialization,
+        ILocalSymbol materializedLocal,
+        IInvocationOperation sourceMethod) {
+        var sourceArgument = sourceMethod.Arguments.Length > 0
+            ? sourceMethod.Arguments[0].Value
+            : null;
+
+        if (TryGetSourceMutationSymbol(sourceArgument) is not { } sourceSymbol) {
+            return false;
+        }
+
+        // Find the single read site for the local variable and only suppress when that read is
+        // after a source mutation.
+        var (readSiteSyntax, materializationSpanEnd) = GetReadSiteAndMaterializationSpan(materializedLocal, materialization);
+        if (readSiteSyntax is null) {
+            return false;
+        }
+
+        IOperation root = materialization;
+        while (root.Parent is not null) {
+            root = root.Parent;
+        }
+
+        foreach (var op in MsOperationExtensions.DescendantsAndSelf(root)) {
+            if (op == materialization) {
+                continue;
+            }
+
+            if (IsMutatingInvocation(op, sourceSymbol) is { } location
+                && location > materializationSpanEnd
+                && location < readSiteSyntax.SpanStart) {
+                return true;
+            }
+
+            if (IsSourceAssignment(op, sourceSymbol) is { } assignmentLocation
+                && assignmentLocation > materializationSpanEnd
+                && assignmentLocation < readSiteSyntax.SpanStart) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static ISymbol? TryGetSourceMutationSymbol(IOperation? sourceArgument) {
+        return sourceArgument switch {
+            ILocalReferenceOperation { Local: { } local } => local,
+            IParameterReferenceOperation { Parameter: { } parameter } => parameter,
+            IConversionOperation { Operand: ILocalReferenceOperation { Local: { } local } } => local,
+            IConversionOperation { Operand: IParameterReferenceOperation { Parameter: { } parameter } } => parameter,
+            _ => null,
+        };
+    }
+
+    private static (SyntaxNode? readSite, int materializationSpanEnd) GetReadSiteAndMaterializationSpan(
+        ILocalSymbol local,
+        IInvocationOperation materialization) {
+        IOperation root = materialization;
+        while (root.Parent is not null) {
+            root = root.Parent;
+        }
+
+        var read = (SyntaxNode?)null;
+        foreach (var desc in MsOperationExtensions.DescendantsAndSelf(root)) {
+            if (desc is ILocalReferenceOperation localRef
+                && SymbolEqualityComparer.Default.Equals(localRef.Local, local)) {
+                read = localRef.Syntax;
+                break;
+            }
+        }
+
+        return (read, materialization.Syntax.Span.End);
+    }
+
+    private static int? IsMutatingInvocation(IOperation operation, ISymbol sourceSymbol) {
+        if (operation is not IInvocationOperation invocation) {
+            return null;
+        }
+
+        if (!s_sourceMutationMethods.Contains(invocation.TargetMethod.Name)) {
+            return null;
+        }
+
+        return invocation.Instance switch {
+            ILocalReferenceOperation { Local: { } local } when SymbolEqualityComparer.Default.Equals(local, sourceSymbol) =>
+                invocation.Syntax.SpanStart,
+            IParameterReferenceOperation { Parameter: { } parameter }
+                when SymbolEqualityComparer.Default.Equals(parameter, sourceSymbol) =>
+                invocation.Syntax.Span.Start,
+            IConversionOperation { Operand: ILocalReferenceOperation { Local: { } local } }
+                when invocation.TargetMethod.IsExtensionMethod is false
+                     && SymbolEqualityComparer.Default.Equals(local, sourceSymbol)
+                => invocation.Syntax.Span.Start,
+            IConversionOperation { Operand: IParameterReferenceOperation { Parameter: { } parameter } }
+                when SymbolEqualityComparer.Default.Equals(parameter, sourceSymbol)
+                => invocation.Syntax.Span.Start,
+            _ => null,
+        };
+    }
+
+    private static int? IsSourceAssignment(IOperation operation, ISymbol sourceSymbol) {
+        if (operation is not IAssignmentOperation assignment) {
+            return null;
+        }
+
+        if (assignment.Target is ILocalReferenceOperation { Local: { } local }
+            && SymbolEqualityComparer.Default.Equals(local, sourceSymbol)) {
+            return assignment.Syntax.Span.Start;
+        }
+
+        if (assignment.Target is IParameterReferenceOperation { Parameter: { } parameter }
+            && SymbolEqualityComparer.Default.Equals(parameter, sourceSymbol)) {
+            return assignment.Syntax.Span.Start;
+        }
+
+        return null;
+    }
+
     private static int CountLocalReads(IOperation materialization, ILocalSymbol local) {
         // Walk up to the root of the operation tree (method body / field initializer / etc.)
-        var root = materialization;
+        IOperation root = materialization;
         while (root.Parent is not null) {
             root = root.Parent;
         }
@@ -291,13 +416,13 @@ public sealed partial class Al0117UnnecessaryLinqMaterializationAnalyzer : AlAna
 
     private static bool TryGetSourceInvocation(
         IInvocationOperation materialization,
-        out IMethodSymbol sourceMethod) {
-        sourceMethod = null!;
+        out IInvocationOperation sourceMethod) {
+        sourceMethod = default!;
 
         // For reduced extension methods (instance-style), the receiver is on Instance
         if (materialization.Instance is IInvocationOperation instanceInvocation) {
-            sourceMethod = instanceInvocation.TargetMethod;
-            return true;
+                sourceMethod = instanceInvocation;
+                return true;
         }
 
         switch (materialization.Arguments.Length)
@@ -305,12 +430,12 @@ public sealed partial class Al0117UnnecessaryLinqMaterializationAnalyzer : AlAna
             // For non-reduced extension methods (static-style), the source is the first argument
             case > 0 when
                 materialization.Arguments[0].Value is IInvocationOperation argInvocation:
-                sourceMethod = argInvocation.TargetMethod;
+                sourceMethod = argInvocation;
                 return true;
             // Unwrap conversions on the first argument
             case > 0 when
                 UnwrapConversions(materialization.Arguments[0].Value) is IInvocationOperation unwrappedInvocation:
-                sourceMethod = unwrappedInvocation.TargetMethod;
+                sourceMethod = unwrappedInvocation;
                 return true;
             default:
                 return false;

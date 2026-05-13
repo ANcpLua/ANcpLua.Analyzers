@@ -48,14 +48,53 @@ public sealed partial class Al0029UseHasAttributeTests : AnalyzerTest<Al0029UseH
                       """);
 
     [Fact]
-    public Task ShouldReportGetAttributesFirstOrDefault() =>
+    public Task ShouldNotReportGetAttributesAnyWithoutPredicate() =>
+        VerifyAsync($$"""
+                      using System.Linq;
+                      {{RoslynPolyfill}}
+
+                      public class C {
+                          bool M(Microsoft.CodeAnalysis.ISymbol symbol) {
+                              return symbol.GetAttributes().Any();
+                          }
+                      }
+                      """);
+
+    [Fact]
+    public Task ShouldNotReportGetAttributesFirstOrDefault() =>
         VerifyAsync($$"""
                       using System.Linq;
                       {{RoslynPolyfill}}
 
                       public class C {
                           object? M(Microsoft.CodeAnalysis.ISymbol symbol) {
-                              return [|symbol.GetAttributes().FirstOrDefault(a => a.AttributeClass?.ToString() == "Test")|];
+                              return symbol.GetAttributes().FirstOrDefault(a => a.AttributeClass?.ToString() == "Test");
+                          }
+                      }
+                      """);
+
+    [Fact]
+    public Task ShouldNotReportGetAttributesWhere() =>
+        VerifyAsync($$"""
+                      using System.Linq;
+                      {{RoslynPolyfill}}
+
+                      public class C {
+                          object[]? M(Microsoft.CodeAnalysis.ISymbol symbol) {
+                              return symbol.GetAttributes().Where(a => a.AttributeClass?.ToString() == "Test").ToArray();
+                          }
+                      }
+                      """);
+
+    [Fact]
+    public Task ShouldNotReportGetAttributesCount() =>
+        VerifyAsync($$"""
+                      using System.Linq;
+                      {{RoslynPolyfill}}
+
+                      public class C {
+                          bool M(Microsoft.CodeAnalysis.ISymbol symbol) {
+                              return symbol.GetAttributes().Count(a => a.AttributeClass?.ToString() == "Test") > 0;
                           }
                       }
                       """);

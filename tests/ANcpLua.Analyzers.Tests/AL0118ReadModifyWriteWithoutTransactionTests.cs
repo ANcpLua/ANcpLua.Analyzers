@@ -158,4 +158,24 @@ public sealed partial class Al0118ReadModifyWriteWithoutTransactionTests : Analy
                           }
                       }
                       """);
+
+    [Fact]
+    public Task ShouldNotReportReadAndWriteOnSeparateCommandObjects() =>
+        VerifyAsync($$"""
+                      using System.Threading;
+                      using System.Threading.Tasks;
+                      using System.Data.Common;
+
+                      {{DbStubs}}
+
+                      public class Repository {
+                          public async Task ReadOnOneWriteOnAnother(DbConnection conn) {
+                              var readCommand = conn.CreateCommand();
+                              var writeCommand = conn.CreateCommand();
+
+                              await ((DbCommand)readCommand).ExecuteReaderAsync();
+                              await ((DbCommand)writeCommand).ExecuteNonQueryAsync();
+                          }
+                      }
+                      """);
 }

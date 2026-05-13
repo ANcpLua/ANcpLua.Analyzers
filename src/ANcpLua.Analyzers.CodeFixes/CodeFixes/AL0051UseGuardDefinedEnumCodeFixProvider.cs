@@ -33,6 +33,10 @@ public sealed partial class Al0051UseGuardDefinedEnumCodeFixProvider
         Document document,
         IfStatementSyntax ifStatement,
         SyntaxNode root) {
+        if (!IsSingleThrowBody(ifStatement)) {
+            return Task.FromResult(document);
+        }
+
         // Extract the value argument from the condition
         var valueExpression = ExtractValueArgument(ifStatement.Condition);
 
@@ -51,6 +55,14 @@ public sealed partial class Al0051UseGuardDefinedEnumCodeFixProvider
         var newRoot = root.ReplaceNode(ifStatement, guardInvocation);
         return Task.FromResult(document.WithSyntaxRoot(newRoot));
     }
+
+    private static bool IsSingleThrowBody(IfStatementSyntax ifStatement) =>
+        ifStatement.Else is null &&
+        ifStatement.Statement switch {
+            ThrowStatementSyntax => true,
+            BlockSyntax block => block.Statements.Count is 1 && block.Statements[0] is ThrowStatementSyntax,
+            _ => false
+        };
 
     private static ExpressionSyntax ExtractValueArgument(ExpressionSyntax condition) {
         // Unwrap parentheses

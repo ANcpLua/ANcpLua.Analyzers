@@ -50,7 +50,8 @@ public sealed partial class Al0027UseSystemTextJsonCodeFixProvider : CodeFixProv
         }
 
         // Check for JsonConvert class
-        if (memberAccess.Expression is not IdentifierNameSyntax { Identifier.Text: "JsonConvert" }) {
+        if (memberAccess.Expression is not { } jsonConvertExpression ||
+            !IsJsonConvertType(jsonConvertExpression)) {
             return false;
         }
 
@@ -75,7 +76,28 @@ public sealed partial class Al0027UseSystemTextJsonCodeFixProvider : CodeFixProv
             typeArgs = genericName.TypeArgumentList;
         }
 
+        var argCount = invocation.ArgumentList.Arguments.Count;
+        if (methodName is "SerializeObject" && typeArgs is not null) {
+            return false;
+        }
+
+        if (methodName is "SerializeObject" && argCount != 1) {
+            return false;
+        }
+
+        if (methodName is "DeserializeObject" && (typeArgs is null || typeArgs.Arguments.Count != 1)) {
+            return false;
+        }
+
+        if (methodName is "DeserializeObject" && argCount != 1) {
+            return false;
+        }
+
         return true;
+    }
+
+    private static bool IsJsonConvertType(ExpressionSyntax expression) {
+        return expression.ToString() is "JsonConvert" or "Newtonsoft.Json.JsonConvert" or "global::Newtonsoft.Json.JsonConvert";
     }
 
     private static Task<Document> ConvertToSystemTextJson(

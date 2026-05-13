@@ -270,4 +270,20 @@ public sealed partial class Al0117UnnecessaryLinqMaterializationTests : Analyzer
                         }
                     }
                     """);
+
+    [Fact]
+    public Task ShouldNotReportWhenSnapshotConsumedAfterMutatingSource() =>
+        VerifyAsync("""
+                    using System.Collections.Generic;
+                    using System.Linq;
+
+                    public class C {
+                        public void M() {
+                            var values = new List<int> { 1, 2, 3 };
+                            var snapshot = values.Where(i => i > 0).ToList();
+                            values.Clear();
+                            foreach (var value in snapshot) { }
+                        }
+                    }
+                    """);
 }

@@ -33,6 +33,13 @@ public sealed partial class Al0118ReadModifyWriteWithoutTransactionAnalyzer : Al
         DiagnosticCategories.Reliability,
         DiagnosticSeverity.Warning);
 
+    private static readonly ImmutableHashSet<string> s_readMethods =
+        ImmutableHashSet.Create(StringComparer.Ordinal, "ExecuteReader", "ExecuteReaderAsync", "ExecuteScalar",
+            "ExecuteScalarAsync");
+
+    private static readonly ImmutableHashSet<string> s_writeMethods =
+        ImmutableHashSet.Create(StringComparer.Ordinal, "ExecuteNonQuery", "ExecuteNonQueryAsync");
+
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
@@ -54,35 +61,123 @@ public sealed partial class Al0118ReadModifyWriteWithoutTransactionAnalyzer : Al
             return;
         }
 
-        var hasRead = false;
-        var hasWrite = false;
-        var hasTransaction = false;
+        var hasUnknownCorrelation = false;
+        var reads = new HashSet<ISymbol>(SymbolEqualityComparer.Default);
+        var writes = new HashSet<ISymbol>(SymbolEqualityComparer.Default);
+        var transactions = new HashSet<ISymbol>(SymbolEqualityComparer.Default);
+        var commandConnections = new Dictionary<ISymbol, ISymbol>(SymbolEqualityComparer.Default);
 
         foreach (var invocation in body.DescendantNodes().OfType<InvocationExpressionSyntax>()) {
             if (GetInvokedMethodName(invocation) is not { } methodName) {
                 continue;
             }
 
+            var receiver = TryGetReceiverSymbol(context.SemanticModel, invocation);
             switch (methodName) {
-                case "ExecuteReader" or "ExecuteReaderAsync" or "ExecuteScalar" or "ExecuteScalarAsync":
-                    hasRead = true;
+                case var name when s_readMethods.Contains(name):
+                    if (receiver is null) {
+                        hasUnknownCorrelation = true;
+                    }
+                    else {
+                        reads.Add(receiver);
+                    }
+
                     break;
-                case "ExecuteNonQuery" or "ExecuteNonQueryAsync":
-                    hasWrite = true;
+                case var name when s_writeMethods.Contains(name):
+                    if (receiver is null) {
+                        hasUnknownCorrelation = true;
+                    }
+                    else {
+                        writes.Add(receiver);
+                    }
+
+                    break;
+                case "CreateCommand":
+                    if (receiver is not null
+                        && TryGetAssignedSymbol(context.SemanticModel, invocation) is { } commandSymbol) {
+                        commandConnections[commandSymbol] = receiver;
+                    }
+
                     break;
                 case "BeginTransaction" or "BeginTransactionAsync":
-                    hasTransaction = true;
+                    if (receiver is null) {
+                        hasUnknownCorrelation = true;
+                    }
+                    else {
+                        transactions.Add(receiver);
+                    }
+
                     break;
             }
+        }
 
-            if (hasTransaction) {
-                return;
+        if (hasUnknownCorrelation) {
+            return;
+        }
+
+        foreach (var command in reads) {
+            if (!writes.Contains(command)) {
+                continue;
+            }
+
+            if (IsProtectedByTransaction(command, commandConnections, transactions)) {
+                continue;
+            }
+
+            context.ReportDiagnostic(s_rule, identifier.GetLocation(), identifier.Text);
+            return;
+        }
+    }
+
+    private static bool IsProtectedByTransaction(
+        ISymbol command,
+        Dictionary<ISymbol, ISymbol> commandConnections,
+        HashSet<ISymbol> transactions) {
+        if (transactions.Contains(command)) {
+            return true;
+        }
+
+        if (commandConnections.TryGetValue(command, out var commandConnection)
+            && transactions.Contains(commandConnection)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private static ISymbol? TryGetReceiverSymbol(SemanticModel semanticModel, InvocationExpressionSyntax invocation) {
+        if (invocation.Expression is not MemberAccessExpressionSyntax { Expression: var expression }) {
+            return null;
+        }
+
+        while (true) {
+            switch (expression) {
+                case CastExpressionSyntax castExpression:
+                    expression = castExpression.Expression;
+                    continue;
+                case ParenthesizedExpressionSyntax parenthesized:
+                    expression = parenthesized.Expression;
+                    continue;
+                default:
+                    return semanticModel.GetSymbolInfo(expression).Symbol;
             }
         }
+    }
 
-        if (hasRead && hasWrite) {
-            context.ReportDiagnostic(s_rule, identifier.GetLocation(), identifier.Text);
+    private static ISymbol? TryGetAssignedSymbol(SemanticModel semanticModel, InvocationExpressionSyntax invocation) {
+        var node = (SyntaxNode?)invocation;
+        while (node is not null) {
+            switch (node) {
+                case EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax declarator }:
+                    return semanticModel.GetDeclaredSymbol(declarator);
+                case AssignmentExpressionSyntax assignment when assignment.Right == node:
+                    return semanticModel.GetSymbolInfo(assignment.Left).Symbol;
+            }
+
+            node = node.Parent;
         }
+
+        return null;
     }
 
     private static string? GetInvokedMethodName(InvocationExpressionSyntax invocation) =>

@@ -71,7 +71,8 @@ public sealed partial class Al0029UseHasAttributeAnalyzer : AlAnalyzer {
     private static bool IsAttributeLinqCheck(IInvocationOperation invocation) {
         var method = invocation.TargetMethod;
 
-        if (method.Name is not ("Any" or "FirstOrDefault" or "Where" or "Count")) {
+        if (method.Name is not "Any" ||
+            !HasPredicateArgument(invocation)) {
             return false;
         }
 
@@ -82,6 +83,11 @@ public sealed partial class Al0029UseHasAttributeAnalyzer : AlAnalyzer {
         return method.IsExtensionMethod &&
                invocation.Arguments.Length > 0 &&
                GetUnderlyingInvocationName(invocation.Arguments[0].Value) == "GetAttributes";
+    }
+
+    private static bool HasPredicateArgument(IInvocationOperation invocation) {
+        var expectedArgumentCount = invocation.Instance is null ? 2 : 1;
+        return invocation.Arguments.Length == expectedArgumentCount;
     }
 
     private static string? GetUnderlyingInvocationName(IOperation? operation) =>

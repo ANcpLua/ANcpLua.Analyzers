@@ -1,4 +1,5 @@
 using ANcpLua.Analyzers.Analyzers;
+using ANcpLua.Analyzers.CodeFixes.CodeFixes;
 using ANcpLua.Roslyn.Utilities.Testing;
 
 namespace ANcpLua.Analyzers.Tests;
@@ -125,4 +126,39 @@ public sealed partial class Al0050UseGuardNotEmptyGuidTests : AnalyzerTest<Al005
             }
         }
         """);
+}
+
+public sealed partial class Al0050UseGuardNotEmptyGuidCodeFixTests
+    : CodeFixTest<Al0050UseGuardNotEmptyGuidAnalyzer, Al0050UseGuardNotEmptyGuidCodeFixProvider> {
+    [Fact]
+    public Task ShouldPreserveMemberAccessReceiver() =>
+        VerifyAsync(
+            """
+            using System;
+            public static class Guard {
+                public static void NotEmpty(Guid value) { }
+            }
+            public class User {
+                public Guid Id { get; set; }
+            }
+            public class C {
+                void M(User user) {
+                    [|if (user.Id == Guid.Empty) throw new ArgumentException("ID cannot be empty.", nameof(user.Id));|]
+                }
+            }
+            """,
+            """
+            using System;
+            public static class Guard {
+                public static void NotEmpty(Guid value) { }
+            }
+            public class User {
+                public Guid Id { get; set; }
+            }
+            public class C {
+                void M(User user) {
+                    Guard.NotEmpty(user.Id);
+                }
+            }
+            """);
 }

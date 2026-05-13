@@ -3,7 +3,7 @@ using ANcpLua.Analyzers.Analyzers;
 namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 
 /// <summary>
-///     Code fix for AL0138: Appends <c>MidpointRounding.AwayFromZero</c> to <c>Math.Round</c> /
+///     Code fix for AL0138: Appends <c>MidpointRounding.ToEven</c> to <c>Math.Round</c> /
 ///     <c>MathF.Round</c> calls that lack an explicit rounding mode.
 /// </summary>
 /// <remarks>
@@ -39,7 +39,7 @@ public sealed partial class Al0138UseExplicitMidpointRoundingCodeFixProvider
             SyntaxFactory.MemberAccessExpression(
                 SyntaxKind.SimpleMemberAccessExpression,
                 SyntaxFactory.IdentifierName("MidpointRounding"),
-                SyntaxFactory.IdentifierName("AwayFromZero")));
+                SyntaxFactory.IdentifierName("ToEven")));
 
         var newArgumentList = invocation.ArgumentList.AddArguments(midpointRoundingArg);
         var newInvocation = invocation.WithArgumentList(newArgumentList);

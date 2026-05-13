@@ -1349,10 +1349,10 @@
         <value>Use Math.Round/MathF.Round overload with explicit MidpointRounding</value>
     </data>
     <data name="AL0138AnalyzerMessageFormat" xml:space="preserve">
-        <value>'{0}' uses banker's rounding by default; pass MidpointRounding.AwayFromZero (or another explicit mode) for predictable behavior</value>
+        <value>'{0}' uses banker's rounding by default; pass MidpointRounding.ToEven (or another explicit mode) for predictable behavior</value>
     </data>
     <data name="AL0138AnalyzerDescription" xml:space="preserve">
-        <value>Math.Round / MathF.Round overloads without a MidpointRounding argument default to ToEven (banker's rounding), which surprises most callers — 0.5 rounds to 0, not 1. Always pass MidpointRounding.AwayFromZero for the natural "round 0.5 up" behavior, or another mode that matches the domain. Banned in qyl-aligned projects via BannedSymbols.txt; this analyzer carries the matching auto-fix that appends MidpointRounding.AwayFromZero to the call.</value>
+        <value>Math.Round / MathF.Round overloads without a MidpointRounding argument default to ToEven (banker's rounding). Pass MidpointRounding.ToEven to preserve current behavior explicitly, or choose AwayFromZero or another mode when the domain requires it. The auto-fix appends MidpointRounding.ToEven to avoid changing runtime behavior.</value>
     </data>
     <!-- AL0139: Use implicit type when the type is apparent -->
     <data name="AL0139AnalyzerTitle" xml:space="preserve">

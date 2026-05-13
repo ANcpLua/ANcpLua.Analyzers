@@ -58,6 +58,53 @@ public sealed partial class Al0114PreferTryParseTests : AnalyzerTestBase {
                     """);
 
     [Fact]
+    public Task ShouldNotReportInsideTryCatchAliasFormatException() =>
+        VerifyAsync("""
+                    using System;
+                    using MyFormatException = System.FormatException;
+
+                    public class C {
+                        public void M(string s) {
+                            try {
+                                var x = int.Parse(s);
+                            } catch (MyFormatException) {
+                            }
+                        }
+                    }
+                    """);
+
+    [Fact]
+    public Task ShouldNotReportInsideTryCatchAliasException() =>
+        VerifyAsync("""
+                    using System;
+                    using AnyError = System.Exception;
+
+                    public class C {
+                        public void M(string s) {
+                            try {
+                                var x = int.Parse(s);
+                            } catch (AnyError) {
+                            }
+                        }
+                    }
+                    """);
+
+    [Fact]
+    public Task ShouldReportWithArgumentExceptionCatchOnly() =>
+        VerifyAsync("""
+                    using System;
+
+                    public class C {
+                        public void M(string s) {
+                            try {
+                                var x = int.Parse(s);
+                            } catch (ArgumentException) {
+                            }
+                        }
+                    }
+                    """);
+
+    [Fact]
     public Task ShouldNotReportTryParse() =>
         VerifyAsync("""
                     using System;

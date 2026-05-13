@@ -37,6 +37,8 @@ public sealed partial class Al0127OutdatedMafPackageVersionAnalyzer : Diagnostic
     /// <summary>Pattern to detect MSBuild property references like $(VariableName).</summary>
     private static readonly Regex s_msBuildPropertyPattern = MsBuildPropertyRegex();
 
+    private static readonly char[] s_prereleaseSegmentSeparators = ['.'];
+
     /// <summary>
     ///     Package version requirements for MAF ecosystem packages.
     ///     Key: package name (case-insensitive). Value: minimum required version and reason.
@@ -236,7 +238,7 @@ public sealed partial class Al0127OutdatedMafPackageVersionAnalyzer : Diagnostic
             < 0 => true,  // Current stable part is lower
             > 0 => false, // Current stable part is higher
             // Stable parts are equal - compare prerelease
-            _ => ComparePrereleaseLabels(current.Value.Prerelease, minimum.Value.Prerelease)
+            _ => ComparePrereleaseLabels(current.Value, minimum.Value)
         };
     }
 
@@ -257,26 +259,70 @@ public sealed partial class Al0127OutdatedMafPackageVersionAnalyzer : Diagnostic
     /// <summary>
     ///     Compares prerelease labels following SemVer 2.0 rules:
     ///     - No prerelease (stable) > any prerelease
-    ///     - Prerelease labels are compared ordinally (rc5 vs rc6)
+    ///     - Identifiers are compared segment-by-segment where numeric segments are compared numerically.
     /// </summary>
     /// <returns><c>true</c> if current is below minimum (i.e., outdated).</returns>
-    private static bool ComparePrereleaseLabels(string? currentPrerelease, string? minimumPrerelease) {
-        switch (currentPrerelease)
-        {
-            // Both stable - equal
-            case null when minimumPrerelease is null:
-            // Current is stable, minimum is prerelease - current is >= minimum
-            case null:
-                return false;
+    private static bool ComparePrereleaseLabels(ParsedVersion currentVersion, ParsedVersion minimumVersion) {
+        if (currentVersion.Prerelease is null && minimumVersion.Prerelease is null) {
+            return false;
         }
 
-        // Current is prerelease, minimum is stable - current is < minimum
-        if (minimumPrerelease is null) {
+        // Stable versions outrank prereleases for the same numeric version.
+        if (currentVersion.Prerelease is null) {
+            return false;
+        }
+
+        if (minimumVersion.Prerelease is null) {
             return true;
         }
 
-        // Both are prerelease - compare ordinally (case-insensitive)
-        return string.Compare(currentPrerelease, minimumPrerelease, StringComparison.OrdinalIgnoreCase) < 0;
+        var maxSegments = Math.Min(currentVersion.PrereleaseSegments.Length, minimumVersion.PrereleaseSegments.Length);
+
+        for (var i = 0; i < maxSegments; i++) {
+            if (ComparePrereleaseSegment(
+                    currentVersion.PrereleaseSegments[i],
+                    minimumVersion.PrereleaseSegments[i]) is var segmentComparison &&
+                segmentComparison is not 0) {
+                return segmentComparison < 0;
+            }
+        }
+
+        return currentVersion.PrereleaseSegments.Length < minimumVersion.PrereleaseSegments.Length;
+    }
+
+    private static int ComparePrereleaseSegment(string currentSegment, string minimumSegment) {
+        var currentIsNumeric = int.TryParse(currentSegment, out var currentNumber);
+        var minimumIsNumeric = int.TryParse(minimumSegment, out var minimumNumber);
+
+        if (currentIsNumeric && minimumIsNumeric) {
+            return currentNumber.CompareTo(minimumNumber);
+        }
+
+        // Numeric identifiers have lower precedence than non-numeric ones.
+        if (currentIsNumeric && !minimumIsNumeric) {
+            return -1;
+        }
+
+        if (!currentIsNumeric && minimumIsNumeric) {
+            return 1;
+        }
+
+        return string.Compare(currentSegment, minimumSegment, StringComparison.Ordinal);
+    }
+
+    private static ImmutableArray<string> ParsePrereleaseParts(string? prerelease) {
+        if (prerelease is null) {
+            return [];
+        }
+
+        var value = prerelease.Trim();
+        if (value.Length is 0) {
+            return [];
+        }
+
+        return value
+            .Split(s_prereleaseSegmentSeparators, StringSplitOptions.RemoveEmptyEntries)
+            .ToImmutableArray();
     }
 
     private static ParsedVersion? ParseVersion(string version) {
@@ -289,6 +335,12 @@ public sealed partial class Al0127OutdatedMafPackageVersionAnalyzer : Diagnostic
 
         if (normalized.Length is 0) {
             return null;
+        }
+
+        // Ignore build metadata (`+...`) for SemVer comparison.
+        var plusIndex = normalized.IndexOfOrdinal("+");
+        if (plusIndex >= 0) {
+            normalized = normalized.Substring(0, plusIndex);
         }
 
         // Split off prerelease label
@@ -316,7 +368,7 @@ public sealed partial class Al0127OutdatedMafPackageVersionAnalyzer : Diagnostic
             return null;
         }
 
-        return new ParsedVersion(major, minor, patch, prerelease);
+        return new ParsedVersion(major, minor, patch, prerelease, ParsePrereleaseParts(prerelease));
     }
 
     private static Location CreateLocation(AdditionalText propsFile, SourceText sourceText, XAttribute attribute) {
@@ -354,7 +406,12 @@ public sealed partial class Al0127OutdatedMafPackageVersionAnalyzer : Diagnostic
     }
 
     /// <summary>Parsed semantic version with optional prerelease label.</summary>
-    private readonly partial record struct ParsedVersion(int Major, int Minor, int Patch, string? Prerelease);
+    private readonly partial record struct ParsedVersion(
+        int Major,
+        int Minor,
+        int Patch,
+        string? Prerelease,
+        ImmutableArray<string> PrereleaseSegments);
 
     /// <summary>Minimum version requirement for a tracked package.</summary>
     private sealed partial record VersionRequirement(string MinimumVersion, string Reason);

@@ -65,6 +65,14 @@ public sealed partial class Al0138UseExplicitMidpointRoundingTests
         """);
 
     [Fact]
+    public Task ShouldNotReportWhenBankersRoundingProvided() => VerifyAsync("""
+        using System;
+        public class C {
+            double M(double x) => Math.Round(x, MidpointRounding.ToEven);
+        }
+        """);
+
+    [Fact]
     public Task ShouldNotReportWhenAllArgumentsProvided() => VerifyAsync("""
         using System;
         public class C {

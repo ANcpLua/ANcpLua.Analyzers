@@ -45,6 +45,20 @@ public sealed partial class Al0007AnalyzerTests : AnalyzerTest<Al0007ToAl0009IXm
                     public void WriteXml(XmlWriter writer) { }
                 }
                 """)]
+    [InlineData("""
+                using System.Xml;
+                using System.Xml.Schema;
+                using System.Xml.Serialization;
+
+                public class C : IXmlSerializable {
+                    XmlSchema? IXmlSerializable.GetSchema() => null;
+
+                    public XmlSchema? GetSchema(string format) => new XmlSchema();
+
+                    public void ReadXml(XmlReader reader) { }
+                    public void WriteXml(XmlWriter writer) { }
+                }
+                """)]
     public Task ShouldNotReportWhenExplicitlyImplemented(string source) => VerifyAsync(source);
 }
 
@@ -99,6 +113,7 @@ public sealed partial class Al0008AnalyzerTests : AnalyzerTest<Al0007ToAl0009IXm
 
                 public class C : IXmlSerializable {
                     XmlSchema? IXmlSerializable.GetSchema() => null;
+                    public XmlSchema? GetSchema(string format) => new XmlSchema();
                     public void ReadXml(XmlReader reader) { }
                     public void WriteXml(XmlWriter writer) { }
                 }
@@ -133,9 +148,21 @@ public sealed partial class Al0009AnalyzerTests : AnalyzerTest<Al0007ToAl0009IXm
                     public void WriteXml(XmlWriter writer) { }
                 }
 
+                public class C2 : IXmlSerializable {
+                    XmlSchema? IXmlSerializable.GetSchema() => null;
+
+                    public XmlSchema? GetSchema(string format) => null;
+                    public void ReadXml(XmlReader reader) { }
+                    public void WriteXml(XmlWriter writer) { }
+                }
+
                 public class D {
                     void M(IXmlSerializable x) {
                         _ = {|AL0009:x.GetSchema()|};
+                    }
+
+                    void M2(C2 x) {
+                        _ = x.GetSchema("format");
                     }
                 }
                 """)]

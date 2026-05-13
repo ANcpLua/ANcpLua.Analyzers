@@ -33,6 +33,10 @@ public sealed partial class Al0048UseGuardNotNegativeCodeFixProvider
         Document document,
         IfStatementSyntax ifStatement,
         SyntaxNode root) {
+        if (!IsSingleThrowBody(ifStatement)) {
+            return Task.FromResult(document);
+        }
+
         // Extract the operand from the condition
         var operandExpression = ExtractOperand(ifStatement.Condition);
 
@@ -45,12 +49,20 @@ public sealed partial class Al0048UseGuardNotNegativeCodeFixProvider
                             SyntaxFactory.IdentifierName("NotNegative")),
                         SyntaxFactory.ArgumentList(
                             SyntaxFactory.SingletonSeparatedList(
-                                SyntaxFactory.Argument(operandExpression.WithoutTrivia())))))
+            SyntaxFactory.Argument(operandExpression.WithoutTrivia())))))
             .WithTriviaFrom(ifStatement);
 
         var newRoot = root.ReplaceNode(ifStatement, guardInvocation);
         return Task.FromResult(document.WithSyntaxRoot(newRoot));
     }
+
+    private static bool IsSingleThrowBody(IfStatementSyntax ifStatement) =>
+        ifStatement.Else is null &&
+        ifStatement.Statement switch {
+            ThrowStatementSyntax => true,
+            BlockSyntax block => block.Statements.Count is 1 && block.Statements[0] is ThrowStatementSyntax,
+            _ => false
+        };
 
     private static ExpressionSyntax ExtractOperand(ExpressionSyntax condition) {
         // Unwrap parentheses

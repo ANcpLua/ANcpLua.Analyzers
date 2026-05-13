@@ -53,6 +53,11 @@ public sealed partial class Al0027AvoidNewtonsoftJsonAnalyzer : AlAnalyzer {
             return;
         }
 
+        if (context.Operation.Parent is IArgumentOperation { Parent: IInvocationOperation invocation } &&
+            IsLegacyJsonType(invocation.TargetMethod.ContainingType)) {
+            return;
+        }
+
         if (IsLegacyJsonType(type)) {
             context.ReportDiagnostic(s_rule, context.Operation.Syntax.GetLocation(), type.Name);
         }

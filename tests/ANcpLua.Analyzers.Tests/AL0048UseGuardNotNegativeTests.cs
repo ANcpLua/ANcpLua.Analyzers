@@ -80,6 +80,33 @@ public sealed partial class Al0048UseGuardNotNegativeTests : AnalyzerTest<Al0048
         """);
 
     [Fact]
+    public Task ShouldNotReportForBlockStatementWithExtraStatements() => VerifyAsync("""
+        using System;
+        public class C {
+            void M(int x) {
+                if (x < 0) {
+                    throw new ArgumentOutOfRangeException(nameof(x));
+                    Console.WriteLine(x);
+                }
+            }
+        }
+        """);
+
+    [Fact]
+    public Task ShouldNotReportWhenElsePresent() => VerifyAsync("""
+        using System;
+        public class C {
+            void M(int x) {
+                if (x < 0) {
+                    throw new ArgumentOutOfRangeException(nameof(x));
+                } else {
+                    Console.WriteLine(x);
+                }
+            }
+        }
+        """);
+
+    [Fact]
     public Task ShouldReportForParenthesizedCondition() => VerifyAsync("""
         using System;
         public class C {

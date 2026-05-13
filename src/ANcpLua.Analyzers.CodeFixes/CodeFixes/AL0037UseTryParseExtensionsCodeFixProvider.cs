@@ -15,30 +15,6 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 [Shared]
 public sealed partial class Al0037UseTryParseExtensionsCodeFixProvider
     : AlCodeFixProvider<ConditionalExpressionSyntax> {
-    // Mapping from type name to extension method name
-    private static readonly Dictionary<string, string> s_typeToExtension = new(StringComparer.Ordinal) {
-        ["int"] = "TryParseInt32",
-        ["Int32"] = "TryParseInt32",
-        ["long"] = "TryParseInt64",
-        ["Int64"] = "TryParseInt64",
-        ["double"] = "TryParseDouble",
-        ["Double"] = "TryParseDouble",
-        ["decimal"] = "TryParseDecimal",
-        ["Decimal"] = "TryParseDecimal",
-        ["bool"] = "TryParseBool",
-        ["Boolean"] = "TryParseBool",
-        ["Guid"] = "TryParseGuid",
-        ["DateTime"] = "TryParseDateTime",
-        ["DateTimeOffset"] = "TryParseDateTimeOffset",
-        ["TimeSpan"] = "TryParseTimeSpan",
-        ["byte"] = "TryParseByte",
-        ["Byte"] = "TryParseByte",
-        ["short"] = "TryParseInt16",
-        ["Int16"] = "TryParseInt16",
-        ["float"] = "TryParseSingle",
-        ["Single"] = "TryParseSingle"
-    };
-
     /// <summary>Gets the diagnostic IDs this code fix can fix.</summary>
     public override ImmutableArray<string> FixableDiagnosticIds => [Al0037UseTryParseExtensionsAnalyzer.DiagnosticId];
 
@@ -68,7 +44,7 @@ public sealed partial class Al0037UseTryParseExtensionsCodeFixProvider
         }
 
         // Get the type and extension method name
-        var (stringArg, extensionName) = ExtractInfo(tryParseInvocation);
+        var (stringArg, extensionName) = ExtractInfo(conditional, tryParseInvocation);
         if (stringArg is null || extensionName is null) {
             return Task.FromResult(document);
         }
@@ -86,6 +62,7 @@ public sealed partial class Al0037UseTryParseExtensionsCodeFixProvider
     }
 
     private static (ExpressionSyntax? stringArg, string? extensionName) ExtractInfo(
+        ConditionalExpressionSyntax conditional,
         InvocationExpressionSyntax invocation) {
         // Pattern: Type.TryParse(stringArg, out var result)
         if (invocation.Expression is not MemberAccessExpressionSyntax {
@@ -94,14 +71,12 @@ public sealed partial class Al0037UseTryParseExtensionsCodeFixProvider
             return (null, null);
         }
 
-        // Get the type name
-        var typeName = memberAccess.Expression switch {
-            IdentifierNameSyntax id => id.Identifier.Text,
-            PredefinedTypeSyntax predefined => predefined.Keyword.Text,
-            _ => null
-        };
+        if (memberAccess.Expression is not { } receiverSyntax) {
+            return (null, null);
+        }
 
-        if (typeName is null || !s_typeToExtension.TryGetValue(typeName, out var extensionName)) {
+        if (GetTypeName(receiverSyntax) is not { } receiverTypeName ||
+            GetTryParseExtension(receiverTypeName) is not { } extensionName) {
             return (null, null);
         }
 
@@ -110,7 +85,74 @@ public sealed partial class Al0037UseTryParseExtensionsCodeFixProvider
             return (null, null);
         }
 
+        if (invocation.ArgumentList.Arguments.Count != 2) {
+            return (null, null);
+        }
+
+        if (invocation.ArgumentList.Arguments[0].Expression is null or AssignmentExpressionSyntax) {
+            return (null, null);
+        }
+
+        if (invocation.ArgumentList.Arguments[1].RefKindKeyword is not { RawKind: (int)SyntaxKind.OutKeyword }) {
+            return (null, null);
+        }
+
+        if (!TryGetOutVariableName(invocation.ArgumentList.Arguments[1].Expression, out var outVarName)) {
+            return (null, null);
+        }
+
+        var whenTrue = conditional.WhenTrue;
+        while (whenTrue is ParenthesizedExpressionSyntax trueParen) {
+            whenTrue = trueParen.Expression;
+        }
+
+        if (whenTrue is not IdentifierNameSyntax whenTrueVar ||
+            whenTrueVar.Identifier.Text != outVarName) {
+            return (null, null);
+        }
+
         var stringArg = invocation.ArgumentList.Arguments[0].Expression;
         return (stringArg, extensionName);
+    }
+
+    private static string? GetTypeName(ExpressionSyntax expression) =>
+        expression switch {
+            IdentifierNameSyntax id => id.Identifier.Text,
+            PredefinedTypeSyntax predefined => predefined.Keyword.Text,
+            QualifiedNameSyntax qualified => qualified.ToString(),
+            AliasQualifiedNameSyntax aliasQualified => aliasQualified.Name.ToString(),
+            MemberAccessExpressionSyntax memberAccess => memberAccess.ToString(),
+            _ => null
+        };
+
+    private static string? GetTryParseExtension(string typeName) =>
+        typeName switch {
+            "System.Int32" or "int" => "TryParseInt32",
+            "System.Int64" or "long" => "TryParseInt64",
+            "System.Double" or "double" => "TryParseDouble",
+            "System.Decimal" or "decimal" => "TryParseDecimal",
+            "System.Boolean" or "bool" => "TryParseBool",
+            "System.Guid" or "Guid" => "TryParseGuid",
+            "System.DateTime" or "DateTime" => "TryParseDateTime",
+            "System.DateTimeOffset" or "DateTimeOffset" => "TryParseDateTimeOffset",
+            "System.TimeSpan" or "TimeSpan" => "TryParseTimeSpan",
+            "System.Byte" or "byte" => "TryParseByte",
+            "System.Int16" or "short" => "TryParseInt16",
+            "System.Single" or "float" => "TryParseSingle",
+            _ => null
+        };
+
+    private static bool TryGetOutVariableName(ExpressionSyntax expression, out string variableName) {
+        switch (expression) {
+            case DeclarationExpressionSyntax { Designation: SingleVariableDesignationSyntax { Identifier.Text: var variable } }:
+                variableName = variable;
+                return true;
+            case IdentifierNameSyntax { Identifier.Text: var variable }:
+                variableName = variable;
+                return true;
+            default:
+                variableName = "";
+                return false;
+        }
     }
 }

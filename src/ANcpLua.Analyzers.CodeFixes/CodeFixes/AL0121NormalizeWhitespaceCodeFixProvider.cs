@@ -25,6 +25,10 @@ public sealed partial class Al0121NormalizeWhitespaceCodeFixProvider : CodeFixPr
                 continue;
             }
 
+            if (IsTextOutputInvocation(invocation)) {
+                continue;
+            }
+
             context.RegisterCodeFix(
                 CodeAction.Create(
                     CodeFixResources.AL0121CodeFixTitle,
@@ -48,4 +52,40 @@ public sealed partial class Al0121NormalizeWhitespaceCodeFixProvider : CodeFixPr
 
         return Task.FromResult(document);
     }
+
+    private static bool IsTextOutputInvocation(InvocationExpressionSyntax invocation) {
+        if (invocation.Parent is not InvocationExpressionSyntax parentInvocation) {
+            return false;
+        }
+
+        if (parentInvocation.Expression is not MemberAccessExpressionSyntax memberAccess) {
+            return false;
+        }
+
+        if (!IsTextOutputMethod(memberAccess.Name.Identifier.ValueText)) {
+            return false;
+        }
+
+        var targetExpression = SkipOutputInvocationWrappers(memberAccess.Expression);
+        return targetExpression == invocation;
+    }
+
+    private static ExpressionSyntax SkipOutputInvocationWrappers(ExpressionSyntax expression) {
+        while (true) {
+            switch (expression) {
+                case ParenthesizedExpressionSyntax parenthesized:
+                    expression = parenthesized.Expression;
+                    continue;
+                case CastExpressionSyntax castExpression:
+                    expression = castExpression.Expression;
+                    continue;
+                default:
+                    return expression;
+            }
+        }
+    }
+
+    private static bool IsTextOutputMethod(string methodName) =>
+        string.Equals(methodName, "ToFullString", StringComparison.Ordinal) ||
+        string.Equals(methodName, "ToString", StringComparison.Ordinal);
 }

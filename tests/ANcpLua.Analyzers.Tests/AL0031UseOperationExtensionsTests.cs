@@ -11,6 +11,11 @@ public sealed partial class Al0031UseOperationExtensionsTests : AnalyzerTest<Al0
                                           namespace Microsoft.CodeAnalysis {
                                               public interface IMethodSymbol {
                                                   string Name { get; }
+                                                  INamedTypeSymbol? ContainingType { get; }
+                                              }
+                                              public interface INamedTypeSymbol {
+                                                  string Name { get; }
+                                                  string MetadataName { get; }
                                               }
                                           }
                                           namespace Microsoft.CodeAnalysis.Operations {
@@ -28,25 +33,45 @@ public sealed partial class Al0031UseOperationExtensionsTests : AnalyzerTest<Al0
                                           """;
 
     [Fact]
-    public Task ShouldReportTargetMethodNameEquals() =>
+    public Task ShouldNotReportTargetMethodNameEqualsWithoutContainingTypeCheck() =>
         VerifyAsync($$"""
                       {{RoslynPolyfill}}
 
                       public class C {
                           bool M(Microsoft.CodeAnalysis.Operations.IInvocationOperation invocation) {
-                              return [|invocation.TargetMethod.Name == "ToString"|];
+                              return invocation.TargetMethod.Name == "ToString";
                           }
                       }
                       """);
 
     [Fact]
-    public Task ShouldReportTargetMethodNameNotEquals() =>
+    public Task ShouldReportTargetMethodNameEqualsWithContainingTypeCheck() =>
         VerifyAsync($$"""
                       {{RoslynPolyfill}}
 
                       public class C {
                           bool M(Microsoft.CodeAnalysis.Operations.IInvocationOperation invocation) {
-                              return [|invocation.TargetMethod.Name != "Dispose"|];
+                              if (invocation.TargetMethod.ContainingType.Name == "String" &&
+                                  [|invocation.TargetMethod.Name == "ToString"|]) {
+                                  return true;
+                              }
+                              return false;
+                          }
+                      }
+                      """);
+
+    [Fact]
+    public Task ShouldReportTargetMethodNameNotEqualsWithContainingTypeCheck() =>
+        VerifyAsync($$"""
+                      {{RoslynPolyfill}}
+
+                      public class C {
+                          bool M(Microsoft.CodeAnalysis.Operations.IInvocationOperation invocation) {
+                              if (invocation.TargetMethod.ContainingType.MetadataName == "String" &&
+                                  [|invocation.TargetMethod.Name != "Dispose"|]) {
+                                  return true;
+                              }
+                              return false;
                           }
                       }
                       """);
@@ -73,6 +98,18 @@ public sealed partial class Al0031UseOperationExtensionsTests : AnalyzerTest<Al0
                               if ([|operation.ConstantValue.HasValue && operation.ConstantValue.Value is int value|]) {
                                   System.Console.WriteLine(value);
                               }
+                          }
+                      }
+                      """);
+
+    [Fact]
+    public Task ShouldNotReportConstantValueAccessFromDifferentOperations() =>
+        VerifyAsync($$"""
+                      {{RoslynPolyfill}}
+
+                      public class C {
+                          bool M(Microsoft.CodeAnalysis.Operations.IOperation left, Microsoft.CodeAnalysis.Operations.IOperation right) {
+                              return left.ConstantValue.HasValue && right.ConstantValue.Value is int;
                           }
                       }
                       """);
