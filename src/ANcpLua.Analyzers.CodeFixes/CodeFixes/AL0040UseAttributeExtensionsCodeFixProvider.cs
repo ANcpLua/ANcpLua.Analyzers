@@ -7,7 +7,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 /// </summary>
 /// <remarks>
 ///     <list type="bullet">
-///         <item><c>attr.ConstructorArguments[0].Value</c> → <c>attr.GetConstructorArgument&lt;object&gt;(0)</c></item>
+///         <item><c>(T)attr.ConstructorArguments[0].Value</c> to <c>(T)attr.GetConstructorArgument&lt;T&gt;(0)</c></item>
 ///     </list>
 /// </remarks>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al0040UseAttributeExtensionsCodeFixProvider))]
@@ -27,11 +27,12 @@ public sealed partial class Al0040UseAttributeExtensionsCodeFixProvider : CodeFi
         var node = root.FindNode(diagnostic.Location.SourceSpan);
 
         // Find the element access pattern: attr.ConstructorArguments[i] or attr.ConstructorArguments[i].Value
-        if (TryExtractConstructorArgumentsPattern(node, out var attrExpr, out var indexExpr)) {
+        if (TryExtractConstructorArgumentsPattern(node, out var attrExpr, out var indexExpr) &&
+            TryInferTypeArgument(node, out var typeArgument)) {
             context.RegisterCodeFix(
                 CodeAction.Create(
                     CodeFixResources.AL0040CodeFixTitle,
-                    _ => ConvertToGetConstructorArgument(context.Document, root, node, attrExpr, indexExpr),
+                    _ => ConvertToGetConstructorArgument(context.Document, root, node, attrExpr, indexExpr, typeArgument),
                     nameof(Al0040UseAttributeExtensionsCodeFixProvider)),
                 diagnostic);
         }
@@ -45,7 +46,7 @@ public sealed partial class Al0040UseAttributeExtensionsCodeFixProvider : CodeFi
         indexExpr = null;
 
         switch (node) {
-            // Pattern 1: attr.ConstructorArguments[i].Value
+            // Pattern: attr.ConstructorArguments[i].Value
             case MemberAccessExpressionSyntax {
                 Name.Identifier.Text: "Value", Expression: ElementAccessExpressionSyntax {
                     Expression: MemberAccessExpressionSyntax {
@@ -56,18 +57,48 @@ public sealed partial class Al0040UseAttributeExtensionsCodeFixProvider : CodeFi
                 attrExpr = constructorArgs1.Expression;
                 indexExpr = elementAccess1.ArgumentList.Arguments.FirstOrDefault()?.Expression;
                 return indexExpr is not null;
-            // Pattern 2: attr.ConstructorArguments[i] (without .Value)
-            case ElementAccessExpressionSyntax {
-                Expression: MemberAccessExpressionSyntax {
-                    Name.Identifier.Text: "ConstructorArguments"
-                } constructorArgs2
-            } elementAccess2:
-                attrExpr = constructorArgs2.Expression;
-                indexExpr = elementAccess2.ArgumentList.Arguments.FirstOrDefault()?.Expression;
-                return indexExpr is not null;
             default:
                 return false;
         }
+    }
+
+    private static bool TryInferTypeArgument(
+        SyntaxNode node,
+        [NotNullWhen(true)] out TypeSyntax? typeArgument) {
+        typeArgument = null;
+
+        if (node is not ExpressionSyntax expression) {
+            return false;
+        }
+
+        var current = expression;
+        while (current.Parent is ParenthesizedExpressionSyntax parenthesized &&
+               ReferenceEquals(parenthesized.Expression, current)) {
+            current = parenthesized;
+        }
+
+        switch (current.Parent) {
+            case CastExpressionSyntax cast when ReferenceEquals(cast.Expression, current):
+                typeArgument = cast.Type.WithoutTrivia();
+                return !IsObjectType(typeArgument);
+            case BinaryExpressionSyntax asExpression
+                when asExpression.IsKind(SyntaxKind.AsExpression) &&
+                     ReferenceEquals(asExpression.Left, current):
+                typeArgument = SyntaxFactory.ParseTypeName(asExpression.Right.ToString());
+                return !IsObjectType(typeArgument);
+            default:
+                return false;
+        }
+    }
+
+    private static bool IsObjectType(TypeSyntax type) {
+        var candidate = type is NullableTypeSyntax nullable
+            ? nullable.ElementType
+            : type;
+        var normalized = candidate.ToString().Replace(" ", string.Empty);
+
+        return candidate is PredefinedTypeSyntax { Keyword.RawKind: (int)SyntaxKind.ObjectKeyword } ||
+               normalized is "Object" or "System.Object" or "global::System.Object";
     }
 
     private static Task<Document> ConvertToGetConstructorArgument(
@@ -75,9 +106,9 @@ public sealed partial class Al0040UseAttributeExtensionsCodeFixProvider : CodeFi
         SyntaxNode root,
         SyntaxNode nodeToReplace,
         ExpressionSyntax attrExpr,
-        ExpressionSyntax indexExpr) {
-        // Create: attr.GetConstructorArgument<object>(index)
-        // Note: We use <object> as we can't infer the type without semantic analysis
+        ExpressionSyntax indexExpr,
+        TypeSyntax typeArgument) {
+        // Create: attr.GetConstructorArgument<T>(index)
         var newExpression = SyntaxFactory.InvocationExpression(
                 SyntaxFactory.MemberAccessExpression(
                     SyntaxKind.SimpleMemberAccessExpression,
@@ -87,8 +118,7 @@ public sealed partial class Al0040UseAttributeExtensionsCodeFixProvider : CodeFi
                         .WithTypeArgumentList(
                             SyntaxFactory.TypeArgumentList(
                                 SyntaxFactory.SingletonSeparatedList<TypeSyntax>(
-                                    SyntaxFactory.PredefinedType(
-                                        SyntaxFactory.Token(SyntaxKind.ObjectKeyword)))))),
+                                    typeArgument.WithoutTrivia())))),
                 SyntaxFactory.ArgumentList(
                     SyntaxFactory.SingletonSeparatedList(
                         SyntaxFactory.Argument(indexExpr.WithoutTrivia()))))

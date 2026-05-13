@@ -46,6 +46,7 @@ public sealed partial class Al0015NormalizeNullGuardStyleTests : AnalyzerTest<Al
                                                                public class W { public object? Value { get; set; } }
                                                                public class C { void M(W? obj) { if (obj.Value is null) throw new ArgumentNullException(nameof(obj)); } }
                                                                """);
+
 }
 
 /// <summary>
@@ -694,5 +695,27 @@ public sealed partial class Al0015EdgeCasesTests : CodeFixTestWithEditorConfig<A
                     "ancplua_nullguard_style", "bcl"
                 }
             }, null, false);
+    }
+
+    [Fact]
+    public Task ShouldNotReportPortableFormForInParameter() {
+        const string Source = """
+                              using System;
+
+                              public class TestClass
+                              {
+                                  public void TestMethod(in string? value)
+                                  {
+                                      if (value is null) throw new ArgumentNullException(nameof(value));
+                                  }
+                              }
+                              """;
+
+        return VerifyAsync(Source, Source,
+            new Dictionary<string, string> {
+                {
+                    "ancplua_nullguard_style", "portable"
+                }
+            });
     }
 }

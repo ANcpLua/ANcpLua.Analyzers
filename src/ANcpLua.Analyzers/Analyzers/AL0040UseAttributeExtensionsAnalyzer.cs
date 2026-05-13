@@ -40,15 +40,14 @@ public sealed partial class Al0040UseAttributeExtensionsAnalyzer : AlAnalyzer {
                     case IPropertyReferenceOperation { Instance: IArrayElementReferenceOperation arrayAccess }:
                         AnalyzeConstructorArgumentsAccess(context, propRef, arrayAccess);
                         break;
+                    case IPropertyReferenceOperation indexerAccess:
+                        AnalyzeConstructorArgumentsIndexerAccess(context, propRef, indexerAccess);
+                        break;
                     case IArrayElementReferenceOperation directArrayAccess:
                         AnalyzeConstructorArgumentsAccess(context, propRef, directArrayAccess);
                         break;
                 }
 
-                break;
-
-            case "ConstructorArguments" when context.Operation.Parent is IArrayElementReferenceOperation parent:
-                AnalyzeConstructorArgumentsIndexing(context, propRef, parent);
                 break;
         }
     }
@@ -72,23 +71,23 @@ public sealed partial class Al0040UseAttributeExtensionsAnalyzer : AlAnalyzer {
         context.ReportDiagnostic(Diagnostic.Create(s_rule, valueAccess.Syntax.GetLocation(), suggestion));
     }
 
-    private static void AnalyzeConstructorArgumentsIndexing(
+    private static void AnalyzeConstructorArgumentsIndexerAccess(
         OperationAnalysisContext context,
-        IMemberReferenceOperation propRef,
-        IOperation arrayElementRef) {
-        if (!IsAttributeDataType(propRef.Instance?.Type)) {
+        IOperation valueAccess,
+        IPropertyReferenceOperation indexerAccess) {
+        if (indexerAccess.Instance is not IPropertyReferenceOperation { Property.Name: "ConstructorArguments" } arrayProp) {
             return;
         }
 
-        if (arrayElementRef.Parent is IPropertyReferenceOperation { Property.Name: "Value" }) {
+        if (!IsAttributeDataType(arrayProp.Instance?.Type)) {
             return;
         }
 
-        var indexStr = arrayElementRef is IArrayElementReferenceOperation arr ? GetIndexValue(arr) : "0";
-        var attrName = propRef.Instance.GetOperandName("attr");
+        var indexStr = GetIndexValue(indexerAccess);
+        var attrName = arrayProp.Instance.GetOperandName("attr");
         var suggestion = $"{attrName}.GetConstructorArgument<T>({indexStr})";
 
-        context.ReportDiagnostic(Diagnostic.Create(s_rule, arrayElementRef.Syntax.GetLocation(), suggestion));
+        context.ReportDiagnostic(Diagnostic.Create(s_rule, valueAccess.Syntax.GetLocation(), suggestion));
     }
 
     private static bool IsTypedConstantType(ITypeSymbol? type) {
@@ -109,6 +108,20 @@ public sealed partial class Al0040UseAttributeExtensionsAnalyzer : AlAnalyzer {
         }
 
         var index = arrayAccess.Indices[0].UnwrapAllConversions();
+
+        if (index is ILiteralOperation { ConstantValue.HasValue: true } literal) {
+            return literal.ConstantValue.Value?.ToString() ?? "0";
+        }
+
+        return index.GetOperandName("0");
+    }
+
+    private static string GetIndexValue(IPropertyReferenceOperation indexerAccess) {
+        if (indexerAccess.Arguments.Length is 0) {
+            return "0";
+        }
+
+        var index = indexerAccess.Arguments[0].Value.UnwrapAllConversions();
 
         if (index is ILiteralOperation { ConstantValue.HasValue: true } literal) {
             return literal.ConstantValue.Value?.ToString() ?? "0";

@@ -74,9 +74,27 @@ public sealed partial class Al0139ToAl0140UseImplicitOrExplicitTypeAnalyzer : Al
     private static void AnalyzeForEachStatement(SyntaxNodeAnalysisContext context) {
         var foreachStatement = (ForEachStatementSyntax)context.Node;
 
-        if (foreachStatement.Type.IsVar) {
-            context.ReportDiagnostic(Diagnostic.Create(s_ruleAl0140, foreachStatement.Type.GetLocation()));
+        if (!foreachStatement.Type.IsVar) {
+            return;
         }
+
+        if (context.SemanticModel.GetForEachStatementInfo(foreachStatement).ElementType is not { } elementType) {
+            return;
+        }
+
+        if (elementType is ITypeSymbol { TypeKind: TypeKind.Error }) {
+            return;
+        }
+
+        if (elementType is INamedTypeSymbol { IsAnonymousType: true }) {
+            return;
+        }
+
+        if (context.CancellationToken.IsCancellationRequested) {
+            return;
+        }
+
+        context.ReportDiagnostic(Diagnostic.Create(s_ruleAl0140, foreachStatement.Type.GetLocation()));
     }
 
     private static bool ShouldAnalyze(

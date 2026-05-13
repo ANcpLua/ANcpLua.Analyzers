@@ -7,16 +7,15 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// </summary>
 /// <remarks>
 ///     <list type="bullet">
-///         <item><c>Math.Round(x)</c> → <c>Math.Round(x, MidpointRounding.AwayFromZero)</c></item>
-///         <item><c>Math.Round(x, digits)</c> → <c>Math.Round(x, digits, MidpointRounding.AwayFromZero)</c></item>
-///         <item><c>MathF.Round(x)</c> → <c>MathF.Round(x, MidpointRounding.AwayFromZero)</c></item>
-///         <item><c>MathF.Round(x, digits)</c> → <c>MathF.Round(x, digits, MidpointRounding.AwayFromZero)</c></item>
+    ///         <item><c>Math.Round(x)</c> -> <c>Math.Round(x, MidpointRounding.ToEven)</c></item>
+    ///         <item><c>Math.Round(x, digits)</c> -> <c>Math.Round(x, digits, MidpointRounding.ToEven)</c></item>
+    ///         <item><c>MathF.Round(x)</c> -> <c>MathF.Round(x, MidpointRounding.ToEven)</c></item>
+    ///         <item><c>MathF.Round(x, digits)</c> -> <c>MathF.Round(x, digits, MidpointRounding.ToEven)</c></item>
 ///     </list>
 ///     <para>
-///         Without an explicit MidpointRounding mode, .NET defaults to <c>ToEven</c> (banker's
-///         rounding) — <c>0.5</c> rounds to <c>0</c> and <c>1.5</c> rounds to <c>2</c>. Most callers
-///         expect <c>AwayFromZero</c>. Banned in qyl-aligned projects via BannedSymbols.txt; this
-///         analyzer carries the matching auto-fix.
+    ///         Without an explicit MidpointRounding mode, .NET defaults to <c>ToEven</c> (banker's
+    ///         rounding). The auto-fix preserves that behavior while making it explicit; callers can
+    ///         choose <c>AwayFromZero</c> or another mode when the domain requires it.
 ///     </para>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]

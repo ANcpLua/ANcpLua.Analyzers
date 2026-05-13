@@ -45,11 +45,12 @@ public sealed partial class Al0037UseTryParseExtensionsAnalyzer : AlAnalyzer {
 
         var method = invocation.TargetMethod;
 
-        if (method.Name != "TryParse" || !method.IsStatic || method.Parameters.Length < 2) {
+        if (method.Name is not "TryParse" || !method.IsStatic || method.Parameters.Length != 2) {
             return;
         }
 
-        if (method.ContainingType is not { } containingType) {
+        if (!IsStringInputTryParse(method) ||
+            method.ContainingType is not { } containingType) {
             return;
         }
 
@@ -57,7 +58,11 @@ public sealed partial class Al0037UseTryParseExtensionsAnalyzer : AlAnalyzer {
             return;
         }
 
-        if (!IsTryParseResultPattern(conditional, invocation)) {
+        if (TryGetOutArgumentName(invocation) is not { } outVarName) {
+            return;
+        }
+
+        if (!IsTryParseResultPattern(conditional, invocation, outVarName)) {
             return;
         }
 
@@ -66,11 +71,7 @@ public sealed partial class Al0037UseTryParseExtensionsAnalyzer : AlAnalyzer {
             $"{stringArg}.{extensionName}()"));
     }
 
-    private static bool IsTryParseResultPattern(IConditionalOperation conditional, IInvocationOperation tryParse) {
-        if (tryParse.Arguments.Length < 2) {
-            return false;
-        }
-
+    private static bool IsTryParseResultPattern(IConditionalOperation conditional, IInvocationOperation tryParse, string outVarName) {
         if (tryParse.Arguments[1].Parameter?.RefKind != RefKind.Out) {
             return false;
         }
@@ -79,7 +80,11 @@ public sealed partial class Al0037UseTryParseExtensionsAnalyzer : AlAnalyzer {
             return false;
         }
 
-        if (whenTrueOp.UnwrapAllConversions() is not ILocalReferenceOperation) {
+        if (whenTrueOp.UnwrapAllConversions() is not ILocalReferenceOperation { Local.Name: var name }) {
+            return false;
+        }
+
+        if (name != outVarName) {
             return false;
         }
 
@@ -93,6 +98,28 @@ public sealed partial class Al0037UseTryParseExtensionsAnalyzer : AlAnalyzer {
             IConversionOperation { Operand: IDefaultValueOperation } => true,
             // Non-null literals (0, false, etc.) would change semantics
             _ => false
+        };
+    }
+
+    private static bool IsStringInputTryParse(IMethodSymbol method) {
+        if (method.Parameters.Length is not 2) {
+            return false;
+        }
+
+        return method.Parameters[0].Type.SpecialType == SpecialType.System_String;
+    }
+
+    private static string? TryGetOutArgumentName(IInvocationOperation invocation) {
+        if (invocation.Arguments.Length != 2 ||
+            invocation.Arguments[1].Syntax is not ArgumentSyntax { RefKindKeyword: { } outKeyword, Expression: var outExpression } ||
+            outKeyword.Kind() is not SyntaxKind.OutKeyword) {
+            return null;
+        }
+
+        return outExpression switch {
+            DeclarationExpressionSyntax { Designation: SingleVariableDesignationSyntax { Identifier.Text: var id } } => id,
+            IdentifierNameSyntax { Identifier.Text: var id } => id,
+            _ => null
         };
     }
 

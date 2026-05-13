@@ -38,7 +38,11 @@ public sealed partial class Al0051UseGuardDefinedEnumAnalyzer : AlAnalyzer {
             return;
         }
 
-        if (!ContainsArgumentExceptionThrow(conditional.WhenTrue)) {
+        if (conditional.WhenFalse is not null) {
+            return;
+        }
+
+        if (!HasSingleArgumentExceptionThrow(conditional.WhenTrue)) {
             return;
         }
 
@@ -84,10 +88,10 @@ public sealed partial class Al0051UseGuardDefinedEnumAnalyzer : AlAnalyzer {
         return valueName is not null ? (true, valueName) : (false, null);
     }
 
-    private static bool ContainsArgumentExceptionThrow(IOperation? operation) =>
+    private static bool HasSingleArgumentExceptionThrow(IOperation? operation) =>
         operation switch {
             null => false,
-            IBlockOperation block => block.Operations.Any(IsArgumentExceptionThrow),
+            IBlockOperation block => block.Operations.Length == 1 && IsArgumentExceptionThrow(block.Operations[0]),
             _ => IsArgumentExceptionThrow(operation)
         };
 

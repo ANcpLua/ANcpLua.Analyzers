@@ -47,6 +47,10 @@ public sealed partial class Al0121NormalizeWhitespaceAnalyzer : AlAnalyzer {
             return;
         }
 
+        if (IsTextOutputSink(invocation)) {
+            return;
+        }
+
         // Narrow the span to just NormalizeWhitespace() rather than the full receiver chain
         if (invocation.Syntax is InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax memberAccess } invocationSyntax) {
             var span = Microsoft.CodeAnalysis.Text.TextSpan.FromBounds(memberAccess.Name.SpanStart, invocationSyntax.Span.End);
@@ -56,4 +60,40 @@ public sealed partial class Al0121NormalizeWhitespaceAnalyzer : AlAnalyzer {
             context.ReportDiagnostic(s_rule, invocation.Syntax.GetLocation());
         }
     }
+
+    private static bool IsTextOutputSink(IInvocationOperation invocation) {
+        if (invocation.Parent is not IInvocationOperation parentInvocation) {
+            return false;
+        }
+
+        if (!IsTextOutputMethod(parentInvocation.TargetMethod.Name)) {
+            return false;
+        }
+
+        var instance = parentInvocation.Instance;
+
+        while (instance is not null) {
+            if (ReferenceEquals(instance, invocation)) {
+                return true;
+            }
+
+            if (instance is IConversionOperation conversion) {
+                instance = conversion.Operand;
+                continue;
+            }
+
+            if (instance is IParenthesizedOperation parenthesized) {
+                instance = parenthesized.Operand;
+                continue;
+            }
+
+            return false;
+        }
+
+        return false;
+    }
+
+    private static bool IsTextOutputMethod(string methodName) =>
+        string.Equals(methodName, "ToFullString", StringComparison.Ordinal) ||
+        string.Equals(methodName, "ToString", StringComparison.Ordinal);
 }

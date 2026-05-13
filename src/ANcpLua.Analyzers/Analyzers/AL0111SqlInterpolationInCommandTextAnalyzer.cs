@@ -38,7 +38,13 @@ public sealed partial class Al0111SqlInterpolationInCommandTextAnalyzer : AlAnal
         var assignment = (AssignmentExpressionSyntax)context.Node;
 
         // Left side must be a member access ending in CommandText
-        if (assignment.Left is not MemberAccessExpressionSyntax { Name.Identifier.Text: "CommandText" }) {
+        if (assignment.Left is not MemberAccessExpressionSyntax memberAccess ||
+            !string.Equals(memberAccess.Name.Identifier.Text, "CommandText", StringComparison.Ordinal)) {
+            return;
+        }
+
+        var propertySymbol = context.SemanticModel.GetSymbolInfo(memberAccess).Symbol as IPropertySymbol;
+        if (propertySymbol is null || !IsDbCommandLike(propertySymbol.ContainingType)) {
             return;
         }
 
@@ -47,6 +53,54 @@ public sealed partial class Al0111SqlInterpolationInCommandTextAnalyzer : AlAnal
             return;
         }
 
+        // Only report when at least one interpolation hole is non-constant.
+        if (!ContainsNonConstantHole(interpolatedString, context.SemanticModel)) {
+            return;
+        }
+
         context.ReportDiagnostic(s_rule, interpolatedString.GetLocation());
+    }
+
+    private static bool IsDbCommandLike(ITypeSymbol containingType) {
+        for (var current = containingType; current is not null; current = current.BaseType) {
+            if (IsDbCommandNamedType(current) || ImplementsDbCommandInterface(current)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool IsDbCommandNamedType(ITypeSymbol type) =>
+        type is INamedTypeSymbol { Name: "DbCommand", ContainingNamespace.Name: "Common", ContainingNamespace.ContainingNamespace.Name: "Data" }
+            && type.ContainingNamespace.ContainingNamespace.ContainingNamespace?.Name is "System";
+
+    private static bool ImplementsDbCommandInterface(ITypeSymbol type) {
+        foreach (var interfaceType in type.AllInterfaces) {
+            if (interfaceType is INamedTypeSymbol { Name: "IDbCommand", ContainingNamespace.Name: "Data" } &&
+                interfaceType.ContainingNamespace.ContainingNamespace?.Name is "System") {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool ContainsNonConstantHole(InterpolatedStringExpressionSyntax interpolatedString, SemanticModel semanticModel) {
+        foreach (var content in interpolatedString.Contents) {
+            if (content is not InterpolationSyntax interpolation) {
+                continue;
+            }
+
+            if (interpolation.Expression is null) {
+                continue;
+            }
+
+            if (!semanticModel.GetConstantValue(interpolation.Expression).HasValue) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

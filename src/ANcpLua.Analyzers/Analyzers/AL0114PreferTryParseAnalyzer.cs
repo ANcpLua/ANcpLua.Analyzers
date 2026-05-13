@@ -51,7 +51,8 @@ public sealed partial class Al0114PreferTryParseAnalyzer : AlAnalyzer {
             return;
         }
 
-        if (IsInsideTryCatchForFormatException(invocation.Syntax)) {
+        if (invocation.SemanticModel is { } semanticModel &&
+            IsInsideTryCatchForFormatException(semanticModel, context.Compilation, invocation.Syntax)) {
             return;
         }
 
@@ -80,7 +81,13 @@ public sealed partial class Al0114PreferTryParseAnalyzer : AlAnalyzer {
             "System.Guid" or
             "System.Enum";
 
-    private static bool IsInsideTryCatchForFormatException(SyntaxNode node) {
+    private static bool IsInsideTryCatchForFormatException(
+        SemanticModel semanticModel,
+        Compilation compilation,
+        SyntaxNode node) {
+        var formatExceptionType = compilation.GetTypeByMetadataName("System.FormatException");
+        var exceptionType = compilation.GetTypeByMetadataName("System.Exception");
+
         for (var current = node.Parent; current is not null; current = current.Parent) {
             if (current is not TryStatementSyntax tryStatement) {
                 continue;
@@ -92,10 +99,27 @@ public sealed partial class Al0114PreferTryParseAnalyzer : AlAnalyzer {
                     return true;
                 }
 
-                var caughtTypeName = catchClause.Declaration.Type.ToString();
-                if (caughtTypeName is "FormatException" or "System.FormatException" or "Exception" or "System.Exception") {
+                if (semanticModel.GetTypeInfo(catchClause.Declaration.Type).Type is not { } caughtType) {
+                    continue;
+                }
+
+                if (IsExceptionOrDerived(caughtType, formatExceptionType) || IsExceptionOrDerived(caughtType, exceptionType)) {
                     return true;
                 }
+            }
+        }
+
+        return false;
+    }
+
+    private static bool IsExceptionOrDerived(ITypeSymbol caughtType, INamedTypeSymbol? knownType) {
+        if (knownType is null) {
+            return false;
+        }
+
+        for (var type = caughtType; type is not null; type = type.BaseType) {
+            if (SymbolEqualityComparer.Default.Equals(type, knownType)) {
+                return true;
             }
         }
 

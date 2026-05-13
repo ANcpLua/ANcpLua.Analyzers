@@ -222,6 +222,6 @@
     </data>
     <!-- AL0138 Code Fix Title -->
     <data name="AL0138CodeFixTitle" xml:space="preserve">
-        <value>Add MidpointRounding.AwayFromZero</value>
+        <value>Add MidpointRounding.ToEven</value>
     </data>
 </root>

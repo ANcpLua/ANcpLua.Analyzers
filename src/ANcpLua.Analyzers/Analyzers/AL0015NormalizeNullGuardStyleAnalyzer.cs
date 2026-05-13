@@ -65,7 +65,7 @@ public sealed partial class Al0015NormalizeNullGuardStyleAnalyzer : AlAnalyzer {
         bool isMultiTargetGlobal) {
         var ifStatement = (IfStatementSyntax)context.Node;
 
-        if (!TryParseNullCheck(ifStatement.Condition, out var identifier)) {
+        if (!TryParseNullCheck(ifStatement.Condition, out var identifierNode)) {
             return;
         }
 
@@ -73,7 +73,7 @@ public sealed partial class Al0015NormalizeNullGuardStyleAnalyzer : AlAnalyzer {
             return;
         }
 
-        if (!IsArgumentNullExceptionThrow(throwStmt, context.SemanticModel, identifier, out var typeName)) {
+        if (!IsArgumentNullExceptionThrow(throwStmt, context.SemanticModel, identifierNode.Identifier.Text, out var typeName)) {
             return;
         }
 
@@ -86,9 +86,12 @@ public sealed partial class Al0015NormalizeNullGuardStyleAnalyzer : AlAnalyzer {
         var configStyle = GetConfigValue(config, global, "ancplua_nullguard_style", "auto").ToUpperInvariant();
 
         var targetStyle = ComputeTargetStyle(hasThrowHelper, hasThrowIfNullBcl, isMultiTarget, configStyle);
+        if (targetStyle == "portable" && !CanAssignToIdentifier(context.SemanticModel, identifierNode)) {
+            return;
+        }
 
         var properties = ImmutableDictionary.CreateBuilder<string, string?>();
-        properties.Add(PropertyIdentifier, identifier);
+        properties.Add(PropertyIdentifier, identifierNode.Identifier.Text);
         properties.Add(PropertyTypeName, typeName);
         properties.Add(PropertyStyle, targetStyle);
 
@@ -119,8 +122,10 @@ public sealed partial class Al0015NormalizeNullGuardStyleAnalyzer : AlAnalyzer {
         string defaultValue) =>
         config.TryGetValue(key, out var v) ? v : global.TryGetValue(key, out v) ? v : defaultValue;
 
-    private static bool TryParseNullCheck(ExpressionSyntax condition, out string identifier) {
-        identifier = "";
+    private static bool TryParseNullCheck(
+        ExpressionSyntax condition,
+        [NotNullWhen(true)] out IdentifierNameSyntax? identifier) {
+        identifier = null;
 
         switch (condition) {
             case IsPatternExpressionSyntax {
@@ -128,18 +133,18 @@ public sealed partial class Al0015NormalizeNullGuardStyleAnalyzer : AlAnalyzer {
             } p
                 when l.IsKind(SyntaxKind.NullLiteralExpression)
                      && p.Expression is IdentifierNameSyntax id:
-                identifier = id.Identifier.Text;
+                identifier = id;
                 return true;
 
             case BinaryExpressionSyntax { Left: var left, Right: var right } bin
                 when bin.IsKind(SyntaxKind.EqualsExpression): {
                 if (right.IsKind(SyntaxKind.NullLiteralExpression) && left is IdentifierNameSyntax lId) {
-                    identifier = lId.Identifier.Text;
+                    identifier = lId;
                     return true;
                 }
 
                 if (left.IsKind(SyntaxKind.NullLiteralExpression) && right is IdentifierNameSyntax rId) {
-                    identifier = rId.Identifier.Text;
+                    identifier = rId;
                     return true;
                 }
 
@@ -194,6 +199,18 @@ public sealed partial class Al0015NormalizeNullGuardStyleAnalyzer : AlAnalyzer {
             LiteralExpressionSyntax lit when lit.IsKind(SyntaxKind.StringLiteralExpression) =>
                 lit.Token.ValueText == targetParam,
             _ => false
+        };
+    }
+
+    private static bool CanAssignToIdentifier(SemanticModel model, IdentifierNameSyntax identifier) {
+        var symbol = model.GetSymbolInfo(identifier).Symbol;
+
+        return symbol switch {
+            IParameterSymbol parameter => parameter.RefKind != RefKind.In,
+            ILocalSymbol local => !local.IsConst,
+            IFieldSymbol field => !field.IsReadOnly && !field.IsConst,
+            IPropertySymbol property => property.SetMethod is not null,
+            _ => true
         };
     }
 }

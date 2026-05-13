@@ -7,9 +7,15 @@ namespace ANcpLua.Analyzers.Tests;
 /// </summary>
 public sealed partial class Al0111SqlInterpolationInCommandTextTests : AnalyzerTestBase {
     private const string DbCommandStub = """
-                                         namespace System.Data {
+                                         namespace System.Data.Common {
                                              public abstract class DbCommand {
                                                  public string CommandText { get; set; }
+                                             }
+                                         }
+
+                                         namespace System.Data {
+                                             public interface IDbCommand {
+                                                 string CommandText { get; set; }
                                              }
                                          }
                                          """;
@@ -20,7 +26,7 @@ public sealed partial class Al0111SqlInterpolationInCommandTextTests : AnalyzerT
                       {{DbCommandStub}}
 
                       public class C {
-                          public void M(System.Data.DbCommand cmd, string table) {
+                          public void M(System.Data.Common.DbCommand cmd, string table) {
                               cmd.CommandText = [|$"SELECT * FROM {table}"|];
                           }
                       }
@@ -32,7 +38,7 @@ public sealed partial class Al0111SqlInterpolationInCommandTextTests : AnalyzerT
                       {{DbCommandStub}}
 
                       public class C {
-                          public void M(System.Data.DbCommand cmd, string value) {
+                          public void M(System.Data.Common.DbCommand cmd, string value) {
                               cmd.CommandText = [|$"SELECT * FROM users WHERE name = '{value}'"|];
                           }
                       }
@@ -44,7 +50,7 @@ public sealed partial class Al0111SqlInterpolationInCommandTextTests : AnalyzerT
                       {{DbCommandStub}}
 
                       public class C {
-                          public void M(System.Data.DbCommand cmd) {
+                          public void M(System.Data.Common.DbCommand cmd) {
                               cmd.CommandText = "SELECT * FROM users";
                           }
                       }
@@ -56,7 +62,7 @@ public sealed partial class Al0111SqlInterpolationInCommandTextTests : AnalyzerT
                       {{DbCommandStub}}
 
                       public class C {
-                          public void M(System.Data.DbCommand cmd, string sql) {
+                          public void M(System.Data.Common.DbCommand cmd, string sql) {
                               cmd.CommandText = sql;
                           }
                       }
@@ -75,4 +81,32 @@ public sealed partial class Al0111SqlInterpolationInCommandTextTests : AnalyzerT
                         }
                     }
                     """);
+
+    [Fact]
+    public Task ShouldReportInterpolatedStringOnIDbCommandLikeType() =>
+        VerifyAsync($$"""
+                      {{DbCommandStub}}
+
+                      public class MyDbCommand : System.Data.IDbCommand {
+                          public string CommandText { get; set; } = "";
+                      }
+
+                      public class C {
+                          public void M(MyDbCommand cmd, string table) {
+                              cmd.CommandText = [|$"SELECT * FROM {table}"|];
+                          }
+                      }
+                      """);
+
+    [Fact]
+    public Task ShouldNotReportInterpolatedStringWithOnlyConstantHoles() =>
+        VerifyAsync($$"""
+                      {{DbCommandStub}}
+
+                      public class C {
+                          public void M(System.Data.Common.DbCommand cmd) {
+                              cmd.CommandText = $"SELECT * FROM {1}";
+                          }
+                      }
+                      """);
 }

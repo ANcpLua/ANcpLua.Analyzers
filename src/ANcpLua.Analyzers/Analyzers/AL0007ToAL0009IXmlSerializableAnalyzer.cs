@@ -1,4 +1,3 @@
-
 namespace ANcpLua.Analyzers.Analyzers;
 
 /// <summary>
@@ -98,8 +97,8 @@ public sealed partial class Al0007ToAl0009IXmlSerializableAnalyzer : AlAnalyzer 
             return;
         }
 
-        if (ixmlSerializable.GetMembers("GetSchema").OfType<IMethodSymbol>().FirstOrDefault()
-            is not { } getSchemaMethod) {
+        if (ixmlSerializable.GetMembers("GetSchema").OfType<IMethodSymbol>()
+                .FirstOrDefault(m => m.Parameters.Length == 0) is not { } getSchemaMethod) {
             return;
         }
 
@@ -122,7 +121,7 @@ public sealed partial class Al0007ToAl0009IXmlSerializableAnalyzer : AlAnalyzer 
             return;
         }
 
-        if (!IsGetSchemaImplementation(methodSymbol, ixmlSerializable)) {
+        if (!IsGetSchemaImplementation(methodSymbol, ixmlSerializable, interfaceGetSchema)) {
             return;
         }
 
@@ -148,23 +147,41 @@ public sealed partial class Al0007ToAl0009IXmlSerializableAnalyzer : AlAnalyzer 
         var invocation = (IInvocationOperation)context.Operation;
         var targetMethod = invocation.TargetMethod;
 
-        if (targetMethod.IsEqualTo(interfaceGetSchema) ||
-            IsGetSchemaImplementation(targetMethod, ixmlSerializable)) {
-            context.ReportDiagnostic(s_ruleAl0009, invocation.Syntax.GetLocation());
+        if (!targetMethod.IsEqualTo(interfaceGetSchema) &&
+            !IsGetSchemaImplementation(targetMethod, ixmlSerializable, interfaceGetSchema)) {
+            return;
         }
+
+        context.ReportDiagnostic(s_ruleAl0009, invocation.Syntax.GetLocation());
     }
 
-    private static bool IsGetSchemaImplementation(IMethodSymbol method, INamedTypeSymbol ixmlSerializable) {
-        var implementsInterface =
-            method.ContainingType.AllInterfaces.Contains(ixmlSerializable, SymbolEqualityComparer.Default);
+    private static bool IsGetSchemaImplementation(
+        IMethodSymbol method,
+        INamedTypeSymbol ixmlSerializable,
+        IMethodSymbol interfaceGetSchema) {
+        if (method.ExplicitInterfaceImplementations.Any(interfaceMethod =>
+                interfaceMethod.IsEqualTo(interfaceGetSchema))) {
+            return true;
+        }
 
-        if (!implementsInterface) {
+        if (method.ContainingType is not INamedTypeSymbol containingType ||
+            !containingType.AllInterfaces.Contains(ixmlSerializable, SymbolEqualityComparer.Default)) {
             return false;
         }
 
-        return method.Name == "GetSchema" ||
-               method.ExplicitInterfaceImplementations.Any(static i => i.Name == "GetSchema");
+        if (!IsGetSchemaSignature(method, interfaceGetSchema)) {
+            return false;
+        }
+
+        return containingType.FindImplementationForInterfaceMember(interfaceGetSchema) is { } implementation &&
+               implementation.IsEqualTo(method);
     }
+
+    private static bool IsGetSchemaSignature(IMethodSymbol method, IMethodSymbol interfaceGetSchema) =>
+        method.Name == "GetSchema" &&
+        method.Arity == interfaceGetSchema.Arity &&
+        method.Parameters.Length == interfaceGetSchema.Parameters.Length &&
+        method.ReturnType.IsEqualTo(interfaceGetSchema.ReturnType);
 
     private static bool ReturnsNonNullValue(SyntaxNode methodDeclaration, SemanticModel model) {
         foreach (var node in methodDeclaration.DescendantNodes()) {

@@ -23,6 +23,8 @@ public sealed partial class Al0049UseGuardPositiveAnalyzer : AlAnalyzer {
         DiagnosticCategories.RoslynUtilities,
         DiagnosticSeverities.Suggestion);
 
+    private const string PropertyExpression = "Expression";
+
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
@@ -37,7 +39,7 @@ public sealed partial class Al0049UseGuardPositiveAnalyzer : AlAnalyzer {
             return;
         }
 
-        if (!TryParseLessThanOrEqualZeroCheck(ifStatement.Condition, out var identifier)) {
+        if (!TryParseLessThanOrEqualZeroCheck(ifStatement.Condition, out var expression)) {
             return;
         }
 
@@ -49,21 +51,39 @@ public sealed partial class Al0049UseGuardPositiveAnalyzer : AlAnalyzer {
             return;
         }
 
-        context.ReportDiagnostic(Diagnostic.Create(s_rule, ifStatement.IfKeyword.GetLocation(), identifier));
+        var expressionText = expression.WithoutTrivia().ToString();
+        var properties = ImmutableDictionary.CreateBuilder<string, string?>();
+        properties.Add(PropertyExpression, expressionText);
+
+        context.ReportDiagnostic(Diagnostic.Create(
+            s_rule,
+            ifStatement.IfKeyword.GetLocation(),
+            properties.ToImmutable(),
+            expressionText));
     }
 
-    private static bool TryParseLessThanOrEqualZeroCheck(ExpressionSyntax condition, out string identifier) {
-        identifier = "";
+    private static bool TryParseLessThanOrEqualZeroCheck(ExpressionSyntax condition, out ExpressionSyntax expression) {
+        expression = null!;
 
         return condition switch {
             BinaryExpressionSyntax { Left: var left, Right: var right } bin
                 when bin.IsKind(SyntaxKind.LessThanOrEqualExpression)
-                     && IsZeroLiteral(right) && TryGetIdentifier(left, out identifier) => true,
+                     && IsZeroLiteral(right) && TryGetCheckedExpression(left, out expression) => true,
             BinaryExpressionSyntax { Left: var left2, Right: var right2 } bin2
                 when bin2.IsKind(SyntaxKind.GreaterThanOrEqualExpression)
-                     && IsZeroLiteral(left2) && TryGetIdentifier(right2, out identifier) => true,
+                     && IsZeroLiteral(left2) && TryGetCheckedExpression(right2, out expression) => true,
             _ => false
         };
+    }
+
+    private static bool TryGetCheckedExpression(ExpressionSyntax expression, out ExpressionSyntax checkedExpression) {
+        checkedExpression = expression switch {
+            IdentifierNameSyntax => expression,
+            MemberAccessExpressionSyntax { Name: IdentifierNameSyntax } => expression,
+            _ => null!
+        };
+
+        return checkedExpression is not null;
     }
 
     private static bool IsZeroLiteral(ExpressionSyntax expression) =>
@@ -76,15 +96,6 @@ public sealed partial class Al0049UseGuardPositiveAnalyzer : AlAnalyzer {
                 innerLit.Token.Value is 0 or 0L or 0.0 or 0.0f or 0m,
             _ => false
         };
-
-    private static bool TryGetIdentifier(ExpressionSyntax expression, out string identifier) {
-        identifier = expression switch {
-            IdentifierNameSyntax id => id.Identifier.Text,
-            MemberAccessExpressionSyntax { Name: IdentifierNameSyntax memberId } => memberId.Identifier.Text,
-            _ => ""
-        };
-        return identifier.Length > 0;
-    }
 
     private static ThrowStatementSyntax? TryGetThrowStatement(StatementSyntax statement) =>
         statement switch {

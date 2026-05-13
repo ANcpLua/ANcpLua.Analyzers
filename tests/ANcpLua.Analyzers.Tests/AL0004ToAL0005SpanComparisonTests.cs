@@ -106,6 +106,14 @@ public sealed partial class Al0005SpanSequenceEqualTests : AnalyzerTest<Al0004To
                     }
                 }
                 """)]
+    [InlineData("""
+                using System;
+                public class C {
+                    void M(ReadOnlySpan<int> span) {
+                        _ = span {|AL0005:== new int[2]|};
+                    }
+                }
+                """)]
     public Task ShouldReportNonConstantComparison(string source) => VerifyAsync(source);
 
     [Theory]
@@ -299,6 +307,25 @@ public sealed partial class Al0005UseSequenceEqualCodeFixTests : CodeFixTest<Al0
             int[] _arr = { 1, 2, 3 };
             void M(ReadOnlySpan<int> span) {
                 _ = span.SequenceEqual(_arr);
+            }
+        }
+        """);
+
+    [Fact]
+    public Task ShouldConvertArrayCreationWithoutInitializerToSequenceEqual() => VerifyAsync(
+        """
+        using System;
+        public class C {
+            void M(ReadOnlySpan<int> span) {
+                _ = span {|AL0005:== new int[2]|};
+            }
+        }
+        """,
+        """
+        using System;
+        public class C {
+            void M(ReadOnlySpan<int> span) {
+                _ = span.SequenceEqual(new int[2]);
             }
         }
         """);

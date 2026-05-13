@@ -19,6 +19,18 @@ public sealed partial class Al0008IXmlSerializableCodeFixProvider : CodeFixProvi
             return;
         }
 
+        if (await context.Document.GetSemanticModelAsync(context.CancellationToken).ConfigureAwait(false)
+            is not { } semanticModel) {
+            return;
+        }
+
+        var ixmlSerializable = semanticModel.Compilation.GetTypeByMetadataName("System.Xml.Serialization.IXmlSerializable");
+        var getSchemaMethod = ixmlSerializable?.GetMembers("GetSchema").OfType<IMethodSymbol>()
+            .FirstOrDefault(m => m.Parameters.Length is 0);
+        if (ixmlSerializable is null || getSchemaMethod is null) {
+            return;
+        }
+
         foreach (var diagnostic in context.Diagnostics) {
             if (diagnostic.Id != Al0007ToAl0009IXmlSerializableAnalyzer.DiagnosticIdAl0008) {
                 continue;
@@ -29,6 +41,12 @@ public sealed partial class Al0008IXmlSerializableCodeFixProvider : CodeFixProvi
                  ?? node.FirstAncestorOrSelf<MethodDeclarationSyntax>() as CSharpSyntaxNode
                  ?? node.FirstAncestorOrSelf<BlockSyntax>() as CSharpSyntaxNode
                  ?? node.FirstAncestorOrSelf<ArrowExpressionClauseSyntax>()) is not { } target) {
+                continue;
+            }
+
+            if (target.FirstAncestorOrSelf<MethodDeclarationSyntax>() is not { } methodDeclaration ||
+                semanticModel.GetDeclaredSymbol(methodDeclaration, context.CancellationToken) is not { } methodSymbol ||
+                !IsActualGetSchemaImplementation(methodSymbol, ixmlSerializable, getSchemaMethod)) {
                 continue;
             }
 
@@ -89,4 +107,26 @@ public sealed partial class Al0008IXmlSerializableCodeFixProvider : CodeFixProvi
     private static ArrowExpressionClauseSyntax CreateNullArrowExpression() =>
         SyntaxFactory.ArrowExpressionClause(
             SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression));
+
+    private static bool IsActualGetSchemaImplementation(
+        IMethodSymbol method,
+        INamedTypeSymbol ixmlSerializable,
+        IMethodSymbol interfaceGetSchema) {
+        if (method.ExplicitInterfaceImplementations.Any(interfaceMethod =>
+                interfaceMethod.IsEqualTo(interfaceGetSchema))) {
+            return true;
+        }
+
+        if (method.ContainingType is not INamedTypeSymbol containingType ||
+            !containingType.AllInterfaces.Contains(ixmlSerializable, SymbolEqualityComparer.Default)) {
+            return false;
+        }
+
+        return method.Arity == interfaceGetSchema.Arity &&
+               method.Parameters.Length == interfaceGetSchema.Parameters.Length &&
+               method.Name == "GetSchema" &&
+               method.ReturnType.IsEqualTo(interfaceGetSchema.ReturnType) &&
+               containingType.FindImplementationForInterfaceMember(interfaceGetSchema) is { } implementation &&
+               implementation.IsEqualTo(method);
+    }
 }

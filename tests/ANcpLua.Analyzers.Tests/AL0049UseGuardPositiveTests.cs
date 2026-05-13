@@ -1,4 +1,5 @@
 using ANcpLua.Analyzers.Analyzers;
+using ANcpLua.Analyzers.CodeFixes.CodeFixes;
 using ANcpLua.Roslyn.Utilities.Testing;
 
 namespace ANcpLua.Analyzers.Tests;
@@ -183,4 +184,39 @@ public sealed partial class Al0049UseGuardPositiveTests : AnalyzerTest<Al0049Use
             }
         }
         """);
+}
+
+public sealed partial class Al0049UseGuardPositiveCodeFixTests
+    : CodeFixTest<Al0049UseGuardPositiveAnalyzer, Al0049UseGuardPositiveCodeFixProvider> {
+    [Fact]
+    public Task ShouldPreserveMemberAccessReceiver() =>
+        VerifyAsync(
+            """
+            using System;
+            public static class Guard {
+                public static void Positive(int value) { }
+            }
+            public class Options {
+                public int Count { get; set; }
+            }
+            public class C {
+                void M(Options opts) {
+                    [|if|] (opts.Count <= 0) throw new ArgumentOutOfRangeException(nameof(opts));
+                }
+            }
+            """,
+            """
+            using System;
+            public static class Guard {
+                public static void Positive(int value) { }
+            }
+            public class Options {
+                public int Count { get; set; }
+            }
+            public class C {
+                void M(Options opts) {
+                    Guard.Positive(opts.Count);
+                }
+            }
+            """);
 }

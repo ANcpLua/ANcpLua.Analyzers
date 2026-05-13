@@ -21,7 +21,7 @@ public sealed partial class Al0050UseGuardNotEmptyGuidAnalyzer : AlAnalyzer {
         DiagnosticSeverities.Suggestion);
 
     /// <summary>Property key for the Guid identifier.</summary>
-    public const string PropertyIdentifier = "Id";
+    private const string PropertyExpression = "Expression";
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
@@ -41,7 +41,7 @@ public sealed partial class Al0050UseGuardNotEmptyGuidAnalyzer : AlAnalyzer {
         }
 
         var properties = ImmutableDictionary.CreateBuilder<string, string?>();
-        properties.Add(PropertyIdentifier, identifier);
+        properties.Add(PropertyExpression, identifier);
 
         context.ReportDiagnostic(Diagnostic.Create(
             s_rule,
@@ -81,7 +81,7 @@ public sealed partial class Al0050UseGuardNotEmptyGuidAnalyzer : AlAnalyzer {
 
         identifier = expression switch {
             IdentifierNameSyntax id => id.Identifier.Text,
-            MemberAccessExpressionSyntax { Name: IdentifierNameSyntax memberId } => memberId.Identifier.Text,
+            MemberAccessExpressionSyntax { Name: IdentifierNameSyntax } => expression.ToString(),
             _ => ""
         };
 

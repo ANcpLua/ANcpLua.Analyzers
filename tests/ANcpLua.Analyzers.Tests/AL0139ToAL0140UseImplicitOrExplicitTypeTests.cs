@@ -163,6 +163,40 @@ public sealed partial class Al0139ToAl0140UseImplicitOrExplicitTypeTests
             }
         }
         """);
+
+    [Fact]
+    public Task ShouldNotReportForForEachVarOverAnonymousType() => VerifyAsync("""
+        using System.Linq;
+
+        class C {
+            void M() {
+                var items = new[] { new { Id = 1 }, new { Id = 2 } };
+                foreach (var item in items) {
+                }
+            }
+        }
+        """);
+
+    [Fact]
+    public Task ShouldNotReportForForEachVarWithErrorType() {
+        const string Source = """
+                              using System.Collections.Generic;
+
+                              class C {
+                                  IEnumerable<MissingType> GetValues() => null;
+
+                                  void M() {
+                                      foreach (var value in GetValues()) {
+                                      }
+                                  }
+                              }
+                              """;
+        var expected = Microsoft.CodeAnalysis.Testing.DiagnosticResult.CompilerError("CS0246")
+            .WithSpan(4, 17, 4, 28)
+            .WithArguments("MissingType");
+
+        return VerifyAsync(Source, [], [expected]);
+    }
 }
 
 /// <summary>

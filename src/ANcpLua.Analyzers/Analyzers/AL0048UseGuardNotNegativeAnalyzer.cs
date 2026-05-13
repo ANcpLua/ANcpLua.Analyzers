@@ -40,7 +40,11 @@ public sealed partial class Al0048UseGuardNotNegativeAnalyzer : AlAnalyzer {
             return;
         }
 
-        if (!ContainsArgumentOutOfRangeExceptionThrow(conditional.WhenTrue)) {
+        if (conditional.WhenFalse is not null) {
+            return;
+        }
+
+        if (!HasSingleArgumentOutOfRangeExceptionThrow(conditional.WhenTrue)) {
             return;
         }
 
@@ -73,10 +77,10 @@ public sealed partial class Al0048UseGuardNotNegativeAnalyzer : AlAnalyzer {
     private static bool IsZeroConstant(IOperation? operation) =>
         operation is ILiteralOperation { ConstantValue: { HasValue: true, Value: 0 or 0L or 0.0 or 0.0f or 0m } };
 
-    private static bool ContainsArgumentOutOfRangeExceptionThrow(IOperation? operation) =>
+    private static bool HasSingleArgumentOutOfRangeExceptionThrow(IOperation? operation) =>
         operation switch {
             null => false,
-            IBlockOperation block => block.Operations.Any(IsArgumentOutOfRangeExceptionThrow),
+            IBlockOperation block => block.Operations.Length == 1 && IsArgumentOutOfRangeExceptionThrow(block.Operations[0]),
             _ => IsArgumentOutOfRangeExceptionThrow(operation)
         };
 
