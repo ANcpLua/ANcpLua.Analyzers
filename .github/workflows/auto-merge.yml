@@ -1,11 +1,27 @@
-# Auto-merge workflow for trusted PRs
+# Auto-merge — native GitHub auto-merge via GITHUB_TOKEN. No custom App, no
+# AUTOMERGE_* secrets, no reusable workflow. The 2026 pattern.
 #
-# Tiers:
-# 1a. Dependabot PRs: Auto-approve + auto-merge for patch/minor
-# 1b. Renovate PRs: Auto-approve + auto-merge
-# 2.  AI Agent fix PRs (copilot/, jules/, claude/): Auto-merge when CI passes
-# 3.  CodeRabbit approved PRs: Auto-merge when CI passes
-# 4.  Owner PRs: Auto-merge when CI passes
+# Who handles what:
+# - Renovate bot PRs   → handled entirely by the shared preset
+#                        (github>ANcpLua/renovate-config) which sets
+#                        platformAutomerge:true (Renovate default) and
+#                        automerge:true on the relevant packageRules. Renovate
+#                        enables native GitHub auto-merge at PR-open time.
+# - Owner PRs          → this workflow enables native auto-merge on PR open
+# - AI Agent PRs       → branches matching claude/, copilot/, jules/
+# - CodeRabbit-approved → enabled when an approving review lands
+#
+# Prereqs (one-time): repo Settings → General → "Allow auto-merge" enabled
+# (verified across all four framework repos). Branch protection on main
+# lists the required status checks; native auto-merge waits for them.
+#
+# Dependabot: not used in any ANcpLua framework repo, so no tier here.
+#
+# Background: the AUTOMERGE_APP_ID GitHub App was deleted on 2026-05-12 as an
+# antipattern (single point of failure across 4 repos, maintenance overhead,
+# and Renovate's platformAutomerge already does the bot tier natively without
+# it). For the human/agent tiers, GITHUB_TOKEN's pull-request:write scope is
+# enough — branch protection still gates the actual merge on required checks.
 
 name: Auto-merge
 
@@ -20,6 +36,20 @@ permissions:
   pull-requests: write
 
 jobs:
-  auto-merge:
-    uses: ANcpLua/renovate-config/.github/workflows/auto-merge-reusable.yml@2ca117da3e29887ce41f3c9abbcb96b14e3f79ab # main (PR #12 - immediate stable bot dependency auto-merge; major/prerelease skipped)
-    secrets: inherit
+  enable-auto-merge:
+    runs-on: ubuntu-latest
+    if: |
+      github.event.pull_request.draft == false && (
+        startsWith(github.event.pull_request.head.ref, 'claude/') ||
+        startsWith(github.event.pull_request.head.ref, 'copilot/') ||
+        startsWith(github.event.pull_request.head.ref, 'jules/') ||
+        github.event.pull_request.user.login == github.repository_owner ||
+        (github.event_name == 'pull_request_review'
+         && github.event.review.state == 'approved'
+         && github.event.review.user.login == 'coderabbitai[bot]')
+      )
+    steps:
+      - name: Enable native auto-merge (squash)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh pr merge ${{ github.event.pull_request.number }} --auto --squash --repo ${{ github.repository }}
