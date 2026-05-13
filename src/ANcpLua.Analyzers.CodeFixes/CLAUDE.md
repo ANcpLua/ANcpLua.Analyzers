@@ -83,22 +83,9 @@ public sealed class Ar0001MyRefactoring : CodeRefactoringProvider {
 
 ## Available Code Fixes
 
-| Diagnostic | Fix Description                           |
-|------------|-------------------------------------------|
-| AL0002     | Simplify repeated negated pattern         |
-| AL0004     | Convert to `is "constant"` pattern        |
-| AL0005     | Convert to `SequenceEqual`                |
-| AL0008     | Make GetSchema return null                |
-| AL0010     | Add `partial` modifier                    |
-| AL0011     | Convert to `Lock` type                    |
-| AL0012     | Replace deprecated OTel attribute         |
-| AL0014     | Convert to `is null`/`is 0` pattern       |
-| AL0015     | Normalize null-guard style                |
-| AL0016     | Combine declaration with null-check       |
-| AL0025     | Add `static` to lambda                    |
-| AL0026     | Replace with TimeProvider                 |
-| AL0027     | Replace Newtonsoft with System.Text.Json  |
-| AL0028-40  | Replace with Roslyn.Utilities extensions  |
+The authoritative list lives in the repo-root [`README.md`](../../README.md#code-fixes) ("Code fixes" section). Do not duplicate it here — past attempts drifted within weeks (e.g., listed AL0010/AL0012 fixes that don't exist, missed AL0045–AL0051 / AL0103 / AL0121 / AL0122 / AL0126 / AL0137 / AL0138 / AL0139 / AL0140 that do).
+
+Source of truth when even README drifts: the actual `CodeFixes/AL*.cs` files in this directory.
 
 ## Available Refactorings
 
