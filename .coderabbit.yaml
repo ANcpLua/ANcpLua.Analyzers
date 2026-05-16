@@ -113,7 +113,57 @@ reviews:
   - "!**/*.sarif"
   - "!**/*.trx"
   path_instructions:
-  - path: "**/*.{cs,csproj,props,targets,sln,slnx}"
+  - path: "**/*.cs"
+    instructions: C#/.NET review. Treat warnings, nullable annotations, async flow,
+      package boundaries, and generated code as correctness concerns. Flag sync-over-async
+      (`.Result`, `.Wait()`, `.GetAwaiter().GetResult()`), fire-and-forget work without
+      lifecycle/error handling, missing CancellationToken on public/internal async
+      methods, `DateTime.Now`/`UtcNow` in domain logic instead of TimeProvider, null-forgiving
+      `!` without a documented proof, catch-and-fallback paths that hide failures,
+      and service registration drift. Prefer data-driven, composable code over hardcoded
+      switch/case tables. Public package/API surface changes need XML docs and explicit
+      compatibility notes.
+  - path: "**/*.csproj"
+    instructions: C#/.NET review. Treat warnings, nullable annotations, async flow,
+      package boundaries, and generated code as correctness concerns. Flag sync-over-async
+      (`.Result`, `.Wait()`, `.GetAwaiter().GetResult()`), fire-and-forget work without
+      lifecycle/error handling, missing CancellationToken on public/internal async
+      methods, `DateTime.Now`/`UtcNow` in domain logic instead of TimeProvider, null-forgiving
+      `!` without a documented proof, catch-and-fallback paths that hide failures,
+      and service registration drift. Prefer data-driven, composable code over hardcoded
+      switch/case tables. Public package/API surface changes need XML docs and explicit
+      compatibility notes.
+  - path: "**/*.props"
+    instructions: C#/.NET review. Treat warnings, nullable annotations, async flow,
+      package boundaries, and generated code as correctness concerns. Flag sync-over-async
+      (`.Result`, `.Wait()`, `.GetAwaiter().GetResult()`), fire-and-forget work without
+      lifecycle/error handling, missing CancellationToken on public/internal async
+      methods, `DateTime.Now`/`UtcNow` in domain logic instead of TimeProvider, null-forgiving
+      `!` without a documented proof, catch-and-fallback paths that hide failures,
+      and service registration drift. Prefer data-driven, composable code over hardcoded
+      switch/case tables. Public package/API surface changes need XML docs and explicit
+      compatibility notes.
+  - path: "**/*.targets"
+    instructions: C#/.NET review. Treat warnings, nullable annotations, async flow,
+      package boundaries, and generated code as correctness concerns. Flag sync-over-async
+      (`.Result`, `.Wait()`, `.GetAwaiter().GetResult()`), fire-and-forget work without
+      lifecycle/error handling, missing CancellationToken on public/internal async
+      methods, `DateTime.Now`/`UtcNow` in domain logic instead of TimeProvider, null-forgiving
+      `!` without a documented proof, catch-and-fallback paths that hide failures,
+      and service registration drift. Prefer data-driven, composable code over hardcoded
+      switch/case tables. Public package/API surface changes need XML docs and explicit
+      compatibility notes.
+  - path: "**/*.sln"
+    instructions: C#/.NET review. Treat warnings, nullable annotations, async flow,
+      package boundaries, and generated code as correctness concerns. Flag sync-over-async
+      (`.Result`, `.Wait()`, `.GetAwaiter().GetResult()`), fire-and-forget work without
+      lifecycle/error handling, missing CancellationToken on public/internal async
+      methods, `DateTime.Now`/`UtcNow` in domain logic instead of TimeProvider, null-forgiving
+      `!` without a documented proof, catch-and-fallback paths that hide failures,
+      and service registration drift. Prefer data-driven, composable code over hardcoded
+      switch/case tables. Public package/API surface changes need XML docs and explicit
+      compatibility notes.
+  - path: "**/*.slnx"
     instructions: C#/.NET review. Treat warnings, nullable annotations, async flow,
       package boundaries, and generated code as correctness concerns. Flag sync-over-async
       (`.Result`, `.Wait()`, `.GetAwaiter().GetResult()`), fire-and-forget work without
@@ -137,13 +187,49 @@ reviews:
       keep required and non-blocking jobs clear; preserve tokenless OIDC upload patterns
       where used; and flag any admin-bypass, force-push, destructive cleanup, or auto-merge
       behavior that can mask a failed required check.
-  - path: "**/*.{md,mdx}"
+  - path: "**/*.md"
     instructions: 'Documentation review. Treat docs as executable team memory: flag
       instructions that disagree with actual scripts, package versions, branch protection,
       generated-file workflows, or repo layout. Keep AGENTS.md/CLAUDE.md rules coherent
       with automation. Do not request cosmetic prose changes unless ambiguity would
       mislead an agent or maintainer.'
-  - path: "**/*.{g.cs,g.ts,g.sql,g.tsp,Designer.cs,generated.*,snap}"
+  - path: "**/*.mdx"
+    instructions: 'Documentation review. Treat docs as executable team memory: flag
+      instructions that disagree with actual scripts, package versions, branch protection,
+      generated-file workflows, or repo layout. Keep AGENTS.md/CLAUDE.md rules coherent
+      with automation. Do not request cosmetic prose changes unless ambiguity would
+      mislead an agent or maintainer.'
+  - path: "**/*.g.cs"
+    instructions: Generated-output discipline. Do not suggest hand-editing generated
+      files. If generated output is wrong or missing, identify the generator/source
+      input and require regeneration in the same PR. If source model changes without
+      matching generated artifacts, flag it.
+  - path: "**/*.g.ts"
+    instructions: Generated-output discipline. Do not suggest hand-editing generated
+      files. If generated output is wrong or missing, identify the generator/source
+      input and require regeneration in the same PR. If source model changes without
+      matching generated artifacts, flag it.
+  - path: "**/*.g.sql"
+    instructions: Generated-output discipline. Do not suggest hand-editing generated
+      files. If generated output is wrong or missing, identify the generator/source
+      input and require regeneration in the same PR. If source model changes without
+      matching generated artifacts, flag it.
+  - path: "**/*.g.tsp"
+    instructions: Generated-output discipline. Do not suggest hand-editing generated
+      files. If generated output is wrong or missing, identify the generator/source
+      input and require regeneration in the same PR. If source model changes without
+      matching generated artifacts, flag it.
+  - path: "**/*.Designer.cs"
+    instructions: Generated-output discipline. Do not suggest hand-editing generated
+      files. If generated output is wrong or missing, identify the generator/source
+      input and require regeneration in the same PR. If source model changes without
+      matching generated artifacts, flag it.
+  - path: "**/*.generated.*"
+    instructions: Generated-output discipline. Do not suggest hand-editing generated
+      files. If generated output is wrong or missing, identify the generator/source
+      input and require regeneration in the same PR. If source model changes without
+      matching generated artifacts, flag it.
+  - path: "**/*.snap"
     instructions: Generated-output discipline. Do not suggest hand-editing generated
       files. If generated output is wrong or missing, identify the generator/source
       input and require regeneration in the same PR. If source model changes without
@@ -168,13 +254,6 @@ reviews:
         part of release-pilot's hard-stop allowlist — flag changes carefully.
       - xUnit + FluentAssertions. AAA pattern.
       - No `Task.Run(() => x.Result)` or other blocking-async.
-  - path: "**/*.props"
-    instructions: |
-      MSBuild property files. netstandard2.0 / netcoreapp3.1 / net8.0+
-      multi-targeting. Review for: TargetFrameworks correctness, that
-      analyzer projects use the right `Microsoft.CodeAnalysis.*` versions
-      (3.11.0 for VS 2019 floor, 4.x for newer features), and
-      IsRoslynComponent=true on analyzer csproj.
   - path: Version.props
     instructions: |
       Single source of truth for version. Manual-tag-triggers-publish pattern:
@@ -365,7 +444,7 @@ reviews:
       timeout_ms: 900000
     languagetool:
       enabled: true
-      level: picky
+      level: default
     biome:
       enabled: false
     hadolint:
@@ -557,7 +636,11 @@ code_generation:
       instructions: Generate XML docs for public/protected APIs and package surfaces.
         Document intent, contracts, cancellation, exceptions, and compatibility. Do
         not add obvious comments to private implementation details.
-    - path: "**/*.{ts,tsx}"
+    - path: "**/*.ts"
+      instructions: Generate concise TSDoc only for exported APIs, hooks, reusable
+        components, schemas, and non-obvious utility behavior. Avoid restating prop
+        names.
+    - path: "**/*.tsx"
       instructions: Generate concise TSDoc only for exported APIs, hooks, reusable
         components, schemas, and non-obvious utility behavior. Avoid restating prop
         names.
@@ -567,7 +650,10 @@ code_generation:
       instructions: Use the repo test stack (xUnit v3/Microsoft Testing Platform where
         present). Prefer focused unit tests plus integration tests for persistence,
         queues, external clients, and generated contracts. Avoid sleeps; use fakes/signals.
-    - path: "**/*.{ts,tsx}"
+    - path: "**/*.ts"
+      instructions: Use the repo frontend test stack. Assert user-visible behavior
+        and accessible roles/states. Avoid waitForTimeout and brittle snapshots.
+    - path: "**/*.tsx"
       instructions: Use the repo frontend test stack. Assert user-visible behavior
         and accessible roles/states. Avoid waitForTimeout and brittle snapshots.
     - path: "**/*.py"
