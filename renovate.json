@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>ANcpLua/renovate-config"],
+  "extends": ["github>O-ANcppLua/renovate-config"],
   "packageRules": [
     {
       "description": "Block self-bumps — Analyzers does not auto-bump its own published packages (and Dummy.* are local test samples)",
