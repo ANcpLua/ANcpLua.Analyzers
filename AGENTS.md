@@ -7,7 +7,7 @@
 Branch protection, auto-merge, CodeRabbit posture, release flow, dependency
 graph, and the cross-repo bootstrap rules for the four ANcpLua framework
 repos are documented in one place at
-[ANcpLua/renovate-config](https://github.com/ANcpLua/renovate-config#ancplua-framework-conventions--renovate-config).
+[O-ANcppLua/renovate-config](https://github.com/O-ANcppLua/renovate-config#ancplua-framework-conventions--renovate-config).
 This file documents conventions specific to this repo only.
 
 
@@ -196,4 +196,3 @@ Re-read `Version.props` before trusting these numbers — CI bumps them under yo
 The SDK auto-injects this analyzer package. To prevent build cycle during development:
 - Use `PackageId=Dummy` in local csproj
 - CI workflow passes `-p:PackageId=ANcpLua.Analyzers`
-
