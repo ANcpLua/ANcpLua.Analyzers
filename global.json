@@ -5,11 +5,11 @@
     "allowPrerelease": true
   },
   "msbuild-sdks": {
-    "ANcpLua.NET.Sdk": "3.4.32",
-    "ANcpLua.NET.Sdk.Web": "3.4.32",
-    "ANcpLua.NET.Sdk.Test": "3.4.32",
-    "ANcpLua.Roslyn.Utilities.Testing": "2.2.12",
-    "ANcpLua.Roslyn.Utilities": "2.2.12"
+    "ANcpLua.NET.Sdk": "3.4.33",
+    "ANcpLua.NET.Sdk.Web": "3.4.33",
+    "ANcpLua.NET.Sdk.Test": "3.4.33",
+    "ANcpLua.Roslyn.Utilities.Testing": "2.2.16",
+    "ANcpLua.Roslyn.Utilities": "2.2.16"
   },
   "test": {
     "runner": "Microsoft.Testing.Platform"
