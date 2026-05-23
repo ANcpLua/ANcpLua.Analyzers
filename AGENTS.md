@@ -68,7 +68,7 @@ var cache = new TypeCache<KnownType>(
     type => context.Compilation.GetTypeByMetadataName(KnownTypeNames[(int)type]));
 ```
 
-Adopted in: AL0004, AL0020, AL0026, AL0030, AL0075, AL0105, AL0106.
+Adopted in: AL0020, AL0024, AL0026, AL0030, AL0105, AL0106. (Re-grep `new TypeCache<` under `src/ANcpLua.Analyzers/Analyzers/` if this list looks suspect — analyzers come and go faster than this prose.)
 
 ## Test Pattern
 
@@ -181,15 +181,15 @@ Bevor du eine Variable in Truth oder im lokalen Override bumpst:
 
 | Package | Variable | Purpose |
 |---------|----------|---------|
-| Microsoft.CodeAnalysis.CSharp | `$(RoslynVersion)` 5.3.0 | Roslyn APIs |
-| ANcpLua.Roslyn.Utilities | `$(ANcpLuaRoslynUtilitiesVersion)` 2.0.4 | Binary package |
-| ANcpLua.Roslyn.Utilities.Sources | `$(ANcpLuaRoslynUtilitiesSourcesVersion)` 2.0.4 | Compile-time source package |
-| ANcpLua.Roslyn.Utilities.Polyfills | `$(ANcpLuaRoslynUtilitiesPolyfillsVersion)` 2.0.4 | netstandard2.0 polyfills |
-| ANcpLua.Roslyn.Utilities.Testing | `$(ANcpLuaRoslynUtilitiesTestingVersion)` 2.0.4 | Test infrastructure |
-| xunit.v3.mtp-v2 | `$(XunitV3Version)` 3.2.2 | Test framework |
-| AwesomeAssertions | `$(AwesomeAssertionsVersion)` 9.4.0 | Assertions |
+| Microsoft.CodeAnalysis.CSharp | `$(RoslynVersion)` | Roslyn APIs |
+| ANcpLua.Roslyn.Utilities | `$(ANcpLuaRoslynUtilitiesVersion)` | Binary package |
+| ANcpLua.Roslyn.Utilities.Sources | `$(ANcpLuaRoslynUtilitiesSourcesVersion)` | Compile-time source package |
+| ANcpLua.Roslyn.Utilities.Polyfills | `$(ANcpLuaRoslynUtilitiesPolyfillsVersion)` | netstandard2.0 polyfills |
+| ANcpLua.Roslyn.Utilities.Testing | `$(ANcpLuaRoslynUtilitiesTestingVersion)` | Test infrastructure |
+| xunit.v3.mtp-v2 | `$(XunitV3Version)` | Test framework |
+| AwesomeAssertions | `$(AwesomeAssertionsVersion)` | Assertions |
 
-Re-read `Version.props` before trusting these numbers — CI bumps them under you. Analyzers is on the v2.x Roslyn.Utilities line.
+`Version.props` is the source of truth — concrete numbers were intentionally dropped from this table because CI bumps them under you. Currently the Roslyn.Utilities chain is on the 2.2.x line (latest 2.2.21 as of 2026-05-23; `IsConstantZero` regression fix landed there — AL0014 floating-point detection depends on it, do not roll back below 2.2.21).
 
 ## SDK Integration Note
 
