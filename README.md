@@ -16,8 +16,8 @@ dotnet add package ANcpLua.Analyzers
 
 ## What you get
 
-- **90 diagnostics** spanning design, reliability, usage, Roslyn utilities, ASP.NET Core, AOT, threading, style, configuration, GenAI, and version management.
-- **38 automatic code fixes** for high-confidence transformations.
+- **89 diagnostics** spanning design, reliability, usage, Roslyn utilities, ASP.NET Core, AOT, threading, style, configuration, GenAI, and version management.
+- **37 automatic code fixes** for high-confidence transformations.
 - **CI-friendly enforcement** through `.editorconfig` severity configuration.
 
 ## Rule coverage by category
@@ -33,7 +33,7 @@ dotnet add package ANcpLua.Analyzers
 | Design | 6 |
 | Threading | 6 |
 | GenAI | 3 |
-| Style | 5 |
+| Style | 4 |
 | Configuration | 1 |
 
 ## Full rule catalog
@@ -128,8 +128,7 @@ dotnet add package ANcpLua.Analyzers
 | [AL0130](https://ancplua.mintlify.app/analyzers/rules/AL0130) | GenAI | Info | `Al0130ToolMustDeclareCapabilityAnalyzer` |
 | [AL0137](https://ancplua.mintlify.app/analyzers/rules/AL0137) | Roslyn Utilities | Warning | `Al0137UseGuardForThrowIfAnalyzer` |
 | [AL0138](https://ancplua.mintlify.app/analyzers/rules/AL0138) | Reliability | Warning | `Al0138UseExplicitMidpointRoundingAnalyzer` |
-| [AL0139](https://ancplua.mintlify.app/analyzers/rules/AL0139) | Style | Warning | `Al0139ToAl0140UseImplicitOrExplicitTypeAnalyzer` |
-| [AL0140](https://ancplua.mintlify.app/analyzers/rules/AL0140) | Style | Warning | `Al0139ToAl0140UseImplicitOrExplicitTypeAnalyzer` |
+| [AL0139](https://ancplua.mintlify.app/analyzers/rules/AL0139) | Style | Warning | `Al0139UseImplicitTypeWhenApparentAnalyzer` |
 
 **Legend:** `Error` = build error, `Warning` = build warning, `Info` = IDE suggestion, `Disabled` = off by default.
 
@@ -146,7 +145,7 @@ Both paths use the same token-selection logic: nearest useful token expression f
 
 Automatic fixes are currently available for:
 
-AL0002, AL0004, AL0005, AL0008, AL0011, AL0014, AL0015, AL0016, AL0025, AL0026, AL0027, AL0028, AL0029, AL0030, AL0031, AL0032, AL0033, AL0034, AL0035, AL0036, AL0037, AL0039, AL0040, AL0045, AL0046, AL0047, AL0048, AL0049, AL0050, AL0051, AL0103, AL0121, AL0122, AL0126, AL0137, AL0138, AL0139, AL0140
+AL0002, AL0004, AL0005, AL0008, AL0011, AL0014, AL0015, AL0016, AL0025, AL0026, AL0027, AL0028, AL0029, AL0030, AL0031, AL0032, AL0033, AL0034, AL0035, AL0036, AL0037, AL0039, AL0040, AL0045, AL0046, AL0047, AL0048, AL0049, AL0050, AL0051, AL0103, AL0121, AL0122, AL0126, AL0137, AL0138, AL0139
 
 ## Configuration
 

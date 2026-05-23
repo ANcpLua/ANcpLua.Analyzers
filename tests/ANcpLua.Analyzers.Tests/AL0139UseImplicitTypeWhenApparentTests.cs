@@ -5,10 +5,10 @@ using ANcpLua.Roslyn.Utilities.Testing;
 namespace ANcpLua.Analyzers.Tests;
 
 /// <summary>
-///     Tests for AL0139/AL0140: conservative explicit-vs-implicit local type style.
+///     Tests for AL0139: conservative implicit local type style.
 /// </summary>
-public sealed partial class Al0139ToAl0140UseImplicitOrExplicitTypeTests
-    : AnalyzerTest<Al0139ToAl0140UseImplicitOrExplicitTypeAnalyzer> {
+public sealed partial class Al0139UseImplicitTypeWhenApparentTests
+    : AnalyzerTest<Al0139UseImplicitTypeWhenApparentAnalyzer> {
     [Theory]
     [InlineData("""
                 class C {
@@ -103,7 +103,7 @@ public sealed partial class Al0139ToAl0140UseImplicitOrExplicitTypeTests
     [InlineData("""
                 class C {
                     object M() {
-                        {|AL0140:var|} value = GetValue();
+                        var value = GetValue();
                         return value;
                     }
                     object GetValue() => new object();
@@ -112,19 +112,19 @@ public sealed partial class Al0139ToAl0140UseImplicitOrExplicitTypeTests
     [InlineData("""
                 class C {
                     void M(string text) {
-                        int.TryParse(text, out {|AL0140:var|} value);
+                        int.TryParse(text, out var value);
                     }
                 }
                 """)]
     [InlineData("""
                 class C {
                     void M(int[] values) {
-                        foreach ({|AL0140:var|} value in values) {
+                        foreach (var value in values) {
                         }
                     }
                 }
                 """)]
-    public Task ShouldReportImplicitTypeWhenTypeIsNotApparent(string source) => VerifyAsync(source);
+    public Task ShouldNotReportVarWhenTypeIsNotApparent(string source) => VerifyAsync(source);
 
     [Fact]
     public Task ShouldNotReportWhenVarWouldBindToARealTypeNamedVar() => VerifyAsync("""
@@ -200,11 +200,11 @@ public sealed partial class Al0139ToAl0140UseImplicitOrExplicitTypeTests
 }
 
 /// <summary>
-///     Code fix tests for AL0139/AL0140.
+///     Code fix tests for AL0139.
 /// </summary>
-public sealed partial class Al0139ToAl0140UseImplicitOrExplicitTypeCodeFixTests
-    : CodeFixTest<Al0139ToAl0140UseImplicitOrExplicitTypeAnalyzer,
-        Al0139ToAl0140UseImplicitOrExplicitTypeCodeFixProvider> {
+public sealed partial class Al0139UseImplicitTypeWhenApparentCodeFixTests
+    : CodeFixTest<Al0139UseImplicitTypeWhenApparentAnalyzer,
+        Al0139UseImplicitTypeWhenApparentCodeFixProvider> {
     [Fact]
     public Task ShouldUseImplicitTypeForApparentInitializer() =>
         VerifyAsync(
@@ -219,64 +219,6 @@ public sealed partial class Al0139ToAl0140UseImplicitOrExplicitTypeCodeFixTests
             class C {
                 void M() {
                     var value = "";
-                }
-            }
-            """);
-
-    [Fact]
-    public Task ShouldUseExplicitTypeForMethodCallInitializer() =>
-        VerifyAsync(
-            """
-            class C {
-                void M() {
-                    {|AL0140:var|} value = GetValue();
-                }
-                string GetValue() => "";
-            }
-            """,
-            """
-            class C {
-                void M() {
-                    string value = GetValue();
-                }
-                string GetValue() => "";
-            }
-            """);
-
-    [Fact]
-    public Task ShouldUseExplicitTypeForOutVar() =>
-        VerifyAsync(
-            """
-            class C {
-                void M(string text) {
-                    int.TryParse(text, out {|AL0140:var|} value);
-                }
-            }
-            """,
-            """
-            class C {
-                void M(string text) {
-                    int.TryParse(text, out int value);
-                }
-            }
-            """);
-
-    [Fact]
-    public Task ShouldUseExplicitTypeForForEachVar() =>
-        VerifyAsync(
-            """
-            class C {
-                void M(int[] values) {
-                    foreach ({|AL0140:var|} value in values) {
-                    }
-                }
-            }
-            """,
-            """
-            class C {
-                void M(int[] values) {
-                    foreach (int value in values) {
-                    }
                 }
             }
             """);

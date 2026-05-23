@@ -1364,14 +1364,4 @@
     <data name="AL0139AnalyzerDescription" xml:space="preserve">
         <value>Local variables should use var when the initializer already makes the type apparent. This keeps declarations short without hiding meaning.</value>
     </data>
-    <!-- AL0140: Use explicit type when the type is not apparent -->
-    <data name="AL0140AnalyzerTitle" xml:space="preserve">
-        <value>Use explicit type when type is not apparent</value>
-    </data>
-    <data name="AL0140AnalyzerMessageFormat" xml:space="preserve">
-        <value>Variable should use explicit type</value>
-    </data>
-    <data name="AL0140AnalyzerDescription" xml:space="preserve">
-        <value>Local variables, foreach variables, and declaration expressions should use explicit types when var would hide the type from the declaration.</value>
-    </data>
 </root>
