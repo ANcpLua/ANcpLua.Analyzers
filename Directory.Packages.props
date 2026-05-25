@@ -1,5 +1,5 @@
 <Project>
-    <!-- Local Version.props mirrors SDK Build/Common/Version.props; dogfooded AL0019 inspects only the local file -->
+    <!-- Local Version.props mirrors SDK Build/Common/Version.props; dogfooded AL1602 inspects only the local file -->
     <Import Project="$(MSBuildThisFileDirectory)Version.props"/>
 
     <PropertyGroup>

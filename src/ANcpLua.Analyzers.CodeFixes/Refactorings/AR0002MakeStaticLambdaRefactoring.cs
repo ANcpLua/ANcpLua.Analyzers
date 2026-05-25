@@ -27,13 +27,13 @@ public sealed partial class Ar0002MakeStaticLambdaRefactoring : CodeRefactoringP
 
         // Check if lambda can be made static using the analyzer's logic
         var semanticModel = await document.GetSemanticModelAsync(context.CancellationToken).ConfigureAwait(false);
-        if (semanticModel is null || !Al0025PreferStaticLambdaAnalyzer.CanBeStatic(lambda, semanticModel)) {
+        if (semanticModel is null || !Al1700PreferStaticLambdaAnalyzer.CanBeStatic(lambda, semanticModel)) {
             return;
         }
 
-        // Skip if AL0025 diagnostic is active (code fix handles it)
+        // Skip if AL1700 diagnostic is active (code fix handles it)
         var diagnostics = semanticModel.GetDiagnostics(lambda.Span, context.CancellationToken);
-        if (diagnostics.Any(static d => d.Id == Al0025PreferStaticLambdaAnalyzer.DiagnosticId)) {
+        if (diagnostics.Any(static d => d.Id == Al1700PreferStaticLambdaAnalyzer.DiagnosticId)) {
             return;
         }
 
@@ -139,7 +139,7 @@ public sealed partial class Ar0002MakeStaticLambdaRefactoring : CodeRefactoringP
         .. root.DescendantNodes()
             .OfType<AnonymousFunctionExpressionSyntax>()
             .Where(lambda => !lambda.Modifiers.Any(SyntaxKind.StaticKeyword) &&
-                             Al0025PreferStaticLambdaAnalyzer.CanBeStatic(lambda, semanticModel))
+                             Al1700PreferStaticLambdaAnalyzer.CanBeStatic(lambda, semanticModel))
     ];
 
     private static AnonymousFunctionExpressionSyntax AddStaticModifier(AnonymousFunctionExpressionSyntax lambda) {

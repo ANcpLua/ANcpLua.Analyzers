@@ -58,7 +58,14 @@
        ANALYZERS (SDK-injected)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Analyzers">
-    <ANcpLuaAnalyzersVersion>1.29.1</ANcpLuaAnalyzersVersion>
+    <!-- INVARIANT (see Directory.Build.props):
+         This is the LAST-PUBLISHED nuget.org version, used by the SDK's
+         GlobalPackageReference self-injection. It must NEVER equal the
+         VersionPrefix of THIS build (currently 2.0.0) because that version
+         doesn't exist on nuget.org yet — restore would fail with NU1102.
+         CR autofix conflated VersionPrefix with this value in commit 2fe348d
+         (2026-05-25) and broke CI; that incident triggered the CR uninstall. -->
+    <ANcpLuaAnalyzersVersion>1.29.4</ANcpLuaAnalyzersVersion>
     <JonSkeetAnalyzersVersion>1.0.0-beta.6</JonSkeetAnalyzersVersion>
   </PropertyGroup>
 

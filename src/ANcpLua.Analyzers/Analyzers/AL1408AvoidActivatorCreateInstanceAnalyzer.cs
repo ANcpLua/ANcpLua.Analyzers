@@ -1,0 +1,80 @@
+using ANcpLua.Roslyn.Utilities.Matching;
+
+namespace ANcpLua.Analyzers.Analyzers;
+
+/// <summary>
+///     AL1408: Avoid Activator.CreateInstance in AOT context.
+/// </summary>
+/// <remarks>
+///     <para>
+///         <c>Activator.CreateInstance</c> uses reflection to create instances at runtime.
+///         In Native AOT, this requires the target type's constructor to be preserved.
+///         Without explicit preservation, the constructor may be trimmed, causing runtime failures.
+///     </para>
+///     <para>
+///         Prefer explicit construction, factory patterns, or annotate with
+///         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructors)].
+///     </para>
+/// </remarks>
+[DiagnosticAnalyzer(LanguageNames.CSharp)]
+public sealed partial class Al1408AvoidActivatorCreateInstanceAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL1408.</summary>
+    private const string DiagnosticId = "AL1408";
+
+    private const string ActivatorTypeName = "System.Activator";
+    private static readonly InvocationMatcher s_createInstanceInvocation = Invoke.Method("CreateInstance");
+
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
+        DiagnosticId,
+        DiagnosticCategories.AotTesting,
+        DiagnosticSeverities.Suggestion);
+
+    /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
+
+    /// <summary>Registers a compilation start action to resolve the Activator type once.</summary>
+    protected override void RegisterActions(AnalysisContext context) =>
+        context.RegisterCompilationStartAction(OnCompilationStart);
+
+    private static void OnCompilationStart(CompilationStartAnalysisContext context) {
+        if (context.Compilation.GetTypeByMetadataName(ActivatorTypeName) is not { } activatorType) {
+            // System.Activator is not referenced; nothing to analyze
+            return;
+        }
+
+        context.RegisterOperationAction(
+            ctx => AnalyzeInvocation(ctx, activatorType),
+            OperationKind.Invocation);
+    }
+
+    private static void AnalyzeInvocation(OperationAnalysisContext context, INamedTypeSymbol activatorType) {
+        if (context.Operation is not IInvocationOperation invocation ||
+            !s_createInstanceInvocation.Matches(invocation)) {
+            return;
+        }
+
+        var targetMethod = invocation.TargetMethod;
+        if (!targetMethod.ContainingType.IsEqualTo(activatorType)) {
+            return;
+        }
+
+        context.ReportDiagnostic(Diagnostic.Create(
+            s_rule,
+            invocation.Syntax.GetLocation(),
+            GetTargetTypeName(invocation)));
+    }
+
+    private static string GetTargetTypeName(IInvocationOperation invocation) {
+        var targetMethod = invocation.TargetMethod;
+        if (targetMethod is { IsGenericMethod: true, TypeArguments.Length: > 0 }) {
+            return targetMethod.TypeArguments[0].ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+        }
+
+        if (invocation.Arguments.Length > 0 &&
+            invocation.Arguments[0].Value is ITypeOfOperation typeOfOperation) {
+            return typeOfOperation.TypeOperand.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+        }
+
+        return "T";
+    }
+}
