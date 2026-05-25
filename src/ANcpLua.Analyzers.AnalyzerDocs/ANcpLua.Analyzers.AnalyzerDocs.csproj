@@ -5,12 +5,12 @@
         <IsPackable>false</IsPackable>
         <!-- Generator-input project; not under analyzer enforcement (scenarios contain "bad" code on purpose) -->
         <EnforceExtendedAnalyzerRules>false</EnforceExtendedAnalyzerRules>
-        <NoWarn>$(NoWarn);CA1031;CA1303;CA1305;CA1707;CA1822;CA1859;CA2007;IDE0055;IDE0058;IDE1006;RS1041;AL0028</NoWarn>
+        <NoWarn>$(NoWarn);CA1031;CA1303;CA1305;CA1707;CA1822;CA1859;CA2007;IDE0055;IDE0058;IDE1006;RS1041;AL1200</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\ANcpLua.Analyzers.AnalyzerDocsGenerator\ANcpLua.Analyzers.AnalyzerDocsGenerator.csproj"/>
-        <!-- Reference for type access (Al0028UseIsEqualToAnalyzer). The SDK already injects the
+        <!-- Reference for type access (Al1200UseIsEqualToAnalyzer). The SDK already injects the
              published ANcpLua.Analyzers package as an analyzer on this project; do NOT add
              OutputItemType="Analyzer" here or the analyzer registration would double up. -->
         <ProjectReference Include="..\ANcpLua.Analyzers\ANcpLua.Analyzers.csproj"/>

@@ -2,12 +2,12 @@
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
         <IsPackable>false</IsPackable>
-        <!-- Generator-input library; not under analyzer enforcement. AL0101 (Activator) is core
+        <!-- Generator-input library; not under analyzer enforcement. AL1408 (Activator) is core
              to the reflection-based design (we INVOKE scenario methods to capture diagnostics);
              everything else is fixed inline. -->
         <EnforceExtendedAnalyzerRules>false</EnforceExtendedAnalyzerRules>
         <!-- CA1308 (ToLowerInvariant): GitHub markdown anchors are canonically lowercase. -->
-        <NoWarn>$(NoWarn);CA1031;CA1303;CA1305;CA1308;CA1707;CA1812;CA1822;CA1859;CA2007;IDE0055;IDE0058;IDE1006;RS1041;AL0101</NoWarn>
+        <NoWarn>$(NoWarn);CA1031;CA1303;CA1305;CA1308;CA1707;CA1812;CA1822;CA1859;CA2007;IDE0055;IDE0058;IDE1006;RS1041;AL1408</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
@@ -20,7 +20,7 @@
              (detected via the "*Analyzer*" project-name pattern). Explicit reference would duplicate. -->
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces"/>
         <PackageReference Include="Basic.Reference.Assemblies.Net100"/>
-        <!-- Roslyn.Utilities for the StringComparison Ordinal shortcuts AL0039 prefers. -->
+        <!-- Roslyn.Utilities for the StringComparison Ordinal shortcuts AL1210 prefers. -->
         <PackageReference Include="ANcpLua.Roslyn.Utilities"/>
     </ItemGroup>
 </Project>

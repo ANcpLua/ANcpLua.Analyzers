@@ -1,200 +1,184 @@
-[![NuGet](https://img.shields.io/nuget/v/ANcpLua.Analyzers?label=NuGet&color=0891B2)](https://www.nuget.org/packages/ANcpLua.Analyzers/)
-[![.NET Standard 2.0](https://img.shields.io/badge/.NET%20Standard-2.0-512BD4)](https://dotnet.microsoft.com/platform/dotnet-standard)
+[![NuGet ANcpLua.Analyzers](https://img.shields.io/nuget/v/ANcpLua.Analyzers?label=ANcpLua.Analyzers&color=0891B2)](https://www.nuget.org/packages/ANcpLua.Analyzers/)
+[![NuGet ANcpLua.NET.Sdk](https://img.shields.io/nuget/v/ANcpLua.NET.Sdk?label=.NET.Sdk&color=0891B2)](https://www.nuget.org/packages/ANcpLua.NET.Sdk/)
+[![NuGet ANcpLua.Roslyn.Utilities](https://img.shields.io/nuget/v/ANcpLua.Roslyn.Utilities?label=.Roslyn.Utilities&color=0891B2)](https://www.nuget.org/packages/ANcpLua.Roslyn.Utilities/)
+[![NuGet ANcpLua.Agents](https://img.shields.io/nuget/v/ANcpLua.Agents?label=.Agents&color=0891B2)](https://www.nuget.org/packages/ANcpLua.Agents/)
+[![.NET](https://img.shields.io/badge/.NET-netstandard2.0-512BD4)](https://dotnet.microsoft.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 # ANcpLua.Analyzers
 
-Roslyn analyzers for modern C# patterns, AOT safety, ASP.NET Core, reliability, GenAI tool governance, and ANcpLua ecosystem conventions.
+Roslyn diagnostic analyzers and code fixes for modern C# correctness, async and threading reliability, AOT and trim safety, ASP.NET Core / Aspire hosting, Roslyn-author hygiene, package/version management, agent-tool governance, and the ANcpLua Roslyn-utilities helper API — 89 rules across 9 domain bands.
 
-## Installation
+Targets: `netstandard2.0` (Roslyn host requirement)
 
-```bash
-dotnet add package ANcpLua.Analyzers
+## Family
+
+| Package | Contents |
+|---|---|
+| [`ANcpLua.Analyzers`](https://www.nuget.org/packages/ANcpLua.Analyzers/) | Roslyn diagnostic analyzers + code fixes (this package) |
+| [`ANcpLua.NET.Sdk`](https://www.nuget.org/packages/ANcpLua.NET.Sdk/) | MSBuild SDK that auto-injects this analyzer package and shared `.editorconfig` defaults |
+| [`ANcpLua.Roslyn.Utilities`](https://www.nuget.org/packages/ANcpLua.Roslyn.Utilities/) | Shared Roslyn helpers, extensions, and `Guard.*` API the `AL12xx` band promotes |
+| [`ANcpLua.Agents`](https://www.nuget.org/packages/ANcpLua.Agents/) | Microsoft Agent Framework consumer toolkit; the `AL18xx` agent-governance band targets its `[LoomTool]` attributes |
+
+## Domain bands
+
+| Range | Domain | Rules |
+|---|---|---|
+| `AL1000..1099` | Correctness / language pitfalls | 13 |
+| `AL1100..1199` | ASP.NET Core / Aspire / web hosting | 10 |
+| `AL1200..1299` | Roslyn Utilities helper API surface | 21 |
+| `AL1300..1399` | Async / threading / reliability | 15 |
+| `AL1400..1499` | AOT / trim safety | 10 |
+| `AL1500..1599` | Roslyn-author hygiene | 6 |
+| `AL1600..1699` | Package / version management / doc alignment | 7 |
+| `AL1700..1799` | Style | 4 |
+| `AL1800..1899` | Agent / tool governance (Loom) | 3 |
+
+`AL0xxx` is reserved for sibling packages in the ANcpLua family that ship their own AL-prefixed analyzers. `AL1900..AL9999` is reserved for future bands.
+
+## Rules
+
+### Correctness / language pitfalls (`AL1000..1012`)
+
+| ID | Severity | Title |
+|---|---|---|
+| AL1000 | Error | Prohibit reassignment of primary constructor parameters |
+| AL1001 | Warning | Don't repeat negated patterns |
+| AL1002 | Error | Don't divide by constant zero |
+| AL1003 | Warning | Use pattern matching when comparing Span with constants |
+| AL1004 | Warning | Use SequenceEqual when comparing Span with non-constants |
+| AL1005 | Warning | Field name conflicts with primary constructor parameter |
+| AL1006 | Error | GetSchema should be explicitly implemented |
+| AL1007 | Error | GetSchema must return null and not be abstract |
+| AL1008 | Error | Don't call IXmlSerializable.GetSchema |
+| AL1009 | Warning | Avoid lock keyword on non-Lock types |
+| AL1010 | Warning | Prefer pattern matching for null and zero comparisons |
+| AL1011 | Info | Normalize null-guard style |
+| AL1012 | Info | Combine declaration with subsequent null-check |
+
+### ASP.NET Core / Aspire (`AL1100..1109`)
+
+| ID | Severity | Title |
+|---|---|---|
+| AL1100 | Error | IFormCollection requires explicit attribute |
+| AL1101 | Error | Multiple structured form sources |
+| AL1102 | Error | Mixed form collection and DTO |
+| AL1103 | Error | Unsupported form type |
+| AL1104 | Error | Form and body conflict |
+| AL1105 | Warning | Missing resilience configuration |
+| AL1106 | Warning | Missing health checks |
+| AL1107 | Info | Consider using configuration for connection string |
+| AL1108 | Warning | Missing service discovery |
+| AL1109 | Warning | Avoid Task.Run in ASP.NET Core request handlers |
+
+### Roslyn Utilities helper API (`AL1200..1220`)
+
+| ID | Severity | Title |
+|---|---|---|
+| AL1200 | Info | Use IsEqualTo extension |
+| AL1201 | Info | Use HasAttribute extension |
+| AL1202 | Info | Use type hierarchy extension |
+| AL1203 | Info | Use operation extension |
+| AL1204 | Info | Use OrEmpty extension |
+| AL1205 | Info | Use ToImmutableArrayOrEmpty extension |
+| AL1206 | Info | Use WhereNotNull extension |
+| AL1207 | Info | Use symbol display string extension |
+| AL1208 | Warning | Use null-guard helper |
+| AL1209 | Warning | Use TryParse extension |
+| AL1210 | Warning | Use StringComparison extension |
+| AL1211 | Warning | Use attribute argument extraction extension |
+| AL1212 | Warning | Use null-or-empty guard helper |
+| AL1213 | Warning | Use null-or-whitespace guard helper |
+| AL1214 | Warning | Use zero-guard helper |
+| AL1215 | Warning | Use non-negative guard helper |
+| AL1216 | Warning | Use positive-guard helper |
+| AL1217 | Warning | Use empty-guid guard helper |
+| AL1218 | Warning | Use defined-enum guard helper |
+| AL1219 | Info | Use *Any* string comparison extension |
+| AL1220 | Warning | Use Guard.* helpers instead of throw helpers |
+
+### Async / threading / reliability (`AL1300..1314`)
+
+| ID | Severity | Title |
+|---|---|---|
+| AL1300 | Warning | Avoid async void methods |
+| AL1301 | Warning | Avoid lock on 'this' |
+| AL1302 | Warning | Avoid lock on typeof(T) |
+| AL1303 | Warning | Avoid lock on string |
+| AL1304 | Warning | Prefer 'await using' for IAsyncDisposable |
+| AL1305 | Warning | Avoid blocking calls in async methods |
+| AL1306 | Warning | Avoid SQL string interpolation in CommandText |
+| AL1307 | Warning | Avoid fire-and-forget task discard |
+| AL1308 | Warning | Prefer TryParse over Parse |
+| AL1309 | Warning | Empty catch block swallows exceptions |
+| AL1310 | Warning | Exception details leaked in HTTP response |
+| AL1311 | Warning | Unnecessary LINQ materialization |
+| AL1312 | Warning | Read-modify-write without transaction |
+| AL1313 | Info | Forward CancellationToken to invocations that support it |
+| AL1314 | Warning | Use Math.Round/MathF.Round overload with explicit MidpointRounding |
+
+### AOT / trim safety (`AL1400..1409`)
+
+| ID | Severity | Title |
+|---|---|---|
+| AL1400 | Error | Method with [AotTest] or [TrimTest] must return int |
+| AL1401 | Warning | [AotTest]/[TrimTest] method should return 100 on success |
+| AL1402 | Warning | [TrimSafe] code must not call methods with [RequiresUnreferencedCode] |
+| AL1403 | Warning | [AotSafe] code must not call methods with [RequiresDynamicCode] |
+| AL1404 | Error | [AotSafe] code must not call [AotUnsafe] code |
+| AL1405 | Warning | Unnecessary [AotUnsafe] attribute |
+| AL1406 | Warning | Avoid 'dynamic' keyword in AOT-published code |
+| AL1407 | Warning | Avoid Expression.Compile() in AOT context |
+| AL1408 | Warning | Activator.CreateInstance is not AOT-safe |
+| AL1409 | Warning | Type.GetType with dynamic name is not AOT-safe |
+
+### Roslyn-author hygiene (`AL1500..1505`)
+
+| ID | Severity | Title |
+|---|---|---|
+| AL1500 | Warning | Closed hierarchy match is not exhaustive |
+| AL1501 | Warning | Avoid storing ISymbol in source generator models |
+| AL1502 | Warning | Use IIncrementalGenerator instead of ISourceGenerator |
+| AL1503 | Warning | Avoid NormalizeWhitespace in source generators |
+| AL1504 | Error | [DuckDbTable] type must be partial |
+| AL1505 | Warning | Conflicting [DuckDbColumn] ordinal values |
+
+### Package / version management (`AL1600..1606`)
+
+| ID | Severity | Title |
+|---|---|---|
+| AL1600 | Warning | Hardcoded package version detected |
+| AL1601 | Warning | Version.props not imported |
+| AL1602 | Warning | Undefined version variable |
+| AL1603 | Warning | Diagnostic missing from documentation |
+| AL1604 | Warning | Diagnostic missing from release notes |
+| AL1605 | Warning | Diagnostic documentation mismatch |
+| AL1606 | Warning | Outdated MAF ecosystem package version |
+
+### Style (`AL1700..1703`)
+
+| ID | Severity | Title |
+|---|---|---|
+| AL1700 | Warning | Anonymous function can be made static |
+| AL1701 | Warning | Avoid DateTime/DateTimeOffset time accessors |
+| AL1702 | Warning | Avoid legacy JSON library |
+| AL1703 | Warning | Use implicit type when type is apparent |
+
+### Agent / tool governance (`AL1800..1802`)
+
+| ID | Severity | Title |
+|---|---|---|
+| AL1800 | Warning | Destructive Loom tool must require approval |
+| AL1801 | Info | Loom tool should declare its side effect |
+| AL1802 | Info | Loom tool should declare required capabilities |
+
+## Usage
+
+```xml
+<PackageReference Include="ANcpLua.Analyzers"
+                  Version="2.0.0"
+                  PrivateAssets="all"
+                  IncludeAssets="analyzers; buildtransitive" />
 ```
 
-> **Using ANcpLua.NET.Sdk?** This package is auto-injected - no installation needed.
-
-## What you get
-
-- **90 diagnostics** spanning design, reliability, usage, Roslyn utilities, ASP.NET Core, AOT, threading, style, configuration, GenAI, and version management.
-- **38 automatic code fixes** for high-confidence transformations.
-- **CI-friendly enforcement** through `.editorconfig` severity configuration.
-
-## Rule coverage by category
-
-| Category | Rules |
-|:---------|------:|
-| Roslyn Utilities | 24 |
-| AOT Testing | 10 |
-| Reliability | 10 |
-| ASP.NET Core | 9 |
-| Usage | 9 |
-| VersionManagement | 7 |
-| Design | 6 |
-| Threading | 6 |
-| GenAI | 3 |
-| Style | 5 |
-| Configuration | 1 |
-
-## Full rule catalog
-
-| Rule | Category | Severity | Analyzer |
-|:-----|:---------|:--------:|:---------|
-| [AL0001](https://ancplua.mintlify.app/analyzers/rules/AL0001) | Design | Error | `Al0001ProhibitPrimaryConstructorParameterReassignmentAnalyzer` |
-| [AL0002](https://ancplua.mintlify.app/analyzers/rules/AL0002) | Design | Warning | `Al0002DontRepeatNegatedPatternAnalyzer` |
-| [AL0003](https://ancplua.mintlify.app/analyzers/rules/AL0003) | Reliability | Error | `Al0003DontDivideByConstantZeroAnalyzer` |
-| [AL0004](https://ancplua.mintlify.app/analyzers/rules/AL0004) | Usage | Warning | `Al0004ToAl0005SpanComparisonAnalyzer` |
-| [AL0005](https://ancplua.mintlify.app/analyzers/rules/AL0005) | Usage | Warning | `Al0004ToAl0005SpanComparisonAnalyzer` |
-| [AL0006](https://ancplua.mintlify.app/analyzers/rules/AL0006) | Design | Warning | `Al0006FieldNameConflictWithPrimaryConstructorAnalyzer` |
-| [AL0007](https://ancplua.mintlify.app/analyzers/rules/AL0007) | Usage | Error | `Al0007ToAl0009IXmlSerializableAnalyzer` |
-| [AL0008](https://ancplua.mintlify.app/analyzers/rules/AL0008) | Usage | Error | `Al0007ToAl0009IXmlSerializableAnalyzer` |
-| [AL0009](https://ancplua.mintlify.app/analyzers/rules/AL0009) | Usage | Error | `Al0007ToAl0009IXmlSerializableAnalyzer` |
-| [AL0011](https://ancplua.mintlify.app/analyzers/rules/AL0011) | Threading | Warning | `Al0011LockKeywordAnalyzer` |
-| [AL0014](https://ancplua.mintlify.app/analyzers/rules/AL0014) | Style | Warning | `Al0014PreferPatternMatchingAnalyzer` |
-| [AL0015](https://ancplua.mintlify.app/analyzers/rules/AL0015) | Style | Info | `Al0015NormalizeNullGuardStyleAnalyzer` |
-| [AL0016](https://ancplua.mintlify.app/analyzers/rules/AL0016) | Style | Info | `Al0016CombineDeclarationWithNullCheckAnalyzer` |
-| [AL0017](https://ancplua.mintlify.app/analyzers/rules/AL0017) | VersionManagement | Warning | `Al0017HardcodedPackageVersionAnalyzer` |
-| [AL0018](https://ancplua.mintlify.app/analyzers/rules/AL0018) | VersionManagement | Warning | `Al0018VersionPropsNotImportedAnalyzer` |
-| [AL0019](https://ancplua.mintlify.app/analyzers/rules/AL0019) | VersionManagement | Warning | `Al0019UndefinedVersionVariableAnalyzer` |
-| [AL0020](https://ancplua.mintlify.app/analyzers/rules/AL0020) | ASP.NET Core | Error | `Al0020ToAl0024FormBindingAnalyzer` |
-| [AL0021](https://ancplua.mintlify.app/analyzers/rules/AL0021) | ASP.NET Core | Error | `Al0020ToAl0024FormBindingAnalyzer` |
-| [AL0022](https://ancplua.mintlify.app/analyzers/rules/AL0022) | ASP.NET Core | Error | `Al0020ToAl0024FormBindingAnalyzer` |
-| [AL0023](https://ancplua.mintlify.app/analyzers/rules/AL0023) | ASP.NET Core | Error | `Al0020ToAl0024FormBindingAnalyzer` |
-| [AL0024](https://ancplua.mintlify.app/analyzers/rules/AL0024) | ASP.NET Core | Error | `Al0020ToAl0024FormBindingAnalyzer` |
-| [AL0025](https://ancplua.mintlify.app/analyzers/rules/AL0025) | Usage | Warning | `Al0025PreferStaticLambdaAnalyzer` |
-| [AL0026](https://ancplua.mintlify.app/analyzers/rules/AL0026) | Usage | Warning | `Al0026AvoidDateTimeNowAnalyzer` |
-| [AL0027](https://ancplua.mintlify.app/analyzers/rules/AL0027) | Usage | Warning | `Al0027AvoidNewtonsoftJsonAnalyzer` |
-| [AL0028](https://ancplua.mintlify.app/analyzers/rules/AL0028) | Roslyn Utilities | Info | `Al0028UseIsEqualToAnalyzer` |
-| [AL0029](https://ancplua.mintlify.app/analyzers/rules/AL0029) | Roslyn Utilities | Info | `Al0029UseHasAttributeAnalyzer` |
-| [AL0030](https://ancplua.mintlify.app/analyzers/rules/AL0030) | Roslyn Utilities | Info | `Al0030UseTypeHierarchyAnalyzer` |
-| [AL0031](https://ancplua.mintlify.app/analyzers/rules/AL0031) | Roslyn Utilities | Info | `Al0031UseOperationExtensionsAnalyzer` |
-| [AL0032](https://ancplua.mintlify.app/analyzers/rules/AL0032) | Roslyn Utilities | Info | `Al0032UseOrEmptyAnalyzer` |
-| [AL0033](https://ancplua.mintlify.app/analyzers/rules/AL0033) | Roslyn Utilities | Info | `Al0033UseToImmutableArrayOrEmptyAnalyzer` |
-| [AL0034](https://ancplua.mintlify.app/analyzers/rules/AL0034) | Roslyn Utilities | Info | `Al0034UseWhereNotNullAnalyzer` |
-| [AL0035](https://ancplua.mintlify.app/analyzers/rules/AL0035) | Roslyn Utilities | Info | `Al0035UseToDisplayStringExtensionsAnalyzer` |
-| [AL0036](https://ancplua.mintlify.app/analyzers/rules/AL0036) | Roslyn Utilities | Warning | `Al0036UseGuardNotNullAnalyzer` |
-| [AL0037](https://ancplua.mintlify.app/analyzers/rules/AL0037) | Roslyn Utilities | Warning | `Al0037UseTryParseExtensionsAnalyzer` |
-| [AL0039](https://ancplua.mintlify.app/analyzers/rules/AL0039) | Roslyn Utilities | Warning | `Al0039UseStringComparisonExtensionsAnalyzer` |
-| [AL0040](https://ancplua.mintlify.app/analyzers/rules/AL0040) | Roslyn Utilities | Warning | `Al0040UseAttributeExtensionsAnalyzer` |
-| [AL0041](https://ancplua.mintlify.app/analyzers/rules/AL0041) | AOT Testing | Error | `Al0041AotTestMustReturnIntAnalyzer` |
-| [AL0042](https://ancplua.mintlify.app/analyzers/rules/AL0042) | AOT Testing | Warning | `Al0042AotTestExitCode100Analyzer` |
-| [AL0043](https://ancplua.mintlify.app/analyzers/rules/AL0043) | AOT Testing | Warning | `Al0043TrimSafeViolationAnalyzer` |
-| [AL0044](https://ancplua.mintlify.app/analyzers/rules/AL0044) | AOT Testing | Warning | `Al0044AotSafeViolationAnalyzer` |
-| [AL0045](https://ancplua.mintlify.app/analyzers/rules/AL0045) | Roslyn Utilities | Warning | `Al0045UseGuardNotNullOrEmptyAnalyzer` |
-| [AL0046](https://ancplua.mintlify.app/analyzers/rules/AL0046) | Roslyn Utilities | Warning | `Al0046UseGuardNotNullOrWhiteSpaceAnalyzer` |
-| [AL0047](https://ancplua.mintlify.app/analyzers/rules/AL0047) | Roslyn Utilities | Warning | `Al0047UseGuardNotZeroAnalyzer` |
-| [AL0048](https://ancplua.mintlify.app/analyzers/rules/AL0048) | Roslyn Utilities | Warning | `Al0048UseGuardNotNegativeAnalyzer` |
-| [AL0049](https://ancplua.mintlify.app/analyzers/rules/AL0049) | Roslyn Utilities | Warning | `Al0049UseGuardPositiveAnalyzer` |
-| [AL0050](https://ancplua.mintlify.app/analyzers/rules/AL0050) | Roslyn Utilities | Warning | `Al0050UseGuardNotEmptyGuidAnalyzer` |
-| [AL0051](https://ancplua.mintlify.app/analyzers/rules/AL0051) | Roslyn Utilities | Warning | `Al0051UseGuardDefinedEnumAnalyzer` |
-| [AL0052](https://ancplua.mintlify.app/analyzers/rules/AL0052) | AOT Testing | Error | `Al0052AotSafeCallsAotUnsafeAnalyzer` |
-| [AL0053](https://ancplua.mintlify.app/analyzers/rules/AL0053) | AOT Testing | Warning | `Al0053UnnecessaryAotUnsafeAnalyzer` |
-| [AL0054](https://ancplua.mintlify.app/analyzers/rules/AL0054) | VersionManagement | Warning | `Al0054ToAl0056DiagnosticsAlignmentAnalyzer` |
-| [AL0055](https://ancplua.mintlify.app/analyzers/rules/AL0055) | VersionManagement | Warning | `Al0054ToAl0056DiagnosticsAlignmentAnalyzer` |
-| [AL0056](https://ancplua.mintlify.app/analyzers/rules/AL0056) | VersionManagement | Warning | `Al0054ToAl0056DiagnosticsAlignmentAnalyzer` |
-| [AL0057](https://ancplua.mintlify.app/analyzers/rules/AL0057) | Threading | Warning | `Al0057ToAl0060ThreadingAnalyzer` |
-| [AL0058](https://ancplua.mintlify.app/analyzers/rules/AL0058) | Threading | Warning | `Al0057ToAl0060ThreadingAnalyzer` |
-| [AL0059](https://ancplua.mintlify.app/analyzers/rules/AL0059) | Threading | Warning | `Al0057ToAl0060ThreadingAnalyzer` |
-| [AL0060](https://ancplua.mintlify.app/analyzers/rules/AL0060) | Threading | Warning | `Al0057ToAl0060ThreadingAnalyzer` |
-| [AL0080](https://ancplua.mintlify.app/analyzers/rules/AL0080) | ASP.NET Core | Warning | `Al0080MissingResilienceConfigurationAnalyzer` |
-| [AL0081](https://ancplua.mintlify.app/analyzers/rules/AL0081) | ASP.NET Core | Warning | `Al0081MissingHealthChecksAnalyzer` |
-| [AL0082](https://ancplua.mintlify.app/analyzers/rules/AL0082) | Configuration | Info | `Al0082ConsiderConnectionStringAnalyzer` |
-| [AL0084](https://ancplua.mintlify.app/analyzers/rules/AL0084) | ASP.NET Core | Warning | `Al0084MissingServiceDiscoveryAnalyzer` |
-| [AL0094](https://ancplua.mintlify.app/analyzers/rules/AL0094) | AOT Testing | Warning | `Al0094AvoidDynamicKeywordAnalyzer` |
-| [AL0095](https://ancplua.mintlify.app/analyzers/rules/AL0095) | AOT Testing | Warning | `Al0095AvoidExpressionCompileAnalyzer` |
-| [AL0101](https://ancplua.mintlify.app/analyzers/rules/AL0101) | AOT Testing | Warning | `Al0101AvoidActivatorCreateInstanceAnalyzer` |
-| [AL0102](https://ancplua.mintlify.app/analyzers/rules/AL0102) | AOT Testing | Warning | `Al0102AvoidTypeGetTypeAnalyzer` |
-| [AL0103](https://ancplua.mintlify.app/analyzers/rules/AL0103) | Design | Warning | `Al0103ClosedTypeHierarchySwitchAnalyzer` |
-| [AL0104](https://ancplua.mintlify.app/analyzers/rules/AL0104) | Reliability | Warning | `Al0104PreferAwaitUsingAnalyzer` |
-| [AL0105](https://ancplua.mintlify.app/analyzers/rules/AL0105) | Threading | Warning | `Al0105AvoidBlockingCallsInAsyncAnalyzer` |
-| [AL0106](https://ancplua.mintlify.app/analyzers/rules/AL0106) | ASP.NET Core | Warning | `Al0106AvoidTaskRunInAspNetCoreAnalyzer` |
-| [AL0111](https://ancplua.mintlify.app/analyzers/rules/AL0111) | Reliability | Warning | `Al0111SqlInterpolationInCommandTextAnalyzer` |
-| [AL0112](https://ancplua.mintlify.app/analyzers/rules/AL0112) | Reliability | Warning | `Al0112FireAndForgetTaskAnalyzer` |
-| [AL0114](https://ancplua.mintlify.app/analyzers/rules/AL0114) | Reliability | Warning | `Al0114PreferTryParseAnalyzer` |
-| [AL0115](https://ancplua.mintlify.app/analyzers/rules/AL0115) | Reliability | Warning | `Al0115EmptyCatchBlockAnalyzer` |
-| [AL0116](https://ancplua.mintlify.app/analyzers/rules/AL0116) | Reliability | Warning | `Al0116ExceptionLeakedInResponseAnalyzer` |
-| [AL0117](https://ancplua.mintlify.app/analyzers/rules/AL0117) | Usage | Info | `Al0117UnnecessaryLinqMaterializationAnalyzer` |
-| [AL0118](https://ancplua.mintlify.app/analyzers/rules/AL0118) | Reliability | Warning | `Al0118ReadModifyWriteWithoutTransactionAnalyzer` |
-| [AL0119](https://ancplua.mintlify.app/analyzers/rules/AL0119) | Roslyn Utilities | Warning | `Al0119SymbolStoredInModelAnalyzer` |
-| [AL0120](https://ancplua.mintlify.app/analyzers/rules/AL0120) | Roslyn Utilities | Warning | `Al0120UseIncrementalGeneratorAnalyzer` |
-| [AL0121](https://ancplua.mintlify.app/analyzers/rules/AL0121) | Roslyn Utilities | Warning | `Al0121NormalizeWhitespaceAnalyzer` |
-| [AL0122](https://ancplua.mintlify.app/analyzers/rules/AL0122) | Design | Error | `Al0122DuckDbTableMustBePartialAnalyzer` |
-| [AL0123](https://ancplua.mintlify.app/analyzers/rules/AL0123) | Design | Warning | `Al0123DuckDbColumnConflictingOrdinalAnalyzer` |
-| [AL0125](https://ancplua.mintlify.app/analyzers/rules/AL0125) | Roslyn Utilities | Info | `Al0125UseStringComparisonAnyExtensionsAnalyzer` |
-| [AL0126](https://ancplua.mintlify.app/analyzers/rules/AL0126) | Reliability | Info | `Al0126CancellationTokenPropagationAnalyzer` |
-| [AL0127](https://ancplua.mintlify.app/analyzers/rules/AL0127) | VersionManagement | Warning | `Al0127OutdatedMafPackageVersionAnalyzer` |
-| [AL0128](https://ancplua.mintlify.app/analyzers/rules/AL0128) | GenAI | Warning | `Al0128DestructiveToolMustRequireApprovalAnalyzer` |
-| [AL0129](https://ancplua.mintlify.app/analyzers/rules/AL0129) | GenAI | Info | `Al0129ToolMustDeclareSideEffectAnalyzer` |
-| [AL0130](https://ancplua.mintlify.app/analyzers/rules/AL0130) | GenAI | Info | `Al0130ToolMustDeclareCapabilityAnalyzer` |
-| [AL0137](https://ancplua.mintlify.app/analyzers/rules/AL0137) | Roslyn Utilities | Warning | `Al0137UseGuardForThrowIfAnalyzer` |
-| [AL0138](https://ancplua.mintlify.app/analyzers/rules/AL0138) | Reliability | Warning | `Al0138UseExplicitMidpointRoundingAnalyzer` |
-| [AL0139](https://ancplua.mintlify.app/analyzers/rules/AL0139) | Style | Warning | `Al0139ToAl0140UseImplicitOrExplicitTypeAnalyzer` |
-| [AL0140](https://ancplua.mintlify.app/analyzers/rules/AL0140) | Style | Warning | `Al0139ToAl0140UseImplicitOrExplicitTypeAnalyzer` |
-
-**Legend:** `Error` = build error, `Warning` = build warning, `Info` = IDE suggestion, `Disabled` = off by default.
-
-## Notable rules
-
-**`AL0126` — `CancellationToken` propagation (Reliability, Info).** Forwards an available cancellation token into async calls. The rule and its code fix cover two patterns:
-
-- Calls that **omit** a `CancellationToken` overload argument when a suitable token is available in scope.
-- Calls that explicitly pass a **default/no-op** token — `default`, `default(CancellationToken)`, or `CancellationToken.None` — and should use the available real token instead.
-
-Both paths use the same token-selection logic: nearest useful token expression first. In xUnit v3 tests, when no closer token is available, the fix can use `global::Xunit.TestContext.Current.CancellationToken`.
-
-## Code fixes
-
-Automatic fixes are currently available for:
-
-AL0002, AL0004, AL0005, AL0008, AL0011, AL0014, AL0015, AL0016, AL0025, AL0026, AL0027, AL0028, AL0029, AL0030, AL0031, AL0032, AL0033, AL0034, AL0035, AL0036, AL0037, AL0039, AL0040, AL0045, AL0046, AL0047, AL0048, AL0049, AL0050, AL0051, AL0103, AL0121, AL0122, AL0126, AL0137, AL0138, AL0139, AL0140
-
-## Configuration
-
-```editorconfig
-[*.cs]
-dotnet_diagnostic.AL0001.severity = error
-dotnet_diagnostic.AL0014.severity = none
-```
-
-## Development commands
-
-```bash
-# Build
-dotnet build ANcpLua.Analyzers.slnx -c Release
-
-# Test
-dotnet test --project tests/ANcpLua.Analyzers.Tests/ANcpLua.Analyzers.Tests.csproj
-
-# Pack
-dotnet pack src/ANcpLua.Analyzers/ANcpLua.Analyzers.csproj -c Release -o artifacts -p:PackageId=ANcpLua.Analyzers
-```
-
-## Documentation
-
-- Overview: [ancplua.mintlify.app/analyzers/overview](https://ancplua.mintlify.app/analyzers/overview)
-- Rule docs: [ancplua.mintlify.app/analyzers/rules](https://ancplua.mintlify.app/analyzers/rules)
-
-### Generated analyzer scenario docs
-
-Per-analyzer scenario catalogs auto-generated from the test scenarios in
-`src/ANcpLua.Analyzers.AnalyzerDocs/` — each file shows the before/after
-example and the analyzer's real diagnostic message (regression-gated by
-CI via `scripts/generate-docs.ps1 -ValidateNoChanges`):
-
-- [AL0028 — Use IsEqualTo extension](docs/Al0028UseIsEqualTo.md)
-
-To regenerate after touching scenarios or a diagnostic message:
-
-```bash
-pwsh ./scripts/generate-docs.ps1
-```
-
-## Related projects
-
-- [ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk) - MSBuild SDK (auto-injects this analyzer package)
-- [ANcpLua.Roslyn.Utilities](https://github.com/ANcpLua/ANcpLua.Roslyn.Utilities) - Shared Roslyn helpers and extensions
-- [ANcpLua.Agents](https://github.com/ANcpLua/ANcpLua.Agents) - MAF runtime helpers + agent test infrastructure
-
-## License
-
-[MIT](LICENSE)
+Siblings: [ANcpLua.Roslyn.Utilities](https://github.com/ANcpLua/ANcpLua.Roslyn.Utilities) · [ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk) · [ANcpLua.Agents](https://github.com/ANcpLua/ANcpLua.Agents) · [Qyl.Opentelemetry.SemanticConventions](https://github.com/ANcpLua/Qyl.Opentelemetry.SemanticConventions)

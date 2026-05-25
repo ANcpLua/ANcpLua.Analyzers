@@ -16,7 +16,7 @@ Unit tests for all analyzers and code fixes.
 dotnet test --project tests/ANcpLua.Analyzers.Tests/ANcpLua.Analyzers.Tests.csproj
 
 # Filter by diagnostic ID (MTP syntax)
-dotnet test --project tests/ANcpLua.Analyzers.Tests/ANcpLua.Analyzers.Tests.csproj --filter-method "*AL0001*"
+dotnet test --project tests/ANcpLua.Analyzers.Tests/ANcpLua.Analyzers.Tests.csproj --filter-method "*AL1000*"
 
 # Filter by test class
 dotnet test --project tests/ANcpLua.Analyzers.Tests/ANcpLua.Analyzers.Tests.csproj --filter-class "*PartialType*"
@@ -39,7 +39,7 @@ From `ANcpLua.Roslyn.Utilities.Testing`:
 ## Analyzer Test Pattern
 
 ```csharp
-public sealed class Al0001Tests : AnalyzerTest<Al0001ProhibitPrimaryConstructorParameterReassignmentAnalyzer> {
+public sealed class Al1000Tests : AnalyzerTest<Al1000ProhibitPrimaryConstructorParameterReassignmentAnalyzer> {
     // Parameterized tests with condensed InlineData
     [Theory]
     [InlineData("int i", "[|i|] = 10")]
@@ -58,12 +58,12 @@ public sealed class Al0001Tests : AnalyzerTest<Al0001ProhibitPrimaryConstructorP
 ## Code Fix Test Pattern
 
 ```csharp
-public sealed class Al0010CodeFixTests : CodeFixTest<Al0010PartialTypeAnalyzer, Al0010PartialTypeCodeFixProvider> {
+public sealed class Al1700CodeFixTests : CodeFixTest<Al1700PreferStaticLambdaAnalyzer, Al1700StaticLambdaCodeFixProvider> {
     [Fact]
     public Task ShouldFix() =>
         VerifyCodeFixAsync(
-            "[|class|] C { }",        // Before - with diagnostic marker
-            "partial class C { }");   // After - expected fix result
+            "class C { System.Action a = [|() => { }|]; }",  // Before - with diagnostic marker
+            "class C { System.Action a = static () => { }; }"); // After - expected fix result
 }
 ```
 
@@ -72,7 +72,7 @@ public sealed class Al0010CodeFixTests : CodeFixTest<Al0010PartialTypeAnalyzer, 
 | Marker              | Meaning                                |
 |---------------------|----------------------------------------|
 | `[|code|]`          | Expected diagnostic at this location   |
-| `{|AL0001:code|}`   | Expected specific diagnostic ID        |
+| `{|AL1000:code|}`   | Expected specific diagnostic ID        |
 
 ## Style Guidelines
 

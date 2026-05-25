@@ -83,7 +83,7 @@ public sealed class Ar0001MyRefactoring : CodeRefactoringProvider {
 
 ## Available Code Fixes
 
-The authoritative list lives in the repo-root [`README.md`](../../README.md#code-fixes) ("Code fixes" section). Do not duplicate it here — past attempts drifted within weeks (e.g., listed AL0010/AL0012 fixes that don't exist, missed AL0045–AL0051 / AL0103 / AL0121 / AL0122 / AL0126 / AL0137 / AL0138 / AL0139 / AL0140 that do).
+The authoritative list lives in the repo-root [`README.md`](../../README.md#code-fixes) ("Code fixes" section). Do not duplicate it here — past attempts drifted within weeks (e.g., listed AL0010/AL0012 fixes that don't exist, missed AL1212–AL1218 / AL1500 / AL1503 / AL1504 / AL1313 / AL1220 / AL1314 / AL1703 that do).
 
 Source of truth when even README drifts: the actual `CodeFixes/AL*.cs` files in this directory.
 

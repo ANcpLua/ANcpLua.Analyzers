@@ -1,198 +1,391 @@
-# AGENTS.md - ANcpLua.Analyzers
+# ANcpLua.Analyzers - Agent Contract
 
-90 diagnostics (AL0001–AL0140 with gaps; full list in `AnalyzerReleases.Unshipped.md`) with 38 automatic code fixes, targeting netstandard2.0. The authoritative rule catalog lives in [`README.md`](README.md#full-rule-catalog) — when these counts drift again, trust `AnalyzerReleases.Unshipped.md` and `src/ANcpLua.Analyzers.CodeFixes/CodeFixes/AL*.cs` over any prose in this file.
+Canonical instruction surface for Codex and Claude. Keep `CLAUDE.md` symlinked to this file; edit this file only.
 
-## Framework conventions
+## Repo Role
 
-Branch protection, auto-merge, CodeRabbit posture, release flow, dependency
-graph, and the cross-repo bootstrap rules for the four ANcpLua framework
-repos are documented in one place at
-[ANcpLua/renovate-config](https://github.com/ANcpLua/renovate-config#ancplua-framework-conventions--renovate-config).
-This file documents conventions specific to this repo only.
+`ANcpLua.Analyzers` is the concrete analyzer package in the ANcpLua framework chain:
 
+```text
+ANcpLua.Roslyn.Utilities -> ANcpLua.NET.Sdk -> ANcpLua.Analyzers -> consumers
+```
+
+`ANcpLua.Roslyn.Utilities` owns reusable Roslyn helpers. This repo owns concrete diagnostics, code fixes, docs generation, packaging, and tests. Telemetry-adjacent diagnostics moved to `ANcpLua.OpenTelemetry.SemanticConventions.Analyzers`; do not reintroduce OTel semantic-convention rules here unless explicitly requested. Tool-governance analyzers such as AL1800-AL1802 may remain here because they are not just OTel semantics.
+
+Rule counts drift. Trust `src/ANcpLua.Analyzers/AnalyzerReleases.*.md` and `src/ANcpLua.Analyzers.CodeFixes/CodeFixes/AL*.cs` over prose.
 
 ## Commands
 
 ```bash
 dotnet build ANcpLua.Analyzers.slnx -c Release
 dotnet test --project tests/ANcpLua.Analyzers.Tests/ANcpLua.Analyzers.Tests.csproj
-dotnet test --project tests/ANcpLua.Analyzers.Tests/ANcpLua.Analyzers.Tests.csproj --filter-method "*AL0001*"
+dotnet test --project tests/ANcpLua.Analyzers.Tests/ANcpLua.Analyzers.Tests.csproj --filter-method "*AL1000*"
 dotnet pack src/ANcpLua.Analyzers/ANcpLua.Analyzers.csproj -c Release -o artifacts -p:PackageId=ANcpLua.Analyzers
 ```
 
-## Project Structure
+Use `--filter-method`, not VSTest-style `--filter "FQN~..."`. Tests use xUnit v3 MTP. The meaningful full verifier is Release build plus the analyzer test project.
 
-```
+## Layout
+
+```text
+AGENTS.md                                           # canonical instructions
+CLAUDE.md                                          # symlink to AGENTS.md
 src/ANcpLua.Analyzers/
-  AlAnalyzer.cs                    # Base class (CreateRule, HelpLink, RegisterActions)
-  Resources.resx                   # Localized strings ({id}AnalyzerTitle/MessageFormat/Description)
-  AnalyzerReleases.Unshipped.md    # Release tracking
-  Analyzers/AL0XXX*.cs             # One file per analyzer (or grouped range)
+  AlAnalyzer.cs                                    # base class, CreateRule, HelpLink, action defaults
+  Resources.resx                                   # {id}AnalyzerTitle/MessageFormat/Description
+  AnalyzerReleases.Shipped.md
+  AnalyzerReleases.Unshipped.md
+  Analyzers/AL0XXX*.cs                             # one analyzer, or one grouped analyzer, per file
+  Analyzers/AsyncContextHelper.cs
 src/ANcpLua.Analyzers.CodeFixes/
-  CodeFixes/AL0XXX*.cs             # One file per code fix
-  Refactorings/AR0XXX*.cs          # Code refactorings
-tests/ANcpLua.Analyzers.Tests/     # Tests both analyzers and code fixes (xunit.v3.mtp-v2)
+  CodeFixes/AL0XXX*.cs
+  Refactorings/AR0XXX*.cs
+tests/ANcpLua.Analyzers.Tests/
+  AL0XXX*Tests.cs
 ```
 
-## Analyzer Template
+## Analyzer Shape
+
+Single-rule analyzer:
 
 ```csharp
+namespace ANcpLua.Analyzers.Analyzers;
+
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed partial class Al00xxDescriptiveNameAnalyzer : AlAnalyzer {
     private const string DiagnosticId = "AL00XX";
 
     private static readonly DiagnosticDescriptor Rule = CreateRule(
-        DiagnosticId, DiagnosticCategories.Category, DiagnosticSeverity.Warning);
+        DiagnosticId,
+        DiagnosticCategories.Usage,
+        DiagnosticSeverity.Warning);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
     protected override void RegisterActions(AnalysisContext context) =>
-        context.RegisterSyntaxNodeAction(Analyze, SyntaxKind.Whatever);
+        context.RegisterSyntaxNodeAction(Analyze, SyntaxKind.InvocationExpression);
+
+    private static void Analyze(SyntaxNodeAnalysisContext context) {
+        context.ReportDiagnostic(Rule, location, arg0);
+    }
 }
 ```
 
-- Each analyzer owns its own `DiagnosticId` as `const string` — NO shared DiagnosticIds class
-- **Visibility rule:** `public` only if a `CodeFixProvider` references it, otherwise `private` (matches the official Roslyn SDK template)
-- Use `CreateRule()` for single-rule analyzers, manual `new DiagnosticDescriptor(...)` for grouped
-- `HelpLink(id)` appends the ID to the Mintlify docs base URL
+Naming contract:
 
-## TypeCache Pattern (preferred for 2+ type resolutions)
+| Element | Rule |
+| --- | --- |
+| File | `Analyzers/AL00XXDescriptiveNameAnalyzer.cs` |
+| Class | `Al00xxDescriptiveNameAnalyzer`; use `Al`, not `AL` |
+| Modifier | `sealed partial class` |
+| Base | `AlAnalyzer` |
+| Namespace | `ANcpLua.Analyzers.Analyzers` |
+| Diagnostic ID | Per-analyzer `const string`; no central `DiagnosticIds` class |
+
+Diagnostic ID visibility:
+
+- `private` by default.
+- `public` only when a sibling code fix references it via `FixableDiagnosticIds => [Al00xxAnalyzer.DiagnosticId]`.
+- Do not make IDs public preemptively.
+
+Descriptor construction:
+
+- Single-rule analyzers use `CreateRule(id, category, severity)`.
+- Grouped analyzers with multiple IDs in one class may manually create `DiagnosticDescriptor` instances with `LocalizableResourceString`.
+- Do not manually construct single-rule descriptors.
+
+Grouped analyzer skeleton:
+
+```csharp
+[DiagnosticAnalyzer(LanguageNames.CSharp)]
+public sealed partial class Al1003ToAl1004SpanComparisonAnalyzer : AlAnalyzer {
+    public const string DiagnosticIdAl1003 = "AL1003";
+    public const string DiagnosticIdAl1004 = "AL1004";
+
+    private static readonly DiagnosticDescriptor RuleAl1003 = new(
+        DiagnosticIdAl1003,
+        new LocalizableResourceString(nameof(Resources.AL1003AnalyzerTitle), Resources.ResourceManager, typeof(Resources)),
+        new LocalizableResourceString(nameof(Resources.AL1003AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources)),
+        DiagnosticCategories.Usage,
+        DiagnosticSeverity.Warning,
+        true,
+        new LocalizableResourceString(nameof(Resources.AL1003AnalyzerDescription), Resources.ResourceManager, typeof(Resources)),
+        HelpLinkBase);
+
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [RuleAl1003, RuleAl1004];
+}
+```
+
+## Resources And Releases
+
+Each new diagnostic needs three `Resources.resx` keys:
+
+```text
+AL00XXAnalyzerTitle
+AL00XXAnalyzerMessageFormat
+AL00XXAnalyzerDescription
+```
+
+`AnalyzerReleases.Unshipped.md` gets one row per diagnostic under `### New Rules`:
+
+```text
+Rule ID | Category | Severity | Notes
+--------|----------|----------|-------
+AL00XX | Usage | Warning | Al00xxDescriptiveNameAnalyzer
+```
+
+Severity names in release files: `Error`, `Warning`, `Info`, `Disabled`.
+
+## Categories And Severity
+
+Known categories from `ANcpLua.Roslyn.Utilities.Sources`:
+
+```csharp
+DiagnosticCategories.Design
+DiagnosticCategories.Reliability
+DiagnosticCategories.Threading
+DiagnosticCategories.Usage
+DiagnosticCategories.Style
+DiagnosticCategories.AotTesting
+DiagnosticCategories.AspNetCore
+DiagnosticCategories.OpenTelemetry
+DiagnosticCategories.GenAI
+DiagnosticCategories.Metrics
+DiagnosticCategories.Configuration
+DiagnosticCategories.VersionManagement
+DiagnosticCategories.RoslynUtilities
+```
+
+Severity choices:
+
+```csharp
+DiagnosticSeverity.Error    // build-breaking
+DiagnosticSeverity.Warning  // build-visible
+DiagnosticSeverity.Info     // IDE only / hidden by default
+```
+
+Named aliases are also available:
+
+```csharp
+DiagnosticSeverities.RequiredFix
+DiagnosticSeverities.Suggestion
+DiagnosticSeverities.HiddenByDefault
+```
+
+Changing diagnostic severity or removing a diagnostic is a consumer-visible breaking change.
+
+## Roslyn Utility Rules
+
+Prefer source-package helpers from `ANcpLua.Roslyn.Utilities.Sources`:
+
+```csharp
+type.IsEqualTo(other)
+type.Implements(interfaceType)
+type.InheritsFrom(baseType)
+str.StartsWithOrdinal(prefix)
+operation.UnwrapAllConversions()
+operation.GetOperandName("fallback")
+context.ReportDiagnostic(Rule, location, args)
+```
+
+Use these instead of manual `SymbolEqualityComparer`, walking `AllInterfaces`, walking `BaseType`, or constructing `Diagnostic.Create` directly. Raw `Diagnostic.Create` is fine only when custom properties are needed.
+
+Use `AsyncContextHelper.IsInsideAsyncContext(node)` for async-context detection. AL1304 and AL1305 use it. Do not duplicate the walk-up loop.
+
+Use `OperationHelper` for argument-exception checks:
+
+```csharp
+OperationHelper.IsArgumentNullException(type)
+OperationHelper.IsArgumentException(type)
+OperationHelper.IsArgumentOutOfRangeException(type)
+OperationHelper.IsAnyArgumentException(type)
+```
+
+## Type Resolution
+
+Use `RegisterCompilationStartAction` when resolving types:
+
+```csharp
+protected override void RegisterActions(AnalysisContext context) =>
+    context.RegisterCompilationStartAction(OnCompilationStart);
+
+private static void OnCompilationStart(CompilationStartAnalysisContext context) {
+    if (context.Compilation.GetTypeByMetadataName("System.IAsyncDisposable") is not { } asyncDisposableType) {
+        return;
+    }
+
+    context.RegisterSyntaxNodeAction(
+        ctx => Analyze(ctx, asyncDisposableType),
+        SyntaxKind.UsingStatement);
+}
+```
+
+For two or more type resolutions, prefer `TypeCache<TEnum>`:
 
 ```csharp
 private enum KnownType { Task, TaskOfT, ValueTask, ValueTaskOfT }
 private static readonly string[] KnownTypeNames = [
-    "System.Threading.Tasks.Task", "System.Threading.Tasks.Task`1",
-    "System.Threading.Tasks.ValueTask", "System.Threading.Tasks.ValueTask`1" ];
+    "System.Threading.Tasks.Task",
+    "System.Threading.Tasks.Task`1",
+    "System.Threading.Tasks.ValueTask",
+    "System.Threading.Tasks.ValueTask`1"
+];
 
 var cache = new TypeCache<KnownType>(
     type => context.Compilation.GetTypeByMetadataName(KnownTypeNames[(int)type]));
 ```
 
-Adopted in: AL0004, AL0020, AL0026, AL0030, AL0075, AL0105, AL0106.
+Adopted examples include AL1100, AL1104, AL1701, AL1202, AL1305, and AL1109; re-grep if stale.
 
-## Test Pattern
+## Test Shape
+
+Analyzer test:
 
 ```csharp
-public sealed partial class Al00xxTests : AnalyzerTest<Al00xxAnalyzer> {
-    [Theory]
-    [InlineData("int i", "[|i|] = 10")]
-    public Task ShouldReport(string param, string stmt) =>
-        VerifyAsync($"public class C({param}) {{ void M() {{ {stmt}; }} }}");
+using AnalyzerTestBase = ANcpLua.Roslyn.Utilities.Testing.AnalyzerTest<ANcpLua.Analyzers.Analyzers.Al00xxDescriptiveNameAnalyzer>;
+
+namespace ANcpLua.Analyzers.Tests;
+
+public sealed partial class Al00xxDescriptiveNameTests : AnalyzerTestBase {
+    [Fact]
+    public Task ShouldReportWhenConditionMet() =>
+        VerifyAsync("""
+                    public class C {
+                        public void M() {
+                            [|Bad()|];
+                        }
+                    }
+                    """);
+
+    [Fact]
+    public Task ShouldNotReportWhenConditionNotMet() =>
+        VerifyAsync("""
+                    public class C {
+                        public void M() {
+                            Good();
+                        }
+                    }
+                    """);
 }
 ```
 
-- `[|span|]` marks expected diagnostic location
-- No marker = negative test (expects zero diagnostics)
-- Use `--filter-method` (MTP syntax), NOT `--filter "FQN~..."` (VSTest)
+Test contract:
 
-## Severity Guidelines
+| Element | Rule |
+| --- | --- |
+| File | `tests/ANcpLua.Analyzers.Tests/AL00XXDescriptiveNameTests.cs` |
+| Class | `Al00xxDescriptiveNameTests` |
+| Modifier | `sealed partial class` |
+| Base | Use `AnalyzerTestBase` alias |
+| Namespace | `ANcpLua.Analyzers.Tests` |
+| Return type | `Task` |
+| Diagnostic span | `[|span|]` |
+| Negative test | no marker means zero diagnostics |
 
-| Severity | MSBuild Behavior | Use When                           |
-|----------|------------------|------------------------------------|
-| Error    | Fails build      | Definite bug, security issue       |
-| Warning  | Shows in output  | Anti-pattern, likely bug           |
-| Info     | IDE only         | Style suggestion (hidden by default) |
+Code fix tests inherit `CodeFixTest<TAnalyzer, TCodeFixProvider>`.
 
-**Info severity diagnostics do NOT appear in `dotnet build` output** — IDE-only, won't block CI.
+External stubs should be local constants:
 
-## Ecosystem
-
+```csharp
+private const string AspNetCoreStubs = """
+                                       namespace Microsoft.AspNetCore.Mvc {
+                                           public abstract class ControllerBase { }
+                                           public abstract class Controller : ControllerBase { }
+                                       }
+                                       """;
 ```
-LAYER 0: ANcpLua.Roslyn.Utilities  <- Roslyn helpers (TypeCache, SymbolMatch, extensions)
-LAYER 1: ANcpLua.NET.Sdk           <- MSBuild SDK (Version.props source of truth)
-LAYER 2: ANcpLua.Analyzers         <- YOU ARE HERE
-LAYER 3: qyl, TourPlanner, etc     <- END USERS (auto-injected by SDK)
-```
 
-**Breaking change protocol:** Changing diagnostic severity or removing a diagnostic breaks all consumers.
+Use `$$"""` raw interpolation when inserting `{{StubConstant}}`.
 
-## Key Extensions from Roslyn.Utilities
+## New Analyzer Checklist
 
-| Extension | Replaces |
-|-----------|----------|
-| `symbol.IsEqualTo(other)` | `SymbolEqualityComparer.Default.Equals` |
-| `symbol.HasAttribute(type)` | Manual `GetAttributes()` foreach loop |
-| `symbol.HasAttributeByShortName("Obsolete")` | Manual name comparison |
-| `type.Implements(iface)` | Walking `AllInterfaces` manually |
-| `type.InheritsFrom(base)` | Walking `BaseType` chain manually |
-| `operation.UnwrapAllConversions()` | Manual conversion unwrapping loop |
-| `context.ReportDiagnostic(Rule, location, args)` | `Diagnostic.Create` boilerplate |
+1. Allocate an unused ID by checking both shipped and unshipped release files.
+2. Search existing analyzers to avoid duplicate coverage.
+3. Add analyzer file under `src/ANcpLua.Analyzers/Analyzers/`.
+4. Add resources.
+5. Add release row.
+6. Add analyzer tests with positive and negative cases.
+7. Add code fix provider and code fix tests only when a safe edit exists.
+8. Build and test.
+
+Anti-duplication checks:
+
+- Async checks use `AsyncContextHelper`.
+- Type identity uses `.IsEqualTo`.
+- Interface checks use `.Implements`.
+- Base type checks use `.InheritsFrom`.
+- Reporting uses `context.ReportDiagnostic`.
+- No hot-path `compilation.GetSemanticModel(otherTree)`.
 
 ## Performance Rules
 
-- `foreach` over Roslyn collections (ImmutableArray) — do NOT convert to LINQ (struct enumerator boxing)
-- Use `RegisterCompilationStartAction` + `RegisterOperationAction` — not syntax when operations suffice
-- Pre-index field values via `RegisterSyntaxNodeAction` — never call `compilation.GetSemanticModel(otherTree)` in hot paths
-- Use `IsEqualTo` for type comparison — never `ToDisplayString()` for type identity
+- Prefer operation analysis when semantic context is needed; syntax analysis is fine for pure syntax.
+- Use `RegisterCompilationStartAction` for per-compilation type lookup.
+- Pre-index cross-tree facts instead of asking for semantic models from unrelated trees in hot paths.
+- Use `foreach` over Roslyn collections; avoid LINQ allocation on analyzer hot paths.
+- Do not compare type identity via `ToDisplayString()`.
 
-## Banned Patterns
+## Banned Or Sensitive Patterns
 
-| Pattern | Use Instead |
-|---------|-------------|
+| Avoid | Use |
+| --- | --- |
 | `FluentAssertions` | `AwesomeAssertions` |
 | `Microsoft.NET.Test.Sdk` | `xunit.v3.mtp-v2` |
-| `--filter "FQN~..."` | `--filter-method` (MTP) |
-| `LangVersion` / `Nullable` in csproj | SDK-owned |
-| `DiagnosticIds.XXX` (shared class) | `const string DiagnosticId` per analyzer (private unless a fix references it) |
-| `compilation.GetSemanticModel(otherTree)` in hot path | Pre-index via RegisterSyntaxNodeAction |
-| `type.ToDisplayString()` for identity | `type.IsEqualTo(cachedSymbol)` |
+| `--filter "FQN~..."` | `--filter-method` |
+| `LangVersion` / `Nullable` in csproj | SDK-owned defaults |
+| central `DiagnosticIds` class | per-analyzer `const string DiagnosticId` |
+| manual interface/base walks | Roslyn.Utilities extensions |
+| hot-path LINQ | direct loops |
 
-## Package Structure
+## Package Shape
 
-| Component                        | Target           | NuGet Location                |
-|----------------------------------|------------------|-------------------------------|
-| ANcpLua.Analyzers.dll            | netstandard2.0   | `analyzers/dotnet/cs/`        |
-| ANcpLua.Analyzers.CodeFixes.dll  | netstandard2.0   | `analyzers/dotnet/cs/`        |
+```text
+ANcpLua.Analyzers.dll            -> analyzers/dotnet/cs/
+ANcpLua.Analyzers.CodeFixes.dll  -> analyzers/dotnet/cs/
+```
 
-Both DLLs are required in the nupkg for IDE code fix integration.
+Both assemblies must be in the nupkg for IDE code fix integration. Local development can use `PackageId=Dummy` to avoid a self-reference cycle. CI passes `-p:PackageId=ANcpLua.Analyzers`.
 
-## Version Management
+## Version Chain
 
-Two `Version.props` files participate, layered via "last wins":
+Version truth usually lives in `ANcpLua.NET.Sdk/src/Build/Common/Version.props`, then flows into consumer projects through the SDK. This repo may also have a local `Version.props` override imported after the SDK copy.
 
-1. **SDK-shipped baseline** — packed inside `ANcpLua.NET.Sdk`, resolved automatically for any project declaring `<Project Sdk="ANcpLua.NET.Sdk">`. Lives at `~/.nuget/packages/ancplua.net.sdk/<ver>/Build/Common/Version.props`.
-2. **Local override** — `./Version.props` at this repo root, imported explicitly by `Directory.Packages.props` AFTER the SDK copy. Used to pin versions AHEAD of the currently-published SDK.
+Rules before touching versions:
 
-Not a symlink — git cannot symlink cleanly across repos. Prune entries from the local file once the SDK publishes with matching versions; drift means stale local overrides, not a broken link.
+- Do not point SDK truth at a package version that is not on NuGet; restore fails with `NU1102`.
+- A repo-local variable for this repo's own package should point to the last published version, not the version being built.
+- CI stamps the new package version at pack time.
+- Central Package Management turns transitive downgrade conflicts into hard restore errors; read `NU1109` details before retrying.
+- A local override equal to or below SDK truth is stale; prune it when the SDK publishes matching values.
+- Publish is tag-driven (`v*`) and gated by tests. If a tag points to a broken commit, use the next patch version rather than force-moving remote tags.
+- Verify package versions through the NuGet flat-container API before bumping.
 
-- `ANcpSdkPackageVersion` is `999.9.9` in the local file (dogfooding sentinel); CI stamps the real version at pack time
-- CI uses `-p:Version=X.Y.Z` at build/pack time for new versions
-- Tag format: `v1.21.0` — triggers publish workflow
+Useful variable names:
 
-## Cross-Repo Awareness — was passiert, wenn du Versionen anfasst
+| Package | Variable |
+| --- | --- |
+| Microsoft.CodeAnalysis.CSharp | `$(RoslynVersion)` |
+| ANcpLua.Roslyn.Utilities | `$(ANcpLuaRoslynUtilitiesVersion)` |
+| ANcpLua.Roslyn.Utilities.Sources | `$(ANcpLuaRoslynUtilitiesSourcesVersion)` |
+| ANcpLua.Roslyn.Utilities.Polyfills | `$(ANcpLuaRoslynUtilitiesPolyfillsVersion)` |
+| ANcpLua.Roslyn.Utilities.Testing | `$(ANcpLuaRoslynUtilitiesTestingVersion)` |
+| xunit.v3.mtp-v2 | `$(XunitV3Version)` |
+| AwesomeAssertions | `$(AwesomeAssertionsVersion)` |
 
-Diese vier Repos bilden eine Bootstrap-Kette: `Roslyn.Utilities → NET.Sdk → (Analyzers, Agents)`. Truth-Source für Paket-Versionen ist **`ANcpLua.NET.Sdk/src/Build/Common/Version.props`**, in den SDK-NuGet-Packages gepackt und in jedes Consumer-Projekt geladen. Dein lokales `Version.props` (sofern vorhanden) wird *nach* der SDK-Datei importiert (last-wins) — gedacht, um lokal AHEAD der gerade-publizierten SDK zu pinnen.
+As of 2026-05-23, the Roslyn.Utilities chain should stay on the 2.2.x line at or above 2.2.21; AL1010 floating-point detection depends on the `IsConstantZero` regression fix.
 
-Bevor du eine Variable in Truth oder im lokalen Override bumpst:
+## Cross-Repo Bootstrap
 
-- **Truth fließt durch GlobalPackageReference.** Pakete wie `ANcpLua.Analyzers` werden von der SDK in *jedes* Consumer-Projekt injiziert. Wenn Truth auf eine Version zeigt, die noch nicht auf nuget.org liegt, scheitert jeder Restore mit `NU1102` — auch die SDK-eigenen Tests (sie packen ein Sample.csproj und builden es). Saubere Reihenfolge: zuerst das ausgeschriebene Repo taggen + auf NuGet bringen, dann Truth nachziehen.
+The framework repos are coupled:
 
-- **Self-Reference: die eigene Paket-Version zeigt auf last-PUBLISHED.** Wenn ein lokales `Version.props` eine Variable für das *eigene* Paket des Repos hat (z.B. `ANcpLuaAnalyzersVersion` in `ANcpLua.Analyzers/Version.props`), muss sie auf die zuletzt-publizierte Version zeigen, nicht auf die hochzukommende. csproj/Tests-Files referenzieren das Paket via `PackageReference` und ziehen es beim Restore aus NuGet; während Restore (vor Pack) gibt's die hochzukommende Version noch nicht. CI stampt die neue Version per `-p:Version=X.Y.Z` erst zur Pack-Time.
+```text
+ANcpLua.Roslyn.Utilities
+ANcpLua.NET.Sdk
+ANcpLua.Analyzers
+ANcpLua.Agents
+```
 
-- **Bumps haben transitive Konsequenzen unter CPM.** Z.B. `Meziantou.Framework.DependencyScanning 2.0.11` zieht `YamlDotNet ≥ 17.0.1`. Bei `ManagePackageVersionsCentrally=true` ist Downgrade ein Hard-Error (`NU1109`). Wenn ein Bump nicht greift, steht der Grund in der Restore-Fehlermeldung — vor dem nächsten Versuch lesen.
+Changing package variables has transitive effects because the SDK injects analyzer packages through `GlobalPackageReference`. Publish lower layers before moving SDK truth upward.
 
-- **Lokales Override gleich/unter Truth ist Müll.** Gleich = Doppelpflege, unter = stille Regression. Pruning sinnvoll, sobald die SDK mit matching Werten publisht.
+Branch protection, release flow, dependency graph, and shared framework conventions live in `ANcpLua/renovate-config`. This file only records repo-local rules.
 
-- **Publish triggert auf Tag-Push `v*`, gegated durch Tests.** Ein Tag auf einen build-broken Commit publisht nicht, bleibt aber als Ghost-Tag remote. Statt remote zu re-assignen (≈ Force-Push), nächste Patch-Version verwenden.
-
-- **Verifiziere Versionen vor dem Bump.** Ein Tippfehler (`2.0.20` statt `2.0.11`) bricht die Topo-Kette, weil Truth in alle Konsumenten fließt. NuGet-API: `https://api.nuget.org/v3-flatcontainer/<lowercased-id>/index.json`.
-
-## Dependencies (from Version.props)
-
-| Package | Variable | Purpose |
-|---------|----------|---------|
-| Microsoft.CodeAnalysis.CSharp | `$(RoslynVersion)` 5.3.0 | Roslyn APIs |
-| ANcpLua.Roslyn.Utilities | `$(ANcpLuaRoslynUtilitiesVersion)` 2.0.4 | Binary package |
-| ANcpLua.Roslyn.Utilities.Sources | `$(ANcpLuaRoslynUtilitiesSourcesVersion)` 2.0.4 | Compile-time source package |
-| ANcpLua.Roslyn.Utilities.Polyfills | `$(ANcpLuaRoslynUtilitiesPolyfillsVersion)` 2.0.4 | netstandard2.0 polyfills |
-| ANcpLua.Roslyn.Utilities.Testing | `$(ANcpLuaRoslynUtilitiesTestingVersion)` 2.0.4 | Test infrastructure |
-| xunit.v3.mtp-v2 | `$(XunitV3Version)` 3.2.2 | Test framework |
-| AwesomeAssertions | `$(AwesomeAssertionsVersion)` 9.4.0 | Assertions |
-
-Re-read `Version.props` before trusting these numbers — CI bumps them under you. Analyzers is on the v2.x Roslyn.Utilities line.
-
-## SDK Integration Note
-
-The SDK auto-injects this analyzer package. To prevent build cycle during development:
-- Use `PackageId=Dummy` in local csproj
-- CI workflow passes `-p:PackageId=ANcpLua.Analyzers`

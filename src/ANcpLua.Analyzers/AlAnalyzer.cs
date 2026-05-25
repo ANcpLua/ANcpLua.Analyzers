@@ -21,7 +21,7 @@ public abstract partial class AlAnalyzer : DiagnosticAnalyzerBase {
     /// <summary>
     ///     Creates a <see cref="DiagnosticDescriptor"/> using resource-based localization.
     /// </summary>
-    /// <param name="id">The diagnostic ID (e.g., "AL0036").</param>
+    /// <param name="id">The diagnostic ID (e.g., "AL1208").</param>
     /// <param name="category">The diagnostic category from <see cref="DiagnosticCategories"/>.</param>
     /// <param name="severity">The diagnostic severity.</param>
     /// <param name="isEnabledByDefault">Whether the diagnostic is enabled by default.</param>
