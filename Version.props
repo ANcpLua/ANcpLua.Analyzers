@@ -60,12 +60,20 @@
   <PropertyGroup Label="Analyzers">
     <!-- INVARIANT (see Directory.Build.props):
          This is the LAST-PUBLISHED nuget.org version, used by the SDK's
-         GlobalPackageReference self-injection. It must NEVER equal the
-         VersionPrefix of THIS build (currently 2.0.0) because that version
-         doesn't exist on nuget.org yet — restore would fail with NU1102.
+         GlobalPackageReference self-injection. Must always be a version
+         that already exists on nuget.org — otherwise restore fails NU1102.
+         After publishing N.M.P, bump to N.M.P. Before publishing N.M.P+1,
+         the value can stay at N.M.P; never set to N.M.P+1 before publish.
+
          CR autofix conflated VersionPrefix with this value in commit 2fe348d
-         (2026-05-25) and broke CI; that incident triggered the CR uninstall. -->
-    <ANcpLuaAnalyzersVersion>1.29.4</ANcpLuaAnalyzersVersion>
+         (2026-05-25) and broke CI; that incident triggered the CR uninstall.
+
+         Post-2.0.0-publish bump (2026-05-25): now safe to track current.
+         Restore at 1.29.4 was forcing the AL repo's CI to dogfood OLD
+         AL0xxx-ID analyzers; consumer Renovate-bump PRs hit build errors
+         like AL0101 (renumbered to AL1408 in 2.0.0) because the OLD rule
+         dll was being resolved here. -->
+    <ANcpLuaAnalyzersVersion>2.0.0</ANcpLuaAnalyzersVersion>
     <JonSkeetAnalyzersVersion>1.0.0-beta.6</JonSkeetAnalyzersVersion>
   </PropertyGroup>
 
