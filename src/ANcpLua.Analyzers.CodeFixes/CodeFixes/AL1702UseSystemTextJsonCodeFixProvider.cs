@@ -32,7 +32,7 @@ public sealed partial class Al1702UseSystemTextJsonCodeFixProvider : CodeFixProv
                 CodeAction.Create(
                     CodeFixResources.AL1702CodeFixTitle,
                     _ => ConvertToSystemTextJson(context.Document, root, invocation, methodName, typeArgs),
-                    nameof(Al1702UseSystemTextJsonCodeFixProvider)),
+                    diagnostic.Id),
                 diagnostic);
         }
     }

@@ -27,7 +27,7 @@ public sealed partial class Al1209UseTryParseExtensionsCodeFixProvider
         CodeAction.Create(
             CodeFixResources.AL1209CodeFixTitle,
             _ => ConvertToExtension(document, conditional, root),
-            nameof(Al1209UseTryParseExtensionsCodeFixProvider));
+            Al1209UseTryParseExtensionsAnalyzer.DiagnosticId);
 
     private static Task<Document> ConvertToExtension(
         Document document,

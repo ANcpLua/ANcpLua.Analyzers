@@ -23,7 +23,7 @@ public sealed partial class Al1700StaticLambdaCodeFixProvider : CodeFixProvider 
                 CodeAction.Create(
                     CodeFixResources.AL1700CodeFixTitle,
                     ct => MakeStaticAsync(context.Document, span, ct),
-                    nameof(CodeFixResources.AL1700CodeFixTitle)),
+                    diagnostic.Id),
                 diagnostic);
         }
 

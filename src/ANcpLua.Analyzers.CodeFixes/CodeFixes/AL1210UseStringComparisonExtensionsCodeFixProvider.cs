@@ -39,7 +39,7 @@ public sealed partial class Al1210UseStringComparisonExtensionsCodeFixProvider
         CodeAction.Create(
             CodeFixResources.AL1210CodeFixTitle,
             _ => ConvertToExtensionMethod(document, invocation, root),
-            nameof(Al1210UseStringComparisonExtensionsCodeFixProvider));
+            Al1210UseStringComparisonExtensionsAnalyzer.DiagnosticId);
 
     private static Task<Document> ConvertToExtensionMethod(
         Document document,

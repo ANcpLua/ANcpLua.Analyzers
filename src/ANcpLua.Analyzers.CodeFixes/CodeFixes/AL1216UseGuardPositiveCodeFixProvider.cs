@@ -29,7 +29,7 @@ public sealed partial class Al1216UseGuardPositiveCodeFixProvider
         CodeAction.Create(
             CodeFixResources.AL1216CodeFixTitle,
             _ => ConvertToGuardPositive(document, ifStatement, root, GetExpressionFromDiagnostic(diagnostic, ifStatement)),
-            nameof(Al1216UseGuardPositiveCodeFixProvider));
+            Al1216UseGuardPositiveAnalyzer.DiagnosticId);
 
     private static Task<Document> ConvertToGuardPositive(
         Document document,

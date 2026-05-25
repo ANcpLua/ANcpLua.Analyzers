@@ -36,7 +36,7 @@ public sealed partial class Al1214UseGuardNotZeroCodeFixProvider
         return CodeAction.Create(
             CodeFixResources.AL1214CodeFixTitle,
             _ => ConvertToGuardNotZero(document, ifStatement, root, identifier),
-            nameof(Al1214UseGuardNotZeroCodeFixProvider));
+            Al1214UseGuardNotZeroAnalyzer.DiagnosticId);
     }
 
     private static Task<Document> ConvertToGuardNotZero(

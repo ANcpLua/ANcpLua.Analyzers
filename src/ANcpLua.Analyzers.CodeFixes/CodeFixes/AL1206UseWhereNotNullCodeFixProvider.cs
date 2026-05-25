@@ -27,7 +27,7 @@ public sealed partial class Al1206UseWhereNotNullCodeFixProvider
         CodeAction.Create(
             CodeFixResources.AL1206CodeFixTitle,
             _ => ConvertToWhereNotNull(document, invocation, root),
-            nameof(Al1206UseWhereNotNullCodeFixProvider));
+            Al1206UseWhereNotNullAnalyzer.DiagnosticId);
 
     private static Task<Document> ConvertToWhereNotNull(
         Document document,

@@ -29,7 +29,7 @@ public sealed partial class Al1504DuckDbTableCodeFixProvider : CodeFixProvider {
                 CodeAction.Create(
                     CodeFixResources.AL1504CodeFixTitle,
                     _ => MakePartialAsync(context.Document, typeDeclaration, root),
-                    nameof(CodeFixResources.AL1504CodeFixTitle)),
+                    diagnostic.Id),
                 diagnostic);
         }
     }

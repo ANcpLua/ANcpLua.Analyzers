@@ -34,7 +34,7 @@ public sealed partial class Al1011NormalizeNullGuardStyleCodeFixProvider : AlCod
         return CodeAction.Create(
             title,
             ct => ApplyFixAsync(document, ifStatement, identifier, typeName, style, ct),
-            nameof(Al1011NormalizeNullGuardStyleCodeFixProvider));
+            Al1011NormalizeNullGuardStyleAnalyzer.DiagnosticId);
     }
 
     private static Task<Document> ApplyFixAsync(

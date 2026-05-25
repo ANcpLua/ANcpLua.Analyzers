@@ -31,7 +31,7 @@ public sealed partial class Al1203UseOperationExtensionsCodeFixProvider : AlCode
             return CodeAction.Create(
                 CodeFixResources.AL1203CodeFixTitle,
                 _ => ConvertToIsMethodNamed(document, binary, root, invocationExpr, containingType, methodName),
-                nameof(Al1203UseOperationExtensionsCodeFixProvider) + "_IsMethodNamed");
+                Al1203UseOperationExtensionsAnalyzer.DiagnosticId);
         }
 
         // Pattern 2: op.ConstantValue.HasValue && op.ConstantValue.Value is T name → TryGetConstantValue<T>
@@ -39,7 +39,7 @@ public sealed partial class Al1203UseOperationExtensionsCodeFixProvider : AlCode
             return CodeAction.Create(
                 CodeFixResources.AL1203CodeFixTitleTryGetConstantValue,
                 _ => ConvertToTryGetConstantValue(document, binary, root, operationExpr, typeName, variableName),
-                nameof(Al1203UseOperationExtensionsCodeFixProvider) + "_TryGetConstantValue");
+                Al1203UseOperationExtensionsAnalyzer.DiagnosticId);
         }
 
         return null;

@@ -44,7 +44,7 @@ public sealed partial class Al1009LockTypeCodeFixProvider : CodeFixProvider {
                 CodeAction.Create(
                     CodeFixResources.AL1009CodeFixTitle,
                     ct => ChangeFieldTypeToLockAsync(context.Document, fieldInfo.declaration, ct),
-                    nameof(CodeFixResources.AL1009CodeFixTitle)),
+                    Al1009LockKeywordAnalyzer.DiagnosticId),
                 diagnostic);
         }
     }

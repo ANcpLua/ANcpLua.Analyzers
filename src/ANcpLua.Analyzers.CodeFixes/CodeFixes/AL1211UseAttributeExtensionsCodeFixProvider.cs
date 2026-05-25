@@ -33,7 +33,7 @@ public sealed partial class Al1211UseAttributeExtensionsCodeFixProvider : CodeFi
                 CodeAction.Create(
                     CodeFixResources.AL1211CodeFixTitle,
                     _ => ConvertToGetConstructorArgument(context.Document, root, node, attrExpr, indexExpr, typeArgument),
-                    nameof(Al1211UseAttributeExtensionsCodeFixProvider)),
+                    Al1211UseAttributeExtensionsAnalyzer.DiagnosticId),
                 diagnostic);
         }
     }

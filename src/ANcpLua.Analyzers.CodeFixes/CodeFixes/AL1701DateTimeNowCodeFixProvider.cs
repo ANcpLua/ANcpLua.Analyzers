@@ -22,7 +22,7 @@ public sealed partial class Al1701DateTimeNowCodeFixProvider : AlCodeFixProvider
         CodeAction.Create(
             CodeFixResources.AL1701CodeFixTitle,
             _ => ConvertToTimeProvider(document, memberAccess, root, diagnostic),
-            nameof(Al1701DateTimeNowCodeFixProvider));
+            diagnostic.Id);
 
     private static Task<Document> ConvertToTimeProvider(
         Document document,

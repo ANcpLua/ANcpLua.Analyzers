@@ -21,7 +21,7 @@ public sealed partial class Al1200UseIsEqualToCodeFixProvider : AlCodeFixProvide
         CodeAction.Create(
             CodeFixResources.AL1200CodeFixTitle,
             _ => ConvertToIsEqualTo(document, invocation, root),
-            nameof(Al1200UseIsEqualToCodeFixProvider));
+            Al1200UseIsEqualToAnalyzer.DiagnosticId);
 
     private static Task<Document> ConvertToIsEqualTo(
         Document document,

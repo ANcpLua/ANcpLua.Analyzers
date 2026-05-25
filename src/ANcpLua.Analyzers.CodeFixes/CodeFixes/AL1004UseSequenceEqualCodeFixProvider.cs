@@ -16,7 +16,7 @@ public sealed partial class Al1004UseSequenceEqualCodeFixProvider : AlCodeFixPro
         CodeAction.Create(
             CodeFixResources.AL1004CodeFixTitle,
             _ => UseSequenceEqual(document, syntax, root),
-            nameof(CodeFixResources.AL1004CodeFixTitle));
+            Al1003ToAl1004SpanComparisonAnalyzer.DiagnosticIdAl1004);
 
     private static Task<Document> UseSequenceEqual(
         Document document,

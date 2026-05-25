@@ -16,7 +16,7 @@ public sealed partial class Al1003SpanPatternMatchingCodeFixProvider : AlCodeFix
         CodeAction.Create(
             CodeFixResources.AL1003CodeFixTitle,
             _ => UsePatternMatching(document, syntax, root),
-            nameof(CodeFixResources.AL1003CodeFixTitle));
+            Al1003ToAl1004SpanComparisonAnalyzer.DiagnosticIdAl1003);
 
     private static Task<Document> UsePatternMatching(
         Document document,

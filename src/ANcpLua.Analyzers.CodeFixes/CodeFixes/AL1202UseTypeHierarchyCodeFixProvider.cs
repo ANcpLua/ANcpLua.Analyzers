@@ -12,7 +12,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 /// </remarks>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al1202UseTypeHierarchyCodeFixProvider))]
 [Shared]
-public sealed partial class Al1202UseTypeHierarchyCodeFixProvider : CodeFixProvider {
+public sealed partial class Al1202UseTypeHierarchyCodeFixProvider : AlCodeFixProvider<Al1202UseTypeHierarchyCodeFixProvider> {
     public override ImmutableArray<string> FixableDiagnosticIds => [Al1202UseTypeHierarchyAnalyzer.DiagnosticId];
 
     public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
@@ -35,7 +35,7 @@ public sealed partial class Al1202UseTypeHierarchyCodeFixProvider : CodeFixProvi
                     CodeAction.Create(
                         CodeFixResources.AL1202ImplementsCodeFixTitle,
                         _ => ConvertToImplements(context.Document, root, forEachStatement, typeExpr, targetExpr),
-                        nameof(Al1202UseTypeHierarchyCodeFixProvider) + "_Implements"),
+                        Al1202UseTypeHierarchyAnalyzer.DiagnosticId),
                     diagnostic);
                 break;
             // Handle while loop over BaseType
@@ -45,7 +45,7 @@ public sealed partial class Al1202UseTypeHierarchyCodeFixProvider : CodeFixProvi
                     CodeAction.Create(
                         CodeFixResources.AL1202InheritsFromCodeFixTitle,
                         _ => ConvertToInheritsFrom(context.Document, root, whileStatement, baseTypeExpr, baseTargetExpr),
-                        nameof(Al1202UseTypeHierarchyCodeFixProvider) + "_InheritsFrom"),
+                        Al1202UseTypeHierarchyAnalyzer.DiagnosticId),
                     diagnostic);
                 break;
         }

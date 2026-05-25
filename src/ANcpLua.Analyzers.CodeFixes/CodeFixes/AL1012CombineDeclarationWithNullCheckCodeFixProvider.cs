@@ -35,7 +35,7 @@ public sealed partial class Al1012CombineDeclarationWithNullCheckCodeFixProvider
         return CodeAction.Create(
             CodeFixResources.AL1012CodeFixTitle,
             ct => CombineAsync(document, declaration, ifStatement, variableName, initializerValue, ct),
-            nameof(Al1012CombineDeclarationWithNullCheckCodeFixProvider));
+            Al1012CombineDeclarationWithNullCheckAnalyzer.DiagnosticId);
     }
 
     private static async Task<Document> CombineAsync(

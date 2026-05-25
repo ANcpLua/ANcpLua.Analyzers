@@ -27,7 +27,7 @@ public sealed partial class Al1215UseGuardNotNegativeCodeFixProvider
         CodeAction.Create(
             CodeFixResources.AL1215CodeFixTitle,
             _ => ConvertToGuardNotNegative(document, ifStatement, root),
-            nameof(Al1215UseGuardNotNegativeCodeFixProvider));
+            Al1215UseGuardNotNegativeAnalyzer.DiagnosticId);
 
     private static Task<Document> ConvertToGuardNotNegative(
         Document document,

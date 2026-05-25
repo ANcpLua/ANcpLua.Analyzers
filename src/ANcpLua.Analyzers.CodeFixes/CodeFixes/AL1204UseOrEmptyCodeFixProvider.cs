@@ -28,7 +28,7 @@ public sealed partial class Al1204UseOrEmptyCodeFixProvider
         CodeAction.Create(
             CodeFixResources.AL1204CodeFixTitle,
             _ => ConvertToOrEmpty(document, coalesce, root),
-            nameof(Al1204UseOrEmptyCodeFixProvider));
+            Al1204UseOrEmptyAnalyzer.DiagnosticId);
 
     private static Task<Document> ConvertToOrEmpty(
         Document document,

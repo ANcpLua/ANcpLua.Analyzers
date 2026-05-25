@@ -25,7 +25,7 @@ public sealed partial class Al1205UseToImmutableArrayOrEmptyCodeFixProvider
         CodeAction.Create(
             CodeFixResources.AL1205CodeFixTitle,
             _ => ConvertToExtension(document, coalesce, root),
-            nameof(Al1205UseToImmutableArrayOrEmptyCodeFixProvider));
+            Al1205UseToImmutableArrayOrEmptyAnalyzer.DiagnosticId);
 
     private static Task<Document> ConvertToExtension(
         Document document,

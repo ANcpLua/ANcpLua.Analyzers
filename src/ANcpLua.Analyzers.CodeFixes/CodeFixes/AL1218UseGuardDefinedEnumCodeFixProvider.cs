@@ -27,7 +27,7 @@ public sealed partial class Al1218UseGuardDefinedEnumCodeFixProvider
         CodeAction.Create(
             CodeFixResources.AL1218CodeFixTitle,
             _ => ConvertToGuardDefinedEnum(document, ifStatement, root),
-            nameof(Al1218UseGuardDefinedEnumCodeFixProvider));
+            Al1218UseGuardDefinedEnumAnalyzer.DiagnosticId);
 
     private static Task<Document> ConvertToGuardDefinedEnum(
         Document document,

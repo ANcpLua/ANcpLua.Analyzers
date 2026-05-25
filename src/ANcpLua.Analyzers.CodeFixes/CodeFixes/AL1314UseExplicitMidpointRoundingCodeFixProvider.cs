@@ -29,7 +29,7 @@ public sealed partial class Al1314UseExplicitMidpointRoundingCodeFixProvider
         CodeAction.Create(
             CodeFixResources.AL1314CodeFixTitle,
             _ => AppendMidpointRounding(document, invocation, root),
-            nameof(Al1314UseExplicitMidpointRoundingCodeFixProvider));
+            Al1314UseExplicitMidpointRoundingAnalyzer.DiagnosticId);
 
     private static Task<Document> AppendMidpointRounding(
         Document document,

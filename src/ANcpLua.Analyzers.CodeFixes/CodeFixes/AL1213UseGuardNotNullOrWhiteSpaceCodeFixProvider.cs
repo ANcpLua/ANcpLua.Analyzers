@@ -27,7 +27,7 @@ public sealed partial class Al1213UseGuardNotNullOrWhiteSpaceCodeFixProvider
         CodeAction.Create(
             CodeFixResources.AL1213CodeFixTitle,
             _ => ConvertToGuardNotNullOrWhiteSpace(document, ifStatement, root),
-            nameof(Al1213UseGuardNotNullOrWhiteSpaceCodeFixProvider));
+            Al1213UseGuardNotNullOrWhiteSpaceAnalyzer.DiagnosticId);
 
     private static Task<Document> ConvertToGuardNotNullOrWhiteSpace(
         Document document,

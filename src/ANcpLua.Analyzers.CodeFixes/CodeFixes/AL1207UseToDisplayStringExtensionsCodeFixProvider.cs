@@ -39,7 +39,7 @@ public sealed partial class Al1207UseToDisplayStringExtensionsCodeFixProvider
         CodeAction.Create(
             CodeFixResources.AL1207CodeFixTitle,
             _ => ConvertToExtension(document, invocation, root),
-            nameof(Al1207UseToDisplayStringExtensionsCodeFixProvider));
+            Al1207UseToDisplayStringExtensionsAnalyzer.DiagnosticId);
 
     private static Task<Document> ConvertToExtension(
         Document document,

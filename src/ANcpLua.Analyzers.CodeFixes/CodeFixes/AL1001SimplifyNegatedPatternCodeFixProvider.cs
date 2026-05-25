@@ -20,7 +20,7 @@ public sealed partial class Al1001SimplifyNegatedPatternCodeFixProvider : AlCode
         return CodeAction.Create(
             CodeFixResources.AL1001CodeFixTitle,
             _ => RemoveRepeatedNegatedPatterns(document, syntax, parent, root),
-            nameof(CodeFixResources.AL1001CodeFixTitle));
+            Al1001DontRepeatNegatedPatternAnalyzer.DiagnosticId);
     }
 
     private static Task<Document> RemoveRepeatedNegatedPatterns(

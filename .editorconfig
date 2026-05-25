@@ -1732,12 +1732,3 @@ dotnet_diagnostic.AL1401.severity = warning
 dotnet_diagnostic.AL1402.severity = warning
 dotnet_diagnostic.AL1403.severity = warning
 
-# =============================================================================
-# Semconv catalog files — historical scoped suppression carried over from the
-# pre-2.0 fork era when OTel semantic-convention analyzers (AL0074/AL0010) lived
-# in this assembly. They moved to Qyl.OpenTelemetry.SemanticConventions.Analyzers
-# and were deleted from this repo in 2.0.0. Only AL1210 (StringComparison
-# extension) still needs scoping in case Semconv catalog files are reintroduced.
-# =============================================================================
-[src/ANcpLua.Analyzers/Semconv/*.cs]
-dotnet_diagnostic.AL1210.severity = none

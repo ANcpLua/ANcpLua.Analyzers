@@ -27,7 +27,7 @@ public sealed partial class Al1208UseGuardNotNullCodeFixProvider
         CodeAction.Create(
             CodeFixResources.AL1208CodeFixTitle,
             _ => ConvertToGuardNotNull(document, coalesce, root),
-            nameof(Al1208UseGuardNotNullCodeFixProvider));
+            Al1208UseGuardNotNullAnalyzer.DiagnosticId);
 
     private static Task<Document> ConvertToGuardNotNull(
         Document document,

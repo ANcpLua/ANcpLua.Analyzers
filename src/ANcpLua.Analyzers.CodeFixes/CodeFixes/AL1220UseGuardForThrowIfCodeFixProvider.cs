@@ -33,7 +33,7 @@ public sealed partial class Al1220UseGuardForThrowIfCodeFixProvider
         CodeAction.Create(
             CodeFixResources.AL1220CodeFixTitle,
             _ => ConvertToGuard(document, invocation, root, diagnostic),
-            nameof(Al1220UseGuardForThrowIfCodeFixProvider));
+            Al1220UseGuardForThrowIfAnalyzer.DiagnosticId);
 
     private static Task<Document> ConvertToGuard(
         Document document,

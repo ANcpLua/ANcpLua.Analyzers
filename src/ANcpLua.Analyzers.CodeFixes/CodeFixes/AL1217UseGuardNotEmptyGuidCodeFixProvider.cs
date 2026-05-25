@@ -33,7 +33,7 @@ public sealed partial class Al1217UseGuardNotEmptyGuidCodeFixProvider
         return CodeAction.Create(
             CodeFixResources.AL1217CodeFixTitle,
             ct => ConvertToGuardNotEmpty(document, ifStatement, expressionText, ct),
-            nameof(Al1217UseGuardNotEmptyGuidCodeFixProvider));
+            Al1217UseGuardNotEmptyGuidAnalyzer.DiagnosticId);
     }
 
     private static Task<Document> ConvertToGuardNotEmpty(

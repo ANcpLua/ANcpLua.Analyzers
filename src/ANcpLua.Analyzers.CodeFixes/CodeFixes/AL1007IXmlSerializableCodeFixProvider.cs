@@ -7,7 +7,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 /// </summary>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al1007IXmlSerializableCodeFixProvider))]
 [Shared]
-public sealed partial class Al1007IXmlSerializableCodeFixProvider : CodeFixProvider {
+public sealed partial class Al1007IXmlSerializableCodeFixProvider : AlCodeFixProvider<Al1007IXmlSerializableCodeFixProvider> {
     public override ImmutableArray<string> FixableDiagnosticIds =>
         [Al1006ToAl1008IXmlSerializableAnalyzer.DiagnosticIdAl1007];
 
@@ -54,7 +54,7 @@ public sealed partial class Al1007IXmlSerializableCodeFixProvider : CodeFixProvi
                 CodeAction.Create(
                     CodeFixResources.AL1007CodeFixTitle,
                     _ => FixAsync(context.Document, target, root),
-                    nameof(CodeFixResources.AL1007CodeFixTitle)),
+                    Al1006ToAl1008IXmlSerializableAnalyzer.DiagnosticIdAl1007),
                 diagnostic);
         }
     }

@@ -22,7 +22,7 @@ public sealed partial class Al1313CancellationTokenPropagationCodeFixProvider
         CodeAction.Create(
             CodeFixResources.AL1313CodeFixTitle,
             ct => AddCancellationTokenAsync(document, invocation, root, ct),
-            nameof(CodeFixResources.AL1313CodeFixTitle));
+            Al1313CancellationTokenPropagationAnalyzer.DiagnosticId);
 
     private static async Task<Document> AddCancellationTokenAsync(
         Document document,
