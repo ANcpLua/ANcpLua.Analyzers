@@ -91,6 +91,9 @@
     <data name="AL1009CodeFixTitle" xml:space="preserve">
     <value>Use Lock type</value>
   </data>
+    <data name="AL1010CodeFixTitle" xml:space="preserve">
+    <value>Use pattern matching</value>
+  </data>
     <data name="AL1701CodeFixTitle" xml:space="preserve">
     <value>Use TimeProvider</value>
   </data>

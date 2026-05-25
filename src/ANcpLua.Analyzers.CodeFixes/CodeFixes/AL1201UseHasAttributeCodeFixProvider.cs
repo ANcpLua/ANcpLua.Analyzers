@@ -11,7 +11,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 /// </remarks>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al1201UseHasAttributeCodeFixProvider))]
 [Shared]
-public sealed partial class Al1201UseHasAttributeCodeFixProvider : AlCodeFixProvider<InvocationExpressionSyntax> {
+public sealed partial class Al1201UseHasAttributeCodeFixProvider : CodeFixProvider {
     public override ImmutableArray<string> FixableDiagnosticIds => [Al1201UseHasAttributeAnalyzer.DiagnosticId];
 
     public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
