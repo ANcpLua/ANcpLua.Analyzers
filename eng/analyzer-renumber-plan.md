@@ -432,7 +432,31 @@ The orphan resx keys enumerated in §3.2 (`AL0061..AL0079`, `AL0085..AL0093`, `A
 
 ---
 
-## 8. Consumer scan (preliminary)
+## 8. Release strategy & consumer scan
+
+### 8.1 Chosen release path: (B) Coordinated simultaneous release
+
+**Decision:** Publish ANcpLua.Analyzers 2.0.0 and ANcpLua.NET.Sdk simultaneously with lockstep version pins to avoid the transient broken state where consumers have the new analyzer package but old SDK .editorconfig mappings.
+
+**Steps:**
+1. Merge all AL→AL1### renumbering commits to main in ANcpLua.Analyzers
+2. Build and stage ANcpLua.Analyzers 2.0.0 nupkg (do NOT publish yet)
+3. Update ANcpLua.NET.Sdk:
+   - Update `src/Config/Analyzer.ANcpLua.Analyzers.editorconfig` with all new AL1### IDs
+   - Bump `ANcpLuaAnalyzersVersion` to `2.0.0` in SDK's Version.props
+   - Update any other references to old AL00## IDs
+4. Build and stage ANcpLua.NET.Sdk nupkg (do NOT publish yet)
+5. Publish both packages within the same maintenance window (< 5 minutes apart)
+6. Monitor for any consumer issues in the first 24 hours
+
+**Rationale:** Option A (sequential publish) would create a window where consumers with auto-restore would get:
+- New analyzer reporting AL1### diagnostics
+- Old SDK .editorconfig still referencing AL00## (causing all per-rule severity customizations to stop working)
+- Result: transient flood of unexpected diagnostics until SDK update propagates
+
+Option B eliminates this gap by ensuring the matching .editorconfig ships simultaneously.
+
+### 8.2 Consumer impact scan
 
 Repos in `~/RiderProjects/` that reference `AL####` literally and will need rewiring after the 2.0.0 break:
 

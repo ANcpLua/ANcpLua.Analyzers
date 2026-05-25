@@ -16,7 +16,7 @@ public sealed partial class Al1010PatternMatchingCodeFixProvider : AlCodeFixProv
         SyntaxNode root,
         Diagnostic diagnostic) =>
         CodeAction.Create(
-            CodeFixResources.AL1003CodeFixTitle,
+            CodeFixResources.AL1010CodeFixTitle,
             _ => ConvertToPatternMatching(document, binary, root),
             Al1010PreferPatternMatchingAnalyzer.DiagnosticId);
 
