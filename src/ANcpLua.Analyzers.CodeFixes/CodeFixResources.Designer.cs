@@ -45,21 +45,21 @@ namespace ANcpLua.Analyzers.CodeFixes {
             }
         }
         
-        internal static string AL0002CodeFixTitle {
+        internal static string AL1001CodeFixTitle {
             get {
-                return ResourceManager.GetString("AL0002CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("AL1001CodeFixTitle", resourceCulture);
             }
         }
         
-        internal static string AL0004CodeFixTitle {
+        internal static string AL1003CodeFixTitle {
             get {
-                return ResourceManager.GetString("AL0004CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("AL1003CodeFixTitle", resourceCulture);
             }
         }
         
-        internal static string AL0005CodeFixTitle {
+        internal static string AL1004CodeFixTitle {
             get {
-                return ResourceManager.GetString("AL0005CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("AL1004CodeFixTitle", resourceCulture);
             }
         }
         
@@ -69,285 +69,207 @@ namespace ANcpLua.Analyzers.CodeFixes {
             }
         }
         
-        internal static string AL0008CodeFixTitle {
+        internal static string AL1007CodeFixTitle {
             get {
-                return ResourceManager.GetString("AL0008CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("AL1007CodeFixTitle", resourceCulture);
             }
         }
         
-        internal static string AL0010CodeFixTitle {
+        internal static string AL1011CodeFixTitle {
             get {
-                return ResourceManager.GetString("AL0010CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("AL1011CodeFixTitle", resourceCulture);
             }
         }
         
-        internal static string AL0012CodeFixTitle {
+        internal static string AL1012CodeFixTitle {
             get {
-                return ResourceManager.GetString("AL0012CodeFixTitle", resourceCulture);
-            }
-        }
-        
-        internal static string AL0015CodeFixTitle {
-            get {
-                return ResourceManager.GetString("AL0015CodeFixTitle", resourceCulture);
-            }
-        }
-        
-        internal static string AL0016CodeFixTitle {
-            get {
-                return ResourceManager.GetString("AL0016CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("AL1012CodeFixTitle", resourceCulture);
             }
         }
 
-        internal static string AL0025CodeFixTitle {
+        internal static string AL1700CodeFixTitle {
             get {
-                return ResourceManager.GetString("AL0025CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("AL1700CodeFixTitle", resourceCulture);
             }
         }
 
-        internal static string AL0011CodeFixTitle {
+        internal static string AL1009CodeFixTitle {
             get {
-                return ResourceManager.GetString("AL0011CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("AL1009CodeFixTitle", resourceCulture);
             }
         }
 
-        internal static string AL0026CodeFixTitle {
+        internal static string AL1701CodeFixTitle {
             get {
-                return ResourceManager.GetString("AL0026CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("AL1701CodeFixTitle", resourceCulture);
             }
         }
 
-        internal static string AL0028CodeFixTitle {
+        internal static string AL1200CodeFixTitle {
             get {
-                return ResourceManager.GetString("AL0028CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("AL1200CodeFixTitle", resourceCulture);
             }
         }
 
-        internal static string AL0031CodeFixTitle {
+        internal static string AL1203CodeFixTitle {
             get {
-                return ResourceManager.GetString("AL0031CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("AL1203CodeFixTitle", resourceCulture);
             }
         }
 
-        internal static string AL0031CodeFixTitleTryGetConstantValue {
+        internal static string AL1203CodeFixTitleTryGetConstantValue {
             get {
-                return ResourceManager.GetString("AL0031CodeFixTitleTryGetConstantValue", resourceCulture);
+                return ResourceManager.GetString("AL1203CodeFixTitleTryGetConstantValue", resourceCulture);
             }
         }
 
-        internal static string AL0027CodeFixTitle {
+        internal static string AL1702CodeFixTitle {
             get {
-                return ResourceManager.GetString("AL0027CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("AL1702CodeFixTitle", resourceCulture);
             }
         }
 
-        internal static string AL0029CodeFixTitle {
+        internal static string AL1201CodeFixTitle {
             get {
-                return ResourceManager.GetString("AL0029CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("AL1201CodeFixTitle", resourceCulture);
             }
         }
 
-        internal static string AL0030ImplementsCodeFixTitle {
+        internal static string AL1202ImplementsCodeFixTitle {
             get {
-                return ResourceManager.GetString("AL0030ImplementsCodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("AL1202ImplementsCodeFixTitle", resourceCulture);
             }
         }
 
-        internal static string AL0030InheritsFromCodeFixTitle {
+        internal static string AL1202InheritsFromCodeFixTitle {
             get {
-                return ResourceManager.GetString("AL0030InheritsFromCodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("AL1202InheritsFromCodeFixTitle", resourceCulture);
             }
         }
 
-        internal static string AL0039CodeFixTitle {
+        internal static string AL1210CodeFixTitle {
             get {
-                return ResourceManager.GetString("AL0039CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("AL1210CodeFixTitle", resourceCulture);
             }
         }
 
-        internal static string AL0032CodeFixTitle {
+        internal static string AL1204CodeFixTitle {
             get {
-                return ResourceManager.GetString("AL0032CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("AL1204CodeFixTitle", resourceCulture);
             }
         }
 
-        internal static string AL0033CodeFixTitle {
+        internal static string AL1205CodeFixTitle {
             get {
-                return ResourceManager.GetString("AL0033CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("AL1205CodeFixTitle", resourceCulture);
             }
         }
 
-        internal static string AL0034CodeFixTitle {
+        internal static string AL1206CodeFixTitle {
             get {
-                return ResourceManager.GetString("AL0034CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("AL1206CodeFixTitle", resourceCulture);
             }
         }
 
-        internal static string AL0035CodeFixTitle {
+        internal static string AL1207CodeFixTitle {
             get {
-                return ResourceManager.GetString("AL0035CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("AL1207CodeFixTitle", resourceCulture);
             }
         }
 
-        internal static string AL0036CodeFixTitle {
+        internal static string AL1208CodeFixTitle {
             get {
-                return ResourceManager.GetString("AL0036CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("AL1208CodeFixTitle", resourceCulture);
             }
         }
 
-        internal static string AL0037CodeFixTitle {
+        internal static string AL1209CodeFixTitle {
             get {
-                return ResourceManager.GetString("AL0037CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("AL1209CodeFixTitle", resourceCulture);
             }
         }
 
-        internal static string AL0040CodeFixTitle {
+        internal static string AL1211CodeFixTitle {
             get {
-                return ResourceManager.GetString("AL0040CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("AL1211CodeFixTitle", resourceCulture);
             }
         }
 
-        internal static string AL0045CodeFixTitle {
+        internal static string AL1212CodeFixTitle {
             get {
-                return ResourceManager.GetString("AL0045CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("AL1212CodeFixTitle", resourceCulture);
             }
         }
 
-        internal static string AL0046CodeFixTitle {
+        internal static string AL1213CodeFixTitle {
             get {
-                return ResourceManager.GetString("AL0046CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("AL1213CodeFixTitle", resourceCulture);
             }
         }
 
-        internal static string AL0047CodeFixTitle {
+        internal static string AL1214CodeFixTitle {
             get {
-                return ResourceManager.GetString("AL0047CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("AL1214CodeFixTitle", resourceCulture);
             }
         }
 
-        internal static string AL0048CodeFixTitle {
+        internal static string AL1215CodeFixTitle {
             get {
-                return ResourceManager.GetString("AL0048CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("AL1215CodeFixTitle", resourceCulture);
             }
         }
 
-        internal static string AL0049CodeFixTitle {
+        internal static string AL1216CodeFixTitle {
             get {
-                return ResourceManager.GetString("AL0049CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("AL1216CodeFixTitle", resourceCulture);
             }
         }
 
-        internal static string AL0050CodeFixTitle {
+        internal static string AL1217CodeFixTitle {
             get {
-                return ResourceManager.GetString("AL0050CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("AL1217CodeFixTitle", resourceCulture);
             }
         }
 
-        internal static string AL0051CodeFixTitle {
+        internal static string AL1218CodeFixTitle {
             get {
-                return ResourceManager.GetString("AL0051CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("AL1218CodeFixTitle", resourceCulture);
             }
         }
 
-        internal static string AL0071CodeFixTitle {
+        internal static string AL1500CodeFixTitle {
             get {
-                return ResourceManager.GetString("AL0071CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("AL1500CodeFixTitle", resourceCulture);
             }
         }
 
-        internal static string AL0072CodeFixTitle {
+        internal static string AL1503CodeFixTitle {
             get {
-                return ResourceManager.GetString("AL0072CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("AL1503CodeFixTitle", resourceCulture);
             }
         }
 
-        internal static string AL0073CodeFixTitle {
+        internal static string AL1504CodeFixTitle {
             get {
-                return ResourceManager.GetString("AL0073CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("AL1504CodeFixTitle", resourceCulture);
             }
         }
 
-        internal static string AL0074CodeFixTitle {
+        internal static string AL1313CodeFixTitle {
             get {
-                return ResourceManager.GetString("AL0074CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("AL1313CodeFixTitle", resourceCulture);
             }
         }
 
-        internal static string AL0103CodeFixTitle {
+        internal static string AL1220CodeFixTitle {
             get {
-                return ResourceManager.GetString("AL0103CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("AL1220CodeFixTitle", resourceCulture);
             }
         }
 
-        internal static string AL0107CodeFixTitle {
+        internal static string AL1314CodeFixTitle {
             get {
-                return ResourceManager.GetString("AL0107CodeFixTitle", resourceCulture);
-            }
-        }
-
-        internal static string AL0108CodeFixTitle {
-            get {
-                return ResourceManager.GetString("AL0108CodeFixTitle", resourceCulture);
-            }
-        }
-
-        internal static string AL0109CodeFixTitle {
-            get {
-                return ResourceManager.GetString("AL0109CodeFixTitle", resourceCulture);
-            }
-        }
-
-        internal static string AL0110CodeFixTitle {
-            get {
-                return ResourceManager.GetString("AL0110CodeFixTitle", resourceCulture);
-            }
-        }
-
-        internal static string AL0121CodeFixTitle {
-            get {
-                return ResourceManager.GetString("AL0121CodeFixTitle", resourceCulture);
-            }
-        }
-
-        internal static string AL0122CodeFixTitle {
-            get {
-                return ResourceManager.GetString("AL0122CodeFixTitle", resourceCulture);
-            }
-        }
-
-        internal static string AL0124CodeFixTitle {
-            get {
-                return ResourceManager.GetString("AL0124CodeFixTitle", resourceCulture);
-            }
-        }
-
-        internal static string AL0126CodeFixTitle {
-            get {
-                return ResourceManager.GetString("AL0126CodeFixTitle", resourceCulture);
-            }
-        }
-
-        internal static string AL0134CodeFixTitle {
-            get {
-                return ResourceManager.GetString("AL0134CodeFixTitle", resourceCulture);
-            }
-        }
-
-        internal static string AL0135CodeFixTitle {
-            get {
-                return ResourceManager.GetString("AL0135CodeFixTitle", resourceCulture);
-            }
-        }
-
-        internal static string AL0137CodeFixTitle {
-            get {
-                return ResourceManager.GetString("AL0137CodeFixTitle", resourceCulture);
-            }
-        }
-
-        internal static string AL0138CodeFixTitle {
-            get {
-                return ResourceManager.GetString("AL0138CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("AL1314CodeFixTitle", resourceCulture);
             }
         }
     }

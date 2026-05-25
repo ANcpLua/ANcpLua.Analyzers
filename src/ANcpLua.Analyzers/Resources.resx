@@ -64,1304 +64,854 @@
             PublicKeyToken=b77a5c561934e089
         </value>
     </resheader>
-    <!-- AL0001: Prohibit primary constructor parameter reassignment -->
-    <data name="AL0001AnalyzerTitle" xml:space="preserve">
+    <!-- AL1000: Prohibit primary constructor parameter reassignment -->
+    <data name="AL1000AnalyzerTitle" xml:space="preserve">
     <value>Prohibit reassignment of primary constructor parameters</value>
   </data>
-    <data name="AL0001AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1000AnalyzerMessageFormat" xml:space="preserve">
     <value>Primary constructor parameter '{0}' should not be reassigned</value>
   </data>
-    <data name="AL0001AnalyzerDescription" xml:space="preserve">
+    <data name="AL1000AnalyzerDescription" xml:space="preserve">
     <value>Primary constructor parameters should not be reassigned as this can lead to confusion and bugs.</value>
   </data>
-    <!-- AL0002: Don't repeat negated patterns -->
-    <data name="AL0002AnalyzerTitle" xml:space="preserve">
+    <!-- AL1001: Don't repeat negated patterns -->
+    <data name="AL1001AnalyzerTitle" xml:space="preserve">
     <value>Don't repeat negated patterns</value>
   </data>
-    <data name="AL0002AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1001AnalyzerMessageFormat" xml:space="preserve">
     <value>Use 'not' only once or not at all</value>
   </data>
-    <data name="AL0002AnalyzerDescription" xml:space="preserve">
+    <data name="AL1001AnalyzerDescription" xml:space="preserve">
     <value>The negated pattern should not be repeated multiple times.</value>
   </data>
-    <!-- AL0003: Don't divide by constant zero -->
-    <data name="AL0003AnalyzerTitle" xml:space="preserve">
+    <!-- AL1002: Don't divide by constant zero -->
+    <data name="AL1002AnalyzerTitle" xml:space="preserve">
     <value>Don't divide by constant zero</value>
   </data>
-    <data name="AL0003AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1002AnalyzerMessageFormat" xml:space="preserve">
     <value>Division by constant zero will throw DivideByZeroException</value>
   </data>
-    <data name="AL0003AnalyzerDescription" xml:space="preserve">
+    <data name="AL1002AnalyzerDescription" xml:space="preserve">
     <value>Integers and Decimal should never be divided by the constant 0 as this causes a DivideByZeroException at runtime.</value>
   </data>
-    <!-- AL0004: Use pattern matching for Span constant comparison -->
-    <data name="AL0004AnalyzerTitle" xml:space="preserve">
+    <!-- AL1003: Use pattern matching for Span constant comparison -->
+    <data name="AL1003AnalyzerTitle" xml:space="preserve">
     <value>Use pattern matching when comparing Span with constants</value>
   </data>
-    <data name="AL0004AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1003AnalyzerMessageFormat" xml:space="preserve">
     <value>Use pattern matching instead of equality operators for Span comparison</value>
   </data>
-    <data name="AL0004AnalyzerDescription" xml:space="preserve">
+    <data name="AL1003AnalyzerDescription" xml:space="preserve">
     <value>When comparing Span and a constant, use pattern matching instead of equality operators, unless you want to compare addresses.</value>
   </data>
-    <!-- AL0005: Use SequenceEqual for Span non-constant comparison -->
-    <data name="AL0005AnalyzerTitle" xml:space="preserve">
+    <!-- AL1004: Use SequenceEqual for Span non-constant comparison -->
+    <data name="AL1004AnalyzerTitle" xml:space="preserve">
     <value>Use SequenceEqual when comparing Span with non-constants</value>
   </data>
-    <data name="AL0005AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1004AnalyzerMessageFormat" xml:space="preserve">
     <value>Use SequenceEqual instead of equality operators for Span comparison</value>
   </data>
-    <data name="AL0005AnalyzerDescription" xml:space="preserve">
+    <data name="AL1004AnalyzerDescription" xml:space="preserve">
     <value>When comparing Span and a non-constant, use SequenceEqual instead of equality operators, unless you want to compare addresses.</value>
   </data>
-    <!-- AL0006: Field name conflicts with primary constructor parameter -->
-    <data name="AL0006AnalyzerTitle" xml:space="preserve">
+    <!-- AL1005: Field name conflicts with primary constructor parameter -->
+    <data name="AL1005AnalyzerTitle" xml:space="preserve">
     <value>Field name conflicts with primary constructor parameter</value>
   </data>
-    <data name="AL0006AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1005AnalyzerMessageFormat" xml:space="preserve">
     <value>Field '{0}' conflicts with a primary constructor parameter</value>
   </data>
-    <data name="AL0006AnalyzerDescription" xml:space="preserve">
+    <data name="AL1005AnalyzerDescription" xml:space="preserve">
     <value>Field names should not conflict with primary constructor parameters to avoid shadowing and confusion.</value>
   </data>
-    <!-- AL0007: GetSchema should be explicitly implemented -->
-    <data name="AL0007AnalyzerTitle" xml:space="preserve">
+    <!-- AL1006: GetSchema should be explicitly implemented -->
+    <data name="AL1006AnalyzerTitle" xml:space="preserve">
     <value>GetSchema should be explicitly implemented</value>
   </data>
-    <data name="AL0007AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1006AnalyzerMessageFormat" xml:space="preserve">
     <value>IXmlSerializable.GetSchema should be explicitly implemented</value>
   </data>
-    <data name="AL0007AnalyzerDescription" xml:space="preserve">
+    <data name="AL1006AnalyzerDescription" xml:space="preserve">
     <value>Implement IXmlSerializable.GetSchema explicitly to avoid exposing it as part of the public API.</value>
   </data>
-    <!-- AL0008: GetSchema must return null -->
-    <data name="AL0008AnalyzerTitle" xml:space="preserve">
+    <!-- AL1007: GetSchema must return null -->
+    <data name="AL1007AnalyzerTitle" xml:space="preserve">
     <value>GetSchema must return null and not be abstract</value>
   </data>
-    <data name="AL0008AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1007AnalyzerMessageFormat" xml:space="preserve">
     <value>IXmlSerializable.GetSchema should return null and not be abstract</value>
   </data>
-    <data name="AL0008AnalyzerDescription" xml:space="preserve">
+    <data name="AL1007AnalyzerDescription" xml:space="preserve">
     <value>GetSchema should return null according to IXmlSerializable guidance and should not be abstract.</value>
   </data>
-    <!-- AL0009: Don't call GetSchema -->
-    <data name="AL0009AnalyzerTitle" xml:space="preserve">
+    <!-- AL1008: Don't call GetSchema -->
+    <data name="AL1008AnalyzerTitle" xml:space="preserve">
     <value>Don't call IXmlSerializable.GetSchema</value>
   </data>
-    <data name="AL0009AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1008AnalyzerMessageFormat" xml:space="preserve">
     <value>Don't call IXmlSerializable.GetSchema</value>
   </data>
-    <data name="AL0009AnalyzerDescription" xml:space="preserve">
+    <data name="AL1008AnalyzerDescription" xml:space="preserve">
     <value>Calling GetSchema is not supported; it should always return null and isn't intended to be invoked.</value>
   </data>
-    <!-- AL0010: Type should be partial -->
-    <data name="AL0010AnalyzerTitle" xml:space="preserve">
-    <value>Type should be partial</value>
-  </data>
-    <data name="AL0010AnalyzerMessageFormat" xml:space="preserve">
-    <value>The type '{0}' should be partial for source generator support</value>
-  </data>
-    <data name="AL0010AnalyzerDescription" xml:space="preserve">
-    <value>Types that are targets for source generators should be marked as partial.</value>
-  </data>
-    <!-- AL0011: Avoid lock keyword on non-Lock types -->
-    <data name="AL0011AnalyzerTitle" xml:space="preserve">
+    <!-- AL1009: Avoid lock keyword on non-Lock types -->
+    <data name="AL1009AnalyzerTitle" xml:space="preserve">
     <value>Avoid lock keyword on non-Lock types</value>
   </data>
-    <data name="AL0011AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1009AnalyzerMessageFormat" xml:space="preserve">
     <value>Use 'Lock _lock = new()' with 'lock(_lock)' instead of 'lock(object)'. The Lock class provides better performance in .NET 9+.</value>
   </data>
-    <data name="AL0011AnalyzerDescription" xml:space="preserve">
+    <data name="AL1009AnalyzerDescription" xml:space="preserve">
     <value>The lock keyword on object/non-Lock types should be replaced with the Lock class from System.Threading.</value>
   </data>
-    <!-- AL0012: Deprecated semantic convention attribute -->
-    <data name="AL0012AnalyzerTitle" xml:space="preserve">
-    <value>Deprecated semantic convention attribute</value>
-  </data>
-    <data name="AL0012AnalyzerMessageFormat" xml:space="preserve">
-    <value>'{0}' is deprecated since schema v{1}. Use '{2}' instead.</value>
-  </data>
-    <data name="AL0012AnalyzerDescription" xml:space="preserve">
-    <value>This attribute name has been deprecated in the OpenTelemetry semantic conventions.</value>
-  </data>
-    <!-- AL0013: Missing telemetry schema URL -->
-    <data name="AL0013AnalyzerTitle" xml:space="preserve">
-    <value>Missing telemetry schema URL</value>
-  </data>
-    <data name="AL0013AnalyzerMessageFormat" xml:space="preserve">
-    <value>OpenTelemetry resource configuration should include 'telemetry.schema_url' attribute</value>
-  </data>
-    <data name="AL0013AnalyzerDescription" xml:space="preserve">
-    <value>Setting the schema URL allows collectors and backends to understand which version of semantic conventions your telemetry uses.</value>
-  </data>
-    <!-- AL0017: Hardcoded package version -->
-    <data name="AL0017AnalyzerTitle" xml:space="preserve">
+    <!-- AL1600: Hardcoded package version -->
+    <data name="AL1600AnalyzerTitle" xml:space="preserve">
     <value>Hardcoded package version detected</value>
   </data>
-    <data name="AL0017AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1600AnalyzerMessageFormat" xml:space="preserve">
     <value>Package '{0}' uses hardcoded version '{1}'. Use $({2}) from Version.props instead.</value>
   </data>
-    <data name="AL0017AnalyzerDescription" xml:space="preserve">
+    <data name="AL1600AnalyzerDescription" xml:space="preserve">
     <value>Package versions should use MSBuild variables from Version.props for centralized version management. This ensures consistency across all projects and simplifies version updates.</value>
   </data>
-    <!-- AL0020: IFormCollection requires explicit [FromForm] -->
-    <data name="AL0020AnalyzerTitle" xml:space="preserve">
+    <!-- AL1100: IFormCollection requires explicit [FromForm] -->
+    <data name="AL1100AnalyzerTitle" xml:space="preserve">
     <value>IFormCollection requires explicit attribute</value>
   </data>
-    <data name="AL0020AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1100AnalyzerMessageFormat" xml:space="preserve">
     <value>Parameter '{0}' on '{1}' uses IFormCollection but lacks [FromForm]. IFormCollection does not auto-bind; add [FromForm] explicitly.</value>
   </data>
-    <data name="AL0020AnalyzerDescription" xml:space="preserve">
+    <data name="AL1100AnalyzerDescription" xml:space="preserve">
     <value>IFormCollection parameters must have an explicit [FromForm] attribute. Unlike IFormFile which auto-binds, IFormCollection requires explicit attribution for clarity and safety.</value>
   </data>
-    <!-- AL0021: Multiple structured form sources -->
-    <data name="AL0021AnalyzerTitle" xml:space="preserve">
+    <!-- AL1101: Multiple structured form sources -->
+    <data name="AL1101AnalyzerTitle" xml:space="preserve">
     <value>Multiple structured form sources</value>
   </data>
-    <data name="AL0021AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1101AnalyzerMessageFormat" xml:space="preserve">
     <value>Endpoint '{0}' has multiple [FromForm] parameters. Only one structured form body ([FromForm] DTO or [FromForm] IFormCollection) is allowed.</value>
   </data>
-    <data name="AL0021AnalyzerDescription" xml:space="preserve">
+    <data name="AL1101AnalyzerDescription" xml:space="preserve">
     <value>An endpoint can only have one structured form source. Multiple [FromForm] DTOs or IFormCollections create ambiguity about which parameter receives the form data.</value>
   </data>
-    <!-- AL0022: Mixed form collection and DTO -->
-    <data name="AL0022AnalyzerTitle" xml:space="preserve">
+    <!-- AL1102: Mixed form collection and DTO -->
+    <data name="AL1102AnalyzerTitle" xml:space="preserve">
     <value>Mixed form collection and DTO</value>
   </data>
-    <data name="AL0022AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1102AnalyzerMessageFormat" xml:space="preserve">
     <value>Endpoint '{0}' mixes [FromForm] IFormCollection with [FromForm] DTO. Use either raw IFormCollection or structured DTO binding, not both.</value>
   </data>
-    <data name="AL0022AnalyzerDescription" xml:space="preserve">
+    <data name="AL1102AnalyzerDescription" xml:space="preserve">
     <value>Mixing IFormCollection with a [FromForm] DTO is not supported. Choose one approach: use IFormCollection for dynamic form access or a typed DTO for structured binding.</value>
   </data>
-    <!-- AL0023: Unsupported form type -->
-    <data name="AL0023AnalyzerTitle" xml:space="preserve">
+    <!-- AL1103: Unsupported form type -->
+    <data name="AL1103AnalyzerTitle" xml:space="preserve">
     <value>Unsupported form type</value>
   </data>
-    <data name="AL0023AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1103AnalyzerMessageFormat" xml:space="preserve">
     <value>Parameter '{0}' on '{1}' cannot be form-bound: {2}</value>
   </data>
-    <data name="AL0023AnalyzerDescription" xml:space="preserve">
+    <data name="AL1103AnalyzerDescription" xml:space="preserve">
     <value>[FromForm] can only bind primitives, primitive collections, or DTOs with a parameterless constructor or primary constructor with all-primitive parameters.</value>
   </data>
-    <!-- AL0024: Form and body conflict -->
-    <data name="AL0024AnalyzerTitle" xml:space="preserve">
+    <!-- AL1104: Form and body conflict -->
+    <data name="AL1104AnalyzerTitle" xml:space="preserve">
     <value>Form and body conflict</value>
   </data>
-    <data name="AL0024AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1104AnalyzerMessageFormat" xml:space="preserve">
     <value>Endpoint '{0}' has both [FromForm] and [FromBody] parameters. An endpoint can read from form data OR JSON body, not both.</value>
   </data>
-    <data name="AL0024AnalyzerDescription" xml:space="preserve">
+    <data name="AL1104AnalyzerDescription" xml:space="preserve">
     <value>An HTTP request body can only be consumed once. Mixing [FromForm] and [FromBody] parameters in the same endpoint is not supported.</value>
   </data>
-    <!-- AL0025: Prefer static lambda -->
-    <data name="AL0025AnalyzerTitle" xml:space="preserve">
+    <!-- AL1700: Prefer static lambda -->
+    <data name="AL1700AnalyzerTitle" xml:space="preserve">
     <value>Anonymous function can be made static</value>
   </data>
-    <data name="AL0025AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1700AnalyzerMessageFormat" xml:space="preserve">
     <value>Anonymous function can be made 'static' since it does not capture any variables</value>
   </data>
-    <data name="AL0025AnalyzerDescription" xml:space="preserve">
+    <data name="AL1700AnalyzerDescription" xml:space="preserve">
     <value>Lambda expressions and anonymous methods that don't capture variables should be marked 'static' to avoid unnecessary allocations and improve performance.</value>
   </data>
-    <!-- AL0026: Avoid DateTime/DateTimeOffset time accessors -->
-    <data name="AL0026AnalyzerTitle" xml:space="preserve">
+    <!-- AL1701: Avoid DateTime/DateTimeOffset time accessors -->
+    <data name="AL1701AnalyzerTitle" xml:space="preserve">
     <value>Avoid DateTime/DateTimeOffset time accessors</value>
   </data>
-    <data name="AL0026AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1701AnalyzerMessageFormat" xml:space="preserve">
     <value>'{0}.{1}' should be replaced with 'TimeProvider.System.{2}()' for better testability</value>
   </data>
-    <data name="AL0026AnalyzerDescription" xml:space="preserve">
+    <data name="AL1701AnalyzerDescription" xml:space="preserve">
     <value>DateTime.Now/UtcNow and DateTimeOffset.Now/UtcNow make code difficult to test. Use TimeProvider.System.GetLocalNow() or GetUtcNow() instead, which can be mocked in tests.</value>
   </data>
-    <!-- AL0027: Avoid legacy JSON library -->
-    <data name="AL0027AnalyzerTitle" xml:space="preserve">
+    <!-- AL1702: Avoid legacy JSON library -->
+    <data name="AL1702AnalyzerTitle" xml:space="preserve">
     <value>Avoid legacy JSON library</value>
   </data>
-    <data name="AL0027AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1702AnalyzerMessageFormat" xml:space="preserve">
     <value>'{0}' is from a legacy JSON library. Use System.Text.Json instead.</value>
   </data>
-    <data name="AL0027AnalyzerDescription" xml:space="preserve">
+    <data name="AL1702AnalyzerDescription" xml:space="preserve">
     <value>The legacy JSON library should be replaced with System.Text.Json for better performance and native .NET support.</value>
   </data>
-    <!-- AL0018: Version.props not imported -->
-    <data name="AL0018AnalyzerTitle" xml:space="preserve">
+    <!-- AL1601: Version.props not imported -->
+    <data name="AL1601AnalyzerTitle" xml:space="preserve">
     <value>Version.props not imported</value>
   </data>
-    <data name="AL0018AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1601AnalyzerMessageFormat" xml:space="preserve">
     <value>Directory.Build.props should import Version.props for centralized version management</value>
   </data>
-    <data name="AL0018AnalyzerDescription" xml:space="preserve">
+    <data name="AL1601AnalyzerDescription" xml:space="preserve">
     <value>Version.props should be imported in Directory.Build.props to enable centralized package version management using $(VariableName) syntax.</value>
   </data>
-    <!-- AL0019: Undefined version variable -->
-    <data name="AL0019AnalyzerTitle" xml:space="preserve">
+    <!-- AL1602: Undefined version variable -->
+    <data name="AL1602AnalyzerTitle" xml:space="preserve">
     <value>Undefined version variable</value>
   </data>
-    <data name="AL0019AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1602AnalyzerMessageFormat" xml:space="preserve">
     <value>Package '{0}' uses undefined version variable '$({1})'. Define '{1}' in Version.props.</value>
   </data>
-    <data name="AL0019AnalyzerDescription" xml:space="preserve">
+    <data name="AL1602AnalyzerDescription" xml:space="preserve">
     <value>Version variables used in Directory.Packages.props must be defined in Version.props. Missing definitions cause silent build failures or empty version strings.</value>
   </data>
-    <!-- AL0028: Use IsEqualTo -->
-    <data name="AL0028AnalyzerTitle" xml:space="preserve">
+    <!-- AL1200: Use IsEqualTo -->
+    <data name="AL1200AnalyzerTitle" xml:space="preserve">
     <value>Use IsEqualTo extension</value>
   </data>
-    <data name="AL0028AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1200AnalyzerMessageFormat" xml:space="preserve">
     <value>Use '{0}' instead of {1}</value>
   </data>
-    <data name="AL0028AnalyzerDescription" xml:space="preserve">
+    <data name="AL1200AnalyzerDescription" xml:space="preserve">
     <value>Use IsEqualTo extension instead of SymbolEqualityComparer.Default.Equals for cleaner symbol comparison.</value>
   </data>
-    <!-- AL0029: Use HasAttribute -->
-    <data name="AL0029AnalyzerTitle" xml:space="preserve">
+    <!-- AL1201: Use HasAttribute -->
+    <data name="AL1201AnalyzerTitle" xml:space="preserve">
     <value>Use HasAttribute extension</value>
   </data>
-    <data name="AL0029AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1201AnalyzerMessageFormat" xml:space="preserve">
     <value>Use '{0}' instead of {1}</value>
   </data>
-    <data name="AL0029AnalyzerDescription" xml:space="preserve">
+    <data name="AL1201AnalyzerDescription" xml:space="preserve">
     <value>Use HasAttribute extension instead of GetAttributes() LINQ queries or foreach loops for cleaner attribute checking.</value>
   </data>
-    <!-- AL0030: Use type hierarchy extensions -->
-    <data name="AL0030AnalyzerTitle" xml:space="preserve">
+    <!-- AL1202: Use type hierarchy extensions -->
+    <data name="AL1202AnalyzerTitle" xml:space="preserve">
     <value>Use type hierarchy extension</value>
   </data>
-    <data name="AL0030AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1202AnalyzerMessageFormat" xml:space="preserve">
     <value>Use '{0}' instead of {1}</value>
   </data>
-    <data name="AL0030AnalyzerDescription" xml:space="preserve">
+    <data name="AL1202AnalyzerDescription" xml:space="preserve">
     <value>Use Implements or InheritsFrom extensions instead of manual AllInterfaces/BaseType iteration loops.</value>
   </data>
-    <!-- AL0031: Use operation extensions -->
-    <data name="AL0031AnalyzerTitle" xml:space="preserve">
+    <!-- AL1203: Use operation extensions -->
+    <data name="AL1203AnalyzerTitle" xml:space="preserve">
     <value>Use operation extension</value>
   </data>
-    <data name="AL0031AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1203AnalyzerMessageFormat" xml:space="preserve">
     <value>Use '{0}' instead of {1}</value>
   </data>
-    <data name="AL0031AnalyzerDescription" xml:space="preserve">
+    <data name="AL1203AnalyzerDescription" xml:space="preserve">
     <value>Use IsMethodNamed or TryGetConstantValue extensions instead of verbose property access patterns.</value>
   </data>
-    <!-- AL0032: Use OrEmpty -->
-    <data name="AL0032AnalyzerTitle" xml:space="preserve">
+    <!-- AL1204: Use OrEmpty -->
+    <data name="AL1204AnalyzerTitle" xml:space="preserve">
     <value>Use OrEmpty extension</value>
   </data>
-    <data name="AL0032AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1204AnalyzerMessageFormat" xml:space="preserve">
     <value>Use '{0}' instead of {1}</value>
   </data>
-    <data name="AL0032AnalyzerDescription" xml:space="preserve">
+    <data name="AL1204AnalyzerDescription" xml:space="preserve">
     <value>Use OrEmpty() extension instead of null-coalescing with Array.Empty, Enumerable.Empty, or collection expressions.</value>
   </data>
-    <!-- AL0033: Use ToImmutableArrayOrEmpty -->
-    <data name="AL0033AnalyzerTitle" xml:space="preserve">
+    <!-- AL1205: Use ToImmutableArrayOrEmpty -->
+    <data name="AL1205AnalyzerTitle" xml:space="preserve">
     <value>Use ToImmutableArrayOrEmpty extension</value>
   </data>
-    <data name="AL0033AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1205AnalyzerMessageFormat" xml:space="preserve">
     <value>Use '{0}' instead of {1}</value>
   </data>
-    <data name="AL0033AnalyzerDescription" xml:space="preserve">
+    <data name="AL1205AnalyzerDescription" xml:space="preserve">
     <value>Use ToImmutableArrayOrEmpty() extension instead of null-conditional ToImmutableArray() with ImmutableArray.Empty fallback.</value>
   </data>
-    <!-- AL0034: Use WhereNotNull -->
-    <data name="AL0034AnalyzerTitle" xml:space="preserve">
+    <!-- AL1206: Use WhereNotNull -->
+    <data name="AL1206AnalyzerTitle" xml:space="preserve">
     <value>Use WhereNotNull extension</value>
   </data>
-    <data name="AL0034AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1206AnalyzerMessageFormat" xml:space="preserve">
     <value>Use '{0}' instead of {1}</value>
   </data>
-    <data name="AL0034AnalyzerDescription" xml:space="preserve">
+    <data name="AL1206AnalyzerDescription" xml:space="preserve">
     <value>Use WhereNotNull() extension instead of Where(x => x != null) or Where(x => x is not null).</value>
   </data>
-    <!-- AL0035: Use GetFullyQualifiedName/GetMetadataName -->
-    <data name="AL0035AnalyzerTitle" xml:space="preserve">
+    <!-- AL1207: Use GetFullyQualifiedName/GetMetadataName -->
+    <data name="AL1207AnalyzerTitle" xml:space="preserve">
     <value>Use symbol display string extension</value>
   </data>
-    <data name="AL0035AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1207AnalyzerMessageFormat" xml:space="preserve">
     <value>Use '{0}' instead of {1}</value>
   </data>
-    <data name="AL0035AnalyzerDescription" xml:space="preserve">
+    <data name="AL1207AnalyzerDescription" xml:space="preserve">
     <value>Use GetFullyQualifiedName() or GetMetadataName() extensions instead of ToDisplayString with SymbolDisplayFormat constants.</value>
   </data>
-    <!-- AL0036: Use null-guard helper -->
-    <data name="AL0036AnalyzerTitle" xml:space="preserve">
+    <!-- AL1208: Use null-guard helper -->
+    <data name="AL1208AnalyzerTitle" xml:space="preserve">
     <value>Use null-guard helper</value>
   </data>
-    <data name="AL0036AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1208AnalyzerMessageFormat" xml:space="preserve">
     <value>Use '{0}' instead of null-coalescing throw</value>
   </data>
-    <data name="AL0036AnalyzerDescription" xml:space="preserve">
+    <data name="AL1208AnalyzerDescription" xml:space="preserve">
     <value>Use null-guard helpers (Throw.IfNull or Guard.NotNull) instead of verbose null-coalescing throw new ArgumentNullException patterns.</value>
   </data>
-    <!-- AL0037: Use TryParse extensions -->
-    <data name="AL0037AnalyzerTitle" xml:space="preserve">
+    <!-- AL1209: Use TryParse extensions -->
+    <data name="AL1209AnalyzerTitle" xml:space="preserve">
     <value>Use TryParse extension</value>
   </data>
-    <data name="AL0037AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1209AnalyzerMessageFormat" xml:space="preserve">
     <value>Use '{0}' instead of verbose TryParse pattern</value>
   </data>
-    <data name="AL0037AnalyzerDescription" xml:space="preserve">
+    <data name="AL1209AnalyzerDescription" xml:space="preserve">
     <value>Use TryParse extension methods (TryParseInt32, TryParseGuid, etc.) instead of verbose Type.TryParse ternary patterns.</value>
   </data>
-    <!-- AL0039: Use StringComparison extensions -->
-    <data name="AL0039AnalyzerTitle" xml:space="preserve">
+    <!-- AL1210: Use StringComparison extensions -->
+    <data name="AL1210AnalyzerTitle" xml:space="preserve">
     <value>Use StringComparison extension</value>
   </data>
-    <data name="AL0039AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1210AnalyzerMessageFormat" xml:space="preserve">
     <value>Use '{0}' for clearer intent</value>
   </data>
-    <data name="AL0039AnalyzerDescription" xml:space="preserve">
+    <data name="AL1210AnalyzerDescription" xml:space="preserve">
     <value>Use StringComparison extensions (EqualsOrdinal, ContainsIgnoreCase, etc.) instead of methods with StringComparison enum parameter.</value>
   </data>
-    <!-- AL0040: Use attribute extensions -->
-    <data name="AL0040AnalyzerTitle" xml:space="preserve">
+    <!-- AL1211: Use attribute extensions -->
+    <data name="AL1211AnalyzerTitle" xml:space="preserve">
     <value>Use attribute argument extraction extension</value>
   </data>
-    <data name="AL0040AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1211AnalyzerMessageFormat" xml:space="preserve">
     <value>Use '{0}' instead of direct ConstructorArguments/NamedArguments access</value>
   </data>
-    <data name="AL0040AnalyzerDescription" xml:space="preserve">
+    <data name="AL1211AnalyzerDescription" xml:space="preserve">
     <value>Use GetConstructorArgument or GetNamedArgument extensions instead of direct array access on AttributeData.</value>
   </data>
-    <!-- AL0041: AotTest must return int -->
-    <data name="AL0041AnalyzerTitle" xml:space="preserve">
+    <!-- AL1400: AotTest must return int -->
+    <data name="AL1400AnalyzerTitle" xml:space="preserve">
     <value>Method with [AotTest] or [TrimTest] must return int</value>
   </data>
-    <data name="AL0041AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1400AnalyzerMessageFormat" xml:space="preserve">
     <value>Method '{0}' has [{1}] attribute but returns '{2}' instead of 'int'</value>
   </data>
-    <data name="AL0041AnalyzerDescription" xml:space="preserve">
+    <data name="AL1400AnalyzerDescription" xml:space="preserve">
     <value>Methods decorated with [AotTest] or [TrimTest] attributes must return int as their exit code. The test harness expects an integer return value to determine success or failure.</value>
   </data>
-    <!-- AL0042: AotTest should return 100 -->
-    <data name="AL0042AnalyzerTitle" xml:space="preserve">
+    <!-- AL1401: AotTest should return 100 -->
+    <data name="AL1401AnalyzerTitle" xml:space="preserve">
     <value>[AotTest]/[TrimTest] method should return 100 on success</value>
   </data>
-    <data name="AL0042AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1401AnalyzerMessageFormat" xml:space="preserve">
     <value>{0}</value>
   </data>
-    <data name="AL0042AnalyzerDescription" xml:space="preserve">
+    <data name="AL1401AnalyzerDescription" xml:space="preserve">
     <value>By convention, AOT/Trim test methods should return 100 to indicate success. Other values are reserved for failure conditions.</value>
   </data>
-    <!-- AL0043: TrimSafe violation -->
-    <data name="AL0043AnalyzerTitle" xml:space="preserve">
+    <!-- AL1402: TrimSafe violation -->
+    <data name="AL1402AnalyzerTitle" xml:space="preserve">
     <value>[TrimSafe] code must not call methods with [RequiresUnreferencedCode]</value>
   </data>
-    <data name="AL0043AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1402AnalyzerMessageFormat" xml:space="preserve">
     <value>Method '{0}' is marked [TrimSafe] but calls '{1}' which has [RequiresUnreferencedCode]</value>
   </data>
-    <data name="AL0043AnalyzerDescription" xml:space="preserve">
+    <data name="AL1402AnalyzerDescription" xml:space="preserve">
     <value>Code marked with [TrimSafe] guarantees it will work correctly in trimmed applications. Calling methods with [RequiresUnreferencedCode] violates this guarantee because those methods may fail at runtime when types are trimmed.</value>
   </data>
-    <!-- AL0044: AotSafe violation -->
-    <data name="AL0044AnalyzerTitle" xml:space="preserve">
+    <!-- AL1403: AotSafe violation -->
+    <data name="AL1403AnalyzerTitle" xml:space="preserve">
     <value>[AotSafe] code must not call methods with [RequiresDynamicCode]</value>
   </data>
-    <data name="AL0044AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1403AnalyzerMessageFormat" xml:space="preserve">
     <value>Method '{0}' is marked [AotSafe] but calls '{1}' which has [RequiresDynamicCode]</value>
   </data>
-    <data name="AL0044AnalyzerDescription" xml:space="preserve">
+    <data name="AL1403AnalyzerDescription" xml:space="preserve">
     <value>Code marked with [AotSafe] guarantees it will work correctly in AOT-compiled applications. Calling methods with [RequiresDynamicCode] violates this guarantee because those methods rely on runtime code generation which is not available in AOT scenarios.</value>
   </data>
-    <!-- AL0045: Use Guard.NotNullOrEmpty -->
-    <data name="AL0045AnalyzerTitle" xml:space="preserve">
+    <!-- AL1212: Use Guard.NotNullOrEmpty -->
+    <data name="AL1212AnalyzerTitle" xml:space="preserve">
     <value>Use null-or-empty guard helper</value>
   </data>
-    <data name="AL0045AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1212AnalyzerMessageFormat" xml:space="preserve">
     <value>Use 'Guard.NotNullOrEmpty({0})' instead of if/throw pattern</value>
   </data>
-    <data name="AL0045AnalyzerDescription" xml:space="preserve">
+    <data name="AL1212AnalyzerDescription" xml:space="preserve">
     <value>Use Guard.NotNullOrEmpty() instead of verbose if (string.IsNullOrEmpty(...)) throw new ArgumentNullException/ArgumentException patterns.</value>
   </data>
-    <!-- AL0046: Use Guard.NotNullOrWhiteSpace -->
-    <data name="AL0046AnalyzerTitle" xml:space="preserve">
+    <!-- AL1213: Use Guard.NotNullOrWhiteSpace -->
+    <data name="AL1213AnalyzerTitle" xml:space="preserve">
     <value>Use null-or-whitespace guard helper</value>
   </data>
-    <data name="AL0046AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1213AnalyzerMessageFormat" xml:space="preserve">
     <value>Use 'Guard.NotNullOrWhiteSpace({0})' instead of if/throw pattern</value>
   </data>
-    <data name="AL0046AnalyzerDescription" xml:space="preserve">
+    <data name="AL1213AnalyzerDescription" xml:space="preserve">
     <value>Use Guard.NotNullOrWhiteSpace() instead of verbose if (string.IsNullOrWhiteSpace(...)) throw new ArgumentNullException/ArgumentException patterns.</value>
   </data>
-    <!-- AL0047: Use Guard.NotZero -->
-    <data name="AL0047AnalyzerTitle" xml:space="preserve">
+    <!-- AL1214: Use Guard.NotZero -->
+    <data name="AL1214AnalyzerTitle" xml:space="preserve">
     <value>Use zero-guard helper</value>
   </data>
-    <data name="AL0047AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1214AnalyzerMessageFormat" xml:space="preserve">
     <value>Use 'Guard.NotZero({0})' instead of if/throw pattern</value>
   </data>
-    <data name="AL0047AnalyzerDescription" xml:space="preserve">
+    <data name="AL1214AnalyzerDescription" xml:space="preserve">
     <value>Use Guard.NotZero() instead of verbose if (x == 0) throw new ArgumentOutOfRangeException patterns.</value>
   </data>
-    <!-- AL0048: Use Guard.NotNegative -->
-    <data name="AL0048AnalyzerTitle" xml:space="preserve">
+    <!-- AL1215: Use Guard.NotNegative -->
+    <data name="AL1215AnalyzerTitle" xml:space="preserve">
     <value>Use non-negative guard helper</value>
   </data>
-    <data name="AL0048AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1215AnalyzerMessageFormat" xml:space="preserve">
     <value>Use 'Guard.NotNegative({0})' instead of if/throw pattern</value>
   </data>
-    <data name="AL0048AnalyzerDescription" xml:space="preserve">
+    <data name="AL1215AnalyzerDescription" xml:space="preserve">
     <value>Use Guard.NotNegative() instead of verbose if (x &lt; 0) throw new ArgumentOutOfRangeException patterns.</value>
   </data>
-    <!-- AL0049: Use Guard.Positive -->
-    <data name="AL0049AnalyzerTitle" xml:space="preserve">
+    <!-- AL1216: Use Guard.Positive -->
+    <data name="AL1216AnalyzerTitle" xml:space="preserve">
     <value>Use positive-guard helper</value>
   </data>
-    <data name="AL0049AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1216AnalyzerMessageFormat" xml:space="preserve">
     <value>Use 'Guard.Positive({0})' instead of if/throw pattern</value>
   </data>
-    <data name="AL0049AnalyzerDescription" xml:space="preserve">
+    <data name="AL1216AnalyzerDescription" xml:space="preserve">
     <value>Use Guard.Positive() instead of verbose if (x &lt;= 0) throw new ArgumentOutOfRangeException patterns.</value>
   </data>
-    <!-- AL0050: Use Guard.NotEmpty for Guid -->
-    <data name="AL0050AnalyzerTitle" xml:space="preserve">
+    <!-- AL1217: Use Guard.NotEmpty for Guid -->
+    <data name="AL1217AnalyzerTitle" xml:space="preserve">
     <value>Use empty-guid guard helper</value>
   </data>
-    <data name="AL0050AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1217AnalyzerMessageFormat" xml:space="preserve">
     <value>Use 'Guard.NotEmpty({0})' instead of if/throw pattern</value>
   </data>
-    <data name="AL0050AnalyzerDescription" xml:space="preserve">
+    <data name="AL1217AnalyzerDescription" xml:space="preserve">
     <value>Use Guard.NotEmpty() instead of verbose if (guid == Guid.Empty) throw new ArgumentException patterns.</value>
   </data>
-    <!-- AL0051: Use Guard.DefinedEnum -->
-    <data name="AL0051AnalyzerTitle" xml:space="preserve">
+    <!-- AL1218: Use Guard.DefinedEnum -->
+    <data name="AL1218AnalyzerTitle" xml:space="preserve">
     <value>Use defined-enum guard helper</value>
   </data>
-    <data name="AL0051AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1218AnalyzerMessageFormat" xml:space="preserve">
     <value>Use 'Guard.DefinedEnum({0})' instead of if/throw pattern</value>
   </data>
-    <data name="AL0051AnalyzerDescription" xml:space="preserve">
+    <data name="AL1218AnalyzerDescription" xml:space="preserve">
     <value>Use Guard.DefinedEnum() instead of verbose if (!Enum.IsDefined) throw new ArgumentException/ArgumentOutOfRangeException patterns.</value>
   </data>
-    <!-- AL0052: AotSafe calls AotUnsafe -->
-    <data name="AL0052AnalyzerTitle" xml:space="preserve">
+    <!-- AL1404: AotSafe calls AotUnsafe -->
+    <data name="AL1404AnalyzerTitle" xml:space="preserve">
     <value>[AotSafe] code must not call [AotUnsafe] code</value>
   </data>
-    <data name="AL0052AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1404AnalyzerMessageFormat" xml:space="preserve">
     <value>Method '{0}' is marked [AotSafe] but calls '{1}' which is marked [AotUnsafe]</value>
   </data>
-    <data name="AL0052AnalyzerDescription" xml:space="preserve">
+    <data name="AL1404AnalyzerDescription" xml:space="preserve">
     <value>Code marked with [AotSafe] guarantees it will work correctly in AOT-compiled applications. Calling methods marked with [AotUnsafe] violates this guarantee because [AotUnsafe] code explicitly declares it requires JIT compilation.</value>
   </data>
-    <!-- AL0053: Unnecessary AotUnsafe -->
-    <data name="AL0053AnalyzerTitle" xml:space="preserve">
+    <!-- AL1405: Unnecessary AotUnsafe -->
+    <data name="AL1405AnalyzerTitle" xml:space="preserve">
     <value>Unnecessary [AotUnsafe] attribute</value>
   </data>
-    <data name="AL0053AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1405AnalyzerMessageFormat" xml:space="preserve">
     <value>'{0}' is marked [AotUnsafe] but contains no AOT-incompatible patterns</value>
   </data>
-    <data name="AL0053AnalyzerDescription" xml:space="preserve">
+    <data name="AL1405AnalyzerDescription" xml:space="preserve">
     <value>The [AotUnsafe] attribute should only be applied to code that actually uses AOT-incompatible patterns such as reflection, dynamic code generation, or calls to methods with [RequiresDynamicCode]. Consider removing the attribute if the code is AOT-compatible.</value>
   </data>
-    <!-- AL0054: Diagnostic missing from docs -->
-    <data name="AL0054AnalyzerTitle" xml:space="preserve">
+    <!-- AL1603: Diagnostic missing from docs -->
+    <data name="AL1603AnalyzerTitle" xml:space="preserve">
     <value>Diagnostic missing from documentation</value>
   </data>
-    <data name="AL0054AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1603AnalyzerMessageFormat" xml:space="preserve">
     <value>{0}</value>
   </data>
-    <data name="AL0054AnalyzerDescription" xml:space="preserve">
+    <data name="AL1603AnalyzerDescription" xml:space="preserve">
     <value>Diagnostics defined in Descriptors.cs should be documented in diagnostics.md. Add documentation for this diagnostic rule.</value>
   </data>
-    <!-- AL0055: Diagnostic missing from release notes -->
-    <data name="AL0055AnalyzerTitle" xml:space="preserve">
+    <!-- AL1604: Diagnostic missing from release notes -->
+    <data name="AL1604AnalyzerTitle" xml:space="preserve">
     <value>Diagnostic missing from release notes</value>
   </data>
-    <data name="AL0055AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1604AnalyzerMessageFormat" xml:space="preserve">
     <value>{0}</value>
   </data>
-    <data name="AL0055AnalyzerDescription" xml:space="preserve">
+    <data name="AL1604AnalyzerDescription" xml:space="preserve">
     <value>Diagnostics defined in Descriptors.cs should be tracked in AnalyzerReleases.Shipped.md or AnalyzerReleases.Unshipped.md. Add a release note entry for this diagnostic rule.</value>
   </data>
-    <!-- AL0056: Diagnostic documentation mismatch -->
-    <data name="AL0056AnalyzerTitle" xml:space="preserve">
+    <!-- AL1605: Diagnostic documentation mismatch -->
+    <data name="AL1605AnalyzerTitle" xml:space="preserve">
     <value>Diagnostic documentation mismatch</value>
   </data>
-    <data name="AL0056AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1605AnalyzerMessageFormat" xml:space="preserve">
     <value>{0}</value>
   </data>
-    <data name="AL0056AnalyzerDescription" xml:space="preserve">
+    <data name="AL1605AnalyzerDescription" xml:space="preserve">
     <value>Diagnostic title, severity, or category in documentation does not match Descriptors.cs. Keep documentation in sync with the source of truth.</value>
   </data>
-    <!-- AL0057: Avoid async void -->
-    <data name="AL0057AnalyzerTitle" xml:space="preserve">
+    <!-- AL1300: Avoid async void -->
+    <data name="AL1300AnalyzerTitle" xml:space="preserve">
     <value>Avoid async void methods</value>
   </data>
-    <data name="AL0057AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1300AnalyzerMessageFormat" xml:space="preserve">
     <value>Async void method '{0}' should return Task instead. Only event handlers should use async void.</value>
   </data>
-    <data name="AL0057AnalyzerDescription" xml:space="preserve">
+    <data name="AL1300AnalyzerDescription" xml:space="preserve">
     <value>Async void methods cannot be awaited, exceptions cannot be caught by the caller, and they complicate unit testing. Use async Task instead, unless the method is an event handler.</value>
   </data>
-    <!-- AL0058: Avoid lock on this -->
-    <data name="AL0058AnalyzerTitle" xml:space="preserve">
+    <!-- AL1301: Avoid lock on this -->
+    <data name="AL1301AnalyzerTitle" xml:space="preserve">
     <value>Avoid lock on 'this'</value>
   </data>
-    <data name="AL0058AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1301AnalyzerMessageFormat" xml:space="preserve">
     <value>Do not lock on 'this'. External code could also lock on this instance, causing potential deadlocks.</value>
   </data>
-    <data name="AL0058AnalyzerDescription" xml:space="preserve">
+    <data name="AL1301AnalyzerDescription" xml:space="preserve">
     <value>Locking on 'this' exposes the lock object to external code. Any code with a reference to this instance can lock on it, potentially causing deadlocks. Use a private readonly object field instead.</value>
   </data>
-    <!-- AL0059: Avoid lock on typeof -->
-    <data name="AL0059AnalyzerTitle" xml:space="preserve">
+    <!-- AL1302: Avoid lock on typeof -->
+    <data name="AL1302AnalyzerTitle" xml:space="preserve">
     <value>Avoid lock on typeof(T)</value>
   </data>
-    <data name="AL0059AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1302AnalyzerMessageFormat" xml:space="preserve">
     <value>Do not lock on 'typeof({0})'. Type objects are globally visible and external code could also lock on them.</value>
   </data>
-    <data name="AL0059AnalyzerDescription" xml:space="preserve">
+    <data name="AL1302AnalyzerDescription" xml:space="preserve">
     <value>Type objects obtained from typeof() are globally visible singletons. Any code can obtain the same Type object and lock on it, potentially causing deadlocks. Use a private static readonly object field instead.</value>
   </data>
-    <!-- AL0060: Avoid lock on string -->
-    <data name="AL0060AnalyzerTitle" xml:space="preserve">
+    <!-- AL1303: Avoid lock on string -->
+    <data name="AL1303AnalyzerTitle" xml:space="preserve">
     <value>Avoid lock on string</value>
   </data>
-    <data name="AL0060AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1303AnalyzerMessageFormat" xml:space="preserve">
     <value>Do not lock on a string. String literals are interned and shared across the entire application, causing potential deadlocks.</value>
   </data>
-    <data name="AL0060AnalyzerDescription" xml:space="preserve">
+    <data name="AL1303AnalyzerDescription" xml:space="preserve">
     <value>String literals are interned by the CLR, meaning identical strings across different assemblies share the same object reference. Locking on a string creates cross-assembly synchronization that is rarely intended and can cause deadlocks. Use a private readonly object field instead.</value>
   </data>
-    <!-- AL0061: Activity/Span missing semantic convention attributes -->
-    <data name="AL0061AnalyzerTitle" xml:space="preserve">
-        <value>Activity/Span missing semantic convention attributes</value>
-    </data>
-    <data name="AL0061AnalyzerMessageFormat" xml:space="preserve">
-        <value>Activity '{0}' should have semantic convention attributes for '{1}' operations</value>
-    </data>
-    <data name="AL0061AnalyzerDescription" xml:space="preserve">
-        <value>OpenTelemetry Activities (Spans) should include semantic convention attributes appropriate for their operation type. This enables correlation, filtering, and analysis in observability backends.</value>
-    </data>
-    <!-- AL0062: Deprecated semantic convention -->
-    <data name="AL0062AnalyzerTitle" xml:space="preserve">
-        <value>Deprecated semantic convention</value>
-    </data>
-    <data name="AL0062AnalyzerMessageFormat" xml:space="preserve">
-        <value>Attribute '{0}' is deprecated since schema v{1}. Use '{2}' instead.</value>
-    </data>
-    <data name="AL0062AnalyzerDescription" xml:space="preserve">
-        <value>This attribute name has been deprecated in the OpenTelemetry semantic conventions. Using the newer attribute name ensures compatibility with modern observability tools.</value>
-    </data>
-    <!-- AL0063: Unregistered ActivitySource -->
-    <data name="AL0063AnalyzerTitle" xml:space="preserve">
-        <value>ActivitySource should be registered with AddSource()</value>
-    </data>
-    <data name="AL0063AnalyzerMessageFormat" xml:space="preserve">
-        <value>ActivitySource '{0}' is not registered with AddSource() in the tracing configuration</value>
-    </data>
-    <data name="AL0063AnalyzerDescription" xml:space="preserve">
-        <value>ActivitySources must be registered with AddSource() in the OpenTelemetry tracing configuration to be included in the trace pipeline. Unregistered sources will not emit spans.</value>
-    </data>
-    <!-- AL0064: GenAI span missing required attributes -->
-    <data name="AL0064AnalyzerTitle" xml:space="preserve">
-        <value>GenAI span missing required attributes</value>
-    </data>
-    <data name="AL0064AnalyzerMessageFormat" xml:space="preserve">
-        <value>GenAI Activity '{0}' is missing required attribute '{1}'</value>
-    </data>
-    <data name="AL0064AnalyzerDescription" xml:space="preserve">
-        <value>GenAI spans must include required semantic convention attributes (gen_ai.system, gen_ai.request.model, gen_ai.operation.name) to enable proper observability and correlation of LLM operations.</value>
-    </data>
-    <!-- AL0065: Incorrect token usage metric -->
-    <data name="AL0065AnalyzerTitle" xml:space="preserve">
-        <value>Use gen_ai.client.token.usage histogram for token metrics</value>
-    </data>
-    <data name="AL0065AnalyzerMessageFormat" xml:space="preserve">
-        <value>Token usage should be recorded using 'gen_ai.client.token.usage' histogram instead of '{0}'</value>
-    </data>
-    <data name="AL0065AnalyzerDescription" xml:space="preserve">
-        <value>GenAI token usage metrics should use the gen_ai.client.token.usage histogram instrument as defined by the semantic conventions. This ensures compatibility with standard GenAI observability dashboards.</value>
-    </data>
-    <!-- AL0066: Invalid GenAI operation name -->
-    <data name="AL0066AnalyzerTitle" xml:space="preserve">
-        <value>GenAI operation name should follow semantic conventions</value>
-    </data>
-    <data name="AL0066AnalyzerMessageFormat" xml:space="preserve">
-        <value>GenAI operation name '{0}' should be one of: chat, text_completion, embeddings</value>
-    </data>
-    <data name="AL0066AnalyzerDescription" xml:space="preserve">
-        <value>GenAI operation names should follow the semantic conventions: 'chat' for chat completions, 'text_completion' for text completions, and 'embeddings' for embedding generation.</value>
-    </data>
-    <!-- AL0067: Unregistered Meter -->
-    <data name="AL0067AnalyzerTitle" xml:space="preserve">
-        <value>Meter should be registered with AddMeter()</value>
-    </data>
-    <data name="AL0067AnalyzerMessageFormat" xml:space="preserve">
-        <value>Meter '{0}' is not registered with AddMeter() in the metrics configuration</value>
-    </data>
-    <data name="AL0067AnalyzerDescription" xml:space="preserve">
-        <value>Meters must be registered with AddMeter() in the OpenTelemetry metrics configuration to be included in the metrics pipeline. Unregistered meters will not export metrics.</value>
-    </data>
-    <!-- AL0068: Invalid metric name -->
-    <data name="AL0068AnalyzerTitle" xml:space="preserve">
-        <value>Metric instrument name should follow naming conventions</value>
-    </data>
-    <data name="AL0068AnalyzerMessageFormat" xml:space="preserve">
-        <value>Metric name '{0}' should follow the pattern: namespace.component.metric_name.unit</value>
-    </data>
-    <data name="AL0068AnalyzerDescription" xml:space="preserve">
-        <value>Metric instrument names should follow OpenTelemetry naming conventions using dot-separated namespaces and snake_case for individual words. Include the unit as a suffix when applicable.</value>
-    </data>
-    <!-- AL0069: Incomplete ServiceDefaults -->
-    <data name="AL0069AnalyzerTitle" xml:space="preserve">
-        <value>ServiceDefaults configuration incomplete</value>
-    </data>
-    <data name="AL0069AnalyzerMessageFormat" xml:space="preserve">
-        <value>ServiceDefaults configuration is missing '{0}'. Add {1} for complete observability setup.</value>
-    </data>
-    <data name="AL0069AnalyzerDescription" xml:space="preserve">
-        <value>Complete ServiceDefaults configuration should include tracing, metrics, and logging setup. Missing components may result in incomplete observability data.</value>
-    </data>
-    <!-- AL0070: Non-OTLP collector endpoint -->
-    <data name="AL0070AnalyzerTitle" xml:space="preserve">
-        <value>Collector endpoint should use OTLP protocol</value>
-    </data>
-    <data name="AL0070AnalyzerMessageFormat" xml:space="preserve">
-        <value>Collector endpoint '{0}' should use OTLP protocol (grpc:// or http://...v1/traces)</value>
-    </data>
-    <data name="AL0070AnalyzerDescription" xml:space="preserve">
-        <value>Collector endpoints should use the OTLP protocol for standardized telemetry export. OTLP provides better performance and broader compatibility than proprietary protocols.</value>
-    </data>
-    <!-- AL0071: [Meter] class must be partial static -->
-    <data name="AL0071AnalyzerTitle" xml:space="preserve">
-        <value>[Meter] class must be partial static</value>
-    </data>
-    <data name="AL0071AnalyzerMessageFormat" xml:space="preserve">
-        <value>Class '{0}' with [Meter] attribute must be declared as 'partial static' for source generator support</value>
-    </data>
-    <data name="AL0071AnalyzerDescription" xml:space="preserve">
-        <value>Classes decorated with [Meter] attribute must be declared as 'partial static' to allow the source generator to implement the metric recording methods. The generator creates static fields for Meter and instrument instances.</value>
-    </data>
-    <!-- AL0072: [Counter]/[Histogram] method must be partial -->
-    <data name="AL0072AnalyzerTitle" xml:space="preserve">
-        <value>Metric method must be partial</value>
-    </data>
-    <data name="AL0072AnalyzerMessageFormat" xml:space="preserve">
-        <value>Method '{0}' with [{1}] attribute must be declared as 'partial' for source generator support</value>
-    </data>
-    <data name="AL0072AnalyzerDescription" xml:space="preserve">
-        <value>Methods decorated with [Counter] or [Histogram] attributes must be declared as 'partial' to allow the source generator to implement the metric recording logic. The generator creates the method body that records values to the corresponding instrument.</value>
-    </data>
-    <!-- AL0073: [Traced] attribute must have non-empty ActivitySourceName -->
-    <data name="AL0073AnalyzerTitle" xml:space="preserve">
-        <value>[Traced] attribute requires non-empty ActivitySourceName</value>
-    </data>
-    <data name="AL0073AnalyzerMessageFormat" xml:space="preserve">
-        <value>[Traced] attribute on '{0}' has empty or null ActivitySourceName - provide a valid source name</value>
-    </data>
-    <data name="AL0073AnalyzerDescription" xml:space="preserve">
-        <value>The [Traced] attribute requires a non-empty ActivitySourceName to identify the source of spans. This name should match a registered ActivitySource in your application's tracing configuration.</value>
-    </data>
-    <!-- AL0074: Deprecated GenAI semantic convention attribute -->
-    <data name="AL0074AnalyzerTitle" xml:space="preserve">
-        <value>Deprecated GenAI semantic convention</value>
-    </data>
-    <data name="AL0074AnalyzerMessageFormat" xml:space="preserve">
-        <value>GenAI attribute '{0}' is deprecated. Use '{1}' instead.</value>
-    </data>
-    <data name="AL0074AnalyzerDescription" xml:space="preserve">
-        <value>Some GenAI semantic convention attributes have been renamed or deprecated. Using the current attribute names ensures compatibility with modern observability tools and dashboards that expect the latest conventions.</value>
-    </data>
-    <!-- AL0075: High-cardinality tag on metrics -->
-    <data name="AL0075AnalyzerTitle" xml:space="preserve">
-        <value>High-cardinality tag on metric</value>
-    </data>
-    <data name="AL0075AnalyzerMessageFormat" xml:space="preserve">
-        <value>Tag '{0}' on metric is high-cardinality and may cause memory issues in metrics backends</value>
-    </data>
-    <data name="AL0075AnalyzerDescription" xml:space="preserve">
-        <value>High-cardinality tags like user.id, request.id, or session.id create a unique time series for each distinct value. This can overwhelm metrics backends with memory and storage costs. Consider using these values as span attributes instead, or aggregate them into buckets.</value>
-    </data>
-    <!-- AL0076: Missing OTel configuration -->
-    <data name="AL0076AnalyzerTitle" xml:space="preserve">
-        <value>Missing OpenTelemetry configuration</value>
-    </data>
-    <data name="AL0076AnalyzerMessageFormat" xml:space="preserve">
-        <value>AddServiceDefaults() is called but AddOpenTelemetry() is missing. Telemetry will not be exported without OpenTelemetry configuration.</value>
-    </data>
-    <data name="AL0076AnalyzerDescription" xml:space="preserve">
-        <value>When using AddServiceDefaults() or similar setup methods, ensure AddOpenTelemetry() is also called to configure telemetry export. Without OpenTelemetry configuration, traces, metrics, and logs will not be exported to observability backends.</value>
-    </data>
-    <!-- AL0077: Duplicate instrumentation -->
-    <data name="AL0077AnalyzerTitle" xml:space="preserve">
-        <value>Duplicate instrumentation detected</value>
-    </data>
-    <data name="AL0077AnalyzerMessageFormat" xml:space="preserve">
-        <value>Method '{0}' has both [Traced] attribute and manual Activity.StartActivity call. This creates duplicate nested spans.</value>
-    </data>
-    <data name="AL0077AnalyzerDescription" xml:space="preserve">
-        <value>When a method is instrumented by both auto-instrumentation (e.g., [Traced] attribute or interceptor) AND manual Activity.StartActivity spans, it creates duplicate nested spans that increase telemetry volume and can cause confusion in trace visualization. Choose one instrumentation approach per method.</value>
-    </data>
-    <!-- AL0078: Invalid ActivitySource name -->
-    <data name="AL0078AnalyzerTitle" xml:space="preserve">
-        <value>Invalid ActivitySource name</value>
-    </data>
-    <data name="AL0078AnalyzerMessageFormat" xml:space="preserve">
-        <value>ActivitySource name '{0}' does not follow reverse-DNS naming convention. Use format like 'company.product.component'.</value>
-    </data>
-    <data name="AL0078AnalyzerDescription" xml:space="preserve">
-        <value>ActivitySource names should follow the reverse-DNS naming convention (e.g., 'company.product.component'). Names must contain at least one dot, use only lowercase letters, digits, dots, and hyphens, and should not contain spaces. This ensures consistent identification across telemetry backends.</value>
-    </data>
-    <!-- AL0079: Manual span recommended for complex async flows -->
-    <data name="AL0079AnalyzerTitle" xml:space="preserve">
-        <value>Manual span recommended</value>
-    </data>
-    <data name="AL0079AnalyzerMessageFormat" xml:space="preserve">
-        <value>Method '{0}' has [Traced] but contains {1}; manual instrumentation may capture execution better</value>
-    </data>
-    <data name="AL0079AnalyzerDescription" xml:space="preserve">
-        <value>Complex async patterns like Task.WhenAll, Parallel.ForEach, multiple awaits, or ConfigureAwait(false) may not be fully captured by auto-instrumentation. Consider using manual Activity.StartActivity() to create explicit child spans for parallel operations, ensuring each branch of execution is properly traced.</value>
-    </data>
-    <!-- AL0080: Missing resilience configuration -->
-    <data name="AL0080AnalyzerTitle" xml:space="preserve">
+    <!-- AL1105: Missing resilience configuration -->
+    <data name="AL1105AnalyzerTitle" xml:space="preserve">
         <value>Missing resilience configuration</value>
     </data>
-    <data name="AL0080AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1105AnalyzerMessageFormat" xml:space="preserve">
         <value>HTTP client '{0}' registered without resilience policies. Consider adding AddStandardResilienceHandler() for retry, timeout, and circuit breaker.</value>
     </data>
-    <data name="AL0080AnalyzerDescription" xml:space="preserve">
+    <data name="AL1105AnalyzerDescription" xml:space="preserve">
         <value>HTTP clients should be configured with resilience policies to handle transient failures gracefully. Use AddStandardResilienceHandler() from Microsoft.Extensions.Http.Resilience or AddResilienceHandler() with custom Polly policies. This ensures automatic retries, timeouts, and circuit breakers for improved reliability.</value>
     </data>
-    <!-- AL0081: Missing Health Checks -->
-    <data name="AL0081AnalyzerTitle" xml:space="preserve">
+    <!-- AL1106: Missing Health Checks -->
+    <data name="AL1106AnalyzerTitle" xml:space="preserve">
         <value>Missing health checks</value>
     </data>
-    <data name="AL0081AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1106AnalyzerMessageFormat" xml:space="preserve">
         <value>Service doesn't expose health check endpoint. Add builder.Services.AddHealthChecks() for container orchestration.</value>
     </data>
-    <data name="AL0081AnalyzerDescription" xml:space="preserve">
+    <data name="AL1106AnalyzerDescription" xml:space="preserve">
         <value>Health checks are essential for container orchestration platforms (Kubernetes, Docker Swarm) to determine service availability. Add builder.Services.AddHealthChecks() and app.MapHealthChecks() to expose /health endpoints for liveness and readiness probes.</value>
     </data>
-    <!-- AL0082: Consider connection string -->
-    <data name="AL0082AnalyzerTitle" xml:space="preserve">
+    <!-- AL1107: Consider connection string -->
+    <data name="AL1107AnalyzerTitle" xml:space="preserve">
         <value>Consider using configuration for connection string</value>
     </data>
-    <data name="AL0082AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1107AnalyzerMessageFormat" xml:space="preserve">
         <value>Hardcoded connection string detected. Use builder.Configuration.GetConnectionString() instead for environment flexibility.</value>
     </data>
-    <data name="AL0082AnalyzerDescription" xml:space="preserve">
+    <data name="AL1107AnalyzerDescription" xml:space="preserve">
         <value>Connection strings should be loaded from configuration (appsettings.json, environment variables, or secrets) rather than hardcoded. This enables different connection strings per environment (dev/staging/production) and avoids committing sensitive credentials to source control.</value>
     </data>
-    <!-- AL0083: Insecure endpoint -->
-    <data name="AL0083AnalyzerTitle" xml:space="preserve">
-        <value>Insecure endpoint</value>
-    </data>
-    <data name="AL0083AnalyzerMessageFormat" xml:space="preserve">
-        <value>HTTP endpoint '{0}' should use HTTPS for production security. Consider using https:// instead.</value>
-    </data>
-    <data name="AL0083AnalyzerDescription" xml:space="preserve">
-        <value>HTTP endpoints expose data in transit to interception and man-in-the-middle attacks. Use HTTPS (TLS) for all production endpoints to ensure data confidentiality and integrity. Localhost and 127.0.0.1 are excluded as they are typically used for local development only.</value>
-    </data>
-    <!-- AL0084: Missing service discovery -->
-    <data name="AL0084AnalyzerTitle" xml:space="preserve">
+    <!-- AL1108: Missing service discovery -->
+    <data name="AL1108AnalyzerTitle" xml:space="preserve">
         <value>Missing service discovery</value>
     </data>
-    <data name="AL0084AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1108AnalyzerMessageFormat" xml:space="preserve">
         <value>Direct URL '{0}' used instead of service discovery. Consider using service name resolution (e.g., 'http+https://servicename') for dynamic endpoint discovery.</value>
     </data>
-    <data name="AL0084AnalyzerDescription" xml:space="preserve">
+    <data name="AL1108AnalyzerDescription" xml:space="preserve">
         <value>Hardcoded URLs in HttpClient.BaseAddress or service client configuration reduce flexibility and complicate deployment across environments. When using .NET Aspire or service discovery libraries, use service names (e.g., 'http+https://apiservice') that resolve to actual endpoints at runtime. This enables automatic endpoint discovery, load balancing, and environment-specific configuration.</value>
     </data>
-    <!-- AL0085: Invalid attribute value -->
-    <data name="AL0085AnalyzerTitle" xml:space="preserve">
-        <value>Invalid attribute value</value>
-    </data>
-    <data name="AL0085AnalyzerMessageFormat" xml:space="preserve">
-        <value>Attribute '{0}' has invalid value '{1}'. Expected: {2}</value>
-    </data>
-    <data name="AL0085AnalyzerDescription" xml:space="preserve">
-        <value>Attribute values must conform to the expected format defined by OpenTelemetry semantic conventions. For example, http.response.status_code must be an integer, gen_ai.system must be a known provider (openai, anthropic, etc.), and error.type should be an exception type or error code. Invalid values may cause issues with telemetry backends and dashboards.</value>
-    </data>
-    <!-- AL0086: Incorrect attribute type -->
-    <data name="AL0086AnalyzerTitle" xml:space="preserve">
-        <value>Incorrect attribute type</value>
-    </data>
-    <data name="AL0086AnalyzerMessageFormat" xml:space="preserve">
-        <value>Attribute '{0}' should be type '{1}' but '{2}' was provided</value>
-    </data>
-    <data name="AL0086AnalyzerDescription" xml:space="preserve">
-        <value>OpenTelemetry semantic conventions specify expected types for attributes. For example, gen_ai.usage.input_tokens should be an integer, not a string. Using incorrect types may cause issues with telemetry backends or dashboards that expect specific types for aggregation and visualization.</value>
-    </data>
-    <!-- AL0087: Prefer constant attribute -->
-    <data name="AL0087AnalyzerTitle" xml:space="preserve">
-        <value>Prefer constant attribute</value>
-    </data>
-    <data name="AL0087AnalyzerMessageFormat" xml:space="preserve">
-        <value>Use '{0}' instead of string literal "{1}" for attribute name</value>
-    </data>
-    <data name="AL0087AnalyzerDescription" xml:space="preserve">
-        <value>OpenTelemetry semantic convention attribute names should use constant fields from GenAiAttributes or SemanticConventions classes instead of string literals. Using constants prevents typos, enables IntelliSense, and ensures consistency with the latest semantic conventions.</value>
-    </data>
-    <!-- AL0088: Sensitive data in attribute -->
-    <data name="AL0088AnalyzerTitle" xml:space="preserve">
-        <value>Sensitive data in span attribute</value>
-    </data>
-    <data name="AL0088AnalyzerMessageFormat" xml:space="preserve">
-        <value>Attribute '{0}' may contain sensitive data (PII or credentials). Consider redacting or excluding this information.</value>
-    </data>
-    <data name="AL0088AnalyzerDescription" xml:space="preserve">
-        <value>Span attributes containing passwords, secrets, tokens, API keys, or PII (SSN, credit card numbers) can leak sensitive information to telemetry backends. Consider redacting sensitive values or excluding these attributes from telemetry. If the data is intentionally included, suppress this warning with a justification comment.</value>
-    </data>
-    <!-- AL0089: Missing OTLP configuration -->
-    <data name="AL0089AnalyzerTitle" xml:space="preserve">
-        <value>Missing OTLP configuration</value>
-    </data>
-    <data name="AL0089AnalyzerMessageFormat" xml:space="preserve">
-        <value>OTLP exporter configured without explicit endpoint. Set OTEL_EXPORTER_OTLP_ENDPOINT environment variable or pass endpoint in code.</value>
-    </data>
-    <data name="AL0089AnalyzerDescription" xml:space="preserve">
-        <value>When using UseOtlpExporter() or AddOtlpExporter() without an explicit endpoint configuration, telemetry will be sent to the default localhost endpoint (localhost:4317 for gRPC, localhost:4318 for HTTP) or fail to export if no collector is running. Configure OTEL_EXPORTER_OTLP_ENDPOINT environment variable or pass the endpoint explicitly in options to ensure reliable telemetry export.</value>
-    </data>
-    <!-- AL0090: Uncompressed export -->
-    <data name="AL0090AnalyzerTitle" xml:space="preserve">
-        <value>Uncompressed OTLP export</value>
-    </data>
-    <data name="AL0090AnalyzerMessageFormat" xml:space="preserve">
-        <value>OTLP exporter using HTTP protocol without compression. Enable gzip compression to reduce bandwidth usage.</value>
-    </data>
-    <data name="AL0090AnalyzerDescription" xml:space="preserve">
-        <value>OTLP HTTP protocol does not enable compression by default, unlike gRPC which uses compression automatically. For HTTP exports, especially with large payloads like gen_ai.content attributes, enabling gzip compression significantly reduces bandwidth usage and export latency. Configure ExportProcessorOptions or OtlpExporterOptions to enable compression.</value>
-    </data>
-    <!-- AL0092: Consider sampling -->
-    <data name="AL0092AnalyzerTitle" xml:space="preserve">
-        <value>Consider configuring sampling</value>
-    </data>
-    <data name="AL0092AnalyzerMessageFormat" xml:space="preserve">
-        <value>OpenTelemetry tracing configured without sampling. Consider using ParentBasedSampler or TraceIdRatioBasedSampler to reduce telemetry volume in production.</value>
-    </data>
-    <data name="AL0092AnalyzerDescription" xml:space="preserve">
-        <value>High-volume services can generate excessive telemetry data without sampling configuration. AlwaysOnSampler captures every span, which may overwhelm backends and increase costs. Consider using ParentBasedSampler (respects parent decisions) or TraceIdRatioBasedSampler (probabilistic) for production environments. Tail-based sampling at the collector level is also recommended for capturing important traces like errors.</value>
-    </data>
-    <!-- AL0093: Missing resource attributes -->
-    <data name="AL0093AnalyzerTitle" xml:space="preserve">
-        <value>Missing resource attributes</value>
-    </data>
-    <data name="AL0093AnalyzerMessageFormat" xml:space="preserve">
-        <value>OpenTelemetry resource is missing '{0}'. Add ResourceBuilder.CreateDefault().AddService() to configure service identification.</value>
-    </data>
-    <data name="AL0093AnalyzerDescription" xml:space="preserve">
-        <value>Resource attributes 'service.name' and 'service.version' are required for proper service identification in observability backends. These attributes enable grouping traces by service and tracking version-specific behavior. Use ResourceBuilder.CreateDefault().AddService(serviceName, serviceVersion) to set them.</value>
-    </data>
-    <!-- AL0091: Batch export disabled -->
-    <data name="AL0091AnalyzerTitle" xml:space="preserve">
-        <value>Batch export disabled</value>
-    </data>
-    <data name="AL0091AnalyzerMessageFormat" xml:space="preserve">
-        <value>SimpleSpanProcessor or SimpleActivityExportProcessor exports spans one at a time. Use BatchSpanProcessor or BatchActivityExportProcessor for better performance.</value>
-    </data>
-    <data name="AL0091AnalyzerDescription" xml:space="preserve">
-        <value>SimpleSpanProcessor and SimpleActivityExportProcessor export each span immediately as it completes, which incurs significant overhead. BatchSpanProcessor and BatchActivityExportProcessor collect spans and export them in batches, reducing network overhead and improving application performance. Use batch processors in production environments.</value>
-    </data>
-    <!-- AL0094: Avoid dynamic keyword in AOT-published code -->
-    <data name="AL0094AnalyzerTitle" xml:space="preserve">
+    <!-- AL1406: Avoid dynamic keyword in AOT-published code -->
+    <data name="AL1406AnalyzerTitle" xml:space="preserve">
         <value>Avoid 'dynamic' keyword in AOT-published code</value>
     </data>
-    <data name="AL0094AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1406AnalyzerMessageFormat" xml:space="preserve">
         <value>Usage of 'dynamic' is incompatible with Native AOT. The '{0}' operation requires System.Reflection.Emit which is not available at runtime.</value>
     </data>
-    <data name="AL0094AnalyzerDescription" xml:space="preserve">
+    <data name="AL1406AnalyzerDescription" xml:space="preserve">
         <value>The 'dynamic' keyword requires System.Reflection.Emit at runtime to generate call sites, which is not available in Native AOT. Replace with statically typed alternatives such as interfaces, generics, or pattern matching.</value>
     </data>
-    <!-- AL0095: Avoid Expression.Compile() in AOT context -->
-    <data name="AL0095AnalyzerTitle" xml:space="preserve">
+    <!-- AL1407: Avoid Expression.Compile() in AOT context -->
+    <data name="AL1407AnalyzerTitle" xml:space="preserve">
         <value>Avoid Expression.Compile() in AOT context</value>
     </data>
-    <data name="AL0095AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1407AnalyzerMessageFormat" xml:space="preserve">
         <value>'{0}' falls back to interpreted mode in Native AOT, which is significantly slower. Consider using source generators or direct code instead.</value>
     </data>
-    <data name="AL0095AnalyzerDescription" xml:space="preserve">
+    <data name="AL1407AnalyzerDescription" xml:space="preserve">
         <value>Expression.Compile() and Expression.CompileToMethod() rely on System.Reflection.Emit to generate IL at runtime. In Native AOT, these fall back to an interpreted mode that is significantly slower. Consider using source generators, direct code, or compile-time expression evaluation instead.</value>
     </data>
-    <!-- AL0096: Enable EventSourceSupport for AOT with telemetry -->
-    <data name="AL0096AnalyzerTitle" xml:space="preserve">
-        <value>Enable EventSourceSupport for AOT with telemetry</value>
-    </data>
-    <data name="AL0096AnalyzerMessageFormat" xml:space="preserve">
-        <value>PublishAot is enabled but EventSourceSupport is not set to true. EventPipe-based telemetry (OpenTelemetry, dotnet-trace, dotnet-counters) requires EventSourceSupport.</value>
-    </data>
-    <data name="AL0096AnalyzerDescription" xml:space="preserve">
-        <value>Native AOT trims EventSource/EventPipe infrastructure by default. If the application uses OpenTelemetry, dotnet-trace, dotnet-counters, or other EventPipe-based diagnostics, set EventSourceSupport to true in the project file to preserve this infrastructure.</value>
-    </data>
-    <!-- AL0104: Prefer await using for IAsyncDisposable -->
-    <data name="AL0104AnalyzerTitle" xml:space="preserve">
+    <!-- AL1304: Prefer await using for IAsyncDisposable -->
+    <data name="AL1304AnalyzerTitle" xml:space="preserve">
         <value>Prefer 'await using' for IAsyncDisposable</value>
     </data>
-    <data name="AL0104AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1304AnalyzerMessageFormat" xml:space="preserve">
         <value>'{0}' implements IAsyncDisposable. Use 'await using' instead of 'using' to ensure DisposeAsync() is called.</value>
     </data>
-    <data name="AL0104AnalyzerDescription" xml:space="preserve">
+    <data name="AL1304AnalyzerDescription" xml:space="preserve">
         <value>Types implementing IAsyncDisposable should be disposed with 'await using' in async methods. Using 'using' calls the synchronous Dispose() method instead of DisposeAsync(), which may skip async cleanup such as flushing buffers, closing network connections, or finalizing telemetry export.</value>
     </data>
-    <!-- AL0105: Avoid blocking calls in async methods -->
-    <data name="AL0105AnalyzerTitle" xml:space="preserve">
+    <!-- AL1305: Avoid blocking calls in async methods -->
+    <data name="AL1305AnalyzerTitle" xml:space="preserve">
         <value>Avoid blocking calls in async methods</value>
     </data>
-    <data name="AL0105AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1305AnalyzerMessageFormat" xml:space="preserve">
         <value>'{0}' blocks the calling thread inside an async method. Use 'await' instead to avoid potential deadlocks.</value>
     </data>
-    <data name="AL0105AnalyzerDescription" xml:space="preserve">
+    <data name="AL1305AnalyzerDescription" xml:space="preserve">
         <value>Calling .Result, .Wait(), or .GetAwaiter().GetResult() on a Task inside an async method blocks the thread pool thread and can cause deadlocks when a SynchronizationContext is present (ASP.NET, WPF). Use 'await' instead to asynchronously wait for the result.</value>
     </data>
-    <!-- AL0106: Avoid Task.Run in ASP.NET Core request handlers -->
-    <data name="AL0106AnalyzerTitle" xml:space="preserve">
+    <!-- AL1109: Avoid Task.Run in ASP.NET Core request handlers -->
+    <data name="AL1109AnalyzerTitle" xml:space="preserve">
         <value>Avoid Task.Run in ASP.NET Core request handlers</value>
     </data>
-    <data name="AL0106AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1109AnalyzerMessageFormat" xml:space="preserve">
         <value>Task.Run adds unnecessary overhead in ASP.NET Core handlers. Request handling already runs on thread pool threads.</value>
     </data>
-    <data name="AL0106AnalyzerDescription" xml:space="preserve">
+    <data name="AL1109AnalyzerDescription" xml:space="preserve">
         <value>ASP.NET Core request handling already runs on thread pool threads. Using Task.Run to offload work to another thread pool thread adds scheduling overhead and context switching without benefit. For CPU-bound work that genuinely needs to not block the request, consider using a background service or suppress this diagnostic with a justification.</value>
     </data>
-    <!-- AL0101: Avoid Activator.CreateInstance in AOT context -->
-    <data name="AL0101AnalyzerTitle" xml:space="preserve">
+    <!-- AL1408: Avoid Activator.CreateInstance in AOT context -->
+    <data name="AL1408AnalyzerTitle" xml:space="preserve">
         <value>Activator.CreateInstance is not AOT-safe</value>
     </data>
-    <data name="AL0101AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1408AnalyzerMessageFormat" xml:space="preserve">
         <value>Activator.CreateInstance&lt;{0}&gt;() uses reflection and is not compatible with NativeAOT. Use explicit construction or factory methods.</value>
     </data>
-    <data name="AL0101AnalyzerDescription" xml:space="preserve">
+    <data name="AL1408AnalyzerDescription" xml:space="preserve">
         <value>Activator.CreateInstance uses reflection to create instances at runtime. In Native AOT, this requires the target type's constructor to be preserved. Use explicit construction, factory patterns, or annotate with [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructors)].</value>
     </data>
-    <!-- AL0102: Avoid Type.GetType with dynamic name in AOT context -->
-    <data name="AL0102AnalyzerTitle" xml:space="preserve">
+    <!-- AL1409: Avoid Type.GetType with dynamic name in AOT context -->
+    <data name="AL1409AnalyzerTitle" xml:space="preserve">
         <value>Type.GetType with dynamic name is not AOT-safe</value>
     </data>
-    <data name="AL0102AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1409AnalyzerMessageFormat" xml:space="preserve">
         <value>Type.GetType with {0} prevents the trimmer from statically analyzing which types to preserve. Use typeof() or a string literal.</value>
     </data>
-    <data name="AL0102AnalyzerDescription" xml:space="preserve">
+    <data name="AL1409AnalyzerDescription" xml:space="preserve">
         <value>Type.GetType(string) with a dynamic type name or case-insensitive search prevents the trimmer from statically analyzing which types to preserve. Use typeof() for compile-time type references. For string literals without case-insensitive search, the trimmer can analyze the call statically.</value>
     </data>
-    <!-- AL0107: Orphaned [TracedTag] -->
-    <data name="AL0107AnalyzerTitle" xml:space="preserve">
-        <value>Orphaned [TracedTag]</value>
-    </data>
-    <data name="AL0107AnalyzerMessageFormat" xml:space="preserve">
-        <value>[TracedTag] on '{0}' has no effect because neither the method nor its declaring type has [Traced]</value>
-    </data>
-    <data name="AL0107AnalyzerDescription" xml:space="preserve">
-        <value>The [TracedTag] attribute is only meaningful when used on parameters of methods that participate in tracing via [Traced]. When neither the method nor its declaring type has [Traced], the tag will be silently ignored and becomes dead metadata.</value>
-    </data>
-    <!-- AL0108: Redundant [NoTrace] -->
-    <data name="AL0108AnalyzerTitle" xml:space="preserve">
-        <value>Redundant [NoTrace]</value>
-    </data>
-    <data name="AL0108AnalyzerMessageFormat" xml:space="preserve">
-        <value>[NoTrace] on '{0}' has no effect because the declaring type has no class-level [Traced]</value>
-    </data>
-    <data name="AL0108AnalyzerDescription" xml:space="preserve">
-        <value>The [NoTrace] attribute is used to opt a method out of class-level [Traced] auto-instrumentation. When the declaring type does not have [Traced], the [NoTrace] attribute has no effect and should be removed to avoid confusion.</value>
-    </data>
-    <!-- AL0109: Non-interceptable [Traced] -->
-    <data name="AL0109AnalyzerTitle" xml:space="preserve">
-        <value>Non-interceptable [Traced]</value>
-    </data>
-    <data name="AL0109AnalyzerMessageFormat" xml:space="preserve">
-        <value>[Traced] on '{0}' will be ignored because abstract, extern, and partial methods cannot be intercepted</value>
-    </data>
-    <data name="AL0109AnalyzerDescription" xml:space="preserve">
-        <value>The [Traced] attribute triggers compile-time interception to create spans. Abstract, extern, and partial definition methods cannot be intercepted by the source generator, so [Traced] will be silently ignored.</value>
-    </data>
-    <!-- AL0110: [TracedTag] on out/ref parameter -->
-    <data name="AL0110AnalyzerTitle" xml:space="preserve">
-        <value>[TracedTag] on out/ref parameter</value>
-    </data>
-    <data name="AL0110AnalyzerMessageFormat" xml:space="preserve">
-        <value>[TracedTag] on '{0}' is not supported for out or ref parameters</value>
-    </data>
-    <data name="AL0110AnalyzerDescription" xml:space="preserve">
-        <value>The [TracedTag] attribute records parameter values as span attributes at the start of method execution. Parameters with out or ref modifiers are not supported because out parameters have no value at method entry and ref parameters may be mutated during execution.</value>
-    </data>
-    <!-- AL0111: SQL interpolation in CommandText -->
-    <data name="AL0111AnalyzerTitle" xml:space="preserve">
+    <!-- AL1306: SQL interpolation in CommandText -->
+    <data name="AL1306AnalyzerTitle" xml:space="preserve">
         <value>Avoid SQL string interpolation in CommandText</value>
     </data>
-    <data name="AL0111AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1306AnalyzerMessageFormat" xml:space="preserve">
         <value>CommandText uses string interpolation which may be vulnerable to SQL injection; use parameterized queries instead</value>
     </data>
-    <data name="AL0111AnalyzerDescription" xml:space="preserve">
+    <data name="AL1306AnalyzerDescription" xml:space="preserve">
         <value>String interpolation in SQL CommandText can lead to SQL injection vulnerabilities. Use parameterized queries with placeholders ($1, @param) instead of interpolating values directly.</value>
     </data>
-    <!-- AL0112: Fire-and-forget task discard -->
-    <data name="AL0112AnalyzerTitle" xml:space="preserve">
+    <!-- AL1307: Fire-and-forget task discard -->
+    <data name="AL1307AnalyzerTitle" xml:space="preserve">
         <value>Avoid fire-and-forget task discard</value>
     </data>
-    <data name="AL0112AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1307AnalyzerMessageFormat" xml:space="preserve">
         <value>Discarded task from '{0}' will silently swallow exceptions; await the task or add explicit error handling</value>
     </data>
-    <data name="AL0112AnalyzerDescription" xml:space="preserve">
+    <data name="AL1307AnalyzerDescription" xml:space="preserve">
         <value>Discarding a Task with _ = causes fire-and-forget behavior where exceptions are silently lost. Await the task, store it for later observation, or add a continuation with error handling.</value>
     </data>
-    <!-- AL0113: Missing exception recording on Activity error status -->
-    <data name="AL0113AnalyzerTitle" xml:space="preserve">
-        <value>Missing exception recording on Activity error status</value>
-    </data>
-    <data name="AL0113AnalyzerMessageFormat" xml:space="preserve">
-        <value>Activity.SetStatus(Error) without recording the exception; call AddEvent or RecordException to capture exception details</value>
-    </data>
-    <data name="AL0113AnalyzerDescription" xml:space="preserve">
-        <value>When setting an Activity status to Error in a catch block, the exception should be recorded as an event on the span for proper observability. Use activity.AddEvent with exception details or a RecordException helper.</value>
-    </data>
-    <!-- AL0114: Prefer TryParse over Parse -->
-    <data name="AL0114AnalyzerTitle" xml:space="preserve">
+    <!-- AL1308: Prefer TryParse over Parse -->
+    <data name="AL1308AnalyzerTitle" xml:space="preserve">
         <value>Prefer TryParse over Parse</value>
     </data>
-    <data name="AL0114AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1308AnalyzerMessageFormat" xml:space="preserve">
         <value>'{0}.Parse' throws on invalid input; use '{0}.TryParse' instead</value>
     </data>
-    <data name="AL0114AnalyzerDescription" xml:space="preserve">
+    <data name="AL1308AnalyzerDescription" xml:space="preserve">
         <value>Parse methods throw FormatException on invalid input. Use TryParse to safely handle invalid input without exceptions, especially when processing user input or external data.</value>
     </data>
-    <!-- AL0115: Empty catch block swallows exceptions -->
-    <data name="AL0115AnalyzerTitle" xml:space="preserve">
+    <!-- AL1309: Empty catch block swallows exceptions -->
+    <data name="AL1309AnalyzerTitle" xml:space="preserve">
         <value>Empty catch block swallows exceptions</value>
     </data>
-    <data name="AL0115AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1309AnalyzerMessageFormat" xml:space="preserve">
         <value>Catch block is empty; add logging, rethrow, or handle the exception</value>
     </data>
-    <data name="AL0115AnalyzerDescription" xml:space="preserve">
+    <data name="AL1309AnalyzerDescription" xml:space="preserve">
         <value>Empty catch blocks silently swallow exceptions, making bugs invisible. At minimum, log the exception. If the exception is truly expected, add a comment explaining why it is safe to ignore.</value>
     </data>
-    <!-- AL0116: Exception details leaked in HTTP response -->
-    <data name="AL0116AnalyzerTitle" xml:space="preserve">
+    <!-- AL1310: Exception details leaked in HTTP response -->
+    <data name="AL1310AnalyzerTitle" xml:space="preserve">
         <value>Exception details leaked in HTTP response</value>
     </data>
-    <data name="AL0116AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1310AnalyzerMessageFormat" xml:space="preserve">
         <value>'{0}' exposes exception internals to the client; return a generic error message instead</value>
     </data>
-    <data name="AL0116AnalyzerDescription" xml:space="preserve">
+    <data name="AL1310AnalyzerDescription" xml:space="preserve">
         <value>Returning exception messages, stack traces, or ToString() output in HTTP responses can expose sensitive implementation details. Return a generic error message and log the exception server-side.</value>
     </data>
-    <!-- AL0117: Unnecessary LINQ materialization -->
-    <data name="AL0117AnalyzerTitle" xml:space="preserve">
+    <!-- AL1311: Unnecessary LINQ materialization -->
+    <data name="AL1311AnalyzerTitle" xml:space="preserve">
         <value>Unnecessary LINQ materialization</value>
     </data>
-    <data name="AL0117AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1311AnalyzerMessageFormat" xml:space="preserve">
         <value>'{0}' after '{1}' forces immediate materialization; consider removing if deferred execution suffices</value>
     </data>
-    <data name="AL0117AnalyzerDescription" xml:space="preserve">
+    <data name="AL1311AnalyzerDescription" xml:space="preserve">
         <value>Calling ToList() or ToArray() immediately after Where(), Select(), or other LINQ operators forces eager evaluation. If the result is only enumerated once, deferred execution avoids allocating an intermediate collection.</value>
     </data>
-    <!-- AL0118: Read-modify-write without transaction -->
-    <data name="AL0118AnalyzerTitle" xml:space="preserve">
+    <!-- AL1312: Read-modify-write without transaction -->
+    <data name="AL1312AnalyzerTitle" xml:space="preserve">
         <value>Read-modify-write without transaction</value>
     </data>
-    <data name="AL0118AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1312AnalyzerMessageFormat" xml:space="preserve">
         <value>Method '{0}' performs both read and write operations without a transaction; wrap in BeginTransaction to ensure consistency</value>
     </data>
-    <data name="AL0118AnalyzerDescription" xml:space="preserve">
+    <data name="AL1312AnalyzerDescription" xml:space="preserve">
         <value>A method that reads data and then writes based on that data without a transaction is vulnerable to race conditions. Another connection could modify the data between the read and write. Use BeginTransaction/BeginTransactionAsync to ensure isolation.</value>
     </data>
-    <!-- AL0119: ISymbol stored in generator model -->
-    <data name="AL0119AnalyzerTitle" xml:space="preserve">
+    <!-- AL1501: ISymbol stored in generator model -->
+    <data name="AL1501AnalyzerTitle" xml:space="preserve">
         <value>Avoid storing ISymbol in source generator models</value>
     </data>
-    <data name="AL0119AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1501AnalyzerMessageFormat" xml:space="preserve">
         <value>Member '{0}' stores ISymbol-derived type '{1}' which breaks incremental generator caching</value>
     </data>
-    <data name="AL0119AnalyzerDescription" xml:space="preserve">
+    <data name="AL1501AnalyzerDescription" xml:space="preserve">
         <value>ISymbol types do not implement value equality. Storing them in source generator models causes the incremental generator cache to be invalidated on every keystroke, defeating the purpose of incremental generation. Extract the needed data as strings or primitive values instead.</value>
     </data>
-    <!-- AL0120: Use IIncrementalGenerator instead of ISourceGenerator -->
-    <data name="AL0120AnalyzerTitle" xml:space="preserve">
+    <!-- AL1502: Use IIncrementalGenerator instead of ISourceGenerator -->
+    <data name="AL1502AnalyzerTitle" xml:space="preserve">
         <value>Use IIncrementalGenerator instead of ISourceGenerator</value>
     </data>
-    <data name="AL0120AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1502AnalyzerMessageFormat" xml:space="preserve">
         <value>Type '{0}' implements ISourceGenerator; use IIncrementalGenerator for better IDE performance</value>
     </data>
-    <data name="AL0120AnalyzerDescription" xml:space="preserve">
+    <data name="AL1502AnalyzerDescription" xml:space="preserve">
         <value>ISourceGenerator (v1 API) runs on every keystroke without caching. IIncrementalGenerator provides an incremental pipeline with automatic caching, significantly improving IDE responsiveness.</value>
     </data>
-    <!-- AL0121: NormalizeWhitespace in source generator -->
-    <data name="AL0121AnalyzerTitle" xml:space="preserve">
+    <!-- AL1503: NormalizeWhitespace in source generator -->
+    <data name="AL1503AnalyzerTitle" xml:space="preserve">
         <value>Avoid NormalizeWhitespace in source generators</value>
     </data>
-    <data name="AL0121AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1503AnalyzerMessageFormat" xml:space="preserve">
         <value>NormalizeWhitespace() is expensive; use raw string literals or manual formatting for source generation</value>
     </data>
-    <data name="AL0121AnalyzerDescription" xml:space="preserve">
+    <data name="AL1503AnalyzerDescription" xml:space="preserve">
         <value>SyntaxFactory.NormalizeWhitespace() traverses the entire syntax tree to rewrite whitespace, which is expensive in source generators that run frequently. Use raw string literals or manual formatting instead.</value>
     </data>
-    <!-- AL0122: DuckDbTable type must be partial -->
-    <data name="AL0122AnalyzerTitle" xml:space="preserve">
+    <!-- AL1504: DuckDbTable type must be partial -->
+    <data name="AL1504AnalyzerTitle" xml:space="preserve">
         <value>[DuckDbTable] type must be partial</value>
     </data>
-    <data name="AL0122AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1504AnalyzerMessageFormat" xml:space="preserve">
         <value>Type '{0}' has [DuckDbTable] but is not partial; the source generator cannot extend it</value>
     </data>
-    <data name="AL0122AnalyzerDescription" xml:space="preserve">
+    <data name="AL1504AnalyzerDescription" xml:space="preserve">
         <value>The DuckDbInsertGenerator source generator creates additional methods (AddParameters, MapFromReader, BuildMultiRowInsertSql) on types marked with [DuckDbTable]. The type must be partial so the generator can add these members.</value>
     </data>
-    <!-- AL0123: Conflicting DuckDbColumn ordinals -->
-    <data name="AL0123AnalyzerTitle" xml:space="preserve">
+    <!-- AL1505: Conflicting DuckDbColumn ordinals -->
+    <data name="AL1505AnalyzerTitle" xml:space="preserve">
         <value>Conflicting [DuckDbColumn] ordinal values</value>
     </data>
-    <data name="AL0123AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1505AnalyzerMessageFormat" xml:space="preserve">
         <value>Properties '{0}' and '{1}' on type '{2}' both specify Ordinal = {3}</value>
     </data>
-    <data name="AL0123AnalyzerDescription" xml:space="preserve">
+    <data name="AL1505AnalyzerDescription" xml:space="preserve">
         <value>Multiple properties in a [DuckDbTable] type have the same Ordinal value in their [DuckDbColumn] attribute. Each column must have a unique ordinal to ensure deterministic column ordering in generated SQL.</value>
     </data>
-    <!-- AL0124: Non-interceptable AgentTraced -->
-    <data name="AL0124AnalyzerTitle" xml:space="preserve">
-        <value>Non-interceptable [AgentTraced]</value>
-    </data>
-    <data name="AL0124AnalyzerMessageFormat" xml:space="preserve">
-        <value>[AgentTraced] on '{0}' will be ignored because abstract, extern, and partial methods cannot be intercepted</value>
-    </data>
-    <data name="AL0124AnalyzerDescription" xml:space="preserve">
-        <value>The [AgentTraced] attribute triggers compile-time interception to create agent spans. Abstract, extern, and partial definition methods cannot be intercepted by the source generator, so [AgentTraced] will be silently ignored.</value>
-    </data>
-    <!-- AL0125: Use *Any* string comparison extensions -->
-    <data name="AL0125AnalyzerTitle" xml:space="preserve">
+    <!-- AL1219: Use *Any* string comparison extensions -->
+    <data name="AL1219AnalyzerTitle" xml:space="preserve">
         <value>Use *Any* string comparison extension</value>
     </data>
-    <data name="AL0125AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1219AnalyzerMessageFormat" xml:space="preserve">
         <value>Use '{0}' to collapse chained equality checks</value>
     </data>
-    <data name="AL0125AnalyzerDescription" xml:space="preserve">
+    <data name="AL1219AnalyzerDescription" xml:space="preserve">
         <value>Chained string equality comparisons (s == "a" || s == "b") can be collapsed into a single EqualsAnyOrdinal/EqualsAnyIgnoreCase call.</value>
     </data>
-    <!-- AL0126: CancellationToken propagation -->
-    <data name="AL0126AnalyzerTitle" xml:space="preserve">
+    <!-- AL1313: CancellationToken propagation -->
+    <data name="AL1313AnalyzerTitle" xml:space="preserve">
         <value>Forward CancellationToken to invocations that support it</value>
     </data>
-    <data name="AL0126AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1313AnalyzerMessageFormat" xml:space="preserve">
         <value>'{0}' has an overload that accepts a CancellationToken</value>
     </data>
-    <data name="AL0126AnalyzerDescription" xml:space="preserve">
+    <data name="AL1313AnalyzerDescription" xml:space="preserve">
         <value>When a CancellationToken is available in scope and the invoked method has an overload accepting one, forward it to enable cooperative cancellation.</value>
     </data>
-    <!-- AL0127: Outdated MAF ecosystem package version -->
-    <data name="AL0127AnalyzerTitle" xml:space="preserve">
+    <!-- AL1606: Outdated MAF ecosystem package version -->
+    <data name="AL1606AnalyzerTitle" xml:space="preserve">
         <value>Outdated MAF ecosystem package version</value>
     </data>
-    <data name="AL0127AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1606AnalyzerMessageFormat" xml:space="preserve">
         <value>Package '{0}' version '{1}' is outdated; minimum required is '{2}'</value>
     </data>
-    <data name="AL0127AnalyzerDescription" xml:space="preserve">
+    <data name="AL1606AnalyzerDescription" xml:space="preserve">
         <value>Detects outdated Microsoft Agent Framework and related package versions. Update to the minimum required version to ensure compatibility with GA APIs and AIFunctionFactoryOptions.</value>
     </data>
-    <!-- AL0128: Destructive Loom tool must require approval -->
-    <data name="AL0128AnalyzerTitle" xml:space="preserve">
+    <!-- AL1800: Destructive Loom tool must require approval -->
+    <data name="AL1800AnalyzerTitle" xml:space="preserve">
         <value>Destructive Loom tool must require approval</value>
     </data>
-    <data name="AL0128AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1800AnalyzerMessageFormat" xml:space="preserve">
         <value>Loom tool '{0}' has destructive side effect '{1}' but does not require approval. Add [RequiresApproval] to ensure governance.</value>
     </data>
-    <data name="AL0128AnalyzerDescription" xml:space="preserve">
+    <data name="AL1800AnalyzerDescription" xml:space="preserve">
         <value>Loom tools with destructive side effects (WritesExternalState, MutatesCode, Deploys, ClosesIssue) must declare [RequiresApproval] to ensure governance gates are in place before execution.</value>
     </data>
-    <!-- AL0129: Loom tool must declare side effect -->
-    <data name="AL0129AnalyzerTitle" xml:space="preserve">
+    <!-- AL1801: Loom tool must declare side effect -->
+    <data name="AL1801AnalyzerTitle" xml:space="preserve">
         <value>Loom tool should declare its side effect</value>
     </data>
-    <data name="AL0129AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1801AnalyzerMessageFormat" xml:space="preserve">
         <value>Loom tool '{0}' does not declare its side effect. Add [ToolSideEffect] to make governance explicit.</value>
     </data>
-    <data name="AL0129AnalyzerDescription" xml:space="preserve">
+    <data name="AL1801AnalyzerDescription" xml:space="preserve">
         <value>Every Loom tool should declare its side effect via [ToolSideEffect] on the method or containing type so that governance policies can be enforced automatically.</value>
     </data>
-    <!-- AL0130: Loom tool must declare capability -->
-    <data name="AL0130AnalyzerTitle" xml:space="preserve">
+    <!-- AL1802: Loom tool must declare capability -->
+    <data name="AL1802AnalyzerTitle" xml:space="preserve">
         <value>Loom tool should declare required capabilities</value>
     </data>
-    <data name="AL0130AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1802AnalyzerMessageFormat" xml:space="preserve">
         <value>Loom tool '{0}' does not declare any required capabilities. Add [RequiresCapability] to enable fine-grained access control.</value>
     </data>
-    <data name="AL0130AnalyzerDescription" xml:space="preserve">
+    <data name="AL1802AnalyzerDescription" xml:space="preserve">
         <value>Every Loom tool should declare its required capabilities via [RequiresCapability] on the method or containing type to enable fine-grained access control.</value>
     </data>
-    <!-- AL0131: Direct GenAI SDK usage bypasses automatic OTel instrumentation -->
-    <data name="AL0131AnalyzerTitle" xml:space="preserve">
-        <value>Direct GenAI SDK call bypasses automatic OTel instrumentation</value>
-    </data>
-    <data name="AL0131AnalyzerMessageFormat" xml:space="preserve">
-        <value>Direct {0} SDK call detected. Register the client via AddChatClient(...).AsBuilder().UseFunctionInvocation().UseOpenTelemetry(...).Build() to produce telemetry automatically.</value>
-    </data>
-    <data name="AL0131AnalyzerDescription" xml:space="preserve">
-        <value>Calling a GenAI SDK type directly prevents automatic OpenTelemetry span emission. Wrap the provider client through Microsoft.Extensions.AI.IChatClient so all LLM calls are traced without changes to call sites.</value>
-    </data>
-    <!-- AL0132: Deprecated semantic convention value -->
-    <data name="AL0132AnalyzerTitle" xml:space="preserve">
-        <value>Deprecated semantic convention value</value>
-    </data>
-    <data name="AL0132AnalyzerMessageFormat" xml:space="preserve">
-        <value>Value '{1}' for attribute '{0}' is deprecated. {2}</value>
-    </data>
-    <data name="AL0132AnalyzerDescription" xml:space="preserve">
-        <value>Some semantic convention attribute values have been renamed or removed. Using current values keeps telemetry compatible with modern OpenTelemetry tooling and schema expectations.</value>
-    </data>
-    <!-- AL0133: Context-sensitive deprecated semantic convention attribute -->
-    <data name="AL0133AnalyzerTitle" xml:space="preserve">
-        <value>Context-sensitive deprecated semantic convention</value>
-    </data>
-    <data name="AL0133AnalyzerMessageFormat" xml:space="preserve">
-        <value>Attribute '{0}' is deprecated. {1}</value>
-    </data>
-    <data name="AL0133AnalyzerDescription" xml:space="preserve">
-        <value>Some deprecated semantic convention attributes cannot be migrated with a simple 1:1 rename. This analyzer highlights attributes that require context-sensitive migration or have no direct replacement.</value>
-    </data>
-    <!-- AL0134: Use semantic convention constant -->
-    <data name="AL0134AnalyzerTitle" xml:space="preserve">
-        <value>Use OpenTelemetry semantic convention constant</value>
-    </data>
-    <data name="AL0134AnalyzerMessageFormat" xml:space="preserve">
-        <value>Hardcoded semantic convention string "{1}". Use the typed constant '{0}' from OpenTelemetry.SemanticConventions instead.</value>
-    </data>
-    <data name="AL0134AnalyzerDescription" xml:space="preserve">
-        <value>OpenTelemetry semantic convention attribute names should reference the typed const fields published by the OpenTelemetry.SemanticConventions package (for example HttpAttributes.AttributeHttpRequestMethod) rather than hand-written string literals. Typed constants protect against typos, stay in sync with the schema version that is actually referenced, and enable tooling to diff telemetry surface area across versions.</value>
-    </data>
-    <!-- AL0135: Legacy SemanticConventions accessor -->
-    <data name="AL0135AnalyzerTitle" xml:space="preserve">
-        <value>Replace legacy SemanticConventions accessor</value>
-    </data>
-    <data name="AL0135AnalyzerMessageFormat" xml:space="preserve">
-        <value>'{0}' is a legacy OpenTelemetry semantic convention accessor. Use the grouped '{1}' constant instead.</value>
-    </data>
-    <data name="AL0135AnalyzerDescription" xml:space="preserve">
-        <value>The aggregated SemanticConventions / TraceSemanticConventions / ResourceSemanticConventions static classes are deprecated in favour of per-domain grouped attribute classes (HttpAttributes, ServerAttributes, DbAttributes, etc.). The new grouping mirrors the upstream OpenTelemetry semantic conventions layout and produces smaller, more navigable diffs on convention upgrades.</value>
-    </data>
-    <!-- AL0136: Incubating semantic convention in library -->
-    <data name="AL0136AnalyzerTitle" xml:space="preserve">
-        <value>Incubating semantic convention referenced from library</value>
-    </data>
-    <data name="AL0136AnalyzerMessageFormat" xml:space="preserve">
-        <value>Instrumentation library references incubating semantic convention '{0}' directly. Copy the definition into a local const to insulate against breaking changes on minor version updates.</value>
-    </data>
-    <data name="AL0136AnalyzerDescription" xml:space="preserve">
-        <value>OpenTelemetry SemanticConventions.Incubating members ship without stability guarantees; their name or value can change across minor versions. Instrumentation libraries that embed incubating references force transitive consumers to upgrade in lockstep. The recommended pattern is to copy the definition into the library's own constants file; see https://opentelemetry.io/docs/specs/semconv/non-normative/code-generation/#stability-and-versioning.</value>
-    </data>
-    <!-- AL0137: Use Guard.* helpers instead of BCL ThrowIf* helpers -->
-    <data name="AL0137AnalyzerTitle" xml:space="preserve">
+    <!-- AL1220: Use Guard.* helpers instead of BCL ThrowIf* helpers -->
+    <data name="AL1220AnalyzerTitle" xml:space="preserve">
         <value>Use Guard.* helpers instead of throw helpers</value>
     </data>
-    <data name="AL0137AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1220AnalyzerMessageFormat" xml:space="preserve">
         <value>Use '{1}' from ANcpLua.Roslyn.Utilities instead of '{0}'</value>
     </data>
-    <data name="AL0137AnalyzerDescription" xml:space="preserve">
+    <data name="AL1220AnalyzerDescription" xml:space="preserve">
         <value>The BCL throw helpers on ArgumentNullException, ArgumentException, and ArgumentOutOfRangeException — and the Microsoft.Shared.Diagnostics.Throw.If* helpers from Microsoft Agent Framework — only throw; they don't return the validated value, so they can't be used in expressions, member initialisers, or chained validation. The Guard.* helpers from ANcpLua.Roslyn.Utilities return the validated value, share the same [CallerArgumentExpression] parameter-name machinery, and compose. Covers BCL ThrowIfNull / NullOrEmpty / NullOrWhiteSpace and the seven ArgumentOutOfRangeException.ThrowIf* helpers, plus MAF Throw.IfNull / IfNullOrMemberNull / IfNullOrEmpty / IfNullOrWhitespace / IfZero / IfLessThan / IfGreaterThan / IfLessThanOrEqual / IfGreaterThanOrEqual / IfOutOfRange. Cold-path-only Throw.ArgumentNullException / ArgumentOutOfRangeException / ArgumentException / InvalidOperationException are intentionally out of scope — they don't validate, just throw. Banned in qyl-aligned projects via BannedSymbols.txt; this analyzer carries the matching auto-fix.</value>
     </data>
-    <!-- AL0138: Use Math.Round / MathF.Round overloads with explicit MidpointRounding -->
-    <data name="AL0138AnalyzerTitle" xml:space="preserve">
+    <!-- AL1314: Use Math.Round / MathF.Round overloads with explicit MidpointRounding -->
+    <data name="AL1314AnalyzerTitle" xml:space="preserve">
         <value>Use Math.Round/MathF.Round overload with explicit MidpointRounding</value>
     </data>
-    <data name="AL0138AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1314AnalyzerMessageFormat" xml:space="preserve">
         <value>'{0}' uses banker's rounding by default; pass MidpointRounding.ToEven (or another explicit mode) for predictable behavior</value>
     </data>
-    <data name="AL0138AnalyzerDescription" xml:space="preserve">
+    <data name="AL1314AnalyzerDescription" xml:space="preserve">
         <value>Math.Round / MathF.Round overloads without a MidpointRounding argument default to ToEven (banker's rounding). Pass MidpointRounding.ToEven to preserve current behavior explicitly, or choose AwayFromZero or another mode when the domain requires it. The auto-fix appends MidpointRounding.ToEven to avoid changing runtime behavior.</value>
     </data>
-    <!-- AL0139: Use implicit type when the type is apparent -->
-    <data name="AL0139AnalyzerTitle" xml:space="preserve">
+    <!-- AL1703: Use implicit type when the type is apparent -->
+    <data name="AL1703AnalyzerTitle" xml:space="preserve">
         <value>Use implicit type when type is apparent</value>
     </data>
-    <data name="AL0139AnalyzerMessageFormat" xml:space="preserve">
+    <data name="AL1703AnalyzerMessageFormat" xml:space="preserve">
         <value>Variable should use implicit type</value>
     </data>
-    <data name="AL0139AnalyzerDescription" xml:space="preserve">
+    <data name="AL1703AnalyzerDescription" xml:space="preserve">
         <value>Local variables should use var when the initializer already makes the type apparent. This keeps declarations short without hiding meaning.</value>
     </data>
 </root>

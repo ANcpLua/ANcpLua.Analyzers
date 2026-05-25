@@ -1,0 +1,119 @@
+
+namespace ANcpLua.Analyzers.Analyzers;
+
+/// <summary>
+///     AL1106: Detects web applications that don't configure health checks.
+/// </summary>
+/// <remarks>
+///     <para>
+///         Health checks are essential for container orchestration platforms to determine
+///         service availability. This analyzer detects when:
+///         <list type="bullet">
+///             <item>WebApplication.CreateBuilder is called without AddHealthChecks()</item>
+///             <item>Host.CreateDefaultBuilder is called without AddHealthChecks()</item>
+///         </list>
+///     </para>
+/// </remarks>
+[DiagnosticAnalyzer(LanguageNames.CSharp)]
+public sealed partial class Al1106MissingHealthChecksAnalyzer : AlAnalyzer {
+    /// <summary>The diagnostic identifier for AL1106.</summary>
+    private const string DiagnosticId = "AL1106";
+
+    private static readonly DiagnosticDescriptor s_rule = CreateRule(
+        DiagnosticId,
+        DiagnosticCategories.AspNetCore,
+        DiagnosticSeverities.Suggestion);
+
+    /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
+
+    /// <summary>Registers syntax tree actions to analyze web application configuration.</summary>
+    protected override void RegisterActions(AnalysisContext context) =>
+        context.RegisterSyntaxNodeAction(AnalyzeInvocation, SyntaxKind.InvocationExpression);
+
+    private static void AnalyzeInvocation(SyntaxNodeAnalysisContext context) {
+        var invocation = (InvocationExpressionSyntax)context.Node;
+
+        if (GetMethodName(invocation) is not ("CreateBuilder" or "CreateDefaultBuilder")
+            || GetReceiverName(invocation) is not ("WebApplication" or "Host")) {
+            return;
+        }
+
+        // Test code creates WebApplication for endpoint registration verification, not production hosting
+        if (IsInsideTestMethod(invocation)) {
+            return;
+        }
+
+        if (invocation.Ancestors().OfType<MethodDeclarationSyntax>().FirstOrDefault() is not { } containingMethod) {
+            if (invocation.Ancestors().OfType<CompilationUnitSyntax>().FirstOrDefault() is { } compilationUnit
+                && !HasHealthChecksConfigured(compilationUnit)) {
+                context.ReportDiagnostic(Diagnostic.Create(s_rule, invocation.GetLocation()));
+            }
+
+            return;
+        }
+
+        if (!HasHealthChecksConfigured(containingMethod)) {
+            context.ReportDiagnostic(Diagnostic.Create(s_rule, invocation.GetLocation()));
+        }
+    }
+
+    private static bool HasHealthChecksConfigured(SyntaxNode scope) {
+        foreach (var inv in scope.DescendantNodes().OfType<InvocationExpressionSyntax>()) {
+            if (GetMethodName(inv) is { } name
+                && (name is "AddHealthChecks" || IsServiceDefaultsWrapper(name))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // Aspire convention: Add[Prefix]ServiceDefaults wrappers compose AddHealthChecks, OTel, resilience,
+    // and service discovery in one call. The canonical Microsoft template uses "AddServiceDefaults";
+    // forks prefix it (AddQylServiceDefaults, AddMyAppServiceDefaults, etc.). Treat the pattern as
+    // equivalent to a direct AddHealthChecks call.
+    private static bool IsServiceDefaultsWrapper(string name) =>
+        name.StartsWithOrdinal("Add") && name.EndsWithOrdinal("ServiceDefaults");
+
+    private static string? GetMethodName(InvocationExpressionSyntax invocation) =>
+        invocation.Expression switch {
+            MemberAccessExpressionSyntax memberAccess => memberAccess.Name.Identifier.Text,
+            IdentifierNameSyntax identifier => identifier.Identifier.Text,
+            _ => null
+        };
+
+    private static string? GetReceiverName(InvocationExpressionSyntax invocation) =>
+        invocation.Expression switch {
+            MemberAccessExpressionSyntax memberAccess => memberAccess.Expression switch {
+                IdentifierNameSyntax identifier => identifier.Identifier.Text,
+                _ => null
+            },
+            _ => null
+        };
+
+    private static bool IsInsideTestMethod(SyntaxNode node) {
+        foreach (var ancestor in node.Ancestors()) {
+            if (ancestor is not MethodDeclarationSyntax method) {
+                continue;
+            }
+
+            foreach (var attrList in method.AttributeLists) {
+                foreach (var attr in attrList.Attributes) {
+                    var name = attr.Name switch {
+                        IdentifierNameSyntax id => id.Identifier.Text,
+                        QualifiedNameSyntax qualified => qualified.Right.Identifier.Text,
+                        _ => null
+                    };
+
+                    if (name is "Test" or "TestMethod" or "Fact" or "Theory"
+                        or "TestAttribute" or "TestMethodAttribute" or "FactAttribute" or "TheoryAttribute") {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+}

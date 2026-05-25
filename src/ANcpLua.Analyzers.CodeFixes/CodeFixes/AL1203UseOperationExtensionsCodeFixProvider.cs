@@ -1,0 +1,278 @@
+using ANcpLua.Analyzers.Analyzers;
+
+namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
+
+/// <summary>
+///     Code fix for AL1203: Converts verbose operation patterns to extension methods.
+/// </summary>
+/// <remarks>
+///     <list type="bullet">
+///         <item><c>invocation.TargetMethod.Name == "name"</c> → <c>invocation.IsMethodNamed("type", "name")</c></item>
+///         <item>
+///             <c>op.ConstantValue.HasValue &amp;&amp; op.ConstantValue.Value is T name</c> →
+///             <c>op.TryGetConstantValue&lt;T&gt;(out var name)</c>
+///         </item>
+///     </list>
+/// </remarks>
+[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al1203UseOperationExtensionsCodeFixProvider))]
+[Shared]
+public sealed partial class Al1203UseOperationExtensionsCodeFixProvider : AlCodeFixProvider<BinaryExpressionSyntax> {
+    public override ImmutableArray<string> FixableDiagnosticIds => [Al1203UseOperationExtensionsAnalyzer.DiagnosticId];
+
+    protected override CodeAction? CreateCodeAction(
+        Document document,
+        BinaryExpressionSyntax binary,
+        SyntaxNode root,
+        Diagnostic diagnostic) {
+        // Pattern 1: TargetMethod.Name == "name" → IsMethodNamed
+        if (TryGetMethodNameComparison(binary, out var invocationExpr, out var methodName) &&
+            diagnostic.Properties.TryGetValue(Al1203UseOperationExtensionsAnalyzer.PropertyContainingType, out var containingType) &&
+            containingType is { Length: > 0 }) {
+            return CodeAction.Create(
+                CodeFixResources.AL1203CodeFixTitle,
+                _ => ConvertToIsMethodNamed(document, binary, root, invocationExpr, containingType, methodName),
+                nameof(Al1203UseOperationExtensionsCodeFixProvider) + "_IsMethodNamed");
+        }
+
+        // Pattern 2: op.ConstantValue.HasValue && op.ConstantValue.Value is T name → TryGetConstantValue<T>
+        if (TryGetConstantValuePattern(binary, out var operationExpr, out var typeName, out var variableName)) {
+            return CodeAction.Create(
+                CodeFixResources.AL1203CodeFixTitleTryGetConstantValue,
+                _ => ConvertToTryGetConstantValue(document, binary, root, operationExpr, typeName, variableName),
+                nameof(Al1203UseOperationExtensionsCodeFixProvider) + "_TryGetConstantValue");
+        }
+
+        return null;
+    }
+
+    private static bool TryGetMethodNameComparison(
+        BinaryExpressionSyntax binary,
+        [NotNullWhen(true)] out ExpressionSyntax? invocationExpr,
+        [NotNullWhen(true)] out string? methodName) {
+        invocationExpr = null;
+        methodName = null;
+
+        // Look for pattern: X.TargetMethod.Name == "string" or "string" == X.TargetMethod.Name
+        var (memberAccess, literal) = GetMemberAccessAndLiteral(binary);
+        if (memberAccess is null || literal is null) {
+            return false;
+        }
+
+        // Check for .TargetMethod.Name pattern
+        if (memberAccess is {
+            Name.Identifier.Text: "Name",
+            Expression: MemberAccessExpressionSyntax { Name.Identifier.Text: "TargetMethod" } targetMethodAccess
+        }) {
+            invocationExpr = targetMethodAccess.Expression;
+            methodName = literal.Token.ValueText;
+            return true;
+        }
+
+        return false;
+    }
+
+    private static (MemberAccessExpressionSyntax? memberAccess, LiteralExpressionSyntax? literal)
+        GetMemberAccessAndLiteral(BinaryExpressionSyntax binary) {
+        return binary switch {
+            { Left: MemberAccessExpressionSyntax leftMember, Right: LiteralExpressionSyntax rightLiteral } when
+                rightLiteral.IsKind(SyntaxKind.StringLiteralExpression) => (leftMember, rightLiteral),
+            { Right: MemberAccessExpressionSyntax rightMember, Left: LiteralExpressionSyntax leftLiteral } when
+                leftLiteral.IsKind(SyntaxKind.StringLiteralExpression) => (rightMember, leftLiteral),
+            _ => (null, null)
+        };
+    }
+
+    private static Task<Document> ConvertToIsMethodNamed(
+        Document document,
+        SyntaxNode binary,
+        SyntaxNode root,
+        ExpressionSyntax invocationExpr,
+        string containingType,
+        string methodName) {
+        var isNegated = binary.IsKind(SyntaxKind.NotEqualsExpression);
+
+        // Create: invocation.IsMethodNamed("ContainingType", "methodName")
+        var isMethodNamedCall = SyntaxFactory.InvocationExpression(
+            SyntaxFactory.MemberAccessExpression(
+                SyntaxKind.SimpleMemberAccessExpression,
+                invocationExpr.WithoutTrivia(),
+                SyntaxFactory.IdentifierName("IsMethodNamed")),
+            SyntaxFactory.ArgumentList(
+                SyntaxFactory.SeparatedList([
+                    SyntaxFactory.Argument(
+                        SyntaxFactory.LiteralExpression(
+                            SyntaxKind.StringLiteralExpression,
+                            SyntaxFactory.Literal(containingType))),
+                    SyntaxFactory.Argument(
+                        SyntaxFactory.LiteralExpression(
+                            SyntaxKind.StringLiteralExpression,
+                            SyntaxFactory.Literal(methodName)))
+                ])));
+
+        ExpressionSyntax newExpression = isNegated
+            ? SyntaxFactory.PrefixUnaryExpression(SyntaxKind.LogicalNotExpression, isMethodNamedCall)
+            : isMethodNamedCall;
+
+        newExpression = newExpression.WithTriviaFrom(binary);
+
+        var newRoot = root.ReplaceNode(binary, newExpression);
+        return Task.FromResult(document.WithSyntaxRoot(newRoot));
+    }
+
+    /// <summary>
+    ///     Detects pattern: op.ConstantValue.HasValue &amp;&amp; op.ConstantValue.Value is T name
+    /// </summary>
+    private static bool TryGetConstantValuePattern(
+        BinaryExpressionSyntax binary,
+        [NotNullWhen(true)] out ExpressionSyntax? operationExpr,
+        [NotNullWhen(true)] out string? typeName,
+        [NotNullWhen(true)] out string? variableName) {
+        operationExpr = null;
+        typeName = null;
+        variableName = null;
+
+        // Must be && expression
+        if (!binary.IsKind(SyntaxKind.LogicalAndExpression)) {
+            return false;
+        }
+
+        // Find the HasValue check and is pattern
+        IsPatternExpressionSyntax? isPattern = null;
+
+        if (TryExtractConstantValueHasValue(binary.Left, out var hasValueExpr) &&
+            binary.Right is IsPatternExpressionSyntax rightPattern) {
+            isPattern = rightPattern;
+        } else if (TryExtractConstantValueHasValue(binary.Right, out hasValueExpr) &&
+                   binary.Left is IsPatternExpressionSyntax leftPattern) {
+            isPattern = leftPattern;
+        }
+
+        if (hasValueExpr is null || isPattern is null) {
+            return false;
+        }
+
+        // Check that is pattern is on .ConstantValue.Value
+        if (!TryExtractConstantValueValue(isPattern.Expression, out var valueExpr)) {
+            return false;
+        }
+
+        // Verify both reference the same operation
+        var hasValueOp = GetOperationFromConstantValue(hasValueExpr);
+        var valueOp = GetOperationFromConstantValue(valueExpr);
+
+        if (hasValueOp is null || valueOp is null ||
+            hasValueOp.ToString() != valueOp.ToString()) {
+            return false;
+        }
+
+        // Extract type and variable name from the pattern
+        if (!TryExtractTypeAndVariable(isPattern.Pattern, out typeName, out variableName)) {
+            return false;
+        }
+
+        operationExpr = hasValueOp;
+        return true;
+    }
+
+    private static bool TryExtractConstantValueHasValue(
+        ExpressionSyntax expr,
+        [NotNullWhen(true)] out ExpressionSyntax? constantValueExpr) {
+        constantValueExpr = null;
+
+        // Pattern: X.ConstantValue.HasValue
+        if (expr is MemberAccessExpressionSyntax {
+            Name.Identifier.Text: "HasValue",
+            Expression: MemberAccessExpressionSyntax {
+                Name.Identifier.Text: "ConstantValue"
+            } constantValue
+        }) {
+            constantValueExpr = constantValue;
+            return true;
+        }
+
+        return false;
+    }
+
+    private static bool TryExtractConstantValueValue(
+        ExpressionSyntax expr,
+        [NotNullWhen(true)] out ExpressionSyntax? constantValueExpr) {
+        constantValueExpr = null;
+
+        // Pattern: X.ConstantValue.Value
+        if (expr is MemberAccessExpressionSyntax {
+            Name.Identifier.Text: "Value",
+            Expression: MemberAccessExpressionSyntax {
+                Name.Identifier.Text: "ConstantValue"
+            } constantValue
+        }) {
+            constantValueExpr = constantValue;
+            return true;
+        }
+
+        return false;
+    }
+
+    private static ExpressionSyntax? GetOperationFromConstantValue(ExpressionSyntax constantValueExpr) {
+        // constantValueExpr is X.ConstantValue, we want X
+        if (constantValueExpr is MemberAccessExpressionSyntax { Expression: { } opExpr }) {
+            return opExpr;
+        }
+
+        return null;
+    }
+
+    private static bool TryExtractTypeAndVariable(
+        PatternSyntax pattern,
+        [NotNullWhen(true)] out string? typeName,
+        [NotNullWhen(true)] out string? variableName) {
+        typeName = null;
+        variableName = null;
+
+        switch (pattern)
+        {
+            // Pattern: is T name (DeclarationPattern)
+            case DeclarationPatternSyntax { Type: { } type, Designation: SingleVariableDesignationSyntax { Identifier: { } id } }:
+                typeName = type.ToString();
+                variableName = id.Text;
+                return true;
+            // Pattern: is T (without variable) - use "value" as default
+            case TypePatternSyntax { Type: { } typeOnly }:
+                typeName = typeOnly.ToString();
+                variableName = "value";
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private static Task<Document> ConvertToTryGetConstantValue(
+        Document document,
+        SyntaxNode binary,
+        SyntaxNode root,
+        ExpressionSyntax operationExpr,
+        string typeName,
+        string variableName) {
+        // Create: operation.TryGetConstantValue<T>(out var name)
+        var tryGetCall = SyntaxFactory.InvocationExpression(
+            SyntaxFactory.MemberAccessExpression(
+                SyntaxKind.SimpleMemberAccessExpression,
+                operationExpr.WithoutTrivia(),
+                SyntaxFactory.GenericName(
+                    SyntaxFactory.Identifier("TryGetConstantValue"),
+                    SyntaxFactory.TypeArgumentList(
+                        SyntaxFactory.SingletonSeparatedList(
+                            SyntaxFactory.ParseTypeName(typeName))))),
+            SyntaxFactory.ArgumentList(
+                SyntaxFactory.SingletonSeparatedList(
+                    SyntaxFactory.Argument(
+                            SyntaxFactory.DeclarationExpression(
+                                SyntaxFactory.IdentifierName("var"),
+                                SyntaxFactory.SingleVariableDesignation(
+                                    SyntaxFactory.Identifier(variableName))))
+                        .WithRefKindKeyword(SyntaxFactory.Token(SyntaxKind.OutKeyword)))));
+
+        var newExpression = tryGetCall.WithTriviaFrom(binary);
+        var newRoot = root.ReplaceNode(binary, newExpression);
+        return Task.FromResult(document.WithSyntaxRoot(newRoot));
+    }
+}

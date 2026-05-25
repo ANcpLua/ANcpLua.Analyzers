@@ -1012,77 +1012,68 @@ dotnet_diagnostic.s3903.severity = none
 
 ## Errors (all rules enforced during internal development) ##
 
-# AL0103 currently over-reports on Roslyn syntax tree hierarchies while dogfooding.
-dotnet_diagnostic.AL0103.severity = suggestion
+# AL1500 currently over-reports on Roslyn syntax tree hierarchies while dogfooding.
+dotnet_diagnostic.AL1500.severity = suggestion
 
-# AL0001: Prohibit reassignment of primary constructor params
-dotnet_diagnostic.AL0001.severity = error
+# AL1000: Prohibit reassignment of primary constructor params
+dotnet_diagnostic.AL1000.severity = error
 
-# AL0002: Don't repeat negated patterns
-dotnet_diagnostic.AL0002.severity = error
+# AL1001: Don't repeat negated patterns
+dotnet_diagnostic.AL1001.severity = error
 
-# AL0003: Don't divide by constant zero
-dotnet_diagnostic.AL0003.severity = error
+# AL1002: Don't divide by constant zero
+dotnet_diagnostic.AL1002.severity = error
 
-# AL0004: Use pattern matching for Span constant comparison
-dotnet_diagnostic.AL0004.severity = error
+# AL1003: Use pattern matching for Span constant comparison
+dotnet_diagnostic.AL1003.severity = error
 
-# AL0005: Use SequenceEqual for Span non-constant comparison
-dotnet_diagnostic.AL0005.severity = error
+# AL1004: Use SequenceEqual for Span non-constant comparison
+dotnet_diagnostic.AL1004.severity = error
 
-# AL0006: Field name conflicts with primary constructor parameter
-dotnet_diagnostic.AL0006.severity = error
+# AL1005: Field name conflicts with primary constructor parameter
+dotnet_diagnostic.AL1005.severity = error
 
-# AL0007: GetSchema should be explicitly implemented
-dotnet_diagnostic.AL0007.severity = error
+# AL1006: GetSchema should be explicitly implemented
+dotnet_diagnostic.AL1006.severity = error
 
-# AL0008: GetSchema must return null and not be abstract
-dotnet_diagnostic.AL0008.severity = error
+# AL1007: GetSchema must return null and not be abstract
+dotnet_diagnostic.AL1007.severity = error
 
-# AL0009: Don't call IXmlSerializable.GetSchema
-dotnet_diagnostic.AL0009.severity = error
+# AL1008: Don't call IXmlSerializable.GetSchema
+dotnet_diagnostic.AL1008.severity = error
 
-# AL0010: Type should be partial for source generator support
-dotnet_diagnostic.AL0010.severity = error
+# AL1009: Avoid lock keyword on non-Lock types (.NET 9+)
+dotnet_diagnostic.AL1009.severity = error
 
-# AL0011: Avoid lock keyword on non-Lock types (.NET 9+)
-dotnet_diagnostic.AL0011.severity = error
+# AL1010: Prefer pattern matching for null/zero comparisons
+dotnet_diagnostic.AL1010.severity = error
 
-# AL0012: Deprecated OTel semantic convention attribute
-dotnet_diagnostic.AL0012.severity = error
+# AL1011: Normalize null-guard style
+dotnet_diagnostic.AL1011.severity = error
 
-# AL0013: Missing telemetry schema URL
-dotnet_diagnostic.AL0013.severity = error
+# AL1012: Combine declaration with subsequent null-check
+dotnet_diagnostic.AL1012.severity = error
 
-# AL0014: Prefer pattern matching for null/zero comparisons
-dotnet_diagnostic.AL0014.severity = error
+# AL1600: Hardcoded package version in Directory.Packages.props
+dotnet_diagnostic.AL1600.severity = error
 
-# AL0015: Normalize null-guard style
-dotnet_diagnostic.AL0015.severity = error
+# AL1100: IFormCollection requires explicit [FromForm]
+dotnet_diagnostic.AL1100.severity = error
 
-# AL0016: Combine declaration with subsequent null-check
-dotnet_diagnostic.AL0016.severity = error
+# AL1101: Multiple structured form sources
+dotnet_diagnostic.AL1101.severity = error
 
-# AL0017: Hardcoded package version in Directory.Packages.props
-dotnet_diagnostic.AL0017.severity = error
+# AL1102: Mixed form collection and DTO
+dotnet_diagnostic.AL1102.severity = error
 
-# AL0020: IFormCollection requires explicit [FromForm]
-dotnet_diagnostic.AL0020.severity = error
+# AL1103: Unsupported form type
+dotnet_diagnostic.AL1103.severity = error
 
-# AL0021: Multiple structured form sources
-dotnet_diagnostic.AL0021.severity = error
+# AL1104: Form and body conflict
+dotnet_diagnostic.AL1104.severity = error
 
-# AL0022: Mixed form collection and DTO
-dotnet_diagnostic.AL0022.severity = error
-
-# AL0023: Unsupported form type
-dotnet_diagnostic.AL0023.severity = error
-
-# AL0024: Form and body conflict
-dotnet_diagnostic.AL0024.severity = error
-
-# AL0025: Prefer static lambda
-dotnet_diagnostic.AL0025.severity = error
+# AL1700: Prefer static lambda
+dotnet_diagnostic.AL1700.severity = error
 
 ### StyleCop ###
 
@@ -1699,61 +1690,54 @@ dotnet_naming_rule.static_readonly_fields_should_be_pascal_case.severity = none
 [tests/**/*.cs]
 
 # Relax ANcpLua.Analyzers to warning for test code
-dotnet_diagnostic.AL0101.severity = none
-dotnet_diagnostic.AL0001.severity = warning
-dotnet_diagnostic.AL0002.severity = warning
-dotnet_diagnostic.AL0003.severity = warning
-dotnet_diagnostic.AL0004.severity = warning
-dotnet_diagnostic.AL0005.severity = warning
-dotnet_diagnostic.AL0006.severity = warning
-dotnet_diagnostic.AL0007.severity = warning
-dotnet_diagnostic.AL0008.severity = warning
-dotnet_diagnostic.AL0009.severity = warning
-dotnet_diagnostic.AL0010.severity = warning
-dotnet_diagnostic.AL0011.severity = warning
-dotnet_diagnostic.AL0012.severity = warning
-dotnet_diagnostic.AL0013.severity = warning
-dotnet_diagnostic.AL0014.severity = warning
-dotnet_diagnostic.AL0015.severity = warning
-dotnet_diagnostic.AL0016.severity = warning
-dotnet_diagnostic.AL0017.severity = warning
-dotnet_diagnostic.AL0018.severity = warning
-dotnet_diagnostic.AL0019.severity = warning
-dotnet_diagnostic.AL0020.severity = warning
-dotnet_diagnostic.AL0021.severity = warning
-dotnet_diagnostic.AL0022.severity = warning
-dotnet_diagnostic.AL0023.severity = warning
-dotnet_diagnostic.AL0024.severity = warning
-dotnet_diagnostic.AL0025.severity = warning
-dotnet_diagnostic.AL0026.severity = warning
-dotnet_diagnostic.AL0027.severity = warning
-dotnet_diagnostic.AL0028.severity = warning
-dotnet_diagnostic.AL0029.severity = warning
-dotnet_diagnostic.AL0030.severity = warning
-dotnet_diagnostic.AL0031.severity = warning
-dotnet_diagnostic.AL0032.severity = warning
-dotnet_diagnostic.AL0033.severity = warning
-dotnet_diagnostic.AL0034.severity = warning
-dotnet_diagnostic.AL0035.severity = warning
-dotnet_diagnostic.AL0036.severity = warning
-dotnet_diagnostic.AL0037.severity = warning
-dotnet_diagnostic.AL0038.severity = warning
-dotnet_diagnostic.AL0039.severity = warning
-dotnet_diagnostic.AL0040.severity = warning
-dotnet_diagnostic.AL0041.severity = warning
-dotnet_diagnostic.AL0042.severity = warning
-dotnet_diagnostic.AL0043.severity = warning
-dotnet_diagnostic.AL0044.severity = warning
+dotnet_diagnostic.AL1408.severity = none
+dotnet_diagnostic.AL1000.severity = warning
+dotnet_diagnostic.AL1001.severity = warning
+dotnet_diagnostic.AL1002.severity = warning
+dotnet_diagnostic.AL1003.severity = warning
+dotnet_diagnostic.AL1004.severity = warning
+dotnet_diagnostic.AL1005.severity = warning
+dotnet_diagnostic.AL1006.severity = warning
+dotnet_diagnostic.AL1007.severity = warning
+dotnet_diagnostic.AL1008.severity = warning
+dotnet_diagnostic.AL1009.severity = warning
+dotnet_diagnostic.AL1010.severity = warning
+dotnet_diagnostic.AL1011.severity = warning
+dotnet_diagnostic.AL1012.severity = warning
+dotnet_diagnostic.AL1600.severity = warning
+dotnet_diagnostic.AL1601.severity = warning
+dotnet_diagnostic.AL1602.severity = warning
+dotnet_diagnostic.AL1100.severity = warning
+dotnet_diagnostic.AL1101.severity = warning
+dotnet_diagnostic.AL1102.severity = warning
+dotnet_diagnostic.AL1103.severity = warning
+dotnet_diagnostic.AL1104.severity = warning
+dotnet_diagnostic.AL1700.severity = warning
+dotnet_diagnostic.AL1701.severity = warning
+dotnet_diagnostic.AL1702.severity = warning
+dotnet_diagnostic.AL1200.severity = warning
+dotnet_diagnostic.AL1201.severity = warning
+dotnet_diagnostic.AL1202.severity = warning
+dotnet_diagnostic.AL1203.severity = warning
+dotnet_diagnostic.AL1204.severity = warning
+dotnet_diagnostic.AL1205.severity = warning
+dotnet_diagnostic.AL1206.severity = warning
+dotnet_diagnostic.AL1207.severity = warning
+dotnet_diagnostic.AL1208.severity = warning
+dotnet_diagnostic.AL1209.severity = warning
+dotnet_diagnostic.AL1210.severity = warning
+dotnet_diagnostic.AL1211.severity = warning
+dotnet_diagnostic.AL1400.severity = warning
+dotnet_diagnostic.AL1401.severity = warning
+dotnet_diagnostic.AL1402.severity = warning
+dotnet_diagnostic.AL1403.severity = warning
 
 # =============================================================================
-# Semconv catalog files — they ARE the deprecation source-of-truth for AL0074.
-# The dictionary keys listing deprecated attribute names would cause AL0074 to
-# match its own lookup table (dictionary-initializer keys parse as InitializerExpressionSyntax
-# which the telemetry-context heuristic treats as a tag write). Scoped suppression
-# is the only honest answer — not a code smell to fix, the analyzer can't meaningfully
-# analyze its own catalog.
+# Semconv catalog files — historical scoped suppression carried over from the
+# pre-2.0 fork era when OTel semantic-convention analyzers (AL0074/AL0010) lived
+# in this assembly. They moved to Qyl.OpenTelemetry.SemanticConventions.Analyzers
+# and were deleted from this repo in 2.0.0. Only AL1210 (StringComparison
+# extension) still needs scoping in case Semconv catalog files are reintroduced.
 # =============================================================================
 [src/ANcpLua.Analyzers/Semconv/*.cs]
-dotnet_diagnostic.AL0074.severity = none
-dotnet_diagnostic.AL0010.severity = none
-dotnet_diagnostic.AL0039.severity = none
+dotnet_diagnostic.AL1210.severity = none

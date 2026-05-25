@@ -16,6 +16,6 @@ public sealed partial class AlAnalyzerDocsVerifier : DocsVerifier
     // ensuring Path.GetDirectoryName returns a non-null directory path.
     protected override string ScenariosSourceFile { get; } =
         Path.Combine(
-            Path.GetDirectoryName(typeof(Al0028UseIsEqualToDocs).Assembly.Location)!,
-            "Al0028UseIsEqualToDocs.cs");
+            Path.GetDirectoryName(typeof(Al1200UseIsEqualToDocs).Assembly.Location)!,
+            "Al1200UseIsEqualToDocs.cs");
 }

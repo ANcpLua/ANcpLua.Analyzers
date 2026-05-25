@@ -1,9 +1,9 @@
 <Project>
     <!-- Expose MSBuild properties to analyzers via AnalyzerConfigOptions -->
     <ItemGroup>
-        <!-- CPM detection - allows AL0018 to detect ManagePackageVersionsCentrally without AdditionalFiles -->
+        <!-- CPM detection - allows AL1601 to detect ManagePackageVersionsCentrally without AdditionalFiles -->
         <CompilerVisibleProperty Include="ManagePackageVersionsCentrally"/>
-        <!-- AOT telemetry detection - allows AL0094/AL0095/AL0096 to scope AOT-only rules to AOT-targeting projects -->
+        <!-- AOT telemetry detection - allows AL1406/AL1407 to scope AOT-only rules to AOT-targeting projects -->
         <CompilerVisibleProperty Include="PublishAot"/>
         <CompilerVisibleProperty Include="IsAotCompatible"/>
         <CompilerVisibleProperty Include="EventSourceSupport"/>

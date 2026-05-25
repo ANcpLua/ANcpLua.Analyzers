@@ -58,7 +58,7 @@
        ANALYZERS (SDK-injected)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Analyzers">
-    <ANcpLuaAnalyzersVersion>1.29.1</ANcpLuaAnalyzersVersion>
+    <ANcpLuaAnalyzersVersion>1.29.4</ANcpLuaAnalyzersVersion>
     <JonSkeetAnalyzersVersion>1.0.0-beta.6</JonSkeetAnalyzersVersion>
   </PropertyGroup>
 

@@ -64,164 +64,122 @@
             PublicKeyToken=b77a5c561934e089
         </value>
     </resheader>
-    <data name="AL0002CodeFixTitle" xml:space="preserve">
+    <data name="AL1001CodeFixTitle" xml:space="preserve">
     <value>Simplify pattern negation</value>
   </data>
-    <data name="AL0004CodeFixTitle" xml:space="preserve">
+    <data name="AL1003CodeFixTitle" xml:space="preserve">
     <value>Use pattern matching</value>
   </data>
-    <data name="AL0005CodeFixTitle" xml:space="preserve">
+    <data name="AL1004CodeFixTitle" xml:space="preserve">
     <value>Use SequenceEqual</value>
   </data>
     <data name="AR0001RefactoringTitle" xml:space="preserve">
     <value>Convert to PascalCase</value>
   </data>
-    <data name="AL0008CodeFixTitle" xml:space="preserve">
+    <data name="AL1007CodeFixTitle" xml:space="preserve">
     <value>Make GetSchema return null</value>
   </data>
-    <data name="AL0010CodeFixTitle" xml:space="preserve">
-    <value>Make type partial</value>
-  </data>
-    <data name="AL0012CodeFixTitle" xml:space="preserve">
-    <value>Use '{0}' instead</value>
-  </data>
-    <data name="AL0015CodeFixTitle" xml:space="preserve">
+    <data name="AL1011CodeFixTitle" xml:space="preserve">
     <value>Normalize null-guard style</value>
   </data>
-    <data name="AL0016CodeFixTitle" xml:space="preserve">
+    <data name="AL1012CodeFixTitle" xml:space="preserve">
     <value>Combine declaration with null-check</value>
   </data>
-    <data name="AL0025CodeFixTitle" xml:space="preserve">
+    <data name="AL1700CodeFixTitle" xml:space="preserve">
     <value>Make static</value>
   </data>
-    <data name="AL0011CodeFixTitle" xml:space="preserve">
+    <data name="AL1009CodeFixTitle" xml:space="preserve">
     <value>Use Lock type</value>
   </data>
-    <data name="AL0026CodeFixTitle" xml:space="preserve">
+    <data name="AL1701CodeFixTitle" xml:space="preserve">
     <value>Use TimeProvider</value>
   </data>
-    <data name="AL0028CodeFixTitle" xml:space="preserve">
+    <data name="AL1200CodeFixTitle" xml:space="preserve">
     <value>Use IsEqualTo extension</value>
   </data>
-    <data name="AL0031CodeFixTitle" xml:space="preserve">
+    <data name="AL1203CodeFixTitle" xml:space="preserve">
     <value>Use IsMethodNamed extension</value>
   </data>
-    <data name="AL0031CodeFixTitleTryGetConstantValue" xml:space="preserve">
+    <data name="AL1203CodeFixTitleTryGetConstantValue" xml:space="preserve">
     <value>Use TryGetConstantValue extension</value>
   </data>
-    <data name="AL0027CodeFixTitle" xml:space="preserve">
+    <data name="AL1702CodeFixTitle" xml:space="preserve">
     <value>Use System.Text.Json</value>
   </data>
-    <data name="AL0029CodeFixTitle" xml:space="preserve">
+    <data name="AL1201CodeFixTitle" xml:space="preserve">
     <value>Use HasAttribute extension</value>
   </data>
-    <data name="AL0030ImplementsCodeFixTitle" xml:space="preserve">
+    <data name="AL1202ImplementsCodeFixTitle" xml:space="preserve">
     <value>Use Implements extension</value>
   </data>
-    <data name="AL0030InheritsFromCodeFixTitle" xml:space="preserve">
+    <data name="AL1202InheritsFromCodeFixTitle" xml:space="preserve">
     <value>Use InheritsFrom extension</value>
   </data>
-    <data name="AL0039CodeFixTitle" xml:space="preserve">
+    <data name="AL1210CodeFixTitle" xml:space="preserve">
     <value>Use StringComparison extension</value>
   </data>
-    <data name="AL0032CodeFixTitle" xml:space="preserve">
+    <data name="AL1204CodeFixTitle" xml:space="preserve">
     <value>Use OrEmpty extension</value>
   </data>
-    <data name="AL0033CodeFixTitle" xml:space="preserve">
+    <data name="AL1205CodeFixTitle" xml:space="preserve">
     <value>Use ToImmutableArrayOrEmpty extension</value>
   </data>
-    <data name="AL0034CodeFixTitle" xml:space="preserve">
+    <data name="AL1206CodeFixTitle" xml:space="preserve">
     <value>Use WhereNotNull extension</value>
   </data>
-    <data name="AL0035CodeFixTitle" xml:space="preserve">
+    <data name="AL1207CodeFixTitle" xml:space="preserve">
     <value>Use display string extension</value>
   </data>
-    <data name="AL0036CodeFixTitle" xml:space="preserve">
+    <data name="AL1208CodeFixTitle" xml:space="preserve">
     <value>Use Guard.NotNull</value>
   </data>
-    <data name="AL0037CodeFixTitle" xml:space="preserve">
+    <data name="AL1209CodeFixTitle" xml:space="preserve">
     <value>Use TryParse extension</value>
   </data>
-<data name="AL0040CodeFixTitle" xml:space="preserve">
+<data name="AL1211CodeFixTitle" xml:space="preserve">
     <value>Use GetConstructorArgument extension</value>
   </data>
-    <data name="AL0045CodeFixTitle" xml:space="preserve">
+    <data name="AL1212CodeFixTitle" xml:space="preserve">
     <value>Use Guard.NotNullOrEmpty</value>
   </data>
-    <data name="AL0046CodeFixTitle" xml:space="preserve">
+    <data name="AL1213CodeFixTitle" xml:space="preserve">
     <value>Use Guard.NotNullOrWhiteSpace</value>
   </data>
-    <data name="AL0047CodeFixTitle" xml:space="preserve">
+    <data name="AL1214CodeFixTitle" xml:space="preserve">
     <value>Use Guard.NotZero</value>
   </data>
-    <data name="AL0048CodeFixTitle" xml:space="preserve">
+    <data name="AL1215CodeFixTitle" xml:space="preserve">
     <value>Use Guard.NotNegative</value>
   </data>
-    <data name="AL0049CodeFixTitle" xml:space="preserve">
+    <data name="AL1216CodeFixTitle" xml:space="preserve">
     <value>Use Guard.Positive</value>
   </data>
-    <data name="AL0050CodeFixTitle" xml:space="preserve">
+    <data name="AL1217CodeFixTitle" xml:space="preserve">
     <value>Use Guard.NotEmpty</value>
   </data>
-    <data name="AL0051CodeFixTitle" xml:space="preserve">
+    <data name="AL1218CodeFixTitle" xml:space="preserve">
     <value>Use Guard.DefinedEnum</value>
   </data>
-    <!-- AL0071-AL0074 Code Fix Titles -->
-    <data name="AL0071CodeFixTitle" xml:space="preserve">
-        <value>Make class 'partial static'</value>
-    </data>
-    <data name="AL0072CodeFixTitle" xml:space="preserve">
-        <value>Make method 'partial'</value>
-    </data>
-    <data name="AL0073CodeFixTitle" xml:space="preserve">
-        <value>Set ActivitySourceName to '{0}'</value>
-    </data>
-    <data name="AL0074CodeFixTitle" xml:space="preserve">
-        <value>Replace with '{0}'</value>
-    </data>
-    <!-- AL0103 Code Fix Title (ClosedTypeHierarchySwitchAnalyzer) -->
-    <data name="AL0103CodeFixTitle" xml:space="preserve">
+    <!-- AL1500 Code Fix Title (ClosedTypeHierarchySwitchAnalyzer) -->
+    <data name="AL1500CodeFixTitle" xml:space="preserve">
         <value>Add missing cases</value>
     </data>
-    <!-- AL0107-AL0110 Code Fix Titles -->
-    <data name="AL0107CodeFixTitle" xml:space="preserve">
-        <value>Remove [TracedTag] attribute</value>
-    </data>
-    <data name="AL0108CodeFixTitle" xml:space="preserve">
-        <value>Remove [NoTrace] attribute</value>
-    </data>
-    <data name="AL0109CodeFixTitle" xml:space="preserve">
-        <value>Remove [Traced] attribute</value>
-    </data>
-    <data name="AL0110CodeFixTitle" xml:space="preserve">
-        <value>Remove [TracedTag] attribute</value>
-    </data>
-    <!-- AL0121-AL0124 Code Fix Titles -->
-    <data name="AL0121CodeFixTitle" xml:space="preserve">
+    <!-- AL1503/AL1504/AL1313 Code Fix Titles -->
+    <data name="AL1503CodeFixTitle" xml:space="preserve">
         <value>Remove NormalizeWhitespace call</value>
     </data>
-    <data name="AL0122CodeFixTitle" xml:space="preserve">
+    <data name="AL1504CodeFixTitle" xml:space="preserve">
         <value>Make type partial</value>
     </data>
-    <data name="AL0124CodeFixTitle" xml:space="preserve">
-        <value>Remove [AgentTraced] attribute</value>
-    </data>
-    <data name="AL0126CodeFixTitle" xml:space="preserve">
+    <data name="AL1313CodeFixTitle" xml:space="preserve">
         <value>Forward CancellationToken</value>
     </data>
-    <!-- AL0134, AL0135 Code Fix Titles -->
-    <data name="AL0134CodeFixTitle" xml:space="preserve">
-        <value>Use '{0}' instead</value>
-    </data>
-    <data name="AL0135CodeFixTitle" xml:space="preserve">
-        <value>Replace with '{0}'</value>
-    </data>
-    <!-- AL0137 Code Fix Title -->
-    <data name="AL0137CodeFixTitle" xml:space="preserve">
+    <!-- AL1220 Code Fix Title -->
+    <data name="AL1220CodeFixTitle" xml:space="preserve">
         <value>Use Guard.* helpers from ANcpLua.Roslyn.Utilities</value>
     </data>
-    <!-- AL0138 Code Fix Title -->
-    <data name="AL0138CodeFixTitle" xml:space="preserve">
+    <!-- AL1314 Code Fix Title -->
+    <data name="AL1314CodeFixTitle" xml:space="preserve">
         <value>Add MidpointRounding.ToEven</value>
     </data>
 </root>
