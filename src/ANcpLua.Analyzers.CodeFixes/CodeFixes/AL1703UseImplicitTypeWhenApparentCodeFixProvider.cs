@@ -24,11 +24,11 @@ public sealed partial class Al1703UseImplicitTypeWhenApparentCodeFixProvider
         CodeAction.Create(
             UseImplicitTypeTitle,
             _ => UseImplicitType(document, root, syntax),
-            UseImplicitTypeTitle);
+            Al1703UseImplicitTypeWhenApparentAnalyzer.DiagnosticId);
 
     private static Task<Document> UseImplicitType(
         Document document,
-        SyntaxNode root,
+
         TypeSyntax typeSyntax) {
         var implicitType = SyntaxFactory.IdentifierName(SyntaxFacts.GetText(SyntaxKind.VarKeyword))
             .WithTriviaFrom(typeSyntax);

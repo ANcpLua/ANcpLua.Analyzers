@@ -35,7 +35,7 @@ public sealed partial class Al1202UseTypeHierarchyCodeFixProvider : CodeFixProvi
                     CodeAction.Create(
                         CodeFixResources.AL1202ImplementsCodeFixTitle,
                         _ => ConvertToImplements(context.Document, root, forEachStatement, typeExpr, targetExpr),
-                        Al1202UseTypeHierarchyAnalyzer.DiagnosticId),
+                        Al1202UseTypeHierarchyAnalyzer.DiagnosticId + ".Implements"),
                     diagnostic);
                 break;
             // Handle while loop over BaseType
@@ -45,7 +45,7 @@ public sealed partial class Al1202UseTypeHierarchyCodeFixProvider : CodeFixProvi
                     CodeAction.Create(
                         CodeFixResources.AL1202InheritsFromCodeFixTitle,
                         _ => ConvertToInheritsFrom(context.Document, root, whileStatement, baseTypeExpr, baseTargetExpr),
-                        Al1202UseTypeHierarchyAnalyzer.DiagnosticId),
+                        Al1202UseTypeHierarchyAnalyzer.DiagnosticId + ".InheritsFrom"),
                     diagnostic);
                 break;
         }

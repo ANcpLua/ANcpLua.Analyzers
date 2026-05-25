@@ -33,7 +33,7 @@ public sealed partial class Al1503NormalizeWhitespaceCodeFixProvider : CodeFixPr
                 CodeAction.Create(
                     CodeFixResources.AL1503CodeFixTitle,
                     _ => RemoveNormalizeWhitespaceAsync(context.Document, invocation, root),
-                    nameof(CodeFixResources.AL1503CodeFixTitle)),
+                    Al1503NormalizeWhitespaceAnalyzer.DiagnosticId),
                 diagnostic);
         }
     }
