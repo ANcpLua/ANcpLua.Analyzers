@@ -77,19 +77,27 @@
       DocsGenerator twice via Exec:
         1. 'enforce-ids' mode  : verify every analyzer/codefix class name, XML doc
            summary, and DiagnosticId const matches the runtime DiagnosticDescriptor.
-        2. 'check' mode        : verify docs/ANcpLua.Analyzers.md and the editorconfig
-           profiles under docs/editorconfig/ still match what the generator would emit.
-      _AlInsideConsistencyCheck is a recursion-break: the nested `dotnet run`
-      rebuilds the DocsGenerator, which transitively re-evaluates this analyzer
-      csproj. Without the sentinel, AfterBuild fires inside the nested build and
-      detonates into hundreds of duplicated errors.
+        2. 'check' mode        : verify docs/ANcpLua.Analyzers.md, per-rule pages,
+           editorconfig profiles, HelpLinkUri values, and the SARIF manifest still
+           match what the generator would emit.
+
+      Gating:
+        * _AlInsideConsistencyCheck: recursion-break. The nested `dotnet run`
+          rebuilds the DocsGenerator, which transitively re-evaluates this
+          analyzer csproj. Without the sentinel, AfterBuild fires inside the
+          nested build and detonates into hundreds of duplicated errors.
+        * TargetFramework == netstandard2.0: this project multi-targets
+          (net10.0;netstandard2.0). MSBuild fires AfterBuild once per TFM, in
+          parallel under -m:N. On Windows that races on the obj/DocsGenerator.dll
+          write lock (CS2012). Pin to the netstandard2.0 inner build so the
+          drift check runs exactly once per outer `dotnet build`.
 
       Opt out with -p:SkipAnalyzerConsistencyCheck=true during inner-loop iteration.
       CI must leave it on.
     -->
     <Target Name="_VerifyAnalyzerConsistency"
             AfterTargets="Build"
-            Condition="'$(SkipAnalyzerConsistencyCheck)' != 'true' AND '$(_AlInsideConsistencyCheck)' != 'true'">
+            Condition="'$(SkipAnalyzerConsistencyCheck)' != 'true' AND '$(_AlInsideConsistencyCheck)' != 'true' AND '$(TargetFramework)' == 'netstandard2.0'">
         <PropertyGroup>
             <_DocsGenProject>$(MSBuildThisFileDirectory)../../tools/ANcpLua.Analyzers.DocsGenerator/ANcpLua.Analyzers.DocsGenerator.csproj</_DocsGenProject>
         </PropertyGroup>
