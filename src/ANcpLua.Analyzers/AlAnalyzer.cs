@@ -5,11 +5,22 @@
 ///     Extends <see cref="DiagnosticAnalyzerBase"/> with resource-based rule creation.
 /// </summary>
 public abstract partial class AlAnalyzer : DiagnosticAnalyzerBase {
-    /// <summary>Base URL for diagnostic help links.</summary>
-    public const string HelpLinkBase = "https://ancplua.mintlify.app/analyzers/rules/";
+    /// <summary>
+    ///     Base URL for diagnostic help links. Resolves to the rule-band sections of
+    ///     <c>README.md</c> in the analyzer repo. The previous <c>ancplua.mintlify.app</c>
+    ///     URL was a 404; this matches the Microsoft pattern of "one stable URL per
+    ///     shipping NuGet" without requiring an external docs site (the README's
+    ///     <c>## Rules</c> section groups all 89 rules by band).
+    /// </summary>
+    public const string HelpLinkBase =
+        "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/README.md#rules";
 
-    /// <summary>Returns the full help link URL for a specific diagnostic ID.</summary>
-    public static string HelpLink(string id) => HelpLinkBase + id;
+    /// <summary>
+    ///     Returns the full help link URL for a specific diagnostic ID. README anchors
+    ///     are by band, not by per-rule ID, so every rule resolves to the same
+    ///     well-known section; users scan the ID list on the page to find their rule.
+    /// </summary>
+    public static string HelpLink(string id) => HelpLinkBase;
 
     /// <inheritdoc />
     protected sealed override void InitializeCore(AnalysisContext context) => RegisterActions(context);
