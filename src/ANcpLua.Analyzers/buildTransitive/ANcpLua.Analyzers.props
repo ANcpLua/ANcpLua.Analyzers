@@ -1,0 +1,41 @@
+<Project>
+
+  <!--
+    Severity-profile knob for consumers of ANcpLua.Analyzers.
+    Set $(AlAnalysisMode) in the consuming csproj to one of:
+
+      Default      Every AL rule at its descriptor-declared default severity.
+                   Useful when ANcpLua.NET.Sdk's bundled editorconfig (or another
+                   ambient config) has tightened severities and you want this
+                   band reset to the analyzer's per-rule defaults.
+
+      AllAsErrors  Every AL rule promoted to error. Use for strict CI.
+
+      Disabled     Every AL rule silenced.
+
+    Unset = no editorconfig injection. Inside an ANcpLua.NET.Sdk consumer, the
+    SDK's bundled per-rule editorconfig still applies; outside it, descriptor
+    severities apply.
+
+    Naming is intentionally NOT bare <AnalysisMode> — that property is owned by
+    Microsoft.CodeAnalysis.NetAnalyzers. The Al* prefix matches the AL00xx-AL18xx
+    diagnostic IDs this analyzer ships.
+
+    The editorconfig profiles below are emitted by tools/ANcpLua.Analyzers.DocsGenerator
+    and packed into this NuGet alongside the .dll. Regenerate with
+    `dotnet run --project tools/ANcpLua.Analyzers.DocsGenerator`.
+  -->
+
+  <ItemGroup Condition=" '$(AlAnalysisMode)' == 'Default' ">
+    <EditorConfigFiles Include="$(MSBuildThisFileDirectory)editorconfig/Default.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(AlAnalysisMode)' == 'AllAsErrors' ">
+    <EditorConfigFiles Include="$(MSBuildThisFileDirectory)editorconfig/AllRulesAsErrors.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(AlAnalysisMode)' == 'Disabled' ">
+    <EditorConfigFiles Include="$(MSBuildThisFileDirectory)editorconfig/AllRulesDisabled.editorconfig" />
+  </ItemGroup>
+
+</Project>

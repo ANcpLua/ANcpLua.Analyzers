@@ -115,6 +115,24 @@
             <TfmSpecificPackageFile Include="$(ArtifactsPath)bin/ANcpLua.Analyzers.CodeFixes/release_netstandard2.0/ANcpLua.Analyzers.CodeFixes.dll" PackagePath="analyzers/dotnet/cs"/>
             <!-- Bundle Roslyn.Utilities dependency (required for analyzer runtime) -->
             <TfmSpecificPackageFile Include="$(OutputPath)ANcpLua.Roslyn.Utilities.dll" PackagePath="analyzers/dotnet/cs"/>
+
+            <!--
+              Pack the buildTransitive props that exposes $(AlAnalysisMode) to consumers.
+              NuGet auto-imports buildTransitive/{PackageId}.props on restore; the props
+              file's ItemGroups switch on the property value and append the matching
+              editorconfig profile to $(EditorConfigFiles). Editorconfig profiles live
+              at docs/editorconfig/ (single source of truth, browsable on GitHub) and
+              ship under buildTransitive/editorconfig/ inside the NuGet so the props's
+              $(MSBuildThisFileDirectory) resolves alongside them.
+            -->
+            <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)buildTransitive/ANcpLua.Analyzers.props"
+                                    PackagePath="buildTransitive/ANcpLua.Analyzers.props"/>
+            <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)../../docs/editorconfig/Default.editorconfig"
+                                    PackagePath="buildTransitive/editorconfig/Default.editorconfig"/>
+            <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)../../docs/editorconfig/AllRulesAsErrors.editorconfig"
+                                    PackagePath="buildTransitive/editorconfig/AllRulesAsErrors.editorconfig"/>
+            <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)../../docs/editorconfig/AllRulesDisabled.editorconfig"
+                                    PackagePath="buildTransitive/editorconfig/AllRulesDisabled.editorconfig"/>
         </ItemGroup>
     </Target>
 </Project>

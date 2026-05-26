@@ -106,10 +106,29 @@ Each ID links to a per-rule page under [`docs/rules/`](rules/) with severity, ca
 | [AL1801](rules/AL1801_ToolMustDeclareSideEffect.md) | Info | Loom tool should declare its side effect | No |
 | [AL1802](rules/AL1802_ToolMustDeclareCapability.md) | Info | Loom tool should declare required capabilities | No |
 
+## Consumer-side severity profile (`AlAnalysisMode`)
+
+Set `<AlAnalysisMode>` in your csproj to switch the whole `AL00xx`–`AL18xx` band in one line instead of dropping editorconfig files:
+
+```xml
+<PropertyGroup>
+  <AlAnalysisMode>AllAsErrors</AlAnalysisMode>
+</PropertyGroup>
+```
+
+| Value | Behavior |
+| -- | -- |
+| `Default` | Every rule at its descriptor-declared default severity. Useful to override an ambient stricter config (incl. ANcpLua.NET.Sdk's bundled profile). |
+| `AllAsErrors` | Every AL rule promoted to error. Use for strict CI. |
+| `Disabled` | Every AL rule silenced. |
+| _(unset)_ | No editorconfig injection. Inside an ANcpLua.NET.Sdk consumer, the SDK's bundled editorconfig still applies; outside it, descriptor severities apply. |
+
+The property is exposed via the analyzer NuGet's `buildTransitive/ANcpLua.Analyzers.props`, which appends the matching editorconfig from `buildTransitive/editorconfig/` to `$(EditorConfigFiles)` on consumer restore. The name is deliberately not bare `<AnalysisMode>` — that property is owned by `Microsoft.CodeAnalysis.NetAnalyzers` and clashing would force consumers into one-or-the-other choices.
+
 ## See also
 
 - [Per-rule pages](rules/) — one markdown file per `AL00xx`–`AL18xx` rule with severity, category, code-fix status, and description.
-- [Editorconfig profiles](editorconfig/) — three drop-in severity profiles: `Default`, `AllRulesAsErrors`, `AllRulesDisabled`.
+- [Editorconfig profiles](editorconfig/) — three drop-in severity profiles: `Default`, `AllRulesAsErrors`, `AllRulesDisabled`. Same content ships inside the NuGet under `buildTransitive/editorconfig/`.
 - [`AnalyzerReleases.Unshipped.md`](../src/ANcpLua.Analyzers/AnalyzerReleases.Unshipped.md) — release-tracking manifest with `ClassName` attribution per Microsoft NetAnalyzers convention.
 
 ## Generated File
