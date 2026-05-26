@@ -34,8 +34,12 @@ jobs:
       - name: Audit SDK adoption
         env:
           SDK_NAME: ANcpLua.NET.Sdk
-          # No exemptions — every csproj in this repo is on the SDK.
-          ALLOW_MICROSOFT_NET_SDK: ''
+          # tools/* build tools (DocsGenerator) intentionally use Microsoft.NET.Sdk
+          # to opt out of the SDK's auto-injected analyzer band — they don't ship,
+          # they only generate docs/SARIF/editorconfig profiles. See the csproj
+          # header comment in each tool for the per-project rationale.
+          ALLOW_MICROSOFT_NET_SDK: |
+            tools/*
           # No held-back surface as of the SDK migration that landed in #131.
           HELD_BACK: ''
           BANNED_PACKAGES: |
