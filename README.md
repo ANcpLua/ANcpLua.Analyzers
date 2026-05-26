@@ -176,9 +176,37 @@ Targets: `netstandard2.0` (Roslyn host requirement)
 
 ```xml
 <PackageReference Include="ANcpLua.Analyzers"
-                  Version="2.0.0"
+                  Version="2.0.1"
                   PrivateAssets="all"
                   IncludeAssets="analyzers; buildtransitive" />
 ```
+
+`IncludeAssets="analyzers; buildtransitive"` is what makes `<AlAnalysisMode>` and the bundled editorconfig profiles flow through. Consumers of `ANcpLua.NET.Sdk` get the analyzer auto-injected and don't need this `<PackageReference>`.
+
+## Consumer-side severity profile (`<AlAnalysisMode>`)
+
+Switch the whole `AL00xx`–`AL18xx` band in one csproj line instead of dropping editorconfig files:
+
+```xml
+<PropertyGroup>
+  <AlAnalysisMode>AllAsErrors</AlAnalysisMode>
+</PropertyGroup>
+```
+
+| Value | Behavior |
+|---|---|
+| `Default` | Every rule at its descriptor-declared default severity. Useful to override an ambient stricter config (incl. `ANcpLua.NET.Sdk`'s bundled profile). |
+| `AllAsErrors` | Every AL rule promoted to error. Use for strict CI. |
+| `Disabled` | Every AL rule silenced. |
+| _(unset)_ | No editorconfig injection. Inside an `ANcpLua.NET.Sdk` consumer the SDK's bundled editorconfig still applies; outside it, descriptor severities apply. |
+
+The knob is exposed via `buildTransitive/ANcpLua.Analyzers.props` in the NuGet, which appends the matching profile from `buildTransitive/editorconfig/` to `$(EditorConfigFiles)` on restore. The name is intentionally not bare `<AnalysisMode>` — that's owned by `Microsoft.CodeAnalysis.NetAnalyzers`.
+
+## Documentation
+
+- **[`docs/ANcpLua.Analyzers.md`](docs/ANcpLua.Analyzers.md)** — slim index with the full catalog, configuration knob, and cross-cutting policy.
+- **[`docs/rules/`](docs/rules/)** — one markdown file per rule (`ALXXXX_<SymbolicName>.md`) with severity, category, code-fix status, description, and source link. Every descriptor's `HelpLinkUri` resolves to a per-rule page, so IDE Quick-Fix "Show error help" lands on the focused rule, not on a multi-thousand-line aggregate.
+- **[`docs/ANcpLua.Analyzers.sarif`](docs/ANcpLua.Analyzers.sarif)** — SARIF v2.1.0 rule manifest for tool interop (Sonar bridges, GitHub Advanced Security uploads, IDE rule-catalog importers).
+- **[`docs/editorconfig/`](docs/editorconfig/)** — three drop-in severity profiles: `Default`, `AllRulesAsErrors`, `AllRulesDisabled`. Same content ships inside the NuGet under `buildTransitive/editorconfig/` so `<AlAnalysisMode>` can pick them up.
 
 Siblings: [ANcpLua.Roslyn.Utilities](https://github.com/ANcpLua/ANcpLua.Roslyn.Utilities) · [ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk) · [ANcpLua.Agents](https://github.com/ANcpLua/ANcpLua.Agents) · [Qyl.Opentelemetry.SemanticConventions](https://github.com/ANcpLua/Qyl.Opentelemetry.SemanticConventions)
