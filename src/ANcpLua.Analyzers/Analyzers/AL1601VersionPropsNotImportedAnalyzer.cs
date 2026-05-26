@@ -50,7 +50,7 @@ public sealed partial class Al1601VersionPropsNotImportedAnalyzer : DiagnosticAn
     private static readonly DiagnosticDescriptor s_rule = new(
         DiagnosticId, s_title, s_messageFormat, DiagnosticCategories.VersionManagement,
         DiagnosticSeverity.Warning, true, s_description,
-        AlAnalyzer.HelpLink(DiagnosticId),
+        RuleDocs.HelpLinkAuto(DiagnosticId),
         WellKnownDiagnosticTags.CompilationEnd);
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>

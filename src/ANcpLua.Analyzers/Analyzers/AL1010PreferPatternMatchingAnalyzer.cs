@@ -40,7 +40,7 @@ public sealed partial class Al1010PreferPatternMatchingAnalyzer : AlAnalyzer {
         true,
         "Pattern matching syntax (is/is not) is more expressive and idiomatic. " +
         "For null checks, it also bypasses overloaded equality operators.",
-        HelpLink(DiagnosticId));
+        RuleDocs.HelpLinkAuto(DiagnosticId));
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];

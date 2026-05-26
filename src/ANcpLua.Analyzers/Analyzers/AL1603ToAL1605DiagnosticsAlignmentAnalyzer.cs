@@ -62,7 +62,7 @@ public sealed partial class Al1603ToAl1605DiagnosticsAlignmentAnalyzer : Diagnos
         DiagnosticSeverity.Warning,
         true,
         "Diagnostics defined in Descriptors.cs should be documented in diagnostics.md.",
-        AlAnalyzer.HelpLink(DiagnosticIdAl1603),
+        RuleDocs.HelpLinkAuto(DiagnosticIdAl1603),
         WellKnownDiagnosticTags.CompilationEnd);
 
     private static readonly DiagnosticDescriptor s_ruleMissingRelease = new(
@@ -73,7 +73,7 @@ public sealed partial class Al1603ToAl1605DiagnosticsAlignmentAnalyzer : Diagnos
         DiagnosticSeverity.Warning,
         true,
         "Diagnostics defined in Descriptors.cs should be tracked in AnalyzerReleases.*.md.",
-        AlAnalyzer.HelpLink(DiagnosticIdAl1604),
+        RuleDocs.HelpLinkAuto(DiagnosticIdAl1604),
         WellKnownDiagnosticTags.CompilationEnd);
 
     private static readonly DiagnosticDescriptor s_ruleMismatch = new(
@@ -84,7 +84,7 @@ public sealed partial class Al1603ToAl1605DiagnosticsAlignmentAnalyzer : Diagnos
         DiagnosticSeverity.Warning,
         true,
         "Diagnostic metadata should be consistent between Descriptors.cs and documentation.",
-        AlAnalyzer.HelpLink(DiagnosticIdAl1605),
+        RuleDocs.HelpLinkAuto(DiagnosticIdAl1605),
         WellKnownDiagnosticTags.CompilationEnd);
 
     /// <inheritdoc />

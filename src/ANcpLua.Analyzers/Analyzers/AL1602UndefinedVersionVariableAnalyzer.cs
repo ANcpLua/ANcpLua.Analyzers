@@ -52,7 +52,7 @@ public sealed partial class Al1602UndefinedVersionVariableAnalyzer : DiagnosticA
     private static readonly DiagnosticDescriptor s_rule = new(
         DiagnosticId, s_title, s_messageFormat, DiagnosticCategories.VersionManagement,
         DiagnosticSeverity.Warning, true, s_description,
-        AlAnalyzer.HelpLinkBase,
+        RuleDocs.HelpLinkAuto(DiagnosticId),
         WellKnownDiagnosticTags.CompilationEnd);
 
     /// <summary>Pattern to extract MSBuild property name from $(VariableName) syntax.</summary>

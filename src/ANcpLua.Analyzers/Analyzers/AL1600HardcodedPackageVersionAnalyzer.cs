@@ -30,7 +30,7 @@ public sealed partial class Al1600HardcodedPackageVersionAnalyzer : DiagnosticAn
     private static readonly DiagnosticDescriptor s_rule = new(
         DiagnosticId, s_title, s_messageFormat, DiagnosticCategories.VersionManagement,
         DiagnosticSeverity.Warning, true, s_description,
-        AlAnalyzer.HelpLink(DiagnosticId),
+        RuleDocs.HelpLinkAuto(DiagnosticId),
         WellKnownDiagnosticTags.CompilationEnd);
 
     private static readonly Dictionary<string, string> s_packageToVariableMap = new(StringComparer.OrdinalIgnoreCase) {

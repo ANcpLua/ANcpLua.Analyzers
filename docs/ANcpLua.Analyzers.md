@@ -12,814 +12,105 @@ Roslyn analyzers + code fixes covering modern C# correctness pitfalls, ASP.NET C
 
 ## Diagnostics
 
-| ID | Severity | Title | Code fix | Description |
-| -- | -- | -- | -- | -- |
-| AL1000 | Error | Prohibit reassignment of primary constructor parameters | No | Primary constructor parameters should not be reassigned as this can lead to confusion and bugs. |
-| AL1001 | Warning | Don't repeat negated patterns | No | The negated pattern should not be repeated multiple times. |
-| AL1002 | Error | Don't divide by constant zero | No | Integers and Decimal should never be divided by the constant 0 as this causes a DivideByZeroException at runtime. |
-| AL1003 | Warning | Use pattern matching when comparing Span with constants | No | When comparing Span and a constant, use pattern matching instead of equality operators, unless you want to compare addresses. |
-| AL1004 | Warning | Use SequenceEqual when comparing Span with non-constants | No | When comparing Span and a non-constant, use SequenceEqual instead of equality operators, unless you want to compare addresses. |
-| AL1005 | Warning | Field name conflicts with primary constructor parameter | No | Field names should not conflict with primary constructor parameters to avoid shadowing and confusion. |
-| AL1006 | Error | GetSchema should be explicitly implemented | No | Implement IXmlSerializable.GetSchema explicitly to avoid exposing it as part of the public API. |
-| AL1007 | Error | GetSchema must return null and not be abstract | No | GetSchema should return null according to IXmlSerializable guidance and should not be abstract. |
-| AL1008 | Error | Don't call IXmlSerializable.GetSchema | No | Calling GetSchema is not supported; it should always return null and isn't intended to be invoked. |
-| AL1009 | Warning | Avoid lock keyword on non-Lock types | No | The lock keyword on object/non-Lock types should be replaced with the Lock class from System.Threading. |
-| AL1010 | Warning | Prefer pattern matching for null and zero comparisons | No | Pattern matching syntax (is/is not) is more expressive and idiomatic. For null checks, it also bypasses overloaded equality operators. |
-| AL1011 | Info | Normalize null-guard style | No | Null-guards should be normalized to the preferred project style (Throw, BCL, or Portable). |
-| AL1012 | Info | Combine declaration with subsequent null-check | No | Combines a variable declaration and an immediate null-check into a single pattern match. |
-| AL1100 | Error | IFormCollection requires explicit attribute | No | IFormCollection parameters must have an explicit [FromForm] attribute. Unlike IFormFile which auto-binds, IFormCollection requires explicit attribution for clarity and safety. |
-| AL1101 | Error | Multiple structured form sources | No | An endpoint can only have one structured form source. Multiple [FromForm] DTOs or IFormCollections create ambiguity about which parameter receives the form data. |
-| AL1102 | Error | Mixed form collection and DTO | No | Mixing IFormCollection with a [FromForm] DTO is not supported. Choose one approach: use IFormCollection for dynamic form access or a typed DTO for structured binding. |
-| AL1103 | Error | Unsupported form type | No | [FromForm] can only bind primitives, primitive collections, or DTOs with a parameterless constructor or primary constructor with all-primitive parameters. |
-| AL1104 | Error | Form and body conflict | No | An HTTP request body can only be consumed once. Mixing [FromForm] and [FromBody] parameters in the same endpoint is not supported. |
-| AL1105 | Warning | Missing resilience configuration | No | HTTP clients should be configured with resilience policies to handle transient failures gracefully. Use AddStandardResilienceHandler() from Microsoft.Extensions.Http.Resilience or AddResilienceHandler() with custom Polly policies. This ensures automatic retries, timeouts, and circuit breakers for improved reliability. |
-| AL1106 | Warning | Missing health checks | No | Health checks are essential for container orchestration platforms (Kubernetes, Docker Swarm) to determine service availability. Add builder.Services.AddHealthChecks() and app.MapHealthChecks() to expose /health endpoints for liveness and readiness probes. |
-| AL1107 | Info | Consider using configuration for connection string | No | Connection strings should be loaded from configuration (appsettings.json, environment variables, or secrets) rather than hardcoded. This enables different connection strings per environment (dev/staging/production) and avoids committing sensitive credentials to source control. |
-| AL1108 | Warning | Missing service discovery | No | Hardcoded URLs in HttpClient.BaseAddress or service client configuration reduce flexibility and complicate deployment across environments. When using .NET Aspire or service discovery libraries, use service names (e.g., 'http+https://apiservice') that resolve to actual endpoints at runtime. This enables automatic endpoint discovery, load balancing, and environment-specific configuration. |
-| AL1109 | Warning | Avoid Task.Run in ASP.NET Core request handlers | No | ASP.NET Core request handling already runs on thread pool threads. Using Task.Run to offload work to another thread pool thread adds scheduling overhead and context switching without benefit. For CPU-bound work that genuinely needs to not block the request, consider using a background service or suppress this diagnostic with a justification. |
-| AL1200 | Info | Use IsEqualTo extension | No | Use IsEqualTo extension instead of SymbolEqualityComparer.Default.Equals for cleaner symbol comparison. |
-| AL1201 | Info | Use HasAttribute extension | No | Use HasAttribute extension instead of GetAttributes() LINQ queries or foreach loops for cleaner attribute checking. |
-| AL1202 | Info | Use type hierarchy extension | No | Use Implements or InheritsFrom extensions instead of manual AllInterfaces/BaseType iteration loops. |
-| AL1203 | Info | Use operation extension | No | Use IsMethodNamed or TryGetConstantValue extensions instead of verbose property access patterns. |
-| AL1204 | Info | Use OrEmpty extension | No | Use OrEmpty() extension instead of null-coalescing with Array.Empty, Enumerable.Empty, or collection expressions. |
-| AL1205 | Info | Use ToImmutableArrayOrEmpty extension | No | Use ToImmutableArrayOrEmpty() extension instead of null-conditional ToImmutableArray() with ImmutableArray.Empty fallback. |
-| AL1206 | Info | Use WhereNotNull extension | No | Use WhereNotNull() extension instead of Where(x => x != null) or Where(x => x is not null). |
-| AL1207 | Info | Use symbol display string extension | No | Use GetFullyQualifiedName() or GetMetadataName() extensions instead of ToDisplayString with SymbolDisplayFormat constants. |
-| AL1208 | Warning | Use null-guard helper | No | Use null-guard helpers (Throw.IfNull or Guard.NotNull) instead of verbose null-coalescing throw new ArgumentNullException patterns. |
-| AL1209 | Warning | Use TryParse extension | No | Use TryParse extension methods (TryParseInt32, TryParseGuid, etc.) instead of verbose Type.TryParse ternary patterns. |
-| AL1210 | Warning | Use StringComparison extension | No | Use StringComparison extensions (EqualsOrdinal, ContainsIgnoreCase, etc.) instead of methods with StringComparison enum parameter. |
-| AL1211 | Warning | Use attribute argument extraction extension | No | Use GetConstructorArgument or GetNamedArgument extensions instead of direct array access on AttributeData. |
-| AL1212 | Warning | Use null-or-empty guard helper | No | Use Guard.NotNullOrEmpty() instead of verbose if (string.IsNullOrEmpty(...)) throw new ArgumentNullException/ArgumentException patterns. |
-| AL1213 | Warning | Use null-or-whitespace guard helper | No | Use Guard.NotNullOrWhiteSpace() instead of verbose if (string.IsNullOrWhiteSpace(...)) throw new ArgumentNullException/ArgumentException patterns. |
-| AL1214 | Warning | Use zero-guard helper | No | Use Guard.NotZero() instead of verbose if (x == 0) throw new ArgumentOutOfRangeException patterns. |
-| AL1215 | Warning | Use non-negative guard helper | No | Use Guard.NotNegative() instead of verbose if (x < 0) throw new ArgumentOutOfRangeException patterns. |
-| AL1216 | Warning | Use positive-guard helper | No | Use Guard.Positive() instead of verbose if (x <= 0) throw new ArgumentOutOfRangeException patterns. |
-| AL1217 | Warning | Use empty-guid guard helper | No | Use Guard.NotEmpty() instead of verbose if (guid == Guid.Empty) throw new ArgumentException patterns. |
-| AL1218 | Warning | Use defined-enum guard helper | No | Use Guard.DefinedEnum() instead of verbose if (!Enum.IsDefined) throw new ArgumentException/ArgumentOutOfRangeException patterns. |
-| AL1219 | Warning | Use *Any* string comparison extension | No | Chained string equality comparisons (s == "a" \|\| s == "b") can be collapsed into a single EqualsAnyOrdinal/EqualsAnyIgnoreCase call. |
-| AL1220 | Warning | Use Guard.* helpers instead of throw helpers | No | The BCL throw helpers on ArgumentNullException, ArgumentException, and ArgumentOutOfRangeException — and the Microsoft.Shared.Diagnostics.Throw.If* helpers from Microsoft Agent Framework — only throw; they don't return the validated value, so they can't be used in expressions, member initialisers, or chained validation. The Guard.* helpers from ANcpLua.Roslyn.Utilities return the validated value, share the same [CallerArgumentExpression] parameter-name machinery, and compose. Covers BCL ThrowIfNull / NullOrEmpty / NullOrWhiteSpace and the seven ArgumentOutOfRangeException.ThrowIf* helpers, plus MAF Throw.IfNull / IfNullOrMemberNull / IfNullOrEmpty / IfNullOrWhitespace / IfZero / IfLessThan / IfGreaterThan / IfLessThanOrEqual / IfGreaterThanOrEqual / IfOutOfRange. Cold-path-only Throw.ArgumentNullException / ArgumentOutOfRangeException / ArgumentException / InvalidOperationException are intentionally out of scope — they don't validate, just throw. Banned in qyl-aligned projects via BannedSymbols.txt; this analyzer carries the matching auto-fix. |
-| AL1300 | Warning | Avoid async void methods | No | Async void methods cannot be awaited, exceptions cannot be caught by the caller, and they complicate unit testing. Use async Task instead, unless the method is an event handler. |
-| AL1301 | Warning | Avoid lock on 'this' | No | Locking on 'this' exposes the lock object to external code. Any code with a reference to this instance can lock on it, potentially causing deadlocks. Use a private readonly object field instead. |
-| AL1302 | Warning | Avoid lock on typeof(T) | No | Type objects obtained from typeof() are globally visible singletons. Any code can obtain the same Type object and lock on it, potentially causing deadlocks. Use a private static readonly object field instead. |
-| AL1303 | Warning | Avoid lock on string | No | String literals are interned by the CLR, meaning identical strings across different assemblies share the same object reference. Locking on a string creates cross-assembly synchronization that is rarely intended and can cause deadlocks. Use a private readonly object field instead. |
-| AL1304 | Warning | Prefer 'await using' for IAsyncDisposable | No | Types implementing IAsyncDisposable should be disposed with 'await using' in async methods. Using 'using' calls the synchronous Dispose() method instead of DisposeAsync(), which may skip async cleanup such as flushing buffers, closing network connections, or finalizing telemetry export. |
-| AL1305 | Warning | Avoid blocking calls in async methods | No | Calling .Result, .Wait(), or .GetAwaiter().GetResult() on a Task inside an async method blocks the thread pool thread and can cause deadlocks when a SynchronizationContext is present (ASP.NET, WPF). Use 'await' instead to asynchronously wait for the result. |
-| AL1306 | Warning | Avoid SQL string interpolation in CommandText | No | String interpolation in SQL CommandText can lead to SQL injection vulnerabilities. Use parameterized queries with placeholders ($1, @param) instead of interpolating values directly. |
-| AL1307 | Warning | Avoid fire-and-forget task discard | No | Discarding a Task with _ = causes fire-and-forget behavior where exceptions are silently lost. Await the task, store it for later observation, or add a continuation with error handling. |
-| AL1308 | Warning | Prefer TryParse over Parse | No | Parse methods throw FormatException on invalid input. Use TryParse to safely handle invalid input without exceptions, especially when processing user input or external data. |
-| AL1309 | Warning | Empty catch block swallows exceptions | No | Empty catch blocks silently swallow exceptions, making bugs invisible. At minimum, log the exception. If the exception is truly expected, add a comment explaining why it is safe to ignore. |
-| AL1310 | Warning | Exception details leaked in HTTP response | No | Returning exception messages, stack traces, or ToString() output in HTTP responses can expose sensitive implementation details. Return a generic error message and log the exception server-side. |
-| AL1311 | Info | Unnecessary LINQ materialization | No | Calling ToList() or ToArray() immediately after Where(), Select(), or other LINQ operators forces eager evaluation. If the result is only enumerated once, deferred execution avoids allocating an intermediate collection. |
-| AL1312 | Warning | Read-modify-write without transaction | No | A method that reads data and then writes based on that data without a transaction is vulnerable to race conditions. Another connection could modify the data between the read and write. Use BeginTransaction/BeginTransactionAsync to ensure isolation. |
-| AL1313 | Info | Forward CancellationToken to invocations that support it | No | When a CancellationToken is available in scope and the invoked method has an overload accepting one, forward it to enable cooperative cancellation. |
-| AL1314 | Warning | Use Math.Round/MathF.Round overload with explicit MidpointRounding | No | Math.Round / MathF.Round overloads without a MidpointRounding argument default to ToEven (banker's rounding). Pass MidpointRounding.ToEven to preserve current behavior explicitly, or choose AwayFromZero or another mode when the domain requires it. The auto-fix appends MidpointRounding.ToEven to avoid changing runtime behavior. |
-| AL1400 | Error | Method with [AotTest] or [TrimTest] must return int | No | Methods decorated with [AotTest] or [TrimTest] attributes must return int as their exit code. The test harness expects an integer return value to determine success or failure. |
-| AL1401 | Warning | [AotTest]/[TrimTest] method should return 100 on success | No | By convention, AOT/Trim test methods should return 100 to indicate success. Other values are reserved for failure conditions. |
-| AL1402 | Warning | [TrimSafe] code must not call methods with [RequiresUnreferencedCode] | No | Code marked with [TrimSafe] guarantees it will work correctly in trimmed applications. Calling methods with [RequiresUnreferencedCode] violates this guarantee because those methods may fail at runtime when types are trimmed. |
-| AL1403 | Warning | [AotSafe] code must not call methods with [RequiresDynamicCode] | No | Code marked with [AotSafe] guarantees it will work correctly in AOT-compiled applications. Calling methods with [RequiresDynamicCode] violates this guarantee because those methods rely on runtime code generation which is not available in AOT scenarios. |
-| AL1404 | Error | [AotSafe] code must not call [AotUnsafe] code | No | Code marked with [AotSafe] guarantees it will work correctly in AOT-compiled applications. Calling methods marked with [AotUnsafe] violates this guarantee because [AotUnsafe] code explicitly declares it requires JIT compilation. |
-| AL1405 | Warning | Unnecessary [AotUnsafe] attribute | No | The [AotUnsafe] attribute should only be applied to code that actually uses AOT-incompatible patterns such as reflection, dynamic code generation, or calls to methods with [RequiresDynamicCode]. Consider removing the attribute if the code is AOT-compatible. |
-| AL1406 | Warning | Avoid 'dynamic' keyword in AOT-published code | No | The 'dynamic' keyword requires System.Reflection.Emit at runtime to generate call sites, which is not available in Native AOT. Replace with statically typed alternatives such as interfaces, generics, or pattern matching. |
-| AL1407 | Warning | Avoid Expression.Compile() in AOT context | No | Expression.Compile() and Expression.CompileToMethod() rely on System.Reflection.Emit to generate IL at runtime. In Native AOT, these fall back to an interpreted mode that is significantly slower. Consider using source generators, direct code, or compile-time expression evaluation instead. |
-| AL1408 | Warning | Activator.CreateInstance is not AOT-safe | No | Activator.CreateInstance uses reflection to create instances at runtime. In Native AOT, this requires the target type's constructor to be preserved. Use explicit construction, factory patterns, or annotate with [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructors)]. |
-| AL1409 | Warning | Type.GetType with dynamic name is not AOT-safe | No | Type.GetType(string) with a dynamic type name or case-insensitive search prevents the trimmer from statically analyzing which types to preserve. Use typeof() for compile-time type references. For string literals without case-insensitive search, the trimmer can analyze the call statically. |
-| AL1500 | Warning | Closed hierarchy match is not exhaustive | No | All sealed subtypes of a closed hierarchy should be explicitly handled in switch expressions, switch statements, and Match<T> calls. |
-| AL1501 | Warning | Avoid storing ISymbol in source generator models | No | ISymbol types do not implement value equality. Storing them in source generator models causes the incremental generator cache to be invalidated on every keystroke, defeating the purpose of incremental generation. Extract the needed data as strings or primitive values instead. |
-| AL1502 | Warning | Use IIncrementalGenerator instead of ISourceGenerator | No | ISourceGenerator (v1 API) runs on every keystroke without caching. IIncrementalGenerator provides an incremental pipeline with automatic caching, significantly improving IDE responsiveness. |
-| AL1503 | Warning | Avoid NormalizeWhitespace in source generators | No | SyntaxFactory.NormalizeWhitespace() traverses the entire syntax tree to rewrite whitespace, which is expensive in source generators that run frequently. Use raw string literals or manual formatting instead. |
-| AL1504 | Error | [DuckDbTable] type must be partial | No | The DuckDbInsertGenerator source generator creates additional methods (AddParameters, MapFromReader, BuildMultiRowInsertSql) on types marked with [DuckDbTable]. The type must be partial so the generator can add these members. |
-| AL1505 | Warning | Conflicting [DuckDbColumn] ordinal values | No | Multiple properties in a [DuckDbTable] type have the same Ordinal value in their [DuckDbColumn] attribute. Each column must have a unique ordinal to ensure deterministic column ordering in generated SQL. |
-| AL1600 | Warning | Hardcoded package version detected | No | Package versions should use MSBuild variables from Version.props for centralized version management. This ensures consistency across all projects and simplifies version updates. |
-| AL1601 | Warning | Version.props not imported | No | Version.props should be imported in Directory.Build.props to enable centralized package version management using $(VariableName) syntax. |
-| AL1602 | Warning | Undefined version variable | No | Version variables used in Directory.Packages.props must be defined in Version.props. Missing definitions cause silent build failures or empty version strings. |
-| AL1603 | Warning | Diagnostic missing from documentation | No | Diagnostics defined in Descriptors.cs should be documented in diagnostics.md. |
-| AL1604 | Warning | Diagnostic missing from release notes | No | Diagnostics defined in Descriptors.cs should be tracked in AnalyzerReleases.*.md. |
-| AL1605 | Warning | Diagnostic documentation mismatch | No | Diagnostic metadata should be consistent between Descriptors.cs and documentation. |
-| AL1606 | Warning | Outdated MAF ecosystem package version | No | Detects outdated Microsoft Agent Framework and related package versions. Update to the minimum required version to ensure compatibility with GA APIs and AIFunctionFactoryOptions. |
-| AL1700 | Warning | Anonymous function can be made static | No | Lambda expressions and anonymous methods that don't capture variables should be marked 'static' to avoid unnecessary allocations and improve performance. |
-| AL1701 | Warning | Avoid DateTime/DateTimeOffset time accessors | No | DateTime.Now/UtcNow and DateTimeOffset.Now/UtcNow make code difficult to test. Use TimeProvider.System.GetLocalNow() or GetUtcNow() instead, which can be mocked in tests. |
-| AL1702 | Warning | Avoid legacy JSON library | No | The legacy JSON library should be replaced with System.Text.Json for better performance and native .NET support. |
-| AL1703 | Warning | Use implicit type when type is apparent | No | Local variables should use var when the initializer already makes the type apparent. This keeps declarations short without hiding meaning. |
-| AL1800 | Warning | Destructive Loom tool must require approval | No | Loom tools with destructive side effects (WritesExternalState, MutatesCode, Deploys, ClosesIssue) must declare [RequiresApproval] to ensure governance gates are in place before execution. |
-| AL1801 | Info | Loom tool should declare its side effect | No | Every Loom tool should declare its side effect via [ToolSideEffect] on the method or containing type so that governance policies can be enforced automatically. |
-| AL1802 | Info | Loom tool should declare required capabilities | No | Every Loom tool should declare its required capabilities via [RequiresCapability] on the method or containing type to enable fine-grained access control. |
-
-## Rule Reference
-
-Each rule below has a stable GitHub anchor (`#al1000`, `#al1001`, …) that every `DiagnosticDescriptor.HelpLinkUri` resolves to. IDE "Show error help" links deep-link straight to the matching sub-section.
-
-### AL1000
-
-**Prohibit reassignment of primary constructor parameters** — *Error, category `Design`*
-
-Primary constructor parameters should not be reassigned as this can lead to confusion and bugs.
-
-Code fix: No.
-
-### AL1001
-
-**Don't repeat negated patterns** — *Warning, category `Design`*
-
-The negated pattern should not be repeated multiple times.
-
-Code fix: No.
-
-### AL1002
-
-**Don't divide by constant zero** — *Error, category `Reliability`*
-
-Integers and Decimal should never be divided by the constant 0 as this causes a DivideByZeroException at runtime.
-
-Code fix: No.
-
-### AL1003
-
-**Use pattern matching when comparing Span with constants** — *Warning, category `Usage`*
-
-When comparing Span and a constant, use pattern matching instead of equality operators, unless you want to compare addresses.
-
-Code fix: No.
-
-### AL1004
-
-**Use SequenceEqual when comparing Span with non-constants** — *Warning, category `Usage`*
-
-When comparing Span and a non-constant, use SequenceEqual instead of equality operators, unless you want to compare addresses.
-
-Code fix: No.
-
-### AL1005
-
-**Field name conflicts with primary constructor parameter** — *Warning, category `Design`*
-
-Field names should not conflict with primary constructor parameters to avoid shadowing and confusion.
-
-Code fix: No.
-
-### AL1006
-
-**GetSchema should be explicitly implemented** — *Error, category `Usage`*
-
-Implement IXmlSerializable.GetSchema explicitly to avoid exposing it as part of the public API.
-
-Code fix: No.
-
-### AL1007
-
-**GetSchema must return null and not be abstract** — *Error, category `Usage`*
-
-GetSchema should return null according to IXmlSerializable guidance and should not be abstract.
-
-Code fix: No.
-
-### AL1008
-
-**Don't call IXmlSerializable.GetSchema** — *Error, category `Usage`*
-
-Calling GetSchema is not supported; it should always return null and isn't intended to be invoked.
-
-Code fix: No.
-
-### AL1009
-
-**Avoid lock keyword on non-Lock types** — *Warning, category `Threading`*
-
-The lock keyword on object/non-Lock types should be replaced with the Lock class from System.Threading.
-
-Code fix: No.
-
-### AL1010
-
-**Prefer pattern matching for null and zero comparisons** — *Warning, category `Style`*
-
-Pattern matching syntax (is/is not) is more expressive and idiomatic. For null checks, it also bypasses overloaded equality operators.
-
-Code fix: No.
-
-### AL1011
-
-**Normalize null-guard style** — *Info, category `Style`*
-
-Null-guards should be normalized to the preferred project style (Throw, BCL, or Portable).
-
-Code fix: No.
-
-### AL1012
-
-**Combine declaration with subsequent null-check** — *Info, category `Style`*
-
-Combines a variable declaration and an immediate null-check into a single pattern match.
-
-Code fix: No.
-
-### AL1100
-
-**IFormCollection requires explicit attribute** — *Error, category `ASP.NET Core`*
-
-IFormCollection parameters must have an explicit [FromForm] attribute. Unlike IFormFile which auto-binds, IFormCollection requires explicit attribution for clarity and safety.
-
-Code fix: No.
-
-### AL1101
-
-**Multiple structured form sources** — *Error, category `ASP.NET Core`*
-
-An endpoint can only have one structured form source. Multiple [FromForm] DTOs or IFormCollections create ambiguity about which parameter receives the form data.
-
-Code fix: No.
-
-### AL1102
-
-**Mixed form collection and DTO** — *Error, category `ASP.NET Core`*
-
-Mixing IFormCollection with a [FromForm] DTO is not supported. Choose one approach: use IFormCollection for dynamic form access or a typed DTO for structured binding.
-
-Code fix: No.
-
-### AL1103
-
-**Unsupported form type** — *Error, category `ASP.NET Core`*
-
-[FromForm] can only bind primitives, primitive collections, or DTOs with a parameterless constructor or primary constructor with all-primitive parameters.
-
-Code fix: No.
-
-### AL1104
-
-**Form and body conflict** — *Error, category `ASP.NET Core`*
-
-An HTTP request body can only be consumed once. Mixing [FromForm] and [FromBody] parameters in the same endpoint is not supported.
-
-Code fix: No.
-
-### AL1105
-
-**Missing resilience configuration** — *Warning, category `ASP.NET Core`*
-
-HTTP clients should be configured with resilience policies to handle transient failures gracefully. Use AddStandardResilienceHandler() from Microsoft.Extensions.Http.Resilience or AddResilienceHandler() with custom Polly policies. This ensures automatic retries, timeouts, and circuit breakers for improved reliability.
-
-Code fix: No.
-
-### AL1106
-
-**Missing health checks** — *Warning, category `ASP.NET Core`*
-
-Health checks are essential for container orchestration platforms (Kubernetes, Docker Swarm) to determine service availability. Add builder.Services.AddHealthChecks() and app.MapHealthChecks() to expose /health endpoints for liveness and readiness probes.
-
-Code fix: No.
-
-### AL1107
-
-**Consider using configuration for connection string** — *Info, category `Configuration`*
-
-Connection strings should be loaded from configuration (appsettings.json, environment variables, or secrets) rather than hardcoded. This enables different connection strings per environment (dev/staging/production) and avoids committing sensitive credentials to source control.
-
-Code fix: No.
-
-### AL1108
-
-**Missing service discovery** — *Warning, category `ASP.NET Core`*
-
-Hardcoded URLs in HttpClient.BaseAddress or service client configuration reduce flexibility and complicate deployment across environments. When using .NET Aspire or service discovery libraries, use service names (e.g., 'http+https://apiservice') that resolve to actual endpoints at runtime. This enables automatic endpoint discovery, load balancing, and environment-specific configuration.
-
-Code fix: No.
-
-### AL1109
-
-**Avoid Task.Run in ASP.NET Core request handlers** — *Warning, category `ASP.NET Core`*
-
-ASP.NET Core request handling already runs on thread pool threads. Using Task.Run to offload work to another thread pool thread adds scheduling overhead and context switching without benefit. For CPU-bound work that genuinely needs to not block the request, consider using a background service or suppress this diagnostic with a justification.
-
-Code fix: No.
-
-### AL1200
-
-**Use IsEqualTo extension** — *Info, category `Roslyn Utilities`*
-
-Use IsEqualTo extension instead of SymbolEqualityComparer.Default.Equals for cleaner symbol comparison.
-
-Code fix: No.
-
-### AL1201
-
-**Use HasAttribute extension** — *Info, category `Roslyn Utilities`*
-
-Use HasAttribute extension instead of GetAttributes() LINQ queries or foreach loops for cleaner attribute checking.
-
-Code fix: No.
-
-### AL1202
-
-**Use type hierarchy extension** — *Info, category `Roslyn Utilities`*
-
-Use Implements or InheritsFrom extensions instead of manual AllInterfaces/BaseType iteration loops.
-
-Code fix: No.
-
-### AL1203
-
-**Use operation extension** — *Info, category `Roslyn Utilities`*
-
-Use IsMethodNamed or TryGetConstantValue extensions instead of verbose property access patterns.
-
-Code fix: No.
-
-### AL1204
-
-**Use OrEmpty extension** — *Info, category `Roslyn Utilities`*
-
-Use OrEmpty() extension instead of null-coalescing with Array.Empty, Enumerable.Empty, or collection expressions.
-
-Code fix: No.
-
-### AL1205
-
-**Use ToImmutableArrayOrEmpty extension** — *Info, category `Roslyn Utilities`*
-
-Use ToImmutableArrayOrEmpty() extension instead of null-conditional ToImmutableArray() with ImmutableArray.Empty fallback.
-
-Code fix: No.
-
-### AL1206
-
-**Use WhereNotNull extension** — *Info, category `Roslyn Utilities`*
-
-Use WhereNotNull() extension instead of Where(x => x != null) or Where(x => x is not null).
-
-Code fix: No.
-
-### AL1207
-
-**Use symbol display string extension** — *Info, category `Roslyn Utilities`*
-
-Use GetFullyQualifiedName() or GetMetadataName() extensions instead of ToDisplayString with SymbolDisplayFormat constants.
-
-Code fix: No.
-
-### AL1208
-
-**Use null-guard helper** — *Warning, category `Roslyn Utilities`*
-
-Use null-guard helpers (Throw.IfNull or Guard.NotNull) instead of verbose null-coalescing throw new ArgumentNullException patterns.
-
-Code fix: No.
-
-### AL1209
-
-**Use TryParse extension** — *Warning, category `Roslyn Utilities`*
-
-Use TryParse extension methods (TryParseInt32, TryParseGuid, etc.) instead of verbose Type.TryParse ternary patterns.
-
-Code fix: No.
-
-### AL1210
-
-**Use StringComparison extension** — *Warning, category `Roslyn Utilities`*
-
-Use StringComparison extensions (EqualsOrdinal, ContainsIgnoreCase, etc.) instead of methods with StringComparison enum parameter.
-
-Code fix: No.
-
-### AL1211
-
-**Use attribute argument extraction extension** — *Warning, category `Roslyn Utilities`*
-
-Use GetConstructorArgument or GetNamedArgument extensions instead of direct array access on AttributeData.
-
-Code fix: No.
-
-### AL1212
-
-**Use null-or-empty guard helper** — *Warning, category `Roslyn Utilities`*
-
-Use Guard.NotNullOrEmpty() instead of verbose if (string.IsNullOrEmpty(...)) throw new ArgumentNullException/ArgumentException patterns.
-
-Code fix: No.
-
-### AL1213
-
-**Use null-or-whitespace guard helper** — *Warning, category `Roslyn Utilities`*
-
-Use Guard.NotNullOrWhiteSpace() instead of verbose if (string.IsNullOrWhiteSpace(...)) throw new ArgumentNullException/ArgumentException patterns.
-
-Code fix: No.
-
-### AL1214
-
-**Use zero-guard helper** — *Warning, category `Roslyn Utilities`*
-
-Use Guard.NotZero() instead of verbose if (x == 0) throw new ArgumentOutOfRangeException patterns.
-
-Code fix: No.
-
-### AL1215
-
-**Use non-negative guard helper** — *Warning, category `Roslyn Utilities`*
-
-Use Guard.NotNegative() instead of verbose if (x < 0) throw new ArgumentOutOfRangeException patterns.
-
-Code fix: No.
-
-### AL1216
-
-**Use positive-guard helper** — *Warning, category `Roslyn Utilities`*
-
-Use Guard.Positive() instead of verbose if (x <= 0) throw new ArgumentOutOfRangeException patterns.
-
-Code fix: No.
-
-### AL1217
-
-**Use empty-guid guard helper** — *Warning, category `Roslyn Utilities`*
-
-Use Guard.NotEmpty() instead of verbose if (guid == Guid.Empty) throw new ArgumentException patterns.
-
-Code fix: No.
-
-### AL1218
-
-**Use defined-enum guard helper** — *Warning, category `Roslyn Utilities`*
-
-Use Guard.DefinedEnum() instead of verbose if (!Enum.IsDefined) throw new ArgumentException/ArgumentOutOfRangeException patterns.
-
-Code fix: No.
-
-### AL1219
-
-**Use *Any* string comparison extension** — *Warning, category `Roslyn Utilities`*
-
-Chained string equality comparisons (s == "a" \|\| s == "b") can be collapsed into a single EqualsAnyOrdinal/EqualsAnyIgnoreCase call.
-
-Code fix: No.
-
-### AL1220
-
-**Use Guard.* helpers instead of throw helpers** — *Warning, category `Roslyn Utilities`*
-
-The BCL throw helpers on ArgumentNullException, ArgumentException, and ArgumentOutOfRangeException — and the Microsoft.Shared.Diagnostics.Throw.If* helpers from Microsoft Agent Framework — only throw; they don't return the validated value, so they can't be used in expressions, member initialisers, or chained validation. The Guard.* helpers from ANcpLua.Roslyn.Utilities return the validated value, share the same [CallerArgumentExpression] parameter-name machinery, and compose. Covers BCL ThrowIfNull / NullOrEmpty / NullOrWhiteSpace and the seven ArgumentOutOfRangeException.ThrowIf* helpers, plus MAF Throw.IfNull / IfNullOrMemberNull / IfNullOrEmpty / IfNullOrWhitespace / IfZero / IfLessThan / IfGreaterThan / IfLessThanOrEqual / IfGreaterThanOrEqual / IfOutOfRange. Cold-path-only Throw.ArgumentNullException / ArgumentOutOfRangeException / ArgumentException / InvalidOperationException are intentionally out of scope — they don't validate, just throw. Banned in qyl-aligned projects via BannedSymbols.txt; this analyzer carries the matching auto-fix.
-
-Code fix: No.
-
-### AL1300
-
-**Avoid async void methods** — *Warning, category `Threading`*
-
-Async void methods cannot be awaited, exceptions cannot be caught by the caller, and they complicate unit testing. Use async Task instead, unless the method is an event handler.
-
-Code fix: No.
-
-### AL1301
-
-**Avoid lock on 'this'** — *Warning, category `Threading`*
-
-Locking on 'this' exposes the lock object to external code. Any code with a reference to this instance can lock on it, potentially causing deadlocks. Use a private readonly object field instead.
-
-Code fix: No.
-
-### AL1302
-
-**Avoid lock on typeof(T)** — *Warning, category `Threading`*
-
-Type objects obtained from typeof() are globally visible singletons. Any code can obtain the same Type object and lock on it, potentially causing deadlocks. Use a private static readonly object field instead.
-
-Code fix: No.
-
-### AL1303
-
-**Avoid lock on string** — *Warning, category `Threading`*
-
-String literals are interned by the CLR, meaning identical strings across different assemblies share the same object reference. Locking on a string creates cross-assembly synchronization that is rarely intended and can cause deadlocks. Use a private readonly object field instead.
-
-Code fix: No.
-
-### AL1304
-
-**Prefer 'await using' for IAsyncDisposable** — *Warning, category `Reliability`*
-
-Types implementing IAsyncDisposable should be disposed with 'await using' in async methods. Using 'using' calls the synchronous Dispose() method instead of DisposeAsync(), which may skip async cleanup such as flushing buffers, closing network connections, or finalizing telemetry export.
-
-Code fix: No.
-
-### AL1305
-
-**Avoid blocking calls in async methods** — *Warning, category `Threading`*
-
-Calling .Result, .Wait(), or .GetAwaiter().GetResult() on a Task inside an async method blocks the thread pool thread and can cause deadlocks when a SynchronizationContext is present (ASP.NET, WPF). Use 'await' instead to asynchronously wait for the result.
-
-Code fix: No.
-
-### AL1306
-
-**Avoid SQL string interpolation in CommandText** — *Warning, category `Reliability`*
-
-String interpolation in SQL CommandText can lead to SQL injection vulnerabilities. Use parameterized queries with placeholders ($1, @param) instead of interpolating values directly.
-
-Code fix: No.
-
-### AL1307
-
-**Avoid fire-and-forget task discard** — *Warning, category `Reliability`*
-
-Discarding a Task with _ = causes fire-and-forget behavior where exceptions are silently lost. Await the task, store it for later observation, or add a continuation with error handling.
-
-Code fix: No.
-
-### AL1308
-
-**Prefer TryParse over Parse** — *Warning, category `Reliability`*
-
-Parse methods throw FormatException on invalid input. Use TryParse to safely handle invalid input without exceptions, especially when processing user input or external data.
-
-Code fix: No.
-
-### AL1309
-
-**Empty catch block swallows exceptions** — *Warning, category `Reliability`*
-
-Empty catch blocks silently swallow exceptions, making bugs invisible. At minimum, log the exception. If the exception is truly expected, add a comment explaining why it is safe to ignore.
-
-Code fix: No.
-
-### AL1310
-
-**Exception details leaked in HTTP response** — *Warning, category `Reliability`*
-
-Returning exception messages, stack traces, or ToString() output in HTTP responses can expose sensitive implementation details. Return a generic error message and log the exception server-side.
-
-Code fix: No.
-
-### AL1311
-
-**Unnecessary LINQ materialization** — *Info, category `Usage`*
-
-Calling ToList() or ToArray() immediately after Where(), Select(), or other LINQ operators forces eager evaluation. If the result is only enumerated once, deferred execution avoids allocating an intermediate collection.
-
-Code fix: No.
-
-### AL1312
-
-**Read-modify-write without transaction** — *Warning, category `Reliability`*
-
-A method that reads data and then writes based on that data without a transaction is vulnerable to race conditions. Another connection could modify the data between the read and write. Use BeginTransaction/BeginTransactionAsync to ensure isolation.
-
-Code fix: No.
-
-### AL1313
-
-**Forward CancellationToken to invocations that support it** — *Info, category `Reliability`*
-
-When a CancellationToken is available in scope and the invoked method has an overload accepting one, forward it to enable cooperative cancellation.
-
-Code fix: No.
-
-### AL1314
-
-**Use Math.Round/MathF.Round overload with explicit MidpointRounding** — *Warning, category `Reliability`*
-
-Math.Round / MathF.Round overloads without a MidpointRounding argument default to ToEven (banker's rounding). Pass MidpointRounding.ToEven to preserve current behavior explicitly, or choose AwayFromZero or another mode when the domain requires it. The auto-fix appends MidpointRounding.ToEven to avoid changing runtime behavior.
-
-Code fix: No.
-
-### AL1400
-
-**Method with [AotTest] or [TrimTest] must return int** — *Error, category `AOT Testing`*
-
-Methods decorated with [AotTest] or [TrimTest] attributes must return int as their exit code. The test harness expects an integer return value to determine success or failure.
-
-Code fix: No.
-
-### AL1401
-
-**[AotTest]/[TrimTest] method should return 100 on success** — *Warning, category `AOT Testing`*
-
-By convention, AOT/Trim test methods should return 100 to indicate success. Other values are reserved for failure conditions.
-
-Code fix: No.
-
-### AL1402
-
-**[TrimSafe] code must not call methods with [RequiresUnreferencedCode]** — *Warning, category `AOT Testing`*
-
-Code marked with [TrimSafe] guarantees it will work correctly in trimmed applications. Calling methods with [RequiresUnreferencedCode] violates this guarantee because those methods may fail at runtime when types are trimmed.
-
-Code fix: No.
-
-### AL1403
-
-**[AotSafe] code must not call methods with [RequiresDynamicCode]** — *Warning, category `AOT Testing`*
-
-Code marked with [AotSafe] guarantees it will work correctly in AOT-compiled applications. Calling methods with [RequiresDynamicCode] violates this guarantee because those methods rely on runtime code generation which is not available in AOT scenarios.
-
-Code fix: No.
-
-### AL1404
-
-**[AotSafe] code must not call [AotUnsafe] code** — *Error, category `AOT Testing`*
-
-Code marked with [AotSafe] guarantees it will work correctly in AOT-compiled applications. Calling methods marked with [AotUnsafe] violates this guarantee because [AotUnsafe] code explicitly declares it requires JIT compilation.
-
-Code fix: No.
-
-### AL1405
-
-**Unnecessary [AotUnsafe] attribute** — *Warning, category `AOT Testing`*
-
-The [AotUnsafe] attribute should only be applied to code that actually uses AOT-incompatible patterns such as reflection, dynamic code generation, or calls to methods with [RequiresDynamicCode]. Consider removing the attribute if the code is AOT-compatible.
-
-Code fix: No.
-
-### AL1406
-
-**Avoid 'dynamic' keyword in AOT-published code** — *Warning, category `AOT Testing`*
-
-The 'dynamic' keyword requires System.Reflection.Emit at runtime to generate call sites, which is not available in Native AOT. Replace with statically typed alternatives such as interfaces, generics, or pattern matching.
-
-Code fix: No.
-
-### AL1407
-
-**Avoid Expression.Compile() in AOT context** — *Warning, category `AOT Testing`*
-
-Expression.Compile() and Expression.CompileToMethod() rely on System.Reflection.Emit to generate IL at runtime. In Native AOT, these fall back to an interpreted mode that is significantly slower. Consider using source generators, direct code, or compile-time expression evaluation instead.
-
-Code fix: No.
-
-### AL1408
-
-**Activator.CreateInstance is not AOT-safe** — *Warning, category `AOT Testing`*
-
-Activator.CreateInstance uses reflection to create instances at runtime. In Native AOT, this requires the target type's constructor to be preserved. Use explicit construction, factory patterns, or annotate with [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructors)].
-
-Code fix: No.
-
-### AL1409
-
-**Type.GetType with dynamic name is not AOT-safe** — *Warning, category `AOT Testing`*
-
-Type.GetType(string) with a dynamic type name or case-insensitive search prevents the trimmer from statically analyzing which types to preserve. Use typeof() for compile-time type references. For string literals without case-insensitive search, the trimmer can analyze the call statically.
-
-Code fix: No.
-
-### AL1500
-
-**Closed hierarchy match is not exhaustive** — *Warning, category `Design`*
-
-All sealed subtypes of a closed hierarchy should be explicitly handled in switch expressions, switch statements, and Match<T> calls.
-
-Code fix: No.
-
-### AL1501
-
-**Avoid storing ISymbol in source generator models** — *Warning, category `Roslyn Utilities`*
-
-ISymbol types do not implement value equality. Storing them in source generator models causes the incremental generator cache to be invalidated on every keystroke, defeating the purpose of incremental generation. Extract the needed data as strings or primitive values instead.
-
-Code fix: No.
-
-### AL1502
-
-**Use IIncrementalGenerator instead of ISourceGenerator** — *Warning, category `Roslyn Utilities`*
-
-ISourceGenerator (v1 API) runs on every keystroke without caching. IIncrementalGenerator provides an incremental pipeline with automatic caching, significantly improving IDE responsiveness.
-
-Code fix: No.
-
-### AL1503
-
-**Avoid NormalizeWhitespace in source generators** — *Warning, category `Roslyn Utilities`*
-
-SyntaxFactory.NormalizeWhitespace() traverses the entire syntax tree to rewrite whitespace, which is expensive in source generators that run frequently. Use raw string literals or manual formatting instead.
-
-Code fix: No.
-
-### AL1504
-
-**[DuckDbTable] type must be partial** — *Error, category `Design`*
-
-The DuckDbInsertGenerator source generator creates additional methods (AddParameters, MapFromReader, BuildMultiRowInsertSql) on types marked with [DuckDbTable]. The type must be partial so the generator can add these members.
-
-Code fix: No.
-
-### AL1505
-
-**Conflicting [DuckDbColumn] ordinal values** — *Warning, category `Design`*
-
-Multiple properties in a [DuckDbTable] type have the same Ordinal value in their [DuckDbColumn] attribute. Each column must have a unique ordinal to ensure deterministic column ordering in generated SQL.
-
-Code fix: No.
-
-### AL1600
-
-**Hardcoded package version detected** — *Warning, category `VersionManagement`*
-
-Package versions should use MSBuild variables from Version.props for centralized version management. This ensures consistency across all projects and simplifies version updates.
-
-Code fix: No.
-
-### AL1601
-
-**Version.props not imported** — *Warning, category `VersionManagement`*
-
-Version.props should be imported in Directory.Build.props to enable centralized package version management using $(VariableName) syntax.
-
-Code fix: No.
-
-### AL1602
-
-**Undefined version variable** — *Warning, category `VersionManagement`*
-
-Version variables used in Directory.Packages.props must be defined in Version.props. Missing definitions cause silent build failures or empty version strings.
-
-Code fix: No.
-
-### AL1603
-
-**Diagnostic missing from documentation** — *Warning, category `VersionManagement`*
-
-Diagnostics defined in Descriptors.cs should be documented in diagnostics.md.
-
-Code fix: No.
-
-### AL1604
-
-**Diagnostic missing from release notes** — *Warning, category `VersionManagement`*
-
-Diagnostics defined in Descriptors.cs should be tracked in AnalyzerReleases.*.md.
-
-Code fix: No.
-
-### AL1605
-
-**Diagnostic documentation mismatch** — *Warning, category `VersionManagement`*
-
-Diagnostic metadata should be consistent between Descriptors.cs and documentation.
-
-Code fix: No.
-
-### AL1606
-
-**Outdated MAF ecosystem package version** — *Warning, category `VersionManagement`*
-
-Detects outdated Microsoft Agent Framework and related package versions. Update to the minimum required version to ensure compatibility with GA APIs and AIFunctionFactoryOptions.
-
-Code fix: No.
-
-### AL1700
-
-**Anonymous function can be made static** — *Warning, category `Usage`*
-
-Lambda expressions and anonymous methods that don't capture variables should be marked 'static' to avoid unnecessary allocations and improve performance.
-
-Code fix: No.
-
-### AL1701
-
-**Avoid DateTime/DateTimeOffset time accessors** — *Warning, category `Usage`*
-
-DateTime.Now/UtcNow and DateTimeOffset.Now/UtcNow make code difficult to test. Use TimeProvider.System.GetLocalNow() or GetUtcNow() instead, which can be mocked in tests.
-
-Code fix: No.
-
-### AL1702
-
-**Avoid legacy JSON library** — *Warning, category `Usage`*
-
-The legacy JSON library should be replaced with System.Text.Json for better performance and native .NET support.
-
-Code fix: No.
-
-### AL1703
-
-**Use implicit type when type is apparent** — *Warning, category `Style`*
-
-Local variables should use var when the initializer already makes the type apparent. This keeps declarations short without hiding meaning.
-
-Code fix: No.
-
-### AL1800
-
-**Destructive Loom tool must require approval** — *Warning, category `GenAI`*
-
-Loom tools with destructive side effects (WritesExternalState, MutatesCode, Deploys, ClosesIssue) must declare [RequiresApproval] to ensure governance gates are in place before execution.
-
-Code fix: No.
-
-### AL1801
-
-**Loom tool should declare its side effect** — *Info, category `GenAI`*
-
-Every Loom tool should declare its side effect via [ToolSideEffect] on the method or containing type so that governance policies can be enforced automatically.
-
-Code fix: No.
-
-### AL1802
-
-**Loom tool should declare required capabilities** — *Info, category `GenAI`*
-
-Every Loom tool should declare its required capabilities via [RequiresCapability] on the method or containing type to enable fine-grained access control.
-
-Code fix: No.
-
+Each ID links to a per-rule page under [`docs/rules/`](rules/) with severity, category, code-fix status, and description. The descriptor's `HelpLinkUri` resolves to the same page, so IDE Quick-Fix "Show error help" lands on the focused rule, not on this index.
+
+| ID | Severity | Title | Code fix |
+| -- | -- | -- | -- |
+| [AL1000](rules/AL1000_ProhibitPrimaryConstructorParameterReassignment.md) | Error | Prohibit reassignment of primary constructor parameters | No |
+| [AL1001](rules/AL1001_DontRepeatNegatedPattern.md) | Warning | Don't repeat negated patterns | No |
+| [AL1002](rules/AL1002_DontDivideByConstantZero.md) | Error | Don't divide by constant zero | No |
+| [AL1003](rules/AL1003_ToAl1004SpanComparison.md) | Warning | Use pattern matching when comparing Span with constants | No |
+| [AL1004](rules/AL1004_ToAl1004SpanComparison.md) | Warning | Use SequenceEqual when comparing Span with non-constants | No |
+| [AL1005](rules/AL1005_FieldNameConflictWithPrimaryConstructor.md) | Warning | Field name conflicts with primary constructor parameter | No |
+| [AL1006](rules/AL1006_ToAl1008IXmlSerializable.md) | Error | GetSchema should be explicitly implemented | No |
+| [AL1007](rules/AL1007_ToAl1008IXmlSerializable.md) | Error | GetSchema must return null and not be abstract | No |
+| [AL1008](rules/AL1008_ToAl1008IXmlSerializable.md) | Error | Don't call IXmlSerializable.GetSchema | No |
+| [AL1009](rules/AL1009_LockKeyword.md) | Warning | Avoid lock keyword on non-Lock types | No |
+| [AL1010](rules/AL1010_PreferPatternMatching.md) | Warning | Prefer pattern matching for null and zero comparisons | No |
+| [AL1011](rules/AL1011_NormalizeNullGuardStyle.md) | Info | Normalize null-guard style | No |
+| [AL1012](rules/AL1012_CombineDeclarationWithNullCheck.md) | Info | Combine declaration with subsequent null-check | No |
+| [AL1100](rules/AL1100_ToAl1104FormBinding.md) | Error | IFormCollection requires explicit attribute | No |
+| [AL1101](rules/AL1101_ToAl1104FormBinding.md) | Error | Multiple structured form sources | No |
+| [AL1102](rules/AL1102_ToAl1104FormBinding.md) | Error | Mixed form collection and DTO | No |
+| [AL1103](rules/AL1103_ToAl1104FormBinding.md) | Error | Unsupported form type | No |
+| [AL1104](rules/AL1104_ToAl1104FormBinding.md) | Error | Form and body conflict | No |
+| [AL1105](rules/AL1105_MissingResilienceConfiguration.md) | Warning | Missing resilience configuration | No |
+| [AL1106](rules/AL1106_MissingHealthChecks.md) | Warning | Missing health checks | No |
+| [AL1107](rules/AL1107_ConsiderConnectionString.md) | Info | Consider using configuration for connection string | No |
+| [AL1108](rules/AL1108_MissingServiceDiscovery.md) | Warning | Missing service discovery | No |
+| [AL1109](rules/AL1109_AvoidTaskRunInAspNetCore.md) | Warning | Avoid Task.Run in ASP.NET Core request handlers | No |
+| [AL1200](rules/AL1200_UseIsEqualTo.md) | Info | Use IsEqualTo extension | No |
+| [AL1201](rules/AL1201_UseHasAttribute.md) | Info | Use HasAttribute extension | No |
+| [AL1202](rules/AL1202_UseTypeHierarchy.md) | Info | Use type hierarchy extension | No |
+| [AL1203](rules/AL1203_UseOperationExtensions.md) | Info | Use operation extension | No |
+| [AL1204](rules/AL1204_UseOrEmpty.md) | Info | Use OrEmpty extension | No |
+| [AL1205](rules/AL1205_UseToImmutableArrayOrEmpty.md) | Info | Use ToImmutableArrayOrEmpty extension | No |
+| [AL1206](rules/AL1206_UseWhereNotNull.md) | Info | Use WhereNotNull extension | No |
+| [AL1207](rules/AL1207_UseToDisplayStringExtensions.md) | Info | Use symbol display string extension | No |
+| [AL1208](rules/AL1208_UseGuardNotNull.md) | Warning | Use null-guard helper | No |
+| [AL1209](rules/AL1209_UseTryParseExtensions.md) | Warning | Use TryParse extension | No |
+| [AL1210](rules/AL1210_UseStringComparisonExtensions.md) | Warning | Use StringComparison extension | No |
+| [AL1211](rules/AL1211_UseAttributeExtensions.md) | Warning | Use attribute argument extraction extension | No |
+| [AL1212](rules/AL1212_UseGuardNotNullOrEmpty.md) | Warning | Use null-or-empty guard helper | No |
+| [AL1213](rules/AL1213_UseGuardNotNullOrWhiteSpace.md) | Warning | Use null-or-whitespace guard helper | No |
+| [AL1214](rules/AL1214_UseGuardNotZero.md) | Warning | Use zero-guard helper | No |
+| [AL1215](rules/AL1215_UseGuardNotNegative.md) | Warning | Use non-negative guard helper | No |
+| [AL1216](rules/AL1216_UseGuardPositive.md) | Warning | Use positive-guard helper | No |
+| [AL1217](rules/AL1217_UseGuardNotEmptyGuid.md) | Warning | Use empty-guid guard helper | No |
+| [AL1218](rules/AL1218_UseGuardDefinedEnum.md) | Warning | Use defined-enum guard helper | No |
+| [AL1219](rules/AL1219_UseStringComparisonAnyExtensions.md) | Warning | Use *Any* string comparison extension | No |
+| [AL1220](rules/AL1220_UseGuardForThrowIf.md) | Warning | Use Guard.* helpers instead of throw helpers | No |
+| [AL1300](rules/AL1300_ToAl1303Threading.md) | Warning | Avoid async void methods | No |
+| [AL1301](rules/AL1301_ToAl1303Threading.md) | Warning | Avoid lock on 'this' | No |
+| [AL1302](rules/AL1302_ToAl1303Threading.md) | Warning | Avoid lock on typeof(T) | No |
+| [AL1303](rules/AL1303_ToAl1303Threading.md) | Warning | Avoid lock on string | No |
+| [AL1304](rules/AL1304_PreferAwaitUsing.md) | Warning | Prefer 'await using' for IAsyncDisposable | No |
+| [AL1305](rules/AL1305_AvoidBlockingCallsInAsync.md) | Warning | Avoid blocking calls in async methods | No |
+| [AL1306](rules/AL1306_SqlInterpolationInCommandText.md) | Warning | Avoid SQL string interpolation in CommandText | No |
+| [AL1307](rules/AL1307_FireAndForgetTask.md) | Warning | Avoid fire-and-forget task discard | No |
+| [AL1308](rules/AL1308_PreferTryParse.md) | Warning | Prefer TryParse over Parse | No |
+| [AL1309](rules/AL1309_EmptyCatchBlock.md) | Warning | Empty catch block swallows exceptions | No |
+| [AL1310](rules/AL1310_ExceptionLeakedInResponse.md) | Warning | Exception details leaked in HTTP response | No |
+| [AL1311](rules/AL1311_UnnecessaryLinqMaterialization.md) | Info | Unnecessary LINQ materialization | No |
+| [AL1312](rules/AL1312_ReadModifyWriteWithoutTransaction.md) | Warning | Read-modify-write without transaction | No |
+| [AL1313](rules/AL1313_CancellationTokenPropagation.md) | Info | Forward CancellationToken to invocations that support it | No |
+| [AL1314](rules/AL1314_UseExplicitMidpointRounding.md) | Warning | Use Math.Round/MathF.Round overload with explicit MidpointRounding | No |
+| [AL1400](rules/AL1400_AotTestMustReturnInt.md) | Error | Method with [AotTest] or [TrimTest] must return int | No |
+| [AL1401](rules/AL1401_AotTestExitCode100.md) | Warning | [AotTest]/[TrimTest] method should return 100 on success | No |
+| [AL1402](rules/AL1402_TrimSafeViolation.md) | Warning | [TrimSafe] code must not call methods with [RequiresUnreferencedCode] | No |
+| [AL1403](rules/AL1403_AotSafeViolation.md) | Warning | [AotSafe] code must not call methods with [RequiresDynamicCode] | No |
+| [AL1404](rules/AL1404_AotSafeCallsAotUnsafe.md) | Error | [AotSafe] code must not call [AotUnsafe] code | No |
+| [AL1405](rules/AL1405_UnnecessaryAotUnsafe.md) | Warning | Unnecessary [AotUnsafe] attribute | No |
+| [AL1406](rules/AL1406_AvoidDynamicKeyword.md) | Warning | Avoid 'dynamic' keyword in AOT-published code | No |
+| [AL1407](rules/AL1407_AvoidExpressionCompile.md) | Warning | Avoid Expression.Compile() in AOT context | No |
+| [AL1408](rules/AL1408_AvoidActivatorCreateInstance.md) | Warning | Activator.CreateInstance is not AOT-safe | No |
+| [AL1409](rules/AL1409_AvoidTypeGetType.md) | Warning | Type.GetType with dynamic name is not AOT-safe | No |
+| [AL1500](rules/AL1500_ClosedTypeHierarchySwitch.md) | Warning | Closed hierarchy match is not exhaustive | No |
+| [AL1501](rules/AL1501_SymbolStoredInModel.md) | Warning | Avoid storing ISymbol in source generator models | No |
+| [AL1502](rules/AL1502_UseIncrementalGenerator.md) | Warning | Use IIncrementalGenerator instead of ISourceGenerator | No |
+| [AL1503](rules/AL1503_NormalizeWhitespace.md) | Warning | Avoid NormalizeWhitespace in source generators | No |
+| [AL1504](rules/AL1504_DuckDbTableMustBePartial.md) | Error | [DuckDbTable] type must be partial | No |
+| [AL1505](rules/AL1505_DuckDbColumnConflictingOrdinal.md) | Warning | Conflicting [DuckDbColumn] ordinal values | No |
+| [AL1600](rules/AL1600_HardcodedPackageVersion.md) | Warning | Hardcoded package version detected | No |
+| [AL1601](rules/AL1601_VersionPropsNotImported.md) | Warning | Version.props not imported | No |
+| [AL1602](rules/AL1602_UndefinedVersionVariable.md) | Warning | Undefined version variable | No |
+| [AL1603](rules/AL1603_ToAl1605DiagnosticsAlignment.md) | Warning | Diagnostic missing from documentation | No |
+| [AL1604](rules/AL1604_ToAl1605DiagnosticsAlignment.md) | Warning | Diagnostic missing from release notes | No |
+| [AL1605](rules/AL1605_ToAl1605DiagnosticsAlignment.md) | Warning | Diagnostic documentation mismatch | No |
+| [AL1606](rules/AL1606_OutdatedMafPackageVersion.md) | Warning | Outdated MAF ecosystem package version | No |
+| [AL1700](rules/AL1700_PreferStaticLambda.md) | Warning | Anonymous function can be made static | No |
+| [AL1701](rules/AL1701_AvoidDateTimeNow.md) | Warning | Avoid DateTime/DateTimeOffset time accessors | No |
+| [AL1702](rules/AL1702_AvoidNewtonsoftJson.md) | Warning | Avoid legacy JSON library | No |
+| [AL1703](rules/AL1703_UseImplicitTypeWhenApparent.md) | Warning | Use implicit type when type is apparent | No |
+| [AL1800](rules/AL1800_DestructiveToolMustRequireApproval.md) | Warning | Destructive Loom tool must require approval | No |
+| [AL1801](rules/AL1801_ToolMustDeclareSideEffect.md) | Info | Loom tool should declare its side effect | No |
+| [AL1802](rules/AL1802_ToolMustDeclareCapability.md) | Info | Loom tool should declare required capabilities | No |
+
+## See also
+
+- [Per-rule pages](rules/) — one markdown file per `AL00xx`–`AL18xx` rule with severity, category, code-fix status, and description.
+- [Editorconfig profiles](editorconfig/) — three drop-in severity profiles: `Default`, `AllRulesAsErrors`, `AllRulesDisabled`.
+- [`AnalyzerReleases.Unshipped.md`](../src/ANcpLua.Analyzers/AnalyzerReleases.Unshipped.md) — release-tracking manifest with `ClassName` attribution per Microsoft NetAnalyzers convention.
 
 ## Generated File
 

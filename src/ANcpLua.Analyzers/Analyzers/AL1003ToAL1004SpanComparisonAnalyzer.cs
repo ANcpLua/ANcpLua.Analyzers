@@ -56,12 +56,12 @@ public sealed partial class Al1003ToAl1004SpanComparisonAnalyzer : AlAnalyzer {
     private static readonly DiagnosticDescriptor s_ruleAl1003 = new(
         DiagnosticIdAl1003, s_titleAl1003, s_messageFormatAl1003, DiagnosticCategories.Usage,
         DiagnosticSeverity.Warning, true, s_descriptionAl1003,
-        HelpLink(DiagnosticIdAl1003));
+        RuleDocs.HelpLinkAuto(DiagnosticIdAl1003));
 
     private static readonly DiagnosticDescriptor s_ruleAl1004 = new(
         DiagnosticIdAl1004, s_titleAl1004, s_messageFormatAl1004, DiagnosticCategories.Usage,
         DiagnosticSeverity.Warning, true, s_descriptionAl1004,
-        HelpLink(DiagnosticIdAl1004));
+        RuleDocs.HelpLinkAuto(DiagnosticIdAl1004));
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics (AL1003 and AL1004).</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_ruleAl1003, s_ruleAl1004];

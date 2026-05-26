@@ -1,32 +1,12 @@
-﻿namespace ANcpLua.Analyzers;
+﻿using System.Runtime.CompilerServices;
+
+namespace ANcpLua.Analyzers;
 
 /// <summary>
 ///     Base class for all ANcpLua analyzers.
 ///     Extends <see cref="DiagnosticAnalyzerBase"/> with resource-based rule creation.
 /// </summary>
 public abstract partial class AlAnalyzer : DiagnosticAnalyzerBase {
-    /// <summary>
-    ///     Base URL for diagnostic help links. Resolves to per-rule anchors in
-    ///     <c>docs/ANcpLua.Analyzers.md</c>, emitted by
-    ///     <c>tools/ANcpLua.Analyzers.DocsGenerator</c>. Matches the Microsoft pattern
-    ///     of "one stable URL per shipping NuGet" — every analyzer in this package
-    ///     points at the same generated rule reference.
-    /// </summary>
-    public const string HelpLinkBase =
-        "https://github.com/ANcpLua/ANcpLua.Analyzers"
-        + "/blob/main/docs/ANcpLua.Analyzers.md#";
-
-    /// <summary>
-    ///     Returns the full help link URL for a specific diagnostic ID. The id is
-    ///     lower-cased to match the anchor GitHub renders from the <c>### ALXXXX</c>
-    ///     heading the DocsGenerator emits.
-    /// </summary>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "Globalization", "CA1308:Normalize strings to uppercase",
-        Justification = "GitHub heading anchors are always lowercased; the URL must match the rendered anchor.")]
-    public static string HelpLink(string id) =>
-        HelpLinkBase + id.ToLowerInvariant();
-
     /// <inheritdoc />
     protected sealed override void InitializeCore(AnalysisContext context) => RegisterActions(context);
 
@@ -36,17 +16,28 @@ public abstract partial class AlAnalyzer : DiagnosticAnalyzerBase {
 
     /// <summary>
     ///     Creates a <see cref="DiagnosticDescriptor"/> using resource-based localization.
+    ///     The <c>helpLinkUri</c> is derived from <paramref name="callerFile"/>
+    ///     (compiler-supplied via <see cref="CallerFilePathAttribute"/>): the file's
+    ///     basename minus the <c>Analyzer</c> suffix and the <c>(AL|Al)NNNN</c>
+    ///     prefix becomes the symbolic name in the URL. This relies on the
+    ///     "file basename equals class name" convention that the <c>--enforce-ids</c>
+    ///     DocsGenerator mode already locks down. URL composition lives in
+    ///     <see cref="RuleDocs"/> so the docs generator (which doesn't link against
+    ///     <c>ANcpLua.Roslyn.Utilities</c>) can call it without resolving this class.
     /// </summary>
     /// <param name="id">The diagnostic ID (e.g., "AL1208").</param>
     /// <param name="category">The diagnostic category from <see cref="DiagnosticCategories"/>.</param>
     /// <param name="severity">The diagnostic severity.</param>
     /// <param name="isEnabledByDefault">Whether the diagnostic is enabled by default.</param>
+    /// <param name="callerFile">Compiler-injected; do not pass.</param>
     /// <returns>A configured <see cref="DiagnosticDescriptor"/>.</returns>
     protected static DiagnosticDescriptor CreateRule(
         string id,
         string category,
         DiagnosticSeverity severity,
-        bool isEnabledByDefault = true) {
+        bool isEnabledByDefault = true,
+        [CallerFilePath] string callerFile = "") {
+        var symbolic = RuleDocs.SymbolicNameFromFile(callerFile);
         return new DiagnosticDescriptor(
             id,
             new LocalizableResourceString($"{id}AnalyzerTitle", Resources.ResourceManager, typeof(Resources)),
@@ -55,6 +46,6 @@ public abstract partial class AlAnalyzer : DiagnosticAnalyzerBase {
             severity,
             isEnabledByDefault,
             new LocalizableResourceString($"{id}AnalyzerDescription", Resources.ResourceManager, typeof(Resources)),
-            HelpLink(id));
+            RuleDocs.HelpLink(id, symbolic));
     }
 }

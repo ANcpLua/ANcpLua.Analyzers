@@ -32,7 +32,7 @@ public sealed partial class Al1500ClosedTypeHierarchySwitchAnalyzer : AlAnalyzer
         true,
         "All sealed subtypes of a closed hierarchy should be explicitly handled in switch expressions, " +
         "switch statements, and Match<T> calls.",
-        HelpLink(DiagnosticId));
+        RuleDocs.HelpLinkAuto(DiagnosticId));
 
     static readonly InvocationMatcher s_matchInvocation = Invoke.Method("Match").Generic();
 

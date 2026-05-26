@@ -31,7 +31,7 @@ public sealed partial class Al1606OutdatedMafPackageVersionAnalyzer : Diagnostic
     private static readonly DiagnosticDescriptor s_rule = new(
         DiagnosticId, s_title, s_messageFormat, DiagnosticCategories.VersionManagement,
         DiagnosticSeverity.Warning, true, s_description,
-        AlAnalyzer.HelpLink(DiagnosticId),
+        RuleDocs.HelpLinkAuto(DiagnosticId),
         WellKnownDiagnosticTags.CompilationEnd);
 
     /// <summary>Pattern to detect MSBuild property references like $(VariableName).</summary>

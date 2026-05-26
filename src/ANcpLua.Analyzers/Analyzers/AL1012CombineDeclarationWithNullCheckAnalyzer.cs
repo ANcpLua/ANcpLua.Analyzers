@@ -37,7 +37,7 @@ public sealed partial class Al1012CombineDeclarationWithNullCheckAnalyzer : AlAn
         DiagnosticSeverity.Info,
         true,
         "Combines a variable declaration and an immediate null-check into a single pattern match.",
-        HelpLink(DiagnosticId));
+        RuleDocs.HelpLinkAuto(DiagnosticId));
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];

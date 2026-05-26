@@ -67,7 +67,7 @@ public sealed partial class Al1100ToAl1104FormBindingAnalyzer : AlAnalyzer {
         DiagnosticSeverity.Error,
         true,
         new LocalizableResourceString($"{ruleNumber}AnalyzerDescription", Resources.ResourceManager, typeof(Resources)),
-        HelpLink(id));
+        RuleDocs.HelpLinkAuto(id));
 
     /// <summary>Registers method symbol actions to analyze endpoint parameter binding.</summary>
     protected override void RegisterActions(AnalysisContext context) =>

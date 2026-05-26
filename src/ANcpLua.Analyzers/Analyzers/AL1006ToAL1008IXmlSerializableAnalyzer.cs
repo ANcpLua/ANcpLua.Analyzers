@@ -69,19 +69,19 @@ public sealed partial class Al1006ToAl1008IXmlSerializableAnalyzer : AlAnalyzer 
         DiagnosticIdAl1006,
         s_titleAl1006, s_messageFormatAl1006, DiagnosticCategories.Usage,
         DiagnosticSeverity.Error, true, s_descriptionAl1006,
-        HelpLink(DiagnosticIdAl1006));
+        RuleDocs.HelpLinkAuto(DiagnosticIdAl1006));
 
     private static readonly DiagnosticDescriptor s_ruleAl1007 = new(
         DiagnosticIdAl1007,
         s_titleAl1007, s_messageFormatAl1007, DiagnosticCategories.Usage,
         DiagnosticSeverity.Error, true, s_descriptionAl1007,
-        HelpLink(DiagnosticIdAl1007));
+        RuleDocs.HelpLinkAuto(DiagnosticIdAl1007));
 
     private static readonly DiagnosticDescriptor s_ruleAl1008 = new(
         DiagnosticIdAl1008,
         s_titleAl1008, s_messageFormatAl1008, DiagnosticCategories.Usage,
         DiagnosticSeverity.Error, true, s_descriptionAl1008,
-        HelpLink(DiagnosticIdAl1008));
+        RuleDocs.HelpLinkAuto(DiagnosticIdAl1008));
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics (AL1006, AL1007, AL1008).</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>

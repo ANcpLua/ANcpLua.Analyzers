@@ -56,18 +56,68 @@ file static class DocsGenerator
         string outputPath,
         string repoRoot)
     {
+        var idToClass = BuildIdToClassMap();
+
+        // (1) Slim index file.
         if (!File.Exists(outputPath))
         {
             Console.Error.WriteLine($"Missing generated docs: {outputPath}");
             return 1;
         }
-
-        if (!string.Equals(File.ReadAllText(outputPath), RenderMarkdown(descriptors, fixableIds), StringComparison.Ordinal))
+        if (!string.Equals(File.ReadAllText(outputPath), RenderIndex(descriptors, fixableIds, idToClass), StringComparison.Ordinal))
         {
-            Console.Error.WriteLine($"Generated docs are stale: {outputPath}");
+            Console.Error.WriteLine($"Index docs are stale: {Path.GetRelativePath(repoRoot, outputPath)}");
             return 1;
         }
 
+        // (2) Per-rule pages under docs/rules/.
+        var rulesDir = Path.Combine(repoRoot, "docs", "rules");
+        var expectedRuleFiles = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var d in descriptors)
+        {
+            if (!idToClass.TryGetValue(d.Id, out var className))
+            {
+                Console.Error.WriteLine($"Descriptor {d.Id} has no owning DiagnosticAnalyzer class — cannot place per-rule page.");
+                return 1;
+            }
+            var symbolic = ToSymbolicName(className);
+            var rulePath = Path.Combine(rulesDir, $"{d.Id}_{symbolic}.md");
+            expectedRuleFiles.Add(Path.GetFileName(rulePath));
+
+            if (!File.Exists(rulePath))
+            {
+                Console.Error.WriteLine($"Missing per-rule page: {Path.GetRelativePath(repoRoot, rulePath)}");
+                return 1;
+            }
+            if (!string.Equals(File.ReadAllText(rulePath), RenderRulePage(d, className, fixableIds), StringComparison.Ordinal))
+            {
+                Console.Error.WriteLine($"Per-rule page is stale: {Path.GetRelativePath(repoRoot, rulePath)}");
+                return 1;
+            }
+
+            // HelpLinkUri drift: descriptor's URL must equal what the generator would emit now.
+            var expectedUri = RuleDocs.HelpLink(d.Id, symbolic);
+            if (!string.Equals(d.HelpLinkUri, expectedUri, StringComparison.Ordinal))
+            {
+                Console.Error.WriteLine($"HelpLinkUri drift on {d.Id}: descriptor='{d.HelpLinkUri}' expected='{expectedUri}'");
+                return 1;
+            }
+        }
+
+        // Fail on stale files left over in docs/rules/ that no descriptor produces.
+        if (Directory.Exists(rulesDir))
+        {
+            foreach (var file in Directory.EnumerateFiles(rulesDir, "*.md"))
+            {
+                if (!expectedRuleFiles.Contains(Path.GetFileName(file)))
+                {
+                    Console.Error.WriteLine($"Stale per-rule page (no matching descriptor): {Path.GetRelativePath(repoRoot, file)}");
+                    return 1;
+                }
+            }
+        }
+
+        // (3) Editorconfig profiles.
         foreach (var (path, expected) in EnumerateEditorconfigProfiles(repoRoot, descriptors))
         {
             if (!File.Exists(path))
@@ -82,8 +132,10 @@ file static class DocsGenerator
             }
         }
 
-        Console.WriteLine($"Generated docs are up to date: {Path.GetRelativePath(repoRoot, outputPath)}");
+        Console.WriteLine($"Index docs are up to date: {Path.GetRelativePath(repoRoot, outputPath)}");
+        Console.WriteLine($"Per-rule pages are up to date ({descriptors.Count}).");
         Console.WriteLine("Editorconfig profiles are up to date.");
+        Console.WriteLine("HelpLinkUri values match per-rule page URLs.");
         return 0;
     }
 
@@ -93,10 +145,37 @@ file static class DocsGenerator
         string outputPath,
         string repoRoot)
     {
+        var idToClass = BuildIdToClassMap();
+
+        // Slim index.
         Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
-        File.WriteAllText(outputPath, RenderMarkdown(descriptors, fixableIds));
+        File.WriteAllText(outputPath, RenderIndex(descriptors, fixableIds, idToClass));
         Console.WriteLine($"Wrote {Path.GetRelativePath(repoRoot, outputPath)}");
 
+        // Per-rule pages.
+        var rulesDir = Path.Combine(repoRoot, "docs", "rules");
+        Directory.CreateDirectory(rulesDir);
+        var expectedRuleFiles = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var d in descriptors)
+        {
+            if (!idToClass.TryGetValue(d.Id, out var className)) continue;
+            var symbolic = ToSymbolicName(className);
+            var rulePath = Path.Combine(rulesDir, $"{d.Id}_{symbolic}.md");
+            expectedRuleFiles.Add(Path.GetFileName(rulePath));
+            File.WriteAllText(rulePath, RenderRulePage(d, className, fixableIds));
+        }
+        // Clean up stale rule pages from prior renames (otherwise --check fails afterward).
+        foreach (var file in Directory.EnumerateFiles(rulesDir, "*.md"))
+        {
+            if (!expectedRuleFiles.Contains(Path.GetFileName(file)))
+            {
+                File.Delete(file);
+                Console.WriteLine($"Removed stale {Path.GetRelativePath(repoRoot, file)}");
+            }
+        }
+        Console.WriteLine($"Wrote {descriptors.Count} per-rule pages under docs/rules/");
+
+        // Editorconfig profiles (unchanged).
         foreach (var (path, content) in EnumerateEditorconfigProfiles(repoRoot, descriptors))
         {
             Directory.CreateDirectory(Path.GetDirectoryName(path)!);
@@ -129,16 +208,59 @@ file static class DocsGenerator
 
     // ─── Markdown rendering ─────────────────────────────────────────────────
 
-    private static string RenderMarkdown(IReadOnlyList<DiagnosticDescriptor> descriptors, HashSet<string> fixableIds)
+    private static string RenderIndex(
+        IReadOnlyList<DiagnosticDescriptor> descriptors,
+        HashSet<string> fixableIds,
+        Dictionary<string, string> idToClass)
     {
         var sb = new StringBuilder();
         WriteHeader(sb);
         sb.AppendLine();
-        WriteDiagnostics(sb, descriptors, fixableIds);
+        WriteDiagnostics(sb, descriptors, fixableIds, idToClass);
         sb.AppendLine();
-        WriteRuleReference(sb, descriptors, fixableIds);
+        WriteRelatedDocs(sb);
         sb.AppendLine();
         WriteGeneratedFile(sb);
+        return sb.ToString().ReplaceLineEndings("\n");
+    }
+
+    /// <summary>
+    ///   Emits one markdown page per rule, keyed by id + symbolic name. Each page is
+    ///   small (header + property table + description + see-also) so IDE Quick-Fix
+    ///   "Show error help" links resolve onto a focused page rather than the
+    ///   multi-thousand-line aggregate.
+    /// </summary>
+    private static string RenderRulePage(
+        DiagnosticDescriptor descriptor,
+        string className,
+        HashSet<string> fixableIds)
+    {
+        var sb = new StringBuilder();
+        var title = Escape(descriptor.Title.ToString());
+        var description = Escape(descriptor.Description.ToString());
+        var codeFix = fixableIds.Contains(descriptor.Id) ? "Yes" : "No";
+        var sourceBasename = FileBasenameForClass(className);
+
+        sb.AppendLine($"# {descriptor.Id}: {title}");
+        sb.AppendLine();
+        sb.AppendLine($"<!-- <auto-generated /> This file is generated by {ProjectRelativePath}. -->");
+        sb.AppendLine();
+        sb.AppendLine("| Property | Value |");
+        sb.AppendLine("| -- | -- |");
+        sb.AppendLine($"| Severity | {descriptor.DefaultSeverity} |");
+        sb.AppendLine($"| Category | `{descriptor.Category}` |");
+        sb.AppendLine($"| Code fix | {codeFix} |");
+        sb.AppendLine($"| Analyzer | `{className}` |");
+        sb.AppendLine($"| Enabled by default | {(descriptor.IsEnabledByDefault ? "Yes" : "No")} |");
+        sb.AppendLine();
+        sb.AppendLine("## Description");
+        sb.AppendLine();
+        sb.AppendLine(description);
+        sb.AppendLine();
+        sb.AppendLine("## See also");
+        sb.AppendLine();
+        sb.AppendLine($"- [Rule index](../{PackageName}.md)");
+        sb.AppendLine($"- [Source: `{sourceBasename}.cs`](../../src/{PackageName}/Analyzers/{sourceBasename}.cs)");
         return sb.ToString().ReplaceLineEndings("\n");
     }
 
@@ -160,39 +282,32 @@ file static class DocsGenerator
     private static void WriteDiagnostics(
         StringBuilder sb,
         IReadOnlyList<DiagnosticDescriptor> descriptors,
-        HashSet<string> fixableIds)
+        HashSet<string> fixableIds,
+        Dictionary<string, string> idToClass)
     {
         sb.AppendLine("## Diagnostics");
         sb.AppendLine();
-        sb.AppendLine("| ID | Severity | Title | Code fix | Description |");
-        sb.AppendLine("| -- | -- | -- | -- | -- |");
+        sb.AppendLine("Each ID links to a per-rule page under [`docs/rules/`](rules/) with severity, category, code-fix status, and description. The descriptor's `HelpLinkUri` resolves to the same page, so IDE Quick-Fix \"Show error help\" lands on the focused rule, not on this index.");
+        sb.AppendLine();
+        sb.AppendLine("| ID | Severity | Title | Code fix |");
+        sb.AppendLine("| -- | -- | -- | -- |");
         foreach (var d in descriptors)
         {
             var fix = fixableIds.Contains(d.Id) ? "Yes" : "No";
-            sb.AppendLine($"| {d.Id} | {d.DefaultSeverity} | {Escape(d.Title.ToString())} | {fix} | {Escape(d.Description.ToString())} |");
+            var link = idToClass.TryGetValue(d.Id, out var className)
+                ? $"[{d.Id}](rules/{d.Id}_{ToSymbolicName(className)}.md)"
+                : d.Id;
+            sb.AppendLine($"| {link} | {d.DefaultSeverity} | {Escape(d.Title.ToString())} | {fix} |");
         }
     }
 
-    private static void WriteRuleReference(
-        StringBuilder sb,
-        IReadOnlyList<DiagnosticDescriptor> descriptors,
-        HashSet<string> fixableIds)
+    private static void WriteRelatedDocs(StringBuilder sb)
     {
-        sb.AppendLine("## Rule Reference");
+        sb.AppendLine("## See also");
         sb.AppendLine();
-        sb.AppendLine("Each rule below has a stable GitHub anchor (`#al1000`, `#al1001`, …) that every `DiagnosticDescriptor.HelpLinkUri` resolves to. IDE \"Show error help\" links deep-link straight to the matching sub-section.");
-        sb.AppendLine();
-        foreach (var d in descriptors)
-        {
-            sb.AppendLine($"### {d.Id}");
-            sb.AppendLine();
-            sb.AppendLine($"**{Escape(d.Title.ToString())}** — *{d.DefaultSeverity}, category `{d.Category}`*");
-            sb.AppendLine();
-            sb.AppendLine(Escape(d.Description.ToString()));
-            sb.AppendLine();
-            sb.AppendLine($"Code fix: {(fixableIds.Contains(d.Id) ? "Yes" : "No")}.");
-            sb.AppendLine();
-        }
+        sb.AppendLine("- [Per-rule pages](rules/) — one markdown file per `AL00xx`–`AL18xx` rule with severity, category, code-fix status, and description.");
+        sb.AppendLine("- [Editorconfig profiles](editorconfig/) — three drop-in severity profiles: `Default`, `AllRulesAsErrors`, `AllRulesDisabled`.");
+        sb.AppendLine("- [`AnalyzerReleases.Unshipped.md`](../src/ANcpLua.Analyzers/AnalyzerReleases.Unshipped.md) — release-tracking manifest with `ClassName` attribution per Microsoft NetAnalyzers convention.");
     }
 
     private static void WriteGeneratedFile(StringBuilder sb)
@@ -206,6 +321,64 @@ file static class DocsGenerator
         sb.AppendLine($"dotnet run --project {ProjectRelativePath} -- --check   # CI guard; fails if either is stale");
         sb.AppendLine($"dotnet run --project {ProjectRelativePath} -- --audit   # print catalog statistics");
         sb.AppendLine("```");
+    }
+
+    // ─── Symbolic-name + on-disk file mapping ───────────────────────────────
+
+    /// <summary>
+    ///   Strips the <c>Analyzer</c> suffix and any <c>Al\d{4}</c> prefix off the
+    ///   class name; the remainder is the symbolic part used in per-rule docs
+    ///   filenames <c>docs/rules/{id}_{symbolic}.md</c> and in the help-link URL.
+    ///   Normalizes embedded uppercase <c>AL\d{4}</c> to Pascal-case <c>Al\d{4}</c>
+    ///   first so the output matches <c>RuleDocs.SymbolicNameFromFile</c> on multi-id
+    ///   classes (e.g., <c>AL1003ToAL1004SpanComparison</c> in a file basename vs
+    ///   <c>Al1003ToAl1004SpanComparison</c> in a reflected class name).
+    /// </summary>
+    private static string ToSymbolicName(string className)
+    {
+        var name = Regex.Replace(className, @"AL(\d{4})", "Al$1");
+        if (name.EndsWith("Analyzer", StringComparison.Ordinal))
+            name = name[..^"Analyzer".Length];
+        var prefix = Regex.Match(name, @"^Al\d{4}");
+        if (prefix.Success)
+            name = name[prefix.Length..];
+        return name;
+    }
+
+    /// <summary>
+    ///   Maps a Pascal-case class name (e.g., <c>Al1003ToAl1004SpanComparisonAnalyzer</c>)
+    ///   to its on-disk source filename (<c>AL1003ToAL1004SpanComparisonAnalyzer.cs</c>).
+    ///   git tracks files with uppercase <c>AL</c> prefix; macOS's case-insensitive
+    ///   default masks this locally but GitHub's case-sensitive URL space does not.
+    ///   Replaces every <c>Al{4-digit}</c> occurrence with uppercase <c>AL{4-digit}</c>
+    ///   so multi-id classes (which carry two IDs in the name) lift both prefixes.
+    /// </summary>
+    private static string FileBasenameForClass(string className) =>
+        Regex.Replace(className, @"Al(\d{4})", "AL$1");
+
+    /// <summary>
+    ///   Walks every concrete <see cref="DiagnosticAnalyzer"/> in the analyzer assembly
+    ///   and builds <c>Id → ClassName</c>. Analyzers that register multiple ids point
+    ///   all of those ids at the same class.
+    /// </summary>
+    private static Dictionary<string, string> BuildIdToClassMap()
+    {
+        var map = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var type in typeof(AlAnalyzer).Assembly.GetTypes())
+        {
+            if (type.IsAbstract) continue;
+            if (!typeof(DiagnosticAnalyzer).IsAssignableFrom(type)) continue;
+            try
+            {
+                if (Activator.CreateInstance(type) is DiagnosticAnalyzer a)
+                {
+                    foreach (var d in a.SupportedDiagnostics)
+                        map[d.Id] = type.Name;
+                }
+            }
+            catch { /* analyzers with non-default ctors are skipped */ }
+        }
+        return map;
     }
 
     // ─── Editorconfig profile emission ──────────────────────────────────────
