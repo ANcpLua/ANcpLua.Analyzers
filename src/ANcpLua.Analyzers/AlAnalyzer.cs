@@ -6,21 +6,26 @@
 /// </summary>
 public abstract partial class AlAnalyzer : DiagnosticAnalyzerBase {
     /// <summary>
-    ///     Base URL for diagnostic help links. Resolves to the rule-band sections of
-    ///     <c>README.md</c> in the analyzer repo. The previous <c>ancplua.mintlify.app</c>
-    ///     URL was a 404; this matches the Microsoft pattern of "one stable URL per
-    ///     shipping NuGet" without requiring an external docs site (the README's
-    ///     <c>## Rules</c> section groups all 89 rules by band).
+    ///     Base URL for diagnostic help links. Resolves to per-rule anchors in
+    ///     <c>docs/ANcpLua.Analyzers.md</c>, emitted by
+    ///     <c>tools/ANcpLua.Analyzers.DocsGenerator</c>. Matches the Microsoft pattern
+    ///     of "one stable URL per shipping NuGet" — every analyzer in this package
+    ///     points at the same generated rule reference.
     /// </summary>
     public const string HelpLinkBase =
-        "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/README.md#rules";
+        "https://github.com/ANcpLua/ANcpLua.Analyzers"
+        + "/blob/main/docs/ANcpLua.Analyzers.md#";
 
     /// <summary>
-    ///     Returns the full help link URL for a specific diagnostic ID. README anchors
-    ///     are by band, not by per-rule ID, so every rule resolves to the same
-    ///     well-known section; users scan the ID list on the page to find their rule.
+    ///     Returns the full help link URL for a specific diagnostic ID. The id is
+    ///     lower-cased to match the anchor GitHub renders from the <c>### ALXXXX</c>
+    ///     heading the DocsGenerator emits.
     /// </summary>
-    public static string HelpLink(string id) => HelpLinkBase;
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "Globalization", "CA1308:Normalize strings to uppercase",
+        Justification = "GitHub heading anchors are always lowercased; the URL must match the rendered anchor.")]
+    public static string HelpLink(string id) =>
+        HelpLinkBase + id.ToLowerInvariant();
 
     /// <inheritdoc />
     protected sealed override void InitializeCore(AnalysisContext context) => RegisterActions(context);

@@ -72,6 +72,35 @@
          when they exist in the project directory (line 335-340 of its .targets file).
          Do NOT add them here — it causes duplicates in Rider's "Show All Files" view. -->
 
+    <!--
+      After-build drift guard. Every `dotnet build` of this project invokes the
+      DocsGenerator twice via Exec:
+        1. 'enforce-ids' mode  : verify every analyzer/codefix class name, XML doc
+           summary, and DiagnosticId const matches the runtime DiagnosticDescriptor.
+        2. 'check' mode        : verify docs/ANcpLua.Analyzers.md and the editorconfig
+           profiles under docs/editorconfig/ still match what the generator would emit.
+      _AlInsideConsistencyCheck is a recursion-break: the nested `dotnet run`
+      rebuilds the DocsGenerator, which transitively re-evaluates this analyzer
+      csproj. Without the sentinel, AfterBuild fires inside the nested build and
+      detonates into hundreds of duplicated errors.
+
+      Opt out with -p:SkipAnalyzerConsistencyCheck=true during inner-loop iteration.
+      CI must leave it on.
+    -->
+    <Target Name="_VerifyAnalyzerConsistency"
+            AfterTargets="Build"
+            Condition="'$(SkipAnalyzerConsistencyCheck)' != 'true' AND '$(_AlInsideConsistencyCheck)' != 'true'">
+        <PropertyGroup>
+            <_DocsGenProject>$(MSBuildThisFileDirectory)../../tools/ANcpLua.Analyzers.DocsGenerator/ANcpLua.Analyzers.DocsGenerator.csproj</_DocsGenProject>
+        </PropertyGroup>
+        <Exec Command="dotnet run --project &quot;$(_DocsGenProject)&quot; --configuration $(Configuration) -- --enforce-ids"
+              WorkingDirectory="$(MSBuildThisFileDirectory)../.."
+              EnvironmentVariables="_AlInsideConsistencyCheck=true"/>
+        <Exec Command="dotnet run --project &quot;$(_DocsGenProject)&quot; --configuration $(Configuration) -- --check"
+              WorkingDirectory="$(MSBuildThisFileDirectory)../.."
+              EnvironmentVariables="_AlInsideConsistencyCheck=true"/>
+    </Target>
+
     <!-- CRITICAL: Pack ALL analyzer assemblies including dependencies (netstandard2.0 only) -->
     <PropertyGroup>
         <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToPackage</TargetsForTfmSpecificContentInPackage>

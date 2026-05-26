@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Renders docs/ANcpLua.Analyzers.md + docs/editorconfig/{Default,AllRulesAsErrors,
+    AllRulesDisabled}.editorconfig by reflecting on the analyzer assembly's
+    DiagnosticAnalyzer subclasses (SupportedDiagnostics) and CodeFixProvider
+    subclasses (FixableDiagnosticIds). Every AL rule's HelpLinkUri deep-links
+    into a "### ALxxxx" sub-section of the markdown, so the generator output IS
+    the contract the descriptors anchor into.
+
+    Modes (invoked via the AfterBuild target in the analyzer csproj OR directly):
+      'audit'             — print catalog stats; no file I/O
+      (default)           — rewrite docs + editorconfig profiles
+      'check'             — CI guard; fails if either artifact is stale
+      'enforce-ids'       — verify source files agree with runtime descriptors
+      'enforce-ids apply' — rewrite source files to align with runtime descriptors
+
+    Uses plain Microsoft.NET.Sdk (NOT ANcpLua.NET.Sdk) so it's not subject to the
+    SDK's auto-injected analyzer band; this is a build tool, not shipping code.
+  -->
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>ANcpLua.Analyzers.DocsGenerator</RootNamespace>
+    <AssemblyName>ANcpLua.Analyzers.DocsGenerator</AssemblyName>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <!-- CPM evaluation from the tools/ subdir doesn't pick up $(RoslynVersion);
+         opt out of CPM and pin the version inline so the tool is self-contained. -->
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+    <!-- Internal tool surface: relax the lint band tuned for shipped library code. -->
+    <NoWarn>$(NoWarn);CA1050;CA1305;CA1707;CA1822;CA1859;CA2007;CS1591;IDE0055</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\ANcpLua.Analyzers\ANcpLua.Analyzers.csproj"/>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.3.0" PrivateAssets="all"/>
+  </ItemGroup>
+
+</Project>
