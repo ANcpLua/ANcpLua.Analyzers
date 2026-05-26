@@ -1,0 +1,1530 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "ANcpLua.Analyzers",
+          "informationUri": "https://github.com/ANcpLua/ANcpLua.Analyzers",
+          "rules": [
+            {
+              "id": "AL1000",
+              "name": "ProhibitPrimaryConstructorParameterReassignment",
+              "shortDescription": {
+                "text": "Prohibit reassignment of primary constructor parameters"
+              },
+              "fullDescription": {
+                "text": "Primary constructor parameters should not be reassigned as this can lead to confusion and bugs."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1000_ProhibitPrimaryConstructorParameterReassignment.md",
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "category": "Design"
+              }
+            },
+            {
+              "id": "AL1001",
+              "name": "DontRepeatNegatedPattern",
+              "shortDescription": {
+                "text": "Don\u0027t repeat negated patterns"
+              },
+              "fullDescription": {
+                "text": "The negated pattern should not be repeated multiple times."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1001_DontRepeatNegatedPattern.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Design"
+              }
+            },
+            {
+              "id": "AL1002",
+              "name": "DontDivideByConstantZero",
+              "shortDescription": {
+                "text": "Don\u0027t divide by constant zero"
+              },
+              "fullDescription": {
+                "text": "Integers and Decimal should never be divided by the constant 0 as this causes a DivideByZeroException at runtime."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1002_DontDivideByConstantZero.md",
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "category": "Reliability"
+              }
+            },
+            {
+              "id": "AL1003",
+              "name": "ToAl1004SpanComparison",
+              "shortDescription": {
+                "text": "Use pattern matching when comparing Span with constants"
+              },
+              "fullDescription": {
+                "text": "When comparing Span and a constant, use pattern matching instead of equality operators, unless you want to compare addresses."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1003_ToAl1004SpanComparison.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Usage"
+              }
+            },
+            {
+              "id": "AL1004",
+              "name": "ToAl1004SpanComparison",
+              "shortDescription": {
+                "text": "Use SequenceEqual when comparing Span with non-constants"
+              },
+              "fullDescription": {
+                "text": "When comparing Span and a non-constant, use SequenceEqual instead of equality operators, unless you want to compare addresses."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1004_ToAl1004SpanComparison.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Usage"
+              }
+            },
+            {
+              "id": "AL1005",
+              "name": "FieldNameConflictWithPrimaryConstructor",
+              "shortDescription": {
+                "text": "Field name conflicts with primary constructor parameter"
+              },
+              "fullDescription": {
+                "text": "Field names should not conflict with primary constructor parameters to avoid shadowing and confusion."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1005_FieldNameConflictWithPrimaryConstructor.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Design"
+              }
+            },
+            {
+              "id": "AL1006",
+              "name": "ToAl1008IXmlSerializable",
+              "shortDescription": {
+                "text": "GetSchema should be explicitly implemented"
+              },
+              "fullDescription": {
+                "text": "Implement IXmlSerializable.GetSchema explicitly to avoid exposing it as part of the public API."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1006_ToAl1008IXmlSerializable.md",
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "category": "Usage"
+              }
+            },
+            {
+              "id": "AL1007",
+              "name": "ToAl1008IXmlSerializable",
+              "shortDescription": {
+                "text": "GetSchema must return null and not be abstract"
+              },
+              "fullDescription": {
+                "text": "GetSchema should return null according to IXmlSerializable guidance and should not be abstract."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1007_ToAl1008IXmlSerializable.md",
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "category": "Usage"
+              }
+            },
+            {
+              "id": "AL1008",
+              "name": "ToAl1008IXmlSerializable",
+              "shortDescription": {
+                "text": "Don\u0027t call IXmlSerializable.GetSchema"
+              },
+              "fullDescription": {
+                "text": "Calling GetSchema is not supported; it should always return null and isn\u0027t intended to be invoked."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1008_ToAl1008IXmlSerializable.md",
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "category": "Usage"
+              }
+            },
+            {
+              "id": "AL1009",
+              "name": "LockKeyword",
+              "shortDescription": {
+                "text": "Avoid lock keyword on non-Lock types"
+              },
+              "fullDescription": {
+                "text": "The lock keyword on object/non-Lock types should be replaced with the Lock class from System.Threading."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1009_LockKeyword.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Threading"
+              }
+            },
+            {
+              "id": "AL1010",
+              "name": "PreferPatternMatching",
+              "shortDescription": {
+                "text": "Prefer pattern matching for null and zero comparisons"
+              },
+              "fullDescription": {
+                "text": "Pattern matching syntax (is/is not) is more expressive and idiomatic. For null checks, it also bypasses overloaded equality operators."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1010_PreferPatternMatching.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Style"
+              }
+            },
+            {
+              "id": "AL1011",
+              "name": "NormalizeNullGuardStyle",
+              "shortDescription": {
+                "text": "Normalize null-guard style"
+              },
+              "fullDescription": {
+                "text": "Null-guards should be normalized to the preferred project style (Throw, BCL, or Portable)."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1011_NormalizeNullGuardStyle.md",
+              "defaultConfiguration": {
+                "level": "note"
+              },
+              "properties": {
+                "category": "Style"
+              }
+            },
+            {
+              "id": "AL1012",
+              "name": "CombineDeclarationWithNullCheck",
+              "shortDescription": {
+                "text": "Combine declaration with subsequent null-check"
+              },
+              "fullDescription": {
+                "text": "Combines a variable declaration and an immediate null-check into a single pattern match."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1012_CombineDeclarationWithNullCheck.md",
+              "defaultConfiguration": {
+                "level": "note"
+              },
+              "properties": {
+                "category": "Style"
+              }
+            },
+            {
+              "id": "AL1100",
+              "name": "ToAl1104FormBinding",
+              "shortDescription": {
+                "text": "IFormCollection requires explicit attribute"
+              },
+              "fullDescription": {
+                "text": "IFormCollection parameters must have an explicit [FromForm] attribute. Unlike IFormFile which auto-binds, IFormCollection requires explicit attribution for clarity and safety."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1100_ToAl1104FormBinding.md",
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "category": "ASP.NET Core"
+              }
+            },
+            {
+              "id": "AL1101",
+              "name": "ToAl1104FormBinding",
+              "shortDescription": {
+                "text": "Multiple structured form sources"
+              },
+              "fullDescription": {
+                "text": "An endpoint can only have one structured form source. Multiple [FromForm] DTOs or IFormCollections create ambiguity about which parameter receives the form data."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1101_ToAl1104FormBinding.md",
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "category": "ASP.NET Core"
+              }
+            },
+            {
+              "id": "AL1102",
+              "name": "ToAl1104FormBinding",
+              "shortDescription": {
+                "text": "Mixed form collection and DTO"
+              },
+              "fullDescription": {
+                "text": "Mixing IFormCollection with a [FromForm] DTO is not supported. Choose one approach: use IFormCollection for dynamic form access or a typed DTO for structured binding."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1102_ToAl1104FormBinding.md",
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "category": "ASP.NET Core"
+              }
+            },
+            {
+              "id": "AL1103",
+              "name": "ToAl1104FormBinding",
+              "shortDescription": {
+                "text": "Unsupported form type"
+              },
+              "fullDescription": {
+                "text": "[FromForm] can only bind primitives, primitive collections, or DTOs with a parameterless constructor or primary constructor with all-primitive parameters."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1103_ToAl1104FormBinding.md",
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "category": "ASP.NET Core"
+              }
+            },
+            {
+              "id": "AL1104",
+              "name": "ToAl1104FormBinding",
+              "shortDescription": {
+                "text": "Form and body conflict"
+              },
+              "fullDescription": {
+                "text": "An HTTP request body can only be consumed once. Mixing [FromForm] and [FromBody] parameters in the same endpoint is not supported."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1104_ToAl1104FormBinding.md",
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "category": "ASP.NET Core"
+              }
+            },
+            {
+              "id": "AL1105",
+              "name": "MissingResilienceConfiguration",
+              "shortDescription": {
+                "text": "Missing resilience configuration"
+              },
+              "fullDescription": {
+                "text": "HTTP clients should be configured with resilience policies to handle transient failures gracefully. Use AddStandardResilienceHandler() from Microsoft.Extensions.Http.Resilience or AddResilienceHandler() with custom Polly policies. This ensures automatic retries, timeouts, and circuit breakers for improved reliability."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1105_MissingResilienceConfiguration.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "ASP.NET Core"
+              }
+            },
+            {
+              "id": "AL1106",
+              "name": "MissingHealthChecks",
+              "shortDescription": {
+                "text": "Missing health checks"
+              },
+              "fullDescription": {
+                "text": "Health checks are essential for container orchestration platforms (Kubernetes, Docker Swarm) to determine service availability. Add builder.Services.AddHealthChecks() and app.MapHealthChecks() to expose /health endpoints for liveness and readiness probes."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1106_MissingHealthChecks.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "ASP.NET Core"
+              }
+            },
+            {
+              "id": "AL1107",
+              "name": "ConsiderConnectionString",
+              "shortDescription": {
+                "text": "Consider using configuration for connection string"
+              },
+              "fullDescription": {
+                "text": "Connection strings should be loaded from configuration (appsettings.json, environment variables, or secrets) rather than hardcoded. This enables different connection strings per environment (dev/staging/production) and avoids committing sensitive credentials to source control."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1107_ConsiderConnectionString.md",
+              "defaultConfiguration": {
+                "level": "note"
+              },
+              "properties": {
+                "category": "Configuration"
+              }
+            },
+            {
+              "id": "AL1108",
+              "name": "MissingServiceDiscovery",
+              "shortDescription": {
+                "text": "Missing service discovery"
+              },
+              "fullDescription": {
+                "text": "Hardcoded URLs in HttpClient.BaseAddress or service client configuration reduce flexibility and complicate deployment across environments. When using .NET Aspire or service discovery libraries, use service names (e.g., \u0027http\u002Bhttps://apiservice\u0027) that resolve to actual endpoints at runtime. This enables automatic endpoint discovery, load balancing, and environment-specific configuration."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1108_MissingServiceDiscovery.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "ASP.NET Core"
+              }
+            },
+            {
+              "id": "AL1109",
+              "name": "AvoidTaskRunInAspNetCore",
+              "shortDescription": {
+                "text": "Avoid Task.Run in ASP.NET Core request handlers"
+              },
+              "fullDescription": {
+                "text": "ASP.NET Core request handling already runs on thread pool threads. Using Task.Run to offload work to another thread pool thread adds scheduling overhead and context switching without benefit. For CPU-bound work that genuinely needs to not block the request, consider using a background service or suppress this diagnostic with a justification."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1109_AvoidTaskRunInAspNetCore.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "ASP.NET Core"
+              }
+            },
+            {
+              "id": "AL1200",
+              "name": "UseIsEqualTo",
+              "shortDescription": {
+                "text": "Use IsEqualTo extension"
+              },
+              "fullDescription": {
+                "text": "Use IsEqualTo extension instead of SymbolEqualityComparer.Default.Equals for cleaner symbol comparison."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1200_UseIsEqualTo.md",
+              "defaultConfiguration": {
+                "level": "note"
+              },
+              "properties": {
+                "category": "Roslyn Utilities"
+              }
+            },
+            {
+              "id": "AL1201",
+              "name": "UseHasAttribute",
+              "shortDescription": {
+                "text": "Use HasAttribute extension"
+              },
+              "fullDescription": {
+                "text": "Use HasAttribute extension instead of GetAttributes() LINQ queries or foreach loops for cleaner attribute checking."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1201_UseHasAttribute.md",
+              "defaultConfiguration": {
+                "level": "note"
+              },
+              "properties": {
+                "category": "Roslyn Utilities"
+              }
+            },
+            {
+              "id": "AL1202",
+              "name": "UseTypeHierarchy",
+              "shortDescription": {
+                "text": "Use type hierarchy extension"
+              },
+              "fullDescription": {
+                "text": "Use Implements or InheritsFrom extensions instead of manual AllInterfaces/BaseType iteration loops."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1202_UseTypeHierarchy.md",
+              "defaultConfiguration": {
+                "level": "note"
+              },
+              "properties": {
+                "category": "Roslyn Utilities"
+              }
+            },
+            {
+              "id": "AL1203",
+              "name": "UseOperationExtensions",
+              "shortDescription": {
+                "text": "Use operation extension"
+              },
+              "fullDescription": {
+                "text": "Use IsMethodNamed or TryGetConstantValue extensions instead of verbose property access patterns."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1203_UseOperationExtensions.md",
+              "defaultConfiguration": {
+                "level": "note"
+              },
+              "properties": {
+                "category": "Roslyn Utilities"
+              }
+            },
+            {
+              "id": "AL1204",
+              "name": "UseOrEmpty",
+              "shortDescription": {
+                "text": "Use OrEmpty extension"
+              },
+              "fullDescription": {
+                "text": "Use OrEmpty() extension instead of null-coalescing with Array.Empty, Enumerable.Empty, or collection expressions."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1204_UseOrEmpty.md",
+              "defaultConfiguration": {
+                "level": "note"
+              },
+              "properties": {
+                "category": "Roslyn Utilities"
+              }
+            },
+            {
+              "id": "AL1205",
+              "name": "UseToImmutableArrayOrEmpty",
+              "shortDescription": {
+                "text": "Use ToImmutableArrayOrEmpty extension"
+              },
+              "fullDescription": {
+                "text": "Use ToImmutableArrayOrEmpty() extension instead of null-conditional ToImmutableArray() with ImmutableArray.Empty fallback."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1205_UseToImmutableArrayOrEmpty.md",
+              "defaultConfiguration": {
+                "level": "note"
+              },
+              "properties": {
+                "category": "Roslyn Utilities"
+              }
+            },
+            {
+              "id": "AL1206",
+              "name": "UseWhereNotNull",
+              "shortDescription": {
+                "text": "Use WhereNotNull extension"
+              },
+              "fullDescription": {
+                "text": "Use WhereNotNull() extension instead of Where(x =\u003E x != null) or Where(x =\u003E x is not null)."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1206_UseWhereNotNull.md",
+              "defaultConfiguration": {
+                "level": "note"
+              },
+              "properties": {
+                "category": "Roslyn Utilities"
+              }
+            },
+            {
+              "id": "AL1207",
+              "name": "UseToDisplayStringExtensions",
+              "shortDescription": {
+                "text": "Use symbol display string extension"
+              },
+              "fullDescription": {
+                "text": "Use GetFullyQualifiedName() or GetMetadataName() extensions instead of ToDisplayString with SymbolDisplayFormat constants."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1207_UseToDisplayStringExtensions.md",
+              "defaultConfiguration": {
+                "level": "note"
+              },
+              "properties": {
+                "category": "Roslyn Utilities"
+              }
+            },
+            {
+              "id": "AL1208",
+              "name": "UseGuardNotNull",
+              "shortDescription": {
+                "text": "Use null-guard helper"
+              },
+              "fullDescription": {
+                "text": "Use null-guard helpers (Throw.IfNull or Guard.NotNull) instead of verbose null-coalescing throw new ArgumentNullException patterns."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1208_UseGuardNotNull.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Roslyn Utilities"
+              }
+            },
+            {
+              "id": "AL1209",
+              "name": "UseTryParseExtensions",
+              "shortDescription": {
+                "text": "Use TryParse extension"
+              },
+              "fullDescription": {
+                "text": "Use TryParse extension methods (TryParseInt32, TryParseGuid, etc.) instead of verbose Type.TryParse ternary patterns."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1209_UseTryParseExtensions.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Roslyn Utilities"
+              }
+            },
+            {
+              "id": "AL1210",
+              "name": "UseStringComparisonExtensions",
+              "shortDescription": {
+                "text": "Use StringComparison extension"
+              },
+              "fullDescription": {
+                "text": "Use StringComparison extensions (EqualsOrdinal, ContainsIgnoreCase, etc.) instead of methods with StringComparison enum parameter."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1210_UseStringComparisonExtensions.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Roslyn Utilities"
+              }
+            },
+            {
+              "id": "AL1211",
+              "name": "UseAttributeExtensions",
+              "shortDescription": {
+                "text": "Use attribute argument extraction extension"
+              },
+              "fullDescription": {
+                "text": "Use GetConstructorArgument or GetNamedArgument extensions instead of direct array access on AttributeData."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1211_UseAttributeExtensions.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Roslyn Utilities"
+              }
+            },
+            {
+              "id": "AL1212",
+              "name": "UseGuardNotNullOrEmpty",
+              "shortDescription": {
+                "text": "Use null-or-empty guard helper"
+              },
+              "fullDescription": {
+                "text": "Use Guard.NotNullOrEmpty() instead of verbose if (string.IsNullOrEmpty(...)) throw new ArgumentNullException/ArgumentException patterns."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1212_UseGuardNotNullOrEmpty.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Roslyn Utilities"
+              }
+            },
+            {
+              "id": "AL1213",
+              "name": "UseGuardNotNullOrWhiteSpace",
+              "shortDescription": {
+                "text": "Use null-or-whitespace guard helper"
+              },
+              "fullDescription": {
+                "text": "Use Guard.NotNullOrWhiteSpace() instead of verbose if (string.IsNullOrWhiteSpace(...)) throw new ArgumentNullException/ArgumentException patterns."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1213_UseGuardNotNullOrWhiteSpace.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Roslyn Utilities"
+              }
+            },
+            {
+              "id": "AL1214",
+              "name": "UseGuardNotZero",
+              "shortDescription": {
+                "text": "Use zero-guard helper"
+              },
+              "fullDescription": {
+                "text": "Use Guard.NotZero() instead of verbose if (x == 0) throw new ArgumentOutOfRangeException patterns."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1214_UseGuardNotZero.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Roslyn Utilities"
+              }
+            },
+            {
+              "id": "AL1215",
+              "name": "UseGuardNotNegative",
+              "shortDescription": {
+                "text": "Use non-negative guard helper"
+              },
+              "fullDescription": {
+                "text": "Use Guard.NotNegative() instead of verbose if (x \u003C 0) throw new ArgumentOutOfRangeException patterns."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1215_UseGuardNotNegative.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Roslyn Utilities"
+              }
+            },
+            {
+              "id": "AL1216",
+              "name": "UseGuardPositive",
+              "shortDescription": {
+                "text": "Use positive-guard helper"
+              },
+              "fullDescription": {
+                "text": "Use Guard.Positive() instead of verbose if (x \u003C= 0) throw new ArgumentOutOfRangeException patterns."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1216_UseGuardPositive.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Roslyn Utilities"
+              }
+            },
+            {
+              "id": "AL1217",
+              "name": "UseGuardNotEmptyGuid",
+              "shortDescription": {
+                "text": "Use empty-guid guard helper"
+              },
+              "fullDescription": {
+                "text": "Use Guard.NotEmpty() instead of verbose if (guid == Guid.Empty) throw new ArgumentException patterns."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1217_UseGuardNotEmptyGuid.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Roslyn Utilities"
+              }
+            },
+            {
+              "id": "AL1218",
+              "name": "UseGuardDefinedEnum",
+              "shortDescription": {
+                "text": "Use defined-enum guard helper"
+              },
+              "fullDescription": {
+                "text": "Use Guard.DefinedEnum() instead of verbose if (!Enum.IsDefined) throw new ArgumentException/ArgumentOutOfRangeException patterns."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1218_UseGuardDefinedEnum.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Roslyn Utilities"
+              }
+            },
+            {
+              "id": "AL1219",
+              "name": "UseStringComparisonAnyExtensions",
+              "shortDescription": {
+                "text": "Use *Any* string comparison extension"
+              },
+              "fullDescription": {
+                "text": "Chained string equality comparisons (s == \u0022a\u0022 || s == \u0022b\u0022) can be collapsed into a single EqualsAnyOrdinal/EqualsAnyIgnoreCase call."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1219_UseStringComparisonAnyExtensions.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Roslyn Utilities"
+              }
+            },
+            {
+              "id": "AL1220",
+              "name": "UseGuardForThrowIf",
+              "shortDescription": {
+                "text": "Use Guard.* helpers instead of throw helpers"
+              },
+              "fullDescription": {
+                "text": "The BCL throw helpers on ArgumentNullException, ArgumentException, and ArgumentOutOfRangeException \u2014 and the Microsoft.Shared.Diagnostics.Throw.If* helpers from Microsoft Agent Framework \u2014 only throw; they don\u0027t return the validated value, so they can\u0027t be used in expressions, member initialisers, or chained validation. The Guard.* helpers from ANcpLua.Roslyn.Utilities return the validated value, share the same [CallerArgumentExpression] parameter-name machinery, and compose. Covers BCL ThrowIfNull / NullOrEmpty / NullOrWhiteSpace and the seven ArgumentOutOfRangeException.ThrowIf* helpers, plus MAF Throw.IfNull / IfNullOrMemberNull / IfNullOrEmpty / IfNullOrWhitespace / IfZero / IfLessThan / IfGreaterThan / IfLessThanOrEqual / IfGreaterThanOrEqual / IfOutOfRange. Cold-path-only Throw.ArgumentNullException / ArgumentOutOfRangeException / ArgumentException / InvalidOperationException are intentionally out of scope \u2014 they don\u0027t validate, just throw. Banned in qyl-aligned projects via BannedSymbols.txt; this analyzer carries the matching auto-fix."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1220_UseGuardForThrowIf.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Roslyn Utilities"
+              }
+            },
+            {
+              "id": "AL1300",
+              "name": "ToAl1303Threading",
+              "shortDescription": {
+                "text": "Avoid async void methods"
+              },
+              "fullDescription": {
+                "text": "Async void methods cannot be awaited, exceptions cannot be caught by the caller, and they complicate unit testing. Use async Task instead, unless the method is an event handler."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1300_ToAl1303Threading.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Threading"
+              }
+            },
+            {
+              "id": "AL1301",
+              "name": "ToAl1303Threading",
+              "shortDescription": {
+                "text": "Avoid lock on \u0027this\u0027"
+              },
+              "fullDescription": {
+                "text": "Locking on \u0027this\u0027 exposes the lock object to external code. Any code with a reference to this instance can lock on it, potentially causing deadlocks. Use a private readonly object field instead."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1301_ToAl1303Threading.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Threading"
+              }
+            },
+            {
+              "id": "AL1302",
+              "name": "ToAl1303Threading",
+              "shortDescription": {
+                "text": "Avoid lock on typeof(T)"
+              },
+              "fullDescription": {
+                "text": "Type objects obtained from typeof() are globally visible singletons. Any code can obtain the same Type object and lock on it, potentially causing deadlocks. Use a private static readonly object field instead."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1302_ToAl1303Threading.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Threading"
+              }
+            },
+            {
+              "id": "AL1303",
+              "name": "ToAl1303Threading",
+              "shortDescription": {
+                "text": "Avoid lock on string"
+              },
+              "fullDescription": {
+                "text": "String literals are interned by the CLR, meaning identical strings across different assemblies share the same object reference. Locking on a string creates cross-assembly synchronization that is rarely intended and can cause deadlocks. Use a private readonly object field instead."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1303_ToAl1303Threading.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Threading"
+              }
+            },
+            {
+              "id": "AL1304",
+              "name": "PreferAwaitUsing",
+              "shortDescription": {
+                "text": "Prefer \u0027await using\u0027 for IAsyncDisposable"
+              },
+              "fullDescription": {
+                "text": "Types implementing IAsyncDisposable should be disposed with \u0027await using\u0027 in async methods. Using \u0027using\u0027 calls the synchronous Dispose() method instead of DisposeAsync(), which may skip async cleanup such as flushing buffers, closing network connections, or finalizing telemetry export."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1304_PreferAwaitUsing.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Reliability"
+              }
+            },
+            {
+              "id": "AL1305",
+              "name": "AvoidBlockingCallsInAsync",
+              "shortDescription": {
+                "text": "Avoid blocking calls in async methods"
+              },
+              "fullDescription": {
+                "text": "Calling .Result, .Wait(), or .GetAwaiter().GetResult() on a Task inside an async method blocks the thread pool thread and can cause deadlocks when a SynchronizationContext is present (ASP.NET, WPF). Use \u0027await\u0027 instead to asynchronously wait for the result."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1305_AvoidBlockingCallsInAsync.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Threading"
+              }
+            },
+            {
+              "id": "AL1306",
+              "name": "SqlInterpolationInCommandText",
+              "shortDescription": {
+                "text": "Avoid SQL string interpolation in CommandText"
+              },
+              "fullDescription": {
+                "text": "String interpolation in SQL CommandText can lead to SQL injection vulnerabilities. Use parameterized queries with placeholders ($1, @param) instead of interpolating values directly."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1306_SqlInterpolationInCommandText.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Reliability"
+              }
+            },
+            {
+              "id": "AL1307",
+              "name": "FireAndForgetTask",
+              "shortDescription": {
+                "text": "Avoid fire-and-forget task discard"
+              },
+              "fullDescription": {
+                "text": "Discarding a Task with _ = causes fire-and-forget behavior where exceptions are silently lost. Await the task, store it for later observation, or add a continuation with error handling."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1307_FireAndForgetTask.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Reliability"
+              }
+            },
+            {
+              "id": "AL1308",
+              "name": "PreferTryParse",
+              "shortDescription": {
+                "text": "Prefer TryParse over Parse"
+              },
+              "fullDescription": {
+                "text": "Parse methods throw FormatException on invalid input. Use TryParse to safely handle invalid input without exceptions, especially when processing user input or external data."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1308_PreferTryParse.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Reliability"
+              }
+            },
+            {
+              "id": "AL1309",
+              "name": "EmptyCatchBlock",
+              "shortDescription": {
+                "text": "Empty catch block swallows exceptions"
+              },
+              "fullDescription": {
+                "text": "Empty catch blocks silently swallow exceptions, making bugs invisible. At minimum, log the exception. If the exception is truly expected, add a comment explaining why it is safe to ignore."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1309_EmptyCatchBlock.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Reliability"
+              }
+            },
+            {
+              "id": "AL1310",
+              "name": "ExceptionLeakedInResponse",
+              "shortDescription": {
+                "text": "Exception details leaked in HTTP response"
+              },
+              "fullDescription": {
+                "text": "Returning exception messages, stack traces, or ToString() output in HTTP responses can expose sensitive implementation details. Return a generic error message and log the exception server-side."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1310_ExceptionLeakedInResponse.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Reliability"
+              }
+            },
+            {
+              "id": "AL1311",
+              "name": "UnnecessaryLinqMaterialization",
+              "shortDescription": {
+                "text": "Unnecessary LINQ materialization"
+              },
+              "fullDescription": {
+                "text": "Calling ToList() or ToArray() immediately after Where(), Select(), or other LINQ operators forces eager evaluation. If the result is only enumerated once, deferred execution avoids allocating an intermediate collection."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1311_UnnecessaryLinqMaterialization.md",
+              "defaultConfiguration": {
+                "level": "note"
+              },
+              "properties": {
+                "category": "Usage"
+              }
+            },
+            {
+              "id": "AL1312",
+              "name": "ReadModifyWriteWithoutTransaction",
+              "shortDescription": {
+                "text": "Read-modify-write without transaction"
+              },
+              "fullDescription": {
+                "text": "A method that reads data and then writes based on that data without a transaction is vulnerable to race conditions. Another connection could modify the data between the read and write. Use BeginTransaction/BeginTransactionAsync to ensure isolation."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1312_ReadModifyWriteWithoutTransaction.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Reliability"
+              }
+            },
+            {
+              "id": "AL1313",
+              "name": "CancellationTokenPropagation",
+              "shortDescription": {
+                "text": "Forward CancellationToken to invocations that support it"
+              },
+              "fullDescription": {
+                "text": "When a CancellationToken is available in scope and the invoked method has an overload accepting one, forward it to enable cooperative cancellation."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1313_CancellationTokenPropagation.md",
+              "defaultConfiguration": {
+                "level": "note"
+              },
+              "properties": {
+                "category": "Reliability"
+              }
+            },
+            {
+              "id": "AL1314",
+              "name": "UseExplicitMidpointRounding",
+              "shortDescription": {
+                "text": "Use Math.Round/MathF.Round overload with explicit MidpointRounding"
+              },
+              "fullDescription": {
+                "text": "Math.Round / MathF.Round overloads without a MidpointRounding argument default to ToEven (banker\u0027s rounding). Pass MidpointRounding.ToEven to preserve current behavior explicitly, or choose AwayFromZero or another mode when the domain requires it. The auto-fix appends MidpointRounding.ToEven to avoid changing runtime behavior."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1314_UseExplicitMidpointRounding.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Reliability"
+              }
+            },
+            {
+              "id": "AL1400",
+              "name": "AotTestMustReturnInt",
+              "shortDescription": {
+                "text": "Method with [AotTest] or [TrimTest] must return int"
+              },
+              "fullDescription": {
+                "text": "Methods decorated with [AotTest] or [TrimTest] attributes must return int as their exit code. The test harness expects an integer return value to determine success or failure."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1400_AotTestMustReturnInt.md",
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "category": "AOT Testing"
+              }
+            },
+            {
+              "id": "AL1401",
+              "name": "AotTestExitCode100",
+              "shortDescription": {
+                "text": "[AotTest]/[TrimTest] method should return 100 on success"
+              },
+              "fullDescription": {
+                "text": "By convention, AOT/Trim test methods should return 100 to indicate success. Other values are reserved for failure conditions."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1401_AotTestExitCode100.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "AOT Testing"
+              }
+            },
+            {
+              "id": "AL1402",
+              "name": "TrimSafeViolation",
+              "shortDescription": {
+                "text": "[TrimSafe] code must not call methods with [RequiresUnreferencedCode]"
+              },
+              "fullDescription": {
+                "text": "Code marked with [TrimSafe] guarantees it will work correctly in trimmed applications. Calling methods with [RequiresUnreferencedCode] violates this guarantee because those methods may fail at runtime when types are trimmed."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1402_TrimSafeViolation.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "AOT Testing"
+              }
+            },
+            {
+              "id": "AL1403",
+              "name": "AotSafeViolation",
+              "shortDescription": {
+                "text": "[AotSafe] code must not call methods with [RequiresDynamicCode]"
+              },
+              "fullDescription": {
+                "text": "Code marked with [AotSafe] guarantees it will work correctly in AOT-compiled applications. Calling methods with [RequiresDynamicCode] violates this guarantee because those methods rely on runtime code generation which is not available in AOT scenarios."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1403_AotSafeViolation.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "AOT Testing"
+              }
+            },
+            {
+              "id": "AL1404",
+              "name": "AotSafeCallsAotUnsafe",
+              "shortDescription": {
+                "text": "[AotSafe] code must not call [AotUnsafe] code"
+              },
+              "fullDescription": {
+                "text": "Code marked with [AotSafe] guarantees it will work correctly in AOT-compiled applications. Calling methods marked with [AotUnsafe] violates this guarantee because [AotUnsafe] code explicitly declares it requires JIT compilation."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1404_AotSafeCallsAotUnsafe.md",
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "category": "AOT Testing"
+              }
+            },
+            {
+              "id": "AL1405",
+              "name": "UnnecessaryAotUnsafe",
+              "shortDescription": {
+                "text": "Unnecessary [AotUnsafe] attribute"
+              },
+              "fullDescription": {
+                "text": "The [AotUnsafe] attribute should only be applied to code that actually uses AOT-incompatible patterns such as reflection, dynamic code generation, or calls to methods with [RequiresDynamicCode]. Consider removing the attribute if the code is AOT-compatible."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1405_UnnecessaryAotUnsafe.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "AOT Testing"
+              }
+            },
+            {
+              "id": "AL1406",
+              "name": "AvoidDynamicKeyword",
+              "shortDescription": {
+                "text": "Avoid \u0027dynamic\u0027 keyword in AOT-published code"
+              },
+              "fullDescription": {
+                "text": "The \u0027dynamic\u0027 keyword requires System.Reflection.Emit at runtime to generate call sites, which is not available in Native AOT. Replace with statically typed alternatives such as interfaces, generics, or pattern matching."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1406_AvoidDynamicKeyword.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "AOT Testing"
+              }
+            },
+            {
+              "id": "AL1407",
+              "name": "AvoidExpressionCompile",
+              "shortDescription": {
+                "text": "Avoid Expression.Compile() in AOT context"
+              },
+              "fullDescription": {
+                "text": "Expression.Compile() and Expression.CompileToMethod() rely on System.Reflection.Emit to generate IL at runtime. In Native AOT, these fall back to an interpreted mode that is significantly slower. Consider using source generators, direct code, or compile-time expression evaluation instead."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1407_AvoidExpressionCompile.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "AOT Testing"
+              }
+            },
+            {
+              "id": "AL1408",
+              "name": "AvoidActivatorCreateInstance",
+              "shortDescription": {
+                "text": "Activator.CreateInstance is not AOT-safe"
+              },
+              "fullDescription": {
+                "text": "Activator.CreateInstance uses reflection to create instances at runtime. In Native AOT, this requires the target type\u0027s constructor to be preserved. Use explicit construction, factory patterns, or annotate with [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructors)]."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1408_AvoidActivatorCreateInstance.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "AOT Testing"
+              }
+            },
+            {
+              "id": "AL1409",
+              "name": "AvoidTypeGetType",
+              "shortDescription": {
+                "text": "Type.GetType with dynamic name is not AOT-safe"
+              },
+              "fullDescription": {
+                "text": "Type.GetType(string) with a dynamic type name or case-insensitive search prevents the trimmer from statically analyzing which types to preserve. Use typeof() for compile-time type references. For string literals without case-insensitive search, the trimmer can analyze the call statically."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1409_AvoidTypeGetType.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "AOT Testing"
+              }
+            },
+            {
+              "id": "AL1500",
+              "name": "ClosedTypeHierarchySwitch",
+              "shortDescription": {
+                "text": "Closed hierarchy match is not exhaustive"
+              },
+              "fullDescription": {
+                "text": "All sealed subtypes of a closed hierarchy should be explicitly handled in switch expressions, switch statements, and Match\u003CT\u003E calls."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1500_ClosedTypeHierarchySwitch.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Design"
+              }
+            },
+            {
+              "id": "AL1501",
+              "name": "SymbolStoredInModel",
+              "shortDescription": {
+                "text": "Avoid storing ISymbol in source generator models"
+              },
+              "fullDescription": {
+                "text": "ISymbol types do not implement value equality. Storing them in source generator models causes the incremental generator cache to be invalidated on every keystroke, defeating the purpose of incremental generation. Extract the needed data as strings or primitive values instead."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1501_SymbolStoredInModel.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Roslyn Utilities"
+              }
+            },
+            {
+              "id": "AL1502",
+              "name": "UseIncrementalGenerator",
+              "shortDescription": {
+                "text": "Use IIncrementalGenerator instead of ISourceGenerator"
+              },
+              "fullDescription": {
+                "text": "ISourceGenerator (v1 API) runs on every keystroke without caching. IIncrementalGenerator provides an incremental pipeline with automatic caching, significantly improving IDE responsiveness."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1502_UseIncrementalGenerator.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Roslyn Utilities"
+              }
+            },
+            {
+              "id": "AL1503",
+              "name": "NormalizeWhitespace",
+              "shortDescription": {
+                "text": "Avoid NormalizeWhitespace in source generators"
+              },
+              "fullDescription": {
+                "text": "SyntaxFactory.NormalizeWhitespace() traverses the entire syntax tree to rewrite whitespace, which is expensive in source generators that run frequently. Use raw string literals or manual formatting instead."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1503_NormalizeWhitespace.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Roslyn Utilities"
+              }
+            },
+            {
+              "id": "AL1504",
+              "name": "DuckDbTableMustBePartial",
+              "shortDescription": {
+                "text": "[DuckDbTable] type must be partial"
+              },
+              "fullDescription": {
+                "text": "The DuckDbInsertGenerator source generator creates additional methods (AddParameters, MapFromReader, BuildMultiRowInsertSql) on types marked with [DuckDbTable]. The type must be partial so the generator can add these members."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1504_DuckDbTableMustBePartial.md",
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "category": "Design"
+              }
+            },
+            {
+              "id": "AL1505",
+              "name": "DuckDbColumnConflictingOrdinal",
+              "shortDescription": {
+                "text": "Conflicting [DuckDbColumn] ordinal values"
+              },
+              "fullDescription": {
+                "text": "Multiple properties in a [DuckDbTable] type have the same Ordinal value in their [DuckDbColumn] attribute. Each column must have a unique ordinal to ensure deterministic column ordering in generated SQL."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1505_DuckDbColumnConflictingOrdinal.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Design"
+              }
+            },
+            {
+              "id": "AL1600",
+              "name": "HardcodedPackageVersion",
+              "shortDescription": {
+                "text": "Hardcoded package version detected"
+              },
+              "fullDescription": {
+                "text": "Package versions should use MSBuild variables from Version.props for centralized version management. This ensures consistency across all projects and simplifies version updates."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1600_HardcodedPackageVersion.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "VersionManagement"
+              }
+            },
+            {
+              "id": "AL1601",
+              "name": "VersionPropsNotImported",
+              "shortDescription": {
+                "text": "Version.props not imported"
+              },
+              "fullDescription": {
+                "text": "Version.props should be imported in Directory.Build.props to enable centralized package version management using $(VariableName) syntax."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1601_VersionPropsNotImported.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "VersionManagement"
+              }
+            },
+            {
+              "id": "AL1602",
+              "name": "UndefinedVersionVariable",
+              "shortDescription": {
+                "text": "Undefined version variable"
+              },
+              "fullDescription": {
+                "text": "Version variables used in Directory.Packages.props must be defined in Version.props. Missing definitions cause silent build failures or empty version strings."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1602_UndefinedVersionVariable.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "VersionManagement"
+              }
+            },
+            {
+              "id": "AL1603",
+              "name": "ToAl1605DiagnosticsAlignment",
+              "shortDescription": {
+                "text": "Diagnostic missing from documentation"
+              },
+              "fullDescription": {
+                "text": "Diagnostics defined in Descriptors.cs should be documented in diagnostics.md."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1603_ToAl1605DiagnosticsAlignment.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "VersionManagement"
+              }
+            },
+            {
+              "id": "AL1604",
+              "name": "ToAl1605DiagnosticsAlignment",
+              "shortDescription": {
+                "text": "Diagnostic missing from release notes"
+              },
+              "fullDescription": {
+                "text": "Diagnostics defined in Descriptors.cs should be tracked in AnalyzerReleases.*.md."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1604_ToAl1605DiagnosticsAlignment.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "VersionManagement"
+              }
+            },
+            {
+              "id": "AL1605",
+              "name": "ToAl1605DiagnosticsAlignment",
+              "shortDescription": {
+                "text": "Diagnostic documentation mismatch"
+              },
+              "fullDescription": {
+                "text": "Diagnostic metadata should be consistent between Descriptors.cs and documentation."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1605_ToAl1605DiagnosticsAlignment.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "VersionManagement"
+              }
+            },
+            {
+              "id": "AL1606",
+              "name": "OutdatedMafPackageVersion",
+              "shortDescription": {
+                "text": "Outdated MAF ecosystem package version"
+              },
+              "fullDescription": {
+                "text": "Detects outdated Microsoft Agent Framework and related package versions. Update to the minimum required version to ensure compatibility with GA APIs and AIFunctionFactoryOptions."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1606_OutdatedMafPackageVersion.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "VersionManagement"
+              }
+            },
+            {
+              "id": "AL1700",
+              "name": "PreferStaticLambda",
+              "shortDescription": {
+                "text": "Anonymous function can be made static"
+              },
+              "fullDescription": {
+                "text": "Lambda expressions and anonymous methods that don\u0027t capture variables should be marked \u0027static\u0027 to avoid unnecessary allocations and improve performance."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1700_PreferStaticLambda.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Usage"
+              }
+            },
+            {
+              "id": "AL1701",
+              "name": "AvoidDateTimeNow",
+              "shortDescription": {
+                "text": "Avoid DateTime/DateTimeOffset time accessors"
+              },
+              "fullDescription": {
+                "text": "DateTime.Now/UtcNow and DateTimeOffset.Now/UtcNow make code difficult to test. Use TimeProvider.System.GetLocalNow() or GetUtcNow() instead, which can be mocked in tests."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1701_AvoidDateTimeNow.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Usage"
+              }
+            },
+            {
+              "id": "AL1702",
+              "name": "AvoidNewtonsoftJson",
+              "shortDescription": {
+                "text": "Avoid legacy JSON library"
+              },
+              "fullDescription": {
+                "text": "The legacy JSON library should be replaced with System.Text.Json for better performance and native .NET support."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1702_AvoidNewtonsoftJson.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Usage"
+              }
+            },
+            {
+              "id": "AL1703",
+              "name": "UseImplicitTypeWhenApparent",
+              "shortDescription": {
+                "text": "Use implicit type when type is apparent"
+              },
+              "fullDescription": {
+                "text": "Local variables should use var when the initializer already makes the type apparent. This keeps declarations short without hiding meaning."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1703_UseImplicitTypeWhenApparent.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "Style"
+              }
+            },
+            {
+              "id": "AL1800",
+              "name": "DestructiveToolMustRequireApproval",
+              "shortDescription": {
+                "text": "Destructive Loom tool must require approval"
+              },
+              "fullDescription": {
+                "text": "Loom tools with destructive side effects (WritesExternalState, MutatesCode, Deploys, ClosesIssue) must declare [RequiresApproval] to ensure governance gates are in place before execution."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1800_DestructiveToolMustRequireApproval.md",
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "GenAI"
+              }
+            },
+            {
+              "id": "AL1801",
+              "name": "ToolMustDeclareSideEffect",
+              "shortDescription": {
+                "text": "Loom tool should declare its side effect"
+              },
+              "fullDescription": {
+                "text": "Every Loom tool should declare its side effect via [ToolSideEffect] on the method or containing type so that governance policies can be enforced automatically."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1801_ToolMustDeclareSideEffect.md",
+              "defaultConfiguration": {
+                "level": "note"
+              },
+              "properties": {
+                "category": "GenAI"
+              }
+            },
+            {
+              "id": "AL1802",
+              "name": "ToolMustDeclareCapability",
+              "shortDescription": {
+                "text": "Loom tool should declare required capabilities"
+              },
+              "fullDescription": {
+                "text": "Every Loom tool should declare its required capabilities via [RequiresCapability] on the method or containing type to enable fine-grained access control."
+              },
+              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1802_ToolMustDeclareCapability.md",
+              "defaultConfiguration": {
+                "level": "note"
+              },
+              "properties": {
+                "category": "GenAI"
+              }
+            }
+          ]
+        }
+      },
+      "results": []
+    }
+  ]
+}

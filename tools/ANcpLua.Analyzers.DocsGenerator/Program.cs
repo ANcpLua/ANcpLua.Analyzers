@@ -4,6 +4,8 @@
 using System.Collections.Immutable;
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using ANcpLua.Analyzers;
 using Microsoft.CodeAnalysis;
@@ -132,9 +134,24 @@ file static class DocsGenerator
             }
         }
 
+        // (4) SARIF v2.1.0 rule manifest for tool interop (Sonar bridges, GitHub
+        // Advanced Security uploads, IDE rule catalogs).
+        var sarifPath = SarifPath(repoRoot);
+        if (!File.Exists(sarifPath))
+        {
+            Console.Error.WriteLine($"Missing SARIF manifest: {Path.GetRelativePath(repoRoot, sarifPath)}");
+            return 1;
+        }
+        if (!string.Equals(File.ReadAllText(sarifPath), RenderSarif(descriptors, idToClass), StringComparison.Ordinal))
+        {
+            Console.Error.WriteLine($"SARIF manifest is stale: {Path.GetRelativePath(repoRoot, sarifPath)}");
+            return 1;
+        }
+
         Console.WriteLine($"Index docs are up to date: {Path.GetRelativePath(repoRoot, outputPath)}");
         Console.WriteLine($"Per-rule pages are up to date ({descriptors.Count}).");
         Console.WriteLine("Editorconfig profiles are up to date.");
+        Console.WriteLine($"SARIF manifest is up to date: {Path.GetRelativePath(repoRoot, sarifPath)}");
         Console.WriteLine("HelpLinkUri values match per-rule page URLs.");
         return 0;
     }
@@ -175,6 +192,11 @@ file static class DocsGenerator
         }
         Console.WriteLine($"Wrote {descriptors.Count} per-rule pages under docs/rules/");
 
+        // SARIF v2.1.0 rule manifest.
+        var sarifPath = SarifPath(repoRoot);
+        File.WriteAllText(sarifPath, RenderSarif(descriptors, idToClass));
+        Console.WriteLine($"Wrote {Path.GetRelativePath(repoRoot, sarifPath)}");
+
         // Editorconfig profiles (unchanged).
         foreach (var (path, content) in EnumerateEditorconfigProfiles(repoRoot, descriptors))
         {
@@ -184,6 +206,82 @@ file static class DocsGenerator
         }
         return 0;
     }
+
+    private static string SarifPath(string repoRoot) =>
+        Path.Combine(repoRoot, "docs", PackageName + ".sarif");
+
+    /// <summary>
+    ///   Emits a SARIF v2.1.0 rule manifest describing every <see cref="DiagnosticDescriptor"/>
+    ///   this package ships. Each descriptor maps to one <c>reportingDescriptor</c> entry
+    ///   inside <c>runs[0].tool.driver.rules</c>. The file is run-results-free —
+    ///   <c>runs[0].results</c> is empty — because this is a *rule catalog* for tool
+    ///   interop (Sonar bridges, GitHub Advanced Security uploads, IDE rule catalogs),
+    ///   not an analyzer execution result. Indent + sort-by-id keeps the output
+    ///   deterministic for <c>--check</c> drift detection.
+    ///
+    ///   Spec: https://docs.oasis-open.org/sarif/sarif/v2.1.0/sarif-v2.1.0.html
+    /// </summary>
+    private static string RenderSarif(
+        IReadOnlyList<DiagnosticDescriptor> descriptors,
+        Dictionary<string, string> idToClass)
+    {
+        var rulesArray = new JsonArray();
+        foreach (var d in descriptors)
+        {
+            var ruleName = idToClass.TryGetValue(d.Id, out var className)
+                ? ToSymbolicName(className)
+                : d.Id;
+
+            var rule = new JsonObject
+            {
+                ["id"] = d.Id,
+                ["name"] = ruleName,
+                ["shortDescription"] = new JsonObject { ["text"] = d.Title.ToString() },
+                ["fullDescription"] = new JsonObject { ["text"] = d.Description.ToString() },
+                ["helpUri"] = d.HelpLinkUri,
+            };
+
+            var defaultConfig = new JsonObject { ["level"] = SarifLevel(d.DefaultSeverity) };
+            if (!d.IsEnabledByDefault)
+                defaultConfig["enabled"] = false;
+            rule["defaultConfiguration"] = defaultConfig;
+
+            rule["properties"] = new JsonObject { ["category"] = d.Category };
+            rulesArray.Add(rule);
+        }
+
+        var doc = new JsonObject
+        {
+            ["$schema"] = "https://json.schemastore.org/sarif-2.1.0.json",
+            ["version"] = "2.1.0",
+            ["runs"] = new JsonArray(
+                new JsonObject
+                {
+                    ["tool"] = new JsonObject
+                    {
+                        ["driver"] = new JsonObject
+                        {
+                            ["name"] = PackageName,
+                            ["informationUri"] = "https://github.com/ANcpLua/ANcpLua.Analyzers",
+                            ["rules"] = rulesArray,
+                        },
+                    },
+                    ["results"] = new JsonArray(),
+                }),
+        };
+
+        var json = doc.ToJsonString(new JsonSerializerOptions { WriteIndented = true });
+        return json.ReplaceLineEndings("\n") + "\n";
+    }
+
+    private static string SarifLevel(DiagnosticSeverity severity) => severity switch
+    {
+        DiagnosticSeverity.Error => "error",
+        DiagnosticSeverity.Warning => "warning",
+        DiagnosticSeverity.Info => "note",
+        DiagnosticSeverity.Hidden => "none",
+        _ => "none",
+    };
 
     private static Mode ParseMode(string[] args)
     {
@@ -326,6 +424,7 @@ file static class DocsGenerator
         sb.AppendLine();
         sb.AppendLine("- [Per-rule pages](rules/) — one markdown file per `AL00xx`–`AL18xx` rule with severity, category, code-fix status, and description.");
         sb.AppendLine("- [Editorconfig profiles](editorconfig/) — three drop-in severity profiles: `Default`, `AllRulesAsErrors`, `AllRulesDisabled`. Same content ships inside the NuGet under `buildTransitive/editorconfig/`.");
+        sb.AppendLine($"- [SARIF rule manifest]({PackageName}.sarif) — SARIF v2.1.0 catalog of every `AL00xx`–`AL18xx` rule (id, name, severity, category, helpUri). Consume from Sonar bridges, GitHub Advanced Security uploads, or IDE rule-catalog tools.");
         sb.AppendLine("- [`AnalyzerReleases.Unshipped.md`](../src/ANcpLua.Analyzers/AnalyzerReleases.Unshipped.md) — release-tracking manifest with `ClassName` attribution per Microsoft NetAnalyzers convention.");
     }
 

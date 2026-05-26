@@ -129,6 +129,7 @@ The property is exposed via the analyzer NuGet's `buildTransitive/ANcpLua.Analyz
 
 - [Per-rule pages](rules/) — one markdown file per `AL00xx`–`AL18xx` rule with severity, category, code-fix status, and description.
 - [Editorconfig profiles](editorconfig/) — three drop-in severity profiles: `Default`, `AllRulesAsErrors`, `AllRulesDisabled`. Same content ships inside the NuGet under `buildTransitive/editorconfig/`.
+- [SARIF rule manifest](ANcpLua.Analyzers.sarif) — SARIF v2.1.0 catalog of every `AL00xx`–`AL18xx` rule (id, name, severity, category, helpUri). Consume from Sonar bridges, GitHub Advanced Security uploads, or IDE rule-catalog tools.
 - [`AnalyzerReleases.Unshipped.md`](../src/ANcpLua.Analyzers/AnalyzerReleases.Unshipped.md) — release-tracking manifest with `ClassName` attribution per Microsoft NetAnalyzers convention.
 
 ## Generated File
