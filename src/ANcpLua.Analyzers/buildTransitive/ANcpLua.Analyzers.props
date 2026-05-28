@@ -23,7 +23,7 @@
 
     The editorconfig profiles below are emitted by tools/ANcpLua.Analyzers.DocsGenerator
     and packed into this NuGet alongside the .dll. Regenerate with
-    `dotnet run --project tools/ANcpLua.Analyzers.DocsGenerator`.
+    `dotnet run -project tools/ANcpLua.Analyzers.DocsGenerator`.
   -->
 
   <ItemGroup Condition=" '$(AlAnalysisMode)' == 'Default' ">
