@@ -77,6 +77,10 @@
     <JonSkeetAnalyzersVersion>1.0.0-beta.6</JonSkeetAnalyzersVersion>
   </PropertyGroup>
 
+  <PropertyGroup Label="Analyzer Testing">
+    <AnalyzerTestingVersion>1.1.3</AnalyzerTestingVersion>
+  </PropertyGroup>
+
   <!-- ═══════════════════════════════════════════════════════════════════════
        LEGACY ALIASES (backward compatibility)
        ═══════════════════════════════════════════════════════════════════════ -->
