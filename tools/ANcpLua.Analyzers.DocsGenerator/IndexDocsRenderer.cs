@@ -41,7 +41,8 @@ internal static class IndexDocsRenderer
         sb.AppendLine();
         sb.AppendLine("## Package family");
         sb.AppendLine();
-        sb.AppendLine("- **[ANcpLua.Analyzers](https://github.com/ANcpLua/ANcpLua.Analyzers)** — this package; the `AL00xx`–`AL18xx` Roslyn diagnostics.");
+        // renumber: post-2.0.0, AL ids live in AL10xx–AL18xx (sibling packages own AL0xxx).
+        sb.AppendLine("- **[ANcpLua.Analyzers](https://github.com/ANcpLua/ANcpLua.Analyzers)** — this package; the `AL10xx`–`AL18xx` Roslyn diagnostics.");
         sb.AppendLine("- **[ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk)** — MSBuild SDK that auto-injects this analyzer + the bundled `editorconfig` severity profile.");
         sb.AppendLine("- **[ANcpLua.Roslyn.Utilities](https://github.com/ANcpLua/ANcpLua.Roslyn.Utilities)** — shared Roslyn helpers + the `Guard.*` API the `AL12xx` band promotes.");
     }
@@ -72,7 +73,8 @@ internal static class IndexDocsRenderer
     {
         sb.AppendLine("## Consumer-side severity profile (`AlAnalysisMode`)");
         sb.AppendLine();
-        sb.AppendLine("Set `<AlAnalysisMode>` in your csproj to switch the whole `AL00xx`–`AL18xx` band in one line instead of dropping editorconfig files:");
+        // renumber: post-2.0.0 band; bump if the AL bands shift again.
+        sb.AppendLine("Set `<AlAnalysisMode>` in your csproj to switch the whole `AL10xx`–`AL18xx` band in one line instead of dropping editorconfig files:");
         sb.AppendLine();
         sb.AppendLine("```xml");
         sb.AppendLine("<PropertyGroup>");
@@ -91,9 +93,11 @@ internal static class IndexDocsRenderer
         sb.AppendLine();
         sb.AppendLine("## See also");
         sb.AppendLine();
-        sb.AppendLine("- [Per-rule pages](rules/) — one markdown file per `AL00xx`–`AL18xx` rule with severity, category, code-fix status, and description.");
+        // renumber: post-2.0.0 band references; bump if the AL bands shift again.
+        sb.AppendLine("- [Per-rule pages](rules/) — one markdown file per `AL10xx`–`AL18xx` rule with severity, category, code-fix status, and description.");
         sb.AppendLine("- [Editorconfig profiles](editorconfig/) — three drop-in severity profiles: `Default`, `AllRulesAsErrors`, `AllRulesDisabled`. Same content ships inside the NuGet under `buildTransitive/editorconfig/`.");
-        sb.AppendLine($"- [SARIF rule manifest]({RepoLayout.PackageName}.sarif) — SARIF v2.1.0 catalog of every `AL00xx`–`AL18xx` rule (id, name, severity, category, helpUri). Consume from Sonar bridges, GitHub Advanced Security uploads, or IDE rule-catalog tools.");
+        sb.AppendLine($"- [SARIF rule manifest]({RepoLayout.PackageName}.sarif) — SARIF v2.1.0 catalog of every `AL10xx`–`AL18xx` rule (id, name, severity, category, helpUri). Consume from Sonar bridges, GitHub Advanced Security uploads, or IDE rule-catalog tools.");
+        sb.AppendLine("- [Migration catalog](migration-catalog.md) — the `AL0xxx` → `AL1xxx` rename map from the 2.0.0 break. Use to resolve stale `dotnet_diagnostic.AL0xxx.severity = …` editorconfig entries.");
         sb.AppendLine("- [`AnalyzerReleases.Unshipped.md`](../src/ANcpLua.Analyzers/AnalyzerReleases.Unshipped.md) — release-tracking manifest with `ClassName` attribution per Microsoft NetAnalyzers convention.");
     }
 
