@@ -5,14 +5,14 @@ namespace ANcpLua.Analyzers.DocsGenerator;
 
 /// <summary>
 ///   Top-level orchestrator. Owns the mode dispatch (<see cref="CliModes.Parse"/>),
-///   the four generated-artifact pipelines (<c>Generate</c> + <c>Check</c>), and the
+///   the generated-artifact pipelines (<c>Generate</c> + <c>Check</c>), and the
 ///   source-side <c>EnforceIds</c> rewriter. Every other class in this project is
 ///   pure logic invoked from here.
 ///
-///   Extension point: each generated artifact (index, per-rule pages, SARIF,
-///   editorconfig) is one numbered step in <see cref="Generate"/> + <see cref="Check"/>.
-///   Adding a new artifact means adding a focused renderer class and one numbered step
-///   in both methods.
+///   Extension point: each generated artifact (index, per-rule pages, migration
+///   catalog, SARIF, editorconfig) is one numbered step in <see cref="Generate"/> +
+///   <see cref="Check"/>. Adding a new artifact means adding a focused renderer class
+///   and one numbered step in both methods.
 /// </summary>
 internal static class DocsGenerator
 {
@@ -27,28 +27,35 @@ internal static class DocsGenerator
 
         var descriptors = DescriptorCatalog.GetDescriptors();
         var fixableIds = DescriptorCatalog.GetFixableDiagnosticIds();
+        var migrationStats = MigrationCatalogStats.Compute();
 
         return mode switch
         {
-            Mode.Audit => Audit(descriptors, fixableIds),
-            Mode.Check => Check(descriptors, fixableIds, outputPath, repoRoot),
-            _ => Generate(descriptors, fixableIds, outputPath, repoRoot),
+            Mode.Audit => Audit(descriptors, fixableIds, migrationStats),
+            Mode.Check => Check(descriptors, fixableIds, migrationStats, outputPath, repoRoot),
+            _ => Generate(descriptors, fixableIds, migrationStats, outputPath, repoRoot),
         };
     }
 
-    private static int Audit(IReadOnlyList<Microsoft.CodeAnalysis.DiagnosticDescriptor> descriptors, HashSet<string> fixableIds)
+    private static int Audit(
+        IReadOnlyList<Microsoft.CodeAnalysis.DiagnosticDescriptor> descriptors,
+        HashSet<string> fixableIds,
+        MigrationCatalogStats migrationStats)
     {
         Console.WriteLine($"{RepoLayout.PackageName} catalog audit");
         Console.WriteLine($"  Total descriptors: {descriptors.Count}");
         Console.WriteLine($"  With code fix:     {descriptors.Count(d => fixableIds.Contains(d.Id))}");
         foreach (var g in descriptors.GroupBy(d => d.DefaultSeverity).OrderByDescending(g => g.Key))
             Console.WriteLine($"  Severity {g.Key,-10}  {g.Count()}");
+        Console.WriteLine();
+        Console.Write(migrationStats.RenderAudit());
         return 0;
     }
 
     private static int Check(
         IReadOnlyList<Microsoft.CodeAnalysis.DiagnosticDescriptor> descriptors,
         HashSet<string> fixableIds,
+        MigrationCatalogStats migrationStats,
         string outputPath,
         string repoRoot)
     {
@@ -113,7 +120,20 @@ internal static class DocsGenerator
             }
         }
 
-        // (3) Editorconfig profiles.
+        // (3) Migration catalog (AL0xxx → AL1xxx rename map from the 2.0.0 break).
+        var migrationPath = RepoLayout.MigrationCatalogPath(repoRoot);
+        if (!File.Exists(migrationPath))
+        {
+            Console.Error.WriteLine($"Missing migration catalog: {Path.GetRelativePath(repoRoot, migrationPath)}");
+            return 1;
+        }
+        if (!string.Equals(File.ReadAllText(migrationPath), MigrationCatalogRenderer.Render(migrationStats), StringComparison.Ordinal))
+        {
+            Console.Error.WriteLine($"Migration catalog is stale: {Path.GetRelativePath(repoRoot, migrationPath)}");
+            return 1;
+        }
+
+        // (4) Editorconfig profiles.
         foreach (var (path, expected) in EditorconfigRenderer.EnumerateProfiles(repoRoot, descriptors))
         {
             if (!File.Exists(path))
@@ -128,7 +148,7 @@ internal static class DocsGenerator
             }
         }
 
-        // (4) SARIF v2.1.0 rule manifest for tool interop (Sonar bridges, GitHub
+        // (5) SARIF v2.1.0 rule manifest for tool interop (Sonar bridges, GitHub
         // Advanced Security uploads, IDE rule catalogs).
         var sarifPath = RepoLayout.SarifPath(repoRoot);
         if (!File.Exists(sarifPath))
@@ -144,6 +164,7 @@ internal static class DocsGenerator
 
         Console.WriteLine($"Index docs are up to date: {Path.GetRelativePath(repoRoot, outputPath)}");
         Console.WriteLine($"Per-rule pages are up to date ({descriptors.Count}).");
+        Console.WriteLine($"Migration catalog is up to date: {Path.GetRelativePath(repoRoot, migrationPath)}");
         Console.WriteLine("Editorconfig profiles are up to date.");
         Console.WriteLine($"SARIF manifest is up to date: {Path.GetRelativePath(repoRoot, sarifPath)}");
         Console.WriteLine("HelpLinkUri values match per-rule page URLs.");
@@ -153,6 +174,7 @@ internal static class DocsGenerator
     private static int Generate(
         IReadOnlyList<Microsoft.CodeAnalysis.DiagnosticDescriptor> descriptors,
         HashSet<string> fixableIds,
+        MigrationCatalogStats migrationStats,
         string outputPath,
         string repoRoot)
     {
@@ -186,12 +208,18 @@ internal static class DocsGenerator
         }
         Console.WriteLine($"Wrote {descriptors.Count} per-rule pages under docs/rules/");
 
-        // (3) SARIF v2.1.0 rule manifest.
+        // (3) Migration catalog (AL0xxx → AL1xxx rename map).
+        var migrationPath = RepoLayout.MigrationCatalogPath(repoRoot);
+        Directory.CreateDirectory(Path.GetDirectoryName(migrationPath)!);
+        File.WriteAllText(migrationPath, MigrationCatalogRenderer.Render(migrationStats));
+        Console.WriteLine($"Wrote {Path.GetRelativePath(repoRoot, migrationPath)}");
+
+        // (4) SARIF v2.1.0 rule manifest.
         var sarifPath = RepoLayout.SarifPath(repoRoot);
         File.WriteAllText(sarifPath, SarifRenderer.Render(descriptors, idToClass));
         Console.WriteLine($"Wrote {Path.GetRelativePath(repoRoot, sarifPath)}");
 
-        // (4) Editorconfig profiles.
+        // (5) Editorconfig profiles.
         foreach (var (path, content) in EditorconfigRenderer.EnumerateProfiles(repoRoot, descriptors))
         {
             Directory.CreateDirectory(Path.GetDirectoryName(path)!);

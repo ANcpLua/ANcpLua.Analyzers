@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using ANcpLua.Analyzers.DocsGenerator;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace ANcpLua.Analyzers.Tests;
@@ -45,6 +46,17 @@ public sealed partial class AnalyzerConventionTests {
                     $"diagnostic ID '{descriptor.Id}' must match AL followed by exactly 4 digits");
             }
         }
+    }
+
+    /// <summary>
+    ///   Highest-leverage safety net for the hand-transcribed AL0xxx → AL1xxx rename map.
+    ///   <c>--check</c> on a dev machine catches OUTPUT drift but only after someone runs
+    ///   <c>./build.sh CheckDocs</c>; this test catches SOURCE drift (typo, duplicate,
+    ///   leak into a sibling-package band) at CI on every PR. Mandatory.
+    /// </summary>
+    [Fact]
+    public void AlIdMigrationCatalog_StructuralInvariants_Hold() {
+        AlIdMigrationCatalog.Validate();
     }
 
     [Fact]

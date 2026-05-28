@@ -33,6 +33,11 @@ internal static class RepoLayout
     public static string EditorconfigDir(string repoRoot) =>
         Path.Combine(repoRoot, "docs", "editorconfig");
 
+    // Migration catalog (AL0xxx → AL1xxx rename map from the 2.0.0 break).
+    // Content source: AlIdMigrationCatalog.Entries. See MigrationCatalogRenderer.
+    public static string MigrationCatalogPath(string repoRoot) =>
+        Path.Combine(repoRoot, "docs", "migration-catalog.md");
+
     public static string AnalyzersSourceDir(string repoRoot) =>
         Path.Combine(repoRoot, "src", PackageName, "Analyzers");
 

@@ -18,5 +18,9 @@
     <ItemGroup>
         <ProjectReference Include="..\..\src\ANcpLua.Analyzers\ANcpLua.Analyzers.csproj"/>
         <ProjectReference Include="..\..\src\ANcpLua.Analyzers.CodeFixes\ANcpLua.Analyzers.CodeFixes.csproj"/>
+        <!-- Exposes the AlIdMigrationCatalog so AnalyzerConventionTests can run
+             Validate() at CI time — the actual safety net for hand-transcription
+             drift in the 89-row Entries array. -->
+        <ProjectReference Include="..\..\tools\ANcpLua.Analyzers.DocsGenerator\ANcpLua.Analyzers.DocsGenerator.csproj"/>
     </ItemGroup>
 </Project>

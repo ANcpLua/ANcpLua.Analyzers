@@ -68,7 +68,7 @@ internal static class EnforceIdsRewriter
                     classRenames[className] = expectedClassName;
             }
 
-            // (2) Class XML doc summary: rewrite "/// AL00XX:" tokens only when they
+            // (2) Class XML doc summary: rewrite "/// AL####:" tokens only when they
             //     don't appear in this class's SupportedDiagnostics set. Multi-diagnostic
             //     analyzers (e.g., AL1003ToAL1004 documents both IDs in the summary) are
             //     not "wrong" — each row is the doc for one of the registered descriptors.
