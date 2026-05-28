@@ -6,7 +6,7 @@ All notable changes to ANcpLua.Analyzers will be documented in this file.
 
 ### Changed (BREAKING)
 
-- **Diagnostic ID renumber.** All 89 active diagnostic IDs renumbered into nine 100-wide domain bands (`AL1000..AL1899`) to avoid collisions with sibling analyzer packages (`ANcpLua.AotReflection` AL0097–AL0100, `ANcpLua.ExtensibleEnumMirror` AL0200–AL0202, `ANcpLua.DiscriminatedUnion` AL0300–AL0303). Old `AL0xxx` IDs no longer fire from this assembly. Full old→new mapping in `eng/analyzer-renumber-plan.md` §2. Consumers must rewrite any `.editorconfig` / `.globalconfig` / `#pragma warning disable` / `<NoWarn>` references to the new IDs.
+- **Diagnostic ID renumber.** All 89 active diagnostic IDs renumbered into nine 100-wide domain bands (`AL1000..AL1899`) to avoid collisions with sibling analyzer packages (`ANcpLua.AotReflection` AL0097–AL0100, `ANcpLua.ExtensibleEnumMirror` AL0200–AL0202, `ANcpLua.DiscriminatedUnion` AL0300–AL0303). Old `AL0xxx` IDs no longer fire from this assembly. Full old→new mapping in `docs/migration-catalog.md`. Consumers must rewrite any `.editorconfig` / `.globalconfig` / `#pragma warning disable` / `<NoWarn>` references to the new IDs.
 - Resource keys in `Resources.resx` and `CodeFixResources.resx` renamed in lockstep (`AL{old}AnalyzerTitle` → `AL{new}AnalyzerTitle`, etc.).
 - Help-link URLs follow the new IDs (`https://ancplua.mintlify.app/analyzers/rules/AL1000` etc.).
 - Class names follow the new IDs (`Al1000…Analyzer`, `Al1000…CodeFixProvider`, `Al1000…Tests`).
@@ -19,7 +19,7 @@ All notable changes to ANcpLua.Analyzers will be documented in this file.
 
 ### Migration
 
-Use the mapping table in `eng/analyzer-renumber-plan.md` §2 to script-rewrite any `AL\d{4}` reference in consumer projects. Common rewires: `AL0001` → `AL1000`, `AL0026` → `AL1701`, `AL0030` → `AL1202`, `AL0126` → `AL1313`.
+Use the mapping table in `docs/migration-catalog.md` to script-rewrite any `AL\d{4}` reference in consumer projects. Common rewires: `AL0001` → `AL1000`, `AL0026` → `AL1701`, `AL0030` → `AL1202`, `AL0126` → `AL1313`.
 
 ## [1.20.2] - 2026-03-20
 

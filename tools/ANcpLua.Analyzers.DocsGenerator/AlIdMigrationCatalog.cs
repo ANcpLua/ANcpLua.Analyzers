@@ -7,13 +7,12 @@ using System.Text.RegularExpressions;
 namespace ANcpLua.Analyzers.DocsGenerator;
 
 /// <summary>
-///   Hand-transcribed AL0xxx → AL1xxx rename map from the 2.0.0 break. Source of
-///   truth: <c>eng/analyzer-renumber-plan.md</c> §2 ("Old to New ID mapping").
-///   Documentation only — this catalog is consumed by the docs generator under
-///   <c>tools/</c> and does NOT ship in the runtime analyzer DLL. The 2.0.1
-///   analyzer no longer emits AL0xxx, so no runtime code needs the old IDs;
-///   the catalog exists purely so the generated migration-catalog markdown can
-///   tell consumers "your editorconfig says AL0001 — that's now AL1000".
+///   AL0xxx → AL1xxx rename map from the 2.0.0 break. Documentation only — this
+///   catalog is consumed by the docs generator under <c>tools/</c> and does NOT
+///   ship in the runtime analyzer DLL. The 2.0.1 analyzer no longer emits
+///   AL0xxx, so no runtime code needs the old IDs; the catalog exists purely so
+///   the generated migration-catalog markdown can tell consumers "your
+///   editorconfig says AL0001 — that's now AL1000".
 ///
 ///   If a follow-up diagnostic ever warns consumers whose editorconfig still
 ///   has stale <c>dotnet_diagnostic.AL0xxx.severity</c> entries, this catalog

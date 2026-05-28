@@ -35,11 +35,8 @@ jobs:
         # MSB4011: SDK double-import warning (harmless, tracked upstream)
         run: dotnet build ANcpLua.Analyzers.slnx -c Release --no-restore --warnaserror /warnnotaserror:MSB4011
 
-      - name: Verify analyzer docs are not stale
-        # Regenerates docs/*.md from src/ANcpLua.Analyzers.AnalyzerDocs scenarios and fails if
-        # the working tree under docs/ has any diff. Forces contributors to regenerate locally
-        # whenever an analyzer's diagnostic message or a scenario changes.
-        run: pwsh ./scripts/generate-docs.ps1 -ValidateNoChanges
+      - name: Verify generated analyzer catalog is not stale
+        run: dotnet run --project tools/ANcpLua.Analyzers.DocsGenerator --configuration Release -- --check
 
   test:
     needs: build

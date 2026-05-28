@@ -10,8 +10,6 @@
         <File Path="LICENSE"/>
     </Folder>
     <Folder Name="/src/">
-        <Project Path="src/ANcpLua.Analyzers.AnalyzerDocs/ANcpLua.Analyzers.AnalyzerDocs.csproj"/>
-        <Project Path="src/ANcpLua.Analyzers.AnalyzerDocsGenerator/ANcpLua.Analyzers.AnalyzerDocsGenerator.csproj"/>
         <Project Path="src/ANcpLua.Analyzers.CodeFixes/ANcpLua.Analyzers.CodeFixes.csproj"/>
         <Project Path="src/ANcpLua.Analyzers/ANcpLua.Analyzers.csproj"/>
     </Folder>

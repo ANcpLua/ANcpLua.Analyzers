@@ -12,9 +12,8 @@ namespace ANcpLua.Analyzers.DocsGenerator;
 ///   "Show error help" links resolve onto a focused page rather than the
 ///   multi-thousand-line aggregate.
 ///
-///   Extension point: per-rule examples sourced from the analyzer test fixtures land
-///   here once a fixture-extraction helper exists — the scenario-docs scaffold in
-///   <c>src/ANcpLua.Analyzers.AnalyzerDocs/</c> is the architectural target.
+///   Extension point: per-rule examples sourced from analyzer test fixtures can
+///   land here once a fixture-extraction helper exists.
 /// </summary>
 internal static class RulePageRenderer
 {

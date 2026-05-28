@@ -68,12 +68,12 @@
          CR autofix conflated VersionPrefix with this value in commit 2fe348d
          (2026-05-25) and broke CI; that incident triggered the CR uninstall.
 
-         Post-2.0.0-publish bump (2026-05-25): now safe to track current.
+         Post-2.0.1-publish bump: now safe to track current.
          Restore at 1.29.4 was forcing the AL repo's CI to dogfood OLD
          AL0xxx-ID analyzers; consumer Renovate-bump PRs hit build errors
          like AL0101 (renumbered to AL1408 in 2.0.0) because the OLD rule
          dll was being resolved here. -->
-    <ANcpLuaAnalyzersVersion>2.0.0</ANcpLuaAnalyzersVersion>
+    <ANcpLuaAnalyzersVersion>2.0.1</ANcpLuaAnalyzersVersion>
     <JonSkeetAnalyzersVersion>1.0.0-beta.6</JonSkeetAnalyzersVersion>
   </PropertyGroup>
 
