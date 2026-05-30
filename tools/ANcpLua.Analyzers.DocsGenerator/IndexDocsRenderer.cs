@@ -98,7 +98,7 @@ internal static class IndexDocsRenderer
         sb.AppendLine("- [Editorconfig profiles](editorconfig/) — three drop-in severity profiles: `Default`, `AllRulesAsErrors`, `AllRulesDisabled`. Same content ships inside the NuGet under `buildTransitive/editorconfig/`.");
         sb.AppendLine($"- [SARIF rule manifest]({RepoLayout.PackageName}.sarif) — SARIF v2.1.0 catalog of every `AL10xx`–`AL18xx` rule (id, name, severity, category, helpUri). Consume from Sonar bridges, GitHub Advanced Security uploads, or IDE rule-catalog tools.");
         sb.AppendLine("- [Migration catalog](migration-catalog.md) — the `AL0xxx` → `AL1xxx` rename map from the 2.0.0 break. Use to resolve stale `dotnet_diagnostic.AL0xxx.severity = …` editorconfig entries.");
-        sb.AppendLine("- [`AnalyzerReleases.Unshipped.md`](../src/ANcpLua.Analyzers/AnalyzerReleases.Unshipped.md) — release-tracking manifest with `ClassName` attribution per Microsoft NetAnalyzers convention.");
+        sb.AppendLine("- [`AnalyzerReleases.Shipped.md`](../src/ANcpLua.Analyzers/AnalyzerReleases.Shipped.md) / [`AnalyzerReleases.Unshipped.md`](../src/ANcpLua.Analyzers/AnalyzerReleases.Unshipped.md) — release-tracking manifest with `ClassName` attribution per Microsoft NetAnalyzers convention. Shipped rules are grouped under their release version; Unshipped holds rules pending the next release.");
     }
 
     private static void WriteGeneratedFile(StringBuilder sb)
