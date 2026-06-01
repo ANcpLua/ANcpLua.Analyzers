@@ -13,6 +13,8 @@ public sealed partial class Al1205UseToImmutableArrayOrEmptyAnalyzer : AlAnalyze
     /// <summary>The diagnostic identifier for AL1205.</summary>
     public const string DiagnosticId = "AL1205";
 
+    private const string EnumerableExtensionsMetadataName = "ANcpLua.Roslyn.Utilities.EnumerableExtensions";
+
     private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.RoslynUtilities,
@@ -23,14 +25,25 @@ public sealed partial class Al1205UseToImmutableArrayOrEmptyAnalyzer : AlAnalyze
 
     /// <summary>Registers syntax or operation actions for analysis.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
-        context.RegisterOperationAction(AnalyzeCoalesce, OperationKind.Coalesce);
+        context.RegisterCompilationStartAction(OnCompilationStart);
 
-    private static void AnalyzeCoalesce(OperationAnalysisContext context) {
-        if (context.Operation is not ICoalesceOperation coalesce) {
+    private static void OnCompilationStart(CompilationStartAnalysisContext context) {
+        // ToImmutableArrayOrEmpty() lives in ANcpLua.Roslyn.Utilities.EnumerableExtensions. Only fire
+        // when present and callable from this compilation; otherwise the code fix would rewrite to a
+        // symbol the consumer cannot resolve.
+        if (context.Compilation.GetTypeByMetadataName(EnumerableExtensionsMetadataName) is not { } gateType) {
             return;
         }
 
-        if (!HasToImmutableArrayOrEmptyExtension(context.Compilation)) {
+        if (!context.Compilation.IsSymbolAccessibleWithin(gateType, context.Compilation.Assembly)) {
+            return;
+        }
+
+        context.RegisterOperationAction(AnalyzeCoalesce, OperationKind.Coalesce);
+    }
+
+    private static void AnalyzeCoalesce(OperationAnalysisContext context) {
+        if (context.Operation is not ICoalesceOperation coalesce) {
             return;
         }
 
@@ -80,43 +93,6 @@ public sealed partial class Al1205UseToImmutableArrayOrEmptyAnalyzer : AlAnalyze
         } conditionalAccess) {
             sourceName = GetOperandDisplayName(conditionalAccess.Operation);
             return true;
-        }
-
-        return false;
-    }
-
-    private static bool HasToImmutableArrayOrEmptyExtension(Compilation compilation) {
-        foreach (var reference in compilation.References) {
-            if (compilation.GetAssemblyOrModuleSymbol(reference) is IAssemblySymbol assembly
-                && HasMethodInAssembly(assembly)) {
-                return true;
-            }
-        }
-
-        return HasMethodInAssembly(compilation.Assembly);
-    }
-
-    private static bool HasMethodInAssembly(IAssemblySymbol assembly) {
-        var stack = new Stack<INamespaceSymbol>();
-        stack.Push(assembly.GlobalNamespace);
-
-        while (stack.Count > 0) {
-            var ns = stack.Pop();
-            foreach (var type in ns.GetTypeMembers()) {
-                if (!type.IsStatic || !type.MightContainExtensionMethods) {
-                    continue;
-                }
-
-                foreach (var member in type.GetMembers("ToImmutableArrayOrEmpty")) {
-                    if (member is IMethodSymbol { IsExtensionMethod: true, Parameters.Length: 1 }) {
-                        return true;
-                    }
-                }
-            }
-
-            foreach (var child in ns.GetNamespaceMembers()) {
-                stack.Push(child);
-            }
         }
 
         return false;

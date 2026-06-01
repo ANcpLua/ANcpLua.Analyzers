@@ -50,6 +50,8 @@ public sealed partial class Al1220UseGuardForThrowIfAnalyzer : AlAnalyzer {
     /// <summary>Property key carrying the target Guard.* method name (e.g. <c>NotNull</c>).</summary>
     public const string PropertyGuardMethod = "GuardMethod";
 
+    private const string GuardMetadataName = "ANcpLua.Roslyn.Utilities.Guard";
+
     /// <summary>The fully-qualified namespace of MAF's Throw helper class.</summary>
     private const string MafThrowNamespace = "Microsoft.Shared.Diagnostics";
 
@@ -63,7 +65,21 @@ public sealed partial class Al1220UseGuardForThrowIfAnalyzer : AlAnalyzer {
 
     /// <summary>Registers operation actions for static-method invocations.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
+        context.RegisterCompilationStartAction(OnCompilationStart);
+
+    private static void OnCompilationStart(CompilationStartAnalysisContext context) {
+        // Guard lives in ANcpLua.Roslyn.Utilities. Only fire when present and callable from this
+        // compilation; otherwise the code fix would rewrite to a symbol the consumer cannot resolve.
+        if (context.Compilation.GetTypeByMetadataName(GuardMetadataName) is not { } gateType) {
+            return;
+        }
+
+        if (!context.Compilation.IsSymbolAccessibleWithin(gateType, context.Compilation.Assembly)) {
+            return;
+        }
+
         context.RegisterOperationAction(AnalyzeInvocation, OperationKind.Invocation);
+    }
 
     private static void AnalyzeInvocation(OperationAnalysisContext context) {
         if (context.Operation is not IInvocationOperation { TargetMethod: var method }) {

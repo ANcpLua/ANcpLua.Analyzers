@@ -16,6 +16,8 @@ public sealed partial class Al1204UseOrEmptyAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL1204.</summary>
     public const string DiagnosticId = "AL1204";
 
+    private const string EnumerableExtensionsMetadataName = "ANcpLua.Roslyn.Utilities.EnumerableExtensions";
+
     private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.RoslynUtilities,
@@ -26,14 +28,25 @@ public sealed partial class Al1204UseOrEmptyAnalyzer : AlAnalyzer {
 
     /// <summary>Registers syntax or operation actions for analysis.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
-        context.RegisterOperationAction(AnalyzeCoalesce, OperationKind.Coalesce);
+        context.RegisterCompilationStartAction(OnCompilationStart);
 
-    private static void AnalyzeCoalesce(OperationAnalysisContext context) {
-        if (context.Operation is not ICoalesceOperation coalesce) {
+    private static void OnCompilationStart(CompilationStartAnalysisContext context) {
+        // OrEmpty() lives in ANcpLua.Roslyn.Utilities.EnumerableExtensions. Only fire when present
+        // and callable from this compilation; otherwise the code fix would rewrite to a symbol the
+        // consumer cannot resolve.
+        if (context.Compilation.GetTypeByMetadataName(EnumerableExtensionsMetadataName) is not { } gateType) {
             return;
         }
 
-        if (!HasOrEmptyExtension(context.Compilation)) {
+        if (!context.Compilation.IsSymbolAccessibleWithin(gateType, context.Compilation.Assembly)) {
+            return;
+        }
+
+        context.RegisterOperationAction(AnalyzeCoalesce, OperationKind.Coalesce);
+    }
+
+    private static void AnalyzeCoalesce(OperationAnalysisContext context) {
+        if (context.Operation is not ICoalesceOperation coalesce) {
             return;
         }
 
@@ -87,45 +100,6 @@ public sealed partial class Al1204UseOrEmptyAnalyzer : AlAnalyzer {
     private static bool IsEnumerableType(ITypeSymbol type) =>
         type is INamedTypeSymbol { IsGenericType: true } named
         && named.OriginalDefinition.ToDisplayString() == "System.Collections.Generic.IEnumerable<T>";
-
-    private static bool HasOrEmptyExtension(Compilation compilation) {
-        foreach (var reference in compilation.References) {
-            if (compilation.GetAssemblyOrModuleSymbol(reference) is IAssemblySymbol assembly
-                && HasOrEmptyInAssembly(assembly)) {
-                return true;
-            }
-        }
-
-        return HasOrEmptyInAssembly(compilation.Assembly);
-    }
-
-    private static bool HasOrEmptyInAssembly(IAssemblySymbol assembly) {
-        var stack = new Stack<INamespaceSymbol>();
-        stack.Push(assembly.GlobalNamespace);
-
-        while (stack.Count > 0) {
-            var ns = stack.Pop();
-            foreach (var type in ns.GetTypeMembers()) {
-                if (!type.IsStatic || !type.MightContainExtensionMethods) {
-                    continue;
-                }
-
-                foreach (var member in type.GetMembers("OrEmpty")) {
-                    if (member is IMethodSymbol { IsExtensionMethod: true, Parameters.Length: 1 } method
-                        && method.Parameters[0].Type.OriginalDefinition.ToDisplayString()
-                            == "System.Collections.Generic.IEnumerable<T>") {
-                        return true;
-                    }
-                }
-            }
-
-            foreach (var child in ns.GetNamespaceMembers()) {
-                stack.Push(child);
-            }
-        }
-
-        return false;
-    }
 
     private static string GetOperandDisplayName(IOperation operation) =>
         operation.GetOperandName("collection");

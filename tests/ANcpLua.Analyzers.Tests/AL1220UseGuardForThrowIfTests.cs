@@ -9,8 +9,20 @@ namespace ANcpLua.Analyzers.Tests;
 ///     ArgumentException.ThrowIfNullOrWhiteSpace throw helpers.
 /// </summary>
 public sealed partial class Al1220UseGuardForThrowIfTests : AnalyzerTest<Al1220UseGuardForThrowIfAnalyzer> {
+    // AL1220 only fires when ANcpLua.Roslyn.Utilities.Guard (which owns Guard.*) is present and
+    // accessible. Each case appends this stub so the gate is open; the dedicated
+    // ShouldNotReportWhenGuardNotReferenced case omits it to assert the gate itself.
+    private const string Stub = """
+                                namespace ANcpLua.Roslyn.Utilities { internal static class Guard { } }
+                                """;
+
+    private static Task Verify(string body) => VerifyAsync($$"""
+                                                            {{body}}
+                                                            {{Stub}}
+                                                            """);
+
     [Fact]
-    public Task ShouldReportForArgumentNullExceptionThrowIfNull() => VerifyAsync("""
+    public Task ShouldReportForArgumentNullExceptionThrowIfNull() => Verify("""
         using System;
         public class C {
             void M(object? x) {
@@ -20,7 +32,7 @@ public sealed partial class Al1220UseGuardForThrowIfTests : AnalyzerTest<Al1220U
         """);
 
     [Fact]
-    public Task ShouldReportForArgumentExceptionThrowIfNullOrEmpty() => VerifyAsync("""
+    public Task ShouldReportForArgumentExceptionThrowIfNullOrEmpty() => Verify("""
         using System;
         public class C {
             void M(string? s) {
@@ -30,7 +42,7 @@ public sealed partial class Al1220UseGuardForThrowIfTests : AnalyzerTest<Al1220U
         """);
 
     [Fact]
-    public Task ShouldReportForArgumentExceptionThrowIfNullOrWhiteSpace() => VerifyAsync("""
+    public Task ShouldReportForArgumentExceptionThrowIfNullOrWhiteSpace() => Verify("""
         using System;
         public class C {
             void M(string? s) {
@@ -40,7 +52,7 @@ public sealed partial class Al1220UseGuardForThrowIfTests : AnalyzerTest<Al1220U
         """);
 
     [Fact]
-    public Task ShouldReportWithFullyQualifiedName() => VerifyAsync("""
+    public Task ShouldReportWithFullyQualifiedName() => Verify("""
         public class C {
             void M(object? x) {
                 [|System.ArgumentNullException.ThrowIfNull(x)|];
@@ -49,7 +61,7 @@ public sealed partial class Al1220UseGuardForThrowIfTests : AnalyzerTest<Al1220U
         """);
 
     [Fact]
-    public Task ShouldNotReportForUnrelatedStaticMethod() => VerifyAsync("""
+    public Task ShouldNotReportForUnrelatedStaticMethod() => Verify("""
         using System;
         public class C {
             void M() {
@@ -59,7 +71,7 @@ public sealed partial class Al1220UseGuardForThrowIfTests : AnalyzerTest<Al1220U
         """);
 
     [Fact]
-    public Task ShouldNotReportForCustomThrowIfNullInDifferentNamespace() => VerifyAsync("""
+    public Task ShouldNotReportForCustomThrowIfNullInDifferentNamespace() => Verify("""
         using Other;
         namespace Other {
             public static class ArgumentNullException {
@@ -74,7 +86,7 @@ public sealed partial class Al1220UseGuardForThrowIfTests : AnalyzerTest<Al1220U
         """);
 
     [Fact]
-    public Task ShouldNotReportForInstanceMethodWithSameName() => VerifyAsync("""
+    public Task ShouldNotReportForInstanceMethodWithSameName() => Verify("""
         public class Stub {
             public void ThrowIfNull(object? x) { }
         }
@@ -86,7 +98,7 @@ public sealed partial class Al1220UseGuardForThrowIfTests : AnalyzerTest<Al1220U
         """);
 
     [Fact]
-    public Task ShouldReportForArgumentOutOfRangeExceptionThrowIfZero() => VerifyAsync("""
+    public Task ShouldReportForArgumentOutOfRangeExceptionThrowIfZero() => Verify("""
         using System;
         public class C {
             void M(int n) {
@@ -96,7 +108,7 @@ public sealed partial class Al1220UseGuardForThrowIfTests : AnalyzerTest<Al1220U
         """);
 
     [Fact]
-    public Task ShouldReportForArgumentOutOfRangeExceptionThrowIfNegative() => VerifyAsync("""
+    public Task ShouldReportForArgumentOutOfRangeExceptionThrowIfNegative() => Verify("""
         using System;
         public class C {
             void M(int n) {
@@ -106,7 +118,7 @@ public sealed partial class Al1220UseGuardForThrowIfTests : AnalyzerTest<Al1220U
         """);
 
     [Fact]
-    public Task ShouldReportForArgumentOutOfRangeExceptionThrowIfNegativeOrZero() => VerifyAsync("""
+    public Task ShouldReportForArgumentOutOfRangeExceptionThrowIfNegativeOrZero() => Verify("""
         using System;
         public class C {
             void M(int n) {
@@ -116,7 +128,7 @@ public sealed partial class Al1220UseGuardForThrowIfTests : AnalyzerTest<Al1220U
         """);
 
     [Fact]
-    public Task ShouldReportForArgumentOutOfRangeExceptionThrowIfGreaterThan() => VerifyAsync("""
+    public Task ShouldReportForArgumentOutOfRangeExceptionThrowIfGreaterThan() => Verify("""
         using System;
         public class C {
             void M(int n) {
@@ -126,7 +138,7 @@ public sealed partial class Al1220UseGuardForThrowIfTests : AnalyzerTest<Al1220U
         """);
 
     [Fact]
-    public Task ShouldReportForArgumentOutOfRangeExceptionThrowIfGreaterThanOrEqual() => VerifyAsync("""
+    public Task ShouldReportForArgumentOutOfRangeExceptionThrowIfGreaterThanOrEqual() => Verify("""
         using System;
         public class C {
             void M(int n) {
@@ -136,7 +148,7 @@ public sealed partial class Al1220UseGuardForThrowIfTests : AnalyzerTest<Al1220U
         """);
 
     [Fact]
-    public Task ShouldReportForArgumentOutOfRangeExceptionThrowIfLessThan() => VerifyAsync("""
+    public Task ShouldReportForArgumentOutOfRangeExceptionThrowIfLessThan() => Verify("""
         using System;
         public class C {
             void M(int n) {
@@ -146,7 +158,7 @@ public sealed partial class Al1220UseGuardForThrowIfTests : AnalyzerTest<Al1220U
         """);
 
     [Fact]
-    public Task ShouldReportForArgumentOutOfRangeExceptionThrowIfLessThanOrEqual() => VerifyAsync("""
+    public Task ShouldReportForArgumentOutOfRangeExceptionThrowIfLessThanOrEqual() => Verify("""
         using System;
         public class C {
             void M(int n) {
@@ -182,7 +194,7 @@ public sealed partial class Al1220UseGuardForThrowIfTests : AnalyzerTest<Al1220U
         """;
 
     [Fact]
-    public Task ShouldReportForMafThrowIfNull() => VerifyAsync($$"""
+    public Task ShouldReportForMafThrowIfNull() => Verify($$"""
         {{MafThrowStub}}
         public class C {
             void M(object? x) {
@@ -192,7 +204,7 @@ public sealed partial class Al1220UseGuardForThrowIfTests : AnalyzerTest<Al1220U
         """);
 
     [Fact]
-    public Task ShouldReportForMafThrowIfNullOrMemberNull() => VerifyAsync($$"""
+    public Task ShouldReportForMafThrowIfNullOrMemberNull() => Verify($$"""
         {{MafThrowStub}}
         public class C {
             void M(string? p, object? m) {
@@ -202,7 +214,7 @@ public sealed partial class Al1220UseGuardForThrowIfTests : AnalyzerTest<Al1220U
         """);
 
     [Fact]
-    public Task ShouldReportForMafThrowIfNullOrEmpty() => VerifyAsync($$"""
+    public Task ShouldReportForMafThrowIfNullOrEmpty() => Verify($$"""
         {{MafThrowStub}}
         public class C {
             void M(string? s) {
@@ -212,7 +224,7 @@ public sealed partial class Al1220UseGuardForThrowIfTests : AnalyzerTest<Al1220U
         """);
 
     [Fact]
-    public Task ShouldReportForMafThrowIfNullOrWhitespace() => VerifyAsync($$"""
+    public Task ShouldReportForMafThrowIfNullOrWhitespace() => Verify($$"""
         {{MafThrowStub}}
         public class C {
             void M(string? s) {
@@ -222,7 +234,7 @@ public sealed partial class Al1220UseGuardForThrowIfTests : AnalyzerTest<Al1220U
         """);
 
     [Fact]
-    public Task ShouldReportForMafThrowIfZero() => VerifyAsync($$"""
+    public Task ShouldReportForMafThrowIfZero() => Verify($$"""
         {{MafThrowStub}}
         public class C {
             void M(int n) {
@@ -232,7 +244,7 @@ public sealed partial class Al1220UseGuardForThrowIfTests : AnalyzerTest<Al1220U
         """);
 
     [Fact]
-    public Task ShouldReportForMafThrowIfLessThan() => VerifyAsync($$"""
+    public Task ShouldReportForMafThrowIfLessThan() => Verify($$"""
         {{MafThrowStub}}
         public class C {
             void M(int n) {
@@ -242,7 +254,7 @@ public sealed partial class Al1220UseGuardForThrowIfTests : AnalyzerTest<Al1220U
         """);
 
     [Fact]
-    public Task ShouldReportForMafThrowIfGreaterThan() => VerifyAsync($$"""
+    public Task ShouldReportForMafThrowIfGreaterThan() => Verify($$"""
         {{MafThrowStub}}
         public class C {
             void M(int n) {
@@ -252,7 +264,7 @@ public sealed partial class Al1220UseGuardForThrowIfTests : AnalyzerTest<Al1220U
         """);
 
     [Fact]
-    public Task ShouldReportForMafThrowIfLessThanOrEqual() => VerifyAsync($$"""
+    public Task ShouldReportForMafThrowIfLessThanOrEqual() => Verify($$"""
         {{MafThrowStub}}
         public class C {
             void M(int n) {
@@ -262,7 +274,7 @@ public sealed partial class Al1220UseGuardForThrowIfTests : AnalyzerTest<Al1220U
         """);
 
     [Fact]
-    public Task ShouldReportForMafThrowIfGreaterThanOrEqual() => VerifyAsync($$"""
+    public Task ShouldReportForMafThrowIfGreaterThanOrEqual() => Verify($$"""
         {{MafThrowStub}}
         public class C {
             void M(int n) {
@@ -272,7 +284,7 @@ public sealed partial class Al1220UseGuardForThrowIfTests : AnalyzerTest<Al1220U
         """);
 
     [Fact]
-    public Task ShouldReportForMafThrowIfOutOfRange() => VerifyAsync($$"""
+    public Task ShouldReportForMafThrowIfOutOfRange() => Verify($$"""
         {{MafThrowStub}}
         public class C {
             void M(int n) {
@@ -282,7 +294,7 @@ public sealed partial class Al1220UseGuardForThrowIfTests : AnalyzerTest<Al1220U
         """);
 
     [Fact]
-    public Task ShouldNotReportForMafColdPathArgumentNullException() => VerifyAsync($$"""
+    public Task ShouldNotReportForMafColdPathArgumentNullException() => Verify($$"""
         {{MafThrowStub}}
         public class C {
             void M() {
@@ -292,7 +304,7 @@ public sealed partial class Al1220UseGuardForThrowIfTests : AnalyzerTest<Al1220U
         """);
 
     [Fact]
-    public Task ShouldNotReportForMafColdPathInvalidOperationException() => VerifyAsync($$"""
+    public Task ShouldNotReportForMafColdPathInvalidOperationException() => Verify($$"""
         {{MafThrowStub}}
         public class C {
             void M() {
@@ -302,7 +314,7 @@ public sealed partial class Al1220UseGuardForThrowIfTests : AnalyzerTest<Al1220U
         """);
 
     [Fact]
-    public Task ShouldNotReportForUnrelatedThrowClass() => VerifyAsync("""
+    public Task ShouldNotReportForUnrelatedThrowClass() => Verify("""
         namespace Other {
             public static class Throw {
                 public static T IfNull<T>(T x) => x!;
@@ -324,7 +336,7 @@ public sealed partial class Al1220UseGuardForThrowIfTests : AnalyzerTest<Al1220U
     ///     Guard.MemberNotNull (different from IfNullOrMemberNull → NotNullWithMember).
     /// </summary>
     [Fact]
-    public Task ShouldReportForMafThrowIfMemberNull() => VerifyAsync("""
+    public Task ShouldReportForMafThrowIfMemberNull() => Verify("""
         #nullable enable
         using System.Runtime.CompilerServices;
         namespace Microsoft.Shared.Diagnostics {
@@ -345,7 +357,7 @@ public sealed partial class Al1220UseGuardForThrowIfTests : AnalyzerTest<Al1220U
     ///     Guard.DefinedEnum, NOT Guard.InRange (which is the (value, min, max) 3-arg case).
     /// </summary>
     [Fact]
-    public Task ShouldReportForMafThrowIfOutOfRangeEnum() => VerifyAsync("""
+    public Task ShouldReportForMafThrowIfOutOfRangeEnum() => Verify("""
         #nullable enable
         using System;
         using System.Runtime.CompilerServices;
@@ -367,7 +379,7 @@ public sealed partial class Al1220UseGuardForThrowIfTests : AnalyzerTest<Al1220U
     ///     the analyzer must NOT report (auto-fix would emit code that doesn't compile).
     /// </summary>
     [Fact]
-    public Task ShouldNotReportForBclThrowIfOnUInt() => VerifyAsync("""
+    public Task ShouldNotReportForBclThrowIfOnUInt() => Verify("""
         #nullable enable
         using System;
         public class C {
@@ -385,7 +397,7 @@ public sealed partial class Al1220UseGuardForThrowIfTests : AnalyzerTest<Al1220U
     ///     argument is a pure IEnumerable.
     /// </summary>
     [Fact]
-    public Task ShouldNotReportForMafThrowIfNullOrEmptyOnIEnumerable() => VerifyAsync("""
+    public Task ShouldNotReportForMafThrowIfNullOrEmptyOnIEnumerable() => Verify("""
         #nullable enable
         using System.Collections.Generic;
         using System.Runtime.CompilerServices;
@@ -400,4 +412,15 @@ public sealed partial class Al1220UseGuardForThrowIfTests : AnalyzerTest<Al1220U
             }
         }
         """);
+
+    // The consumer scenario: a project that does not reference ANcpLua.Roslyn.Utilities has no
+    // Guard type, so AL1220 must stay silent on BCL throw-helper code.
+    [Fact]
+    public Task ShouldNotReportWhenGuardNotReferenced() =>
+        VerifyAsync("""
+                    using System;
+                    public class C {
+                        void M(object? x) { ArgumentNullException.ThrowIfNull(x); }
+                    }
+                    """);
 }
