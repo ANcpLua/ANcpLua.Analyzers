@@ -21,6 +21,7 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 [Shared]
 public sealed partial class Al1212UseGuardNotNullOrEmptyCodeFixProvider
     : AlCodeFixProvider<IfStatementSyntax> {
+    private const string ExtensionsNamespace = "ANcpLua.Roslyn.Utilities";
     /// <summary>Gets the diagnostic IDs this code fix can fix.</summary>
     public override ImmutableArray<string> FixableDiagnosticIds => [Al1212UseGuardNotNullOrEmptyAnalyzer.DiagnosticId];
 
@@ -55,7 +56,34 @@ public sealed partial class Al1212UseGuardNotNullOrEmptyCodeFixProvider
             .WithTriviaFrom(ifStatement);
 
         var newRoot = root.ReplaceNode(ifStatement, guardCall);
+        newRoot = AddUsingIfMissing(newRoot, ExtensionsNamespace);
         return Task.FromResult(document.WithSyntaxRoot(newRoot));
+    }
+
+    private static SyntaxNode AddUsingIfMissing(SyntaxNode root, string namespaceName) {
+        if (root is not CompilationUnitSyntax compilationUnit) {
+            return root;
+        }
+
+        if (compilationUnit.Usings.Any(u => u.Name?.ToString() == namespaceName)) {
+            return root;
+        }
+
+        var newUsing = SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(namespaceName))
+            .WithTrailingTrivia(DetectEndOfLine(compilationUnit));
+
+        return compilationUnit.AddUsings(newUsing);
+    }
+
+    private static SyntaxTrivia DetectEndOfLine(CompilationUnitSyntax compilationUnit) {
+        // Preserve the file's CRLF/LF convention so the inserted using does not corrupt line endings.
+        foreach (var trivia in compilationUnit.DescendantTrivia()) {
+            if (trivia.IsKind(SyntaxKind.EndOfLineTrivia)) {
+                return trivia;
+            }
+        }
+
+        return SyntaxFactory.LineFeed;
     }
 
     private static ExpressionSyntax ExtractArgumentFromCondition(ExpressionSyntax condition) {

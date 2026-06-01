@@ -8,8 +8,19 @@ namespace ANcpLua.Analyzers.Tests;
 ///     Tests for AL1217: Use Guard.NotEmpty instead of if (guid == Guid.Empty) throw.
 /// </summary>
 public sealed partial class Al1217UseGuardNotEmptyGuidTests : AnalyzerTest<Al1217UseGuardNotEmptyGuidAnalyzer> {
+    // AL1217 only fires when ANcpLua.Roslyn.Utilities.Guard is present and accessible.
+    // Each case appends this stub; ShouldNotReportWhenGuardNotReferenced omits it.
+    private const string Stub = """
+                                namespace ANcpLua.Roslyn.Utilities { internal static class Guard { } }
+                                """;
+
+    private static Task Verify(string body) => VerifyAsync($$"""
+                                                            {{body}}
+                                                            {{Stub}}
+                                                            """);
+
     [Fact]
-    public Task ShouldReportForGuidEqualsEmpty() => VerifyAsync("""
+    public Task ShouldReportForGuidEqualsEmpty() => Verify("""
         using System;
         public class C {
             void M(Guid id) {
@@ -19,7 +30,7 @@ public sealed partial class Al1217UseGuardNotEmptyGuidTests : AnalyzerTest<Al121
         """);
 
     [Fact]
-    public Task ShouldReportForGuidEmptyEquals() => VerifyAsync("""
+    public Task ShouldReportForGuidEmptyEquals() => Verify("""
         using System;
         public class C {
             void M(Guid id) {
@@ -29,7 +40,7 @@ public sealed partial class Al1217UseGuardNotEmptyGuidTests : AnalyzerTest<Al121
         """);
 
     [Fact]
-    public Task ShouldReportForBlockWithThrow() => VerifyAsync("""
+    public Task ShouldReportForBlockWithThrow() => Verify("""
         using System;
         public class C {
             void M(Guid id) {
@@ -41,7 +52,7 @@ public sealed partial class Al1217UseGuardNotEmptyGuidTests : AnalyzerTest<Al121
         """);
 
     [Fact]
-    public Task ShouldNotReportForGuidEqualsDefault() => VerifyAsync("""
+    public Task ShouldNotReportForGuidEqualsDefault() => Verify("""
         using System;
         public class C {
             void M(Guid id) {
@@ -51,7 +62,7 @@ public sealed partial class Al1217UseGuardNotEmptyGuidTests : AnalyzerTest<Al121
         """);
 
     [Fact]
-    public Task ShouldNotReportForOtherTypes() => VerifyAsync("""
+    public Task ShouldNotReportForOtherTypes() => Verify("""
         using System;
         public class C {
             void M(int id) {
@@ -61,7 +72,7 @@ public sealed partial class Al1217UseGuardNotEmptyGuidTests : AnalyzerTest<Al121
         """);
 
     [Fact]
-    public Task ShouldNotReportForOtherExceptionTypes() => VerifyAsync("""
+    public Task ShouldNotReportForOtherExceptionTypes() => Verify("""
         using System;
         public class C {
             void M(Guid id) {
@@ -71,7 +82,7 @@ public sealed partial class Al1217UseGuardNotEmptyGuidTests : AnalyzerTest<Al121
         """);
 
     [Fact]
-    public Task ShouldNotReportForNotEqualsPattern() => VerifyAsync("""
+    public Task ShouldNotReportForNotEqualsPattern() => Verify("""
         using System;
         public class C {
             void M(Guid id) {
@@ -81,7 +92,7 @@ public sealed partial class Al1217UseGuardNotEmptyGuidTests : AnalyzerTest<Al121
         """);
 
     [Fact]
-    public Task ShouldNotReportForIfWithElse() => VerifyAsync("""
+    public Task ShouldNotReportForIfWithElse() => Verify("""
         using System;
         public class C {
             void M(Guid id) {
@@ -94,7 +105,7 @@ public sealed partial class Al1217UseGuardNotEmptyGuidTests : AnalyzerTest<Al121
         """);
 
     [Fact]
-    public Task ShouldNotReportForBlockWithMultipleStatements() => VerifyAsync("""
+    public Task ShouldNotReportForBlockWithMultipleStatements() => Verify("""
         using System;
         public class C {
             void M(Guid id) {
@@ -107,7 +118,7 @@ public sealed partial class Al1217UseGuardNotEmptyGuidTests : AnalyzerTest<Al121
         """);
 
     [Fact]
-    public Task ShouldReportForArgumentNullException() => VerifyAsync("""
+    public Task ShouldReportForArgumentNullException() => Verify("""
         using System;
         public class C {
             void M(Guid id) {
@@ -117,7 +128,7 @@ public sealed partial class Al1217UseGuardNotEmptyGuidTests : AnalyzerTest<Al121
         """);
 
     [Fact]
-    public Task ShouldReportForMemberAccess() => VerifyAsync("""
+    public Task ShouldReportForMemberAccess() => Verify("""
         using System;
         public class C {
             private Guid _id;
@@ -126,18 +137,38 @@ public sealed partial class Al1217UseGuardNotEmptyGuidTests : AnalyzerTest<Al121
             }
         }
         """);
+
+    // Gate regression: no Guard type in scope → no diagnostic.
+    [Fact]
+    public Task ShouldNotReportWhenGuardNotReferenced() =>
+        VerifyAsync("""
+                    using System;
+                    public class C {
+                        void M(Guid id) {
+                            if (id == Guid.Empty) throw new ArgumentException("ID cannot be empty.", nameof(id));
+                        }
+                    }
+                    """);
 }
 
 public sealed partial class Al1217UseGuardNotEmptyGuidCodeFixTests
     : CodeFixTest<Al1217UseGuardNotEmptyGuidAnalyzer, Al1217UseGuardNotEmptyGuidCodeFixProvider> {
+    // Polyfill in the real namespace so the analyzer gate opens and Guard.NotEmpty() resolves.
+    private const string GuardPolyfill = """
+        using ANcpLua.Roslyn.Utilities;
+        namespace ANcpLua.Roslyn.Utilities {
+            public static class Guard {
+                public static void NotEmpty(System.Guid value) { }
+            }
+        }
+        """;
+
     [Fact]
     public Task ShouldPreserveMemberAccessReceiver() =>
         VerifyAsync(
-            """
+            $$"""
             using System;
-            public static class Guard {
-                public static void NotEmpty(Guid value) { }
-            }
+            {{GuardPolyfill}}
             public class User {
                 public Guid Id { get; set; }
             }
@@ -147,11 +178,9 @@ public sealed partial class Al1217UseGuardNotEmptyGuidCodeFixTests
                 }
             }
             """,
-            """
+            $$"""
             using System;
-            public static class Guard {
-                public static void NotEmpty(Guid value) { }
-            }
+            {{GuardPolyfill}}
             public class User {
                 public Guid Id { get; set; }
             }

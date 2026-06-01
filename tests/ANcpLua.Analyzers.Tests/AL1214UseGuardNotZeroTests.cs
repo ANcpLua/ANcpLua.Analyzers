@@ -7,8 +7,20 @@ namespace ANcpLua.Analyzers.Tests;
 ///     Tests for AL1214: Use Guard.NotZero instead of if (x == 0) throw ArgumentOutOfRangeException.
 /// </summary>
 public sealed partial class Al1214UseGuardNotZeroTests : AnalyzerTest<Al1214UseGuardNotZeroAnalyzer> {
+    // AL1214 only fires when ANcpLua.Roslyn.Utilities.Guard is present and accessible.
+    // Each case appends this stub so the gate is open; the dedicated
+    // ShouldNotReportWhenGuardNotReferenced case omits it to assert the gate itself.
+    private const string Stub = """
+                                namespace ANcpLua.Roslyn.Utilities { internal static class Guard { } }
+                                """;
+
+    private static Task Verify(string body) => VerifyAsync($$"""
+                                                            {{body}}
+                                                            {{Stub}}
+                                                            """);
+
     [Fact]
-    public Task ShouldReportForEqualsZero() => VerifyAsync("""
+    public Task ShouldReportForEqualsZero() => Verify("""
         using System;
         public class C {
             void M(int x) {
@@ -18,7 +30,7 @@ public sealed partial class Al1214UseGuardNotZeroTests : AnalyzerTest<Al1214UseG
         """);
 
     [Fact]
-    public Task ShouldReportForZeroEqualsX() => VerifyAsync("""
+    public Task ShouldReportForZeroEqualsX() => Verify("""
         using System;
         public class C {
             void M(int x) {
@@ -28,7 +40,7 @@ public sealed partial class Al1214UseGuardNotZeroTests : AnalyzerTest<Al1214UseG
         """);
 
     [Fact]
-    public Task ShouldReportForLongType() => VerifyAsync("""
+    public Task ShouldReportForLongType() => Verify("""
         using System;
         public class C {
             void M(long x) {
@@ -38,7 +50,7 @@ public sealed partial class Al1214UseGuardNotZeroTests : AnalyzerTest<Al1214UseG
         """);
 
     [Fact]
-    public Task ShouldReportForDoubleType() => VerifyAsync("""
+    public Task ShouldReportForDoubleType() => Verify("""
         using System;
         public class C {
             void M(double x) {
@@ -48,7 +60,7 @@ public sealed partial class Al1214UseGuardNotZeroTests : AnalyzerTest<Al1214UseG
         """);
 
     [Fact]
-    public Task ShouldReportForDecimalType() => VerifyAsync("""
+    public Task ShouldReportForDecimalType() => Verify("""
         using System;
         public class C {
             void M(decimal x) {
@@ -58,7 +70,7 @@ public sealed partial class Al1214UseGuardNotZeroTests : AnalyzerTest<Al1214UseG
         """);
 
     [Fact]
-    public Task ShouldReportForBlockStatement() => VerifyAsync("""
+    public Task ShouldReportForBlockStatement() => Verify("""
         using System;
         public class C {
             void M(int x) {
@@ -70,7 +82,7 @@ public sealed partial class Al1214UseGuardNotZeroTests : AnalyzerTest<Al1214UseG
         """);
 
     [Fact]
-    public Task ShouldReportForIsPattern() => VerifyAsync("""
+    public Task ShouldReportForIsPattern() => Verify("""
         using System;
         public class C {
             void M(int x) {
@@ -80,7 +92,7 @@ public sealed partial class Al1214UseGuardNotZeroTests : AnalyzerTest<Al1214UseG
         """);
 
     [Fact]
-    public Task ShouldReportWithMessage() => VerifyAsync("""
+    public Task ShouldReportWithMessage() => Verify("""
         using System;
         public class C {
             void M(int x) {
@@ -164,4 +176,17 @@ public sealed partial class Al1214UseGuardNotZeroTests : AnalyzerTest<Al1214UseG
             }
         }
         """);
+
+    // The consumer scenario: a project that does not reference ANcpLua.Roslyn.Utilities has no
+    // Guard type, so AL1214 must stay silent on correct BCL zero-check patterns.
+    [Fact]
+    public Task ShouldNotReportWhenGuardNotReferenced() =>
+        VerifyAsync("""
+                    using System;
+                    public class C {
+                        void M(int x) {
+                            if (x == 0) throw new ArgumentOutOfRangeException(nameof(x));
+                        }
+                    }
+                    """);
 }

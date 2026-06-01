@@ -9,14 +9,19 @@ namespace ANcpLua.Analyzers.Tests;
 /// </summary>
 public sealed partial class Al1206UseWhereNotNullCodeFixTests
     : CodeFixTest<Al1206UseWhereNotNullAnalyzer, Al1206UseWhereNotNullCodeFixProvider> {
-    // Polyfill stub - matches ANcpLua.Roslyn.Utilities signature
+    // Polyfill stub - matches ANcpLua.Roslyn.Utilities signature. Declared in the real
+    // ANcpLua.Roslyn.Utilities namespace so the analyzer's accessibility gate opens, and imported
+    // so the rewritten WhereNotNull() call resolves (the code fix adds this using when missing).
     private const string ExtensionsPolyfill = """
         #nullable enable
         using System.Collections.Generic;
         using System.Linq;
-        public static class EnumerableExtensions {
-            public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T?> source)
-                => throw null!;
+        using ANcpLua.Roslyn.Utilities;
+        namespace ANcpLua.Roslyn.Utilities {
+            public static class EnumerableExtensions {
+                public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T?> source)
+                    => throw null!;
+            }
         }
         """;
 

@@ -7,8 +7,19 @@ namespace ANcpLua.Analyzers.Tests;
 ///     Tests for AL1218: Use Guard.DefinedEnum instead of if (!Enum.IsDefined) throw patterns.
 /// </summary>
 public sealed partial class Al1218UseGuardDefinedEnumTests : AnalyzerTest<Al1218UseGuardDefinedEnumAnalyzer> {
+    // AL1218 only fires when ANcpLua.Roslyn.Utilities.Guard is present and accessible.
+    // Each case appends this stub; ShouldNotReportWhenGuardNotReferenced omits it.
+    private const string Stub = """
+                                namespace ANcpLua.Roslyn.Utilities { internal static class Guard { } }
+                                """;
+
+    private static Task Verify(string body) => VerifyAsync($$"""
+                                                            {{body}}
+                                                            {{Stub}}
+                                                            """);
+
     [Fact]
-    public Task ShouldReportForNonGenericEnumIsDefined() => VerifyAsync("""
+    public Task ShouldReportForNonGenericEnumIsDefined() => Verify("""
         using System;
         public enum MyEnum { A, B, C }
         public class C {
@@ -19,7 +30,7 @@ public sealed partial class Al1218UseGuardDefinedEnumTests : AnalyzerTest<Al1218
         """);
 
     [Fact]
-    public Task ShouldReportForGenericEnumIsDefined() => VerifyAsync("""
+    public Task ShouldReportForGenericEnumIsDefined() => Verify("""
         using System;
         public enum MyEnum { A, B, C }
         public class C {
@@ -30,7 +41,7 @@ public sealed partial class Al1218UseGuardDefinedEnumTests : AnalyzerTest<Al1218
         """);
 
     [Fact]
-    public Task ShouldReportForArgumentOutOfRangeException() => VerifyAsync("""
+    public Task ShouldReportForArgumentOutOfRangeException() => Verify("""
         using System;
         public enum MyEnum { A, B, C }
         public class C {
@@ -41,7 +52,7 @@ public sealed partial class Al1218UseGuardDefinedEnumTests : AnalyzerTest<Al1218
         """);
 
     [Fact]
-    public Task ShouldReportWithBlockStatement() => VerifyAsync("""
+    public Task ShouldReportWithBlockStatement() => Verify("""
         using System;
         public enum MyEnum { A, B, C }
         public class C {
@@ -55,7 +66,7 @@ public sealed partial class Al1218UseGuardDefinedEnumTests : AnalyzerTest<Al1218
         """);
 
     [Fact]
-    public Task ShouldReportWithParenthesizedCondition() => VerifyAsync("""
+    public Task ShouldReportWithParenthesizedCondition() => Verify("""
         using System;
         public enum MyEnum { A, B, C }
         public class C {
@@ -66,7 +77,7 @@ public sealed partial class Al1218UseGuardDefinedEnumTests : AnalyzerTest<Al1218
         """);
 
     [Fact]
-    public Task ShouldNotReportForBlockStatementWithExtraStatements() => VerifyAsync("""
+    public Task ShouldNotReportForBlockStatementWithExtraStatements() => Verify("""
         using System;
         public enum MyEnum { A, B, C }
         public class C {
@@ -80,7 +91,7 @@ public sealed partial class Al1218UseGuardDefinedEnumTests : AnalyzerTest<Al1218
         """);
 
     [Fact]
-    public Task ShouldNotReportWhenElsePresent() => VerifyAsync("""
+    public Task ShouldNotReportWhenElsePresent() => Verify("""
         using System;
         public enum MyEnum { A, B, C }
         public class C {
@@ -95,7 +106,7 @@ public sealed partial class Al1218UseGuardDefinedEnumTests : AnalyzerTest<Al1218
         """);
 
     [Fact]
-    public Task ShouldNotReportWithoutNegation() => VerifyAsync("""
+    public Task ShouldNotReportWithoutNegation() => Verify("""
         using System;
         public enum MyEnum { A, B, C }
         public class C {
@@ -109,7 +120,7 @@ public sealed partial class Al1218UseGuardDefinedEnumTests : AnalyzerTest<Al1218
         """);
 
     [Fact]
-    public Task ShouldNotReportForOtherExceptionTypes() => VerifyAsync("""
+    public Task ShouldNotReportForOtherExceptionTypes() => Verify("""
         using System;
         public enum MyEnum { A, B, C }
         public class C {
@@ -120,7 +131,7 @@ public sealed partial class Al1218UseGuardDefinedEnumTests : AnalyzerTest<Al1218
         """);
 
     [Fact]
-    public Task ShouldNotReportForTernaryExpression() => VerifyAsync("""
+    public Task ShouldNotReportForTernaryExpression() => Verify("""
         using System;
         public enum MyEnum { A, B, C }
         public class C {
@@ -129,7 +140,7 @@ public sealed partial class Al1218UseGuardDefinedEnumTests : AnalyzerTest<Al1218
         """);
 
     [Fact]
-    public Task ShouldNotReportForOtherMethods() => VerifyAsync("""
+    public Task ShouldNotReportForOtherMethods() => Verify("""
         using System;
         public enum MyEnum { A, B, C }
         public class C {
@@ -140,7 +151,7 @@ public sealed partial class Al1218UseGuardDefinedEnumTests : AnalyzerTest<Al1218
         """);
 
     [Fact]
-    public Task ShouldReportForFullyQualifiedEnumType() => VerifyAsync("""
+    public Task ShouldReportForFullyQualifiedEnumType() => Verify("""
         using System;
         public enum MyEnum { A, B, C }
         public class C {
@@ -149,4 +160,17 @@ public sealed partial class Al1218UseGuardDefinedEnumTests : AnalyzerTest<Al1218
             }
         }
         """);
+
+    // Gate regression: no Guard type in scope → no diagnostic.
+    [Fact]
+    public Task ShouldNotReportWhenGuardNotReferenced() =>
+        VerifyAsync("""
+                    using System;
+                    public enum MyEnum { A, B, C }
+                    public class C {
+                        void M(MyEnum value) {
+                            if (!Enum.IsDefined(typeof(MyEnum), value)) throw new ArgumentException("Invalid enum value.");
+                        }
+                    }
+                    """);
 }

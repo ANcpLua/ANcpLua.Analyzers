@@ -7,8 +7,20 @@ namespace ANcpLua.Analyzers.Tests;
 ///     Tests for AL1213: Use Guard.NotNullOrWhiteSpace instead of if (string.IsNullOrWhiteSpace(x)) throw.
 /// </summary>
 public sealed partial class Al1213UseGuardNotNullOrWhiteSpaceTests : AnalyzerTest<Al1213UseGuardNotNullOrWhiteSpaceAnalyzer> {
+    // AL1213 only fires when ANcpLua.Roslyn.Utilities.Guard is present and accessible.
+    // Each case appends this stub so the gate is open; the dedicated
+    // ShouldNotReportWhenGuardNotReferenced case omits it to assert the gate itself.
+    private const string Stub = """
+                                namespace ANcpLua.Roslyn.Utilities { internal static class Guard { } }
+                                """;
+
+    private static Task Verify(string body) => VerifyAsync($$"""
+                                                            {{body}}
+                                                            {{Stub}}
+                                                            """);
+
     [Fact]
-    public Task ShouldReportForIsNullOrWhiteSpaceWithArgumentNullException() => VerifyAsync("""
+    public Task ShouldReportForIsNullOrWhiteSpaceWithArgumentNullException() => Verify("""
         using System;
         public class C {
             void M(string? value) {
@@ -18,7 +30,7 @@ public sealed partial class Al1213UseGuardNotNullOrWhiteSpaceTests : AnalyzerTes
         """);
 
     [Fact]
-    public Task ShouldReportForIsNullOrWhiteSpaceWithArgumentException() => VerifyAsync("""
+    public Task ShouldReportForIsNullOrWhiteSpaceWithArgumentException() => Verify("""
         using System;
         public class C {
             void M(string? value) {
@@ -28,7 +40,7 @@ public sealed partial class Al1213UseGuardNotNullOrWhiteSpaceTests : AnalyzerTes
         """);
 
     [Fact]
-    public Task ShouldReportForBlockBody() => VerifyAsync("""
+    public Task ShouldReportForBlockBody() => Verify("""
         using System;
         public class C {
             void M(string? value) {
@@ -93,7 +105,7 @@ public sealed partial class Al1213UseGuardNotNullOrWhiteSpaceTests : AnalyzerTes
         """);
 
     [Fact]
-    public Task ShouldReportForStringClassNameUppercase() => VerifyAsync("""
+    public Task ShouldReportForStringClassNameUppercase() => Verify("""
         using System;
         public class C {
             void M(string? value) {
@@ -103,7 +115,7 @@ public sealed partial class Al1213UseGuardNotNullOrWhiteSpaceTests : AnalyzerTes
         """);
 
     [Fact]
-    public Task ShouldReportForMemberAccess() => VerifyAsync("""
+    public Task ShouldReportForMemberAccess() => Verify("""
         using System;
         public class C {
             private string? _name;
@@ -112,4 +124,17 @@ public sealed partial class Al1213UseGuardNotNullOrWhiteSpaceTests : AnalyzerTes
             }
         }
         """);
+
+    // The consumer scenario: a project that does not reference ANcpLua.Roslyn.Utilities has no
+    // Guard type, so AL1213 must stay silent on correct BCL whitespace guard patterns.
+    [Fact]
+    public Task ShouldNotReportWhenGuardNotReferenced() =>
+        VerifyAsync("""
+                    using System;
+                    public class C {
+                        void M(string? value) {
+                            if (string.IsNullOrWhiteSpace(value)) throw new ArgumentNullException(nameof(value));
+                        }
+                    }
+                    """);
 }

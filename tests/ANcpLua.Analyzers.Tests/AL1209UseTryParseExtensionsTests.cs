@@ -8,8 +8,20 @@ namespace ANcpLua.Analyzers.Tests;
 ///     Tests for AL1209: Use TryParse extension methods instead of verbose patterns.
 /// </summary>
 public sealed partial class Al1209UseTryParseExtensionsTests : AnalyzerTest<Al1209UseTryParseExtensionsAnalyzer> {
+    // AL1209 only fires when ANcpLua.Roslyn.Utilities.TryExtensions (which owns TryParseInt32 etc.)
+    // is present and accessible. Each case appends this stub so the gate is open; the dedicated
+    // ShouldNotReportWhenTryExtensionsNotReferenced case omits it to assert the gate itself.
+    private const string Stub = """
+                                namespace ANcpLua.Roslyn.Utilities { internal static class TryExtensions { } }
+                                """;
+
+    private static Task Verify(string body) => VerifyAsync($$"""
+                                                            {{body}}
+                                                            {{Stub}}
+                                                            """);
+
     [Fact]
-    public Task ShouldReportForIntTryParse() => VerifyAsync("""
+    public Task ShouldReportForIntTryParse() => Verify("""
         using System;
         public class C {
             int? M(string s) => [|int.TryParse(s, out var v) ? v : null|];
@@ -17,7 +29,7 @@ public sealed partial class Al1209UseTryParseExtensionsTests : AnalyzerTest<Al12
         """);
 
     [Fact]
-    public Task ShouldReportForLongTryParse() => VerifyAsync("""
+    public Task ShouldReportForLongTryParse() => Verify("""
         using System;
         public class C {
             long? M(string s) => [|long.TryParse(s, out var v) ? v : null|];
@@ -25,7 +37,7 @@ public sealed partial class Al1209UseTryParseExtensionsTests : AnalyzerTest<Al12
         """);
 
     [Fact]
-    public Task ShouldReportForGuidTryParse() => VerifyAsync("""
+    public Task ShouldReportForGuidTryParse() => Verify("""
         using System;
         public class C {
             Guid? M(string s) => [|Guid.TryParse(s, out var v) ? v : default(Guid?)|];
@@ -33,7 +45,7 @@ public sealed partial class Al1209UseTryParseExtensionsTests : AnalyzerTest<Al12
         """);
 
     [Fact]
-    public Task ShouldReportForBoolTryParse() => VerifyAsync("""
+    public Task ShouldReportForBoolTryParse() => Verify("""
         using System;
         public class C {
             bool? M(string s) => [|bool.TryParse(s, out var v) ? v : null|];
@@ -41,7 +53,7 @@ public sealed partial class Al1209UseTryParseExtensionsTests : AnalyzerTest<Al12
         """);
 
     [Fact]
-    public Task ShouldNotReportForNonTryParseMethod() => VerifyAsync("""
+    public Task ShouldNotReportForNonTryParseMethod() => Verify("""
                     using System;
                     public class C {
                         bool M(string s) => s.StartsWith("test") ? true : false;
@@ -49,7 +61,7 @@ public sealed partial class Al1209UseTryParseExtensionsTests : AnalyzerTest<Al12
                     """);
 
     [Fact]
-    public Task ShouldNotReportForWrongTrueBranchExpression() => VerifyAsync("""
+    public Task ShouldNotReportForWrongTrueBranchExpression() => Verify("""
                     using System;
                     public class C {
                         int? M(string s) {
@@ -60,7 +72,7 @@ public sealed partial class Al1209UseTryParseExtensionsTests : AnalyzerTest<Al12
                     """);
 
     [Fact]
-    public Task ShouldNotReportForDifferentOutFallback() => VerifyAsync("""
+    public Task ShouldNotReportForDifferentOutFallback() => Verify("""
                     using System;
                     public class C {
                         int? M(string s) => int.TryParse(s, out var v) ? v : 0;
@@ -68,12 +80,23 @@ public sealed partial class Al1209UseTryParseExtensionsTests : AnalyzerTest<Al12
                     """);
 
     [Fact]
-    public Task ShouldNotReportForSpanOverload() => VerifyAsync("""
+    public Task ShouldNotReportForSpanOverload() => Verify("""
                     using System;
                     using System.Globalization;
                     public class C {
                         int? M(string s, IFormatProvider provider) =>
                             int.TryParse(s, NumberStyles.Integer, provider, out var v) ? v : null;
+                    }
+                    """);
+
+    // The consumer scenario: a project that does not reference ANcpLua.Roslyn.Utilities has no
+    // TryExtensions type, so AL1209 must stay silent on correct TryParse patterns.
+    [Fact]
+    public Task ShouldNotReportWhenTryExtensionsNotReferenced() =>
+        VerifyAsync("""
+                    using System;
+                    public class C {
+                        int? M(string s) => int.TryParse(s, out var v) ? v : null;
                     }
                     """);
 }
@@ -86,7 +109,7 @@ public sealed partial class Al1209UseTryParseExtensionsCodeFixTests
     private const string TryParseExtensionsPolyfill = """
                                                   using ANcpLua.Roslyn.Utilities;
                                                   namespace ANcpLua.Roslyn.Utilities {
-                                                      public static class TryParseExtensions {
+                                                      public static class TryExtensions {
                                                           public static int? TryParseInt32(this string value) => null;
                                                           public static long? TryParseInt64(this string value) => null;
                                                           public static bool? TryParseBool(this string value) => null;

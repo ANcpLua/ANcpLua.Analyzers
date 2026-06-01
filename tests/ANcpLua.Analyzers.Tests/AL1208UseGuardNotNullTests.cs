@@ -7,8 +7,20 @@ namespace ANcpLua.Analyzers.Tests;
 ///     Tests for AL1208: Use Guard.NotNull instead of ?? throw new ArgumentNullException.
 /// </summary>
 public sealed partial class Al1208UseGuardNotNullTests : AnalyzerTest<Al1208UseGuardNotNullAnalyzer> {
+    // AL1208 only fires when ANcpLua.Roslyn.Utilities.Guard is present and accessible.
+    // Each case appends this stub so the gate is open; the dedicated
+    // ShouldNotReportWhenGuardNotReferenced case omits it to assert the gate itself.
+    private const string Stub = """
+                                namespace ANcpLua.Roslyn.Utilities { internal static class Guard { } }
+                                """;
+
+    private static Task Verify(string body) => VerifyAsync($$"""
+                                                            {{body}}
+                                                            {{Stub}}
+                                                            """);
+
     [Fact]
-    public Task ShouldReportForNullCoalesceThrow() => VerifyAsync("""
+    public Task ShouldReportForNullCoalesceThrow() => Verify("""
         using System;
         public class C {
             string M(string? x) => [|x ?? throw new ArgumentNullException(nameof(x))|];
@@ -16,7 +28,7 @@ public sealed partial class Al1208UseGuardNotNullTests : AnalyzerTest<Al1208UseG
         """);
 
     [Fact]
-    public Task ShouldReportForAssignmentPattern() => VerifyAsync("""
+    public Task ShouldReportForAssignmentPattern() => Verify("""
         using System;
         public class C {
             void M(string? x) {
@@ -26,7 +38,7 @@ public sealed partial class Al1208UseGuardNotNullTests : AnalyzerTest<Al1208UseG
         """);
 
     [Fact]
-    public Task ShouldReportForObjectParameter() => VerifyAsync("""
+    public Task ShouldReportForObjectParameter() => Verify("""
         using System;
         public class C {
             object M(object? value) => [|value ?? throw new ArgumentNullException(nameof(value))|];
@@ -50,7 +62,7 @@ public sealed partial class Al1208UseGuardNotNullTests : AnalyzerTest<Al1208UseG
         """);
 
     [Fact]
-    public Task ShouldSuggestThrowIfNullWhenHelperAvailable() => VerifyAsync("""
+    public Task ShouldSuggestThrowIfNullWhenHelperAvailable() => Verify("""
         using System;
         namespace Microsoft.Shared.Diagnostics {
             public static class Throw {
@@ -61,4 +73,15 @@ public sealed partial class Al1208UseGuardNotNullTests : AnalyzerTest<Al1208UseG
             string M(string? x) => [|x ?? throw new ArgumentNullException(nameof(x))|];
         }
         """);
+
+    // The consumer scenario: a project that does not reference ANcpLua.Roslyn.Utilities has no
+    // Guard type, so AL1208 must stay silent on correct BCL null-coalescing throw patterns.
+    [Fact]
+    public Task ShouldNotReportWhenGuardNotReferenced() =>
+        VerifyAsync("""
+                    using System;
+                    public class C {
+                        string M(string? x) => x ?? throw new ArgumentNullException(nameof(x));
+                    }
+                    """);
 }

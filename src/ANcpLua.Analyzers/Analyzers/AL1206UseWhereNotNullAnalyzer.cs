@@ -15,6 +15,8 @@ public sealed partial class Al1206UseWhereNotNullAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL1206.</summary>
     public const string DiagnosticId = "AL1206";
 
+    private const string EnumerableExtensionsMetadataName = "ANcpLua.Roslyn.Utilities.EnumerableExtensions";
+
     private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.RoslynUtilities,
@@ -25,7 +27,23 @@ public sealed partial class Al1206UseWhereNotNullAnalyzer : AlAnalyzer {
 
     /// <summary>Registers syntax or operation actions for analysis.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
+        context.RegisterCompilationStartAction(OnCompilationStart);
+
+    private static void OnCompilationStart(CompilationStartAnalysisContext context) {
+        // WhereNotNull() lives in ANcpLua.Roslyn.Utilities.EnumerableExtensions. Only fire when that
+        // type is present and callable from this compilation; otherwise the code fix would rewrite to
+        // a symbol the consumer can never resolve. Projects that do not reference ANcpLua.Roslyn.Utilities
+        // are unaffected.
+        if (context.Compilation.GetTypeByMetadataName(EnumerableExtensionsMetadataName) is not { } extensionsType) {
+            return;
+        }
+
+        if (!context.Compilation.IsSymbolAccessibleWithin(extensionsType, context.Compilation.Assembly)) {
+            return;
+        }
+
         context.RegisterOperationAction(AnalyzeInvocation, OperationKind.Invocation);
+    }
 
     private static void AnalyzeInvocation(OperationAnalysisContext context) {
         if (context.Operation is not IInvocationOperation invocation) {

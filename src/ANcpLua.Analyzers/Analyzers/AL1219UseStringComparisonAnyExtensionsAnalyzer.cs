@@ -9,6 +9,8 @@ public sealed partial class Al1219UseStringComparisonAnyExtensionsAnalyzer : AlA
     /// <summary>The diagnostic identifier for AL1219.</summary>
     private const string DiagnosticId = "AL1219";
 
+    private const string StringComparisonExtensionsMetadataName = "ANcpLua.Roslyn.Utilities.StringComparisonExtensions";
+
     private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.RoslynUtilities,
@@ -19,7 +21,22 @@ public sealed partial class Al1219UseStringComparisonAnyExtensionsAnalyzer : AlA
 
     /// <inheritdoc />
     protected override void RegisterActions(AnalysisContext context) =>
+        context.RegisterCompilationStartAction(OnCompilationStart);
+
+    private static void OnCompilationStart(CompilationStartAnalysisContext context) {
+        // EqualsAnyOrdinal() lives in ANcpLua.Roslyn.Utilities.StringComparisonExtensions. Only fire when
+        // that type is present and callable from this compilation; otherwise the suggestion would reference
+        // a symbol the consumer cannot resolve.
+        if (context.Compilation.GetTypeByMetadataName(StringComparisonExtensionsMetadataName) is not { } gateType) {
+            return;
+        }
+
+        if (!context.Compilation.IsSymbolAccessibleWithin(gateType, context.Compilation.Assembly)) {
+            return;
+        }
+
         context.RegisterOperationAction(AnalyzeBinaryOperator, OperationKind.BinaryOperator);
+    }
 
     private static void AnalyzeBinaryOperator(OperationAnalysisContext context) {
         if (context.Operation is not IBinaryOperation { OperatorKind: BinaryOperatorKind.ConditionalOr } topOr) {

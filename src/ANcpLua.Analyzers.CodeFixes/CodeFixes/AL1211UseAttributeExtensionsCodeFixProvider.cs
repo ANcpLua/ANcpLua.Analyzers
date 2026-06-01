@@ -13,6 +13,8 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al1211UseAttributeExtensionsCodeFixProvider))]
 [Shared]
 public sealed partial class Al1211UseAttributeExtensionsCodeFixProvider : CodeFixProvider {
+    private const string ExtensionsNamespace = "ANcpLua.Roslyn.Utilities";
+
     public override ImmutableArray<string> FixableDiagnosticIds => [Al1211UseAttributeExtensionsAnalyzer.DiagnosticId];
 
     public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
@@ -125,6 +127,33 @@ public sealed partial class Al1211UseAttributeExtensionsCodeFixProvider : CodeFi
             .WithTriviaFrom(nodeToReplace);
 
         var newRoot = root.ReplaceNode(nodeToReplace, newExpression);
+        newRoot = AddUsingIfMissing(newRoot, ExtensionsNamespace);
         return Task.FromResult(document.WithSyntaxRoot(newRoot));
+    }
+
+    private static SyntaxNode AddUsingIfMissing(SyntaxNode root, string namespaceName) {
+        if (root is not CompilationUnitSyntax compilationUnit) {
+            return root;
+        }
+
+        if (compilationUnit.Usings.Any(u => u.Name?.ToString() == namespaceName)) {
+            return root;
+        }
+
+        var newUsing = SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(namespaceName))
+            .WithTrailingTrivia(DetectEndOfLine(compilationUnit));
+
+        return compilationUnit.AddUsings(newUsing);
+    }
+
+    private static SyntaxTrivia DetectEndOfLine(CompilationUnitSyntax compilationUnit) {
+        // Preserve the file's CRLF/LF convention so the inserted using does not corrupt line endings.
+        foreach (var trivia in compilationUnit.DescendantTrivia()) {
+            if (trivia.IsKind(SyntaxKind.EndOfLineTrivia)) {
+                return trivia;
+            }
+        }
+
+        return SyntaxFactory.LineFeed;
     }
 }

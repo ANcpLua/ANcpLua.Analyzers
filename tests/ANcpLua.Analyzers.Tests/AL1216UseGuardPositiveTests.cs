@@ -8,8 +8,19 @@ namespace ANcpLua.Analyzers.Tests;
 ///     Tests for AL1216: Use Guard.Positive instead of if (x &lt;= 0) throw new ArgumentOutOfRangeException.
 /// </summary>
 public sealed partial class Al1216UseGuardPositiveTests : AnalyzerTest<Al1216UseGuardPositiveAnalyzer> {
+    // AL1216 only fires when ANcpLua.Roslyn.Utilities.Guard is present and accessible.
+    // Each positive/negative case appends this stub; ShouldNotReportWhenGuardNotReferenced omits it.
+    private const string Stub = """
+                                namespace ANcpLua.Roslyn.Utilities { internal static class Guard { } }
+                                """;
+
+    private static Task Verify(string body) => VerifyAsync($$"""
+                                                            {{body}}
+                                                            {{Stub}}
+                                                            """);
+
     [Fact]
-    public Task ShouldReportForLessThanOrEqualZero() => VerifyAsync("""
+    public Task ShouldReportForLessThanOrEqualZero() => Verify("""
         using System;
         public class C {
             void M(int x) {
@@ -19,7 +30,7 @@ public sealed partial class Al1216UseGuardPositiveTests : AnalyzerTest<Al1216Use
         """);
 
     [Fact]
-    public Task ShouldReportForReversedComparison() => VerifyAsync("""
+    public Task ShouldReportForReversedComparison() => Verify("""
         using System;
         public class C {
             void M(int x) {
@@ -29,7 +40,7 @@ public sealed partial class Al1216UseGuardPositiveTests : AnalyzerTest<Al1216Use
         """);
 
     [Fact]
-    public Task ShouldReportForLong() => VerifyAsync("""
+    public Task ShouldReportForLong() => Verify("""
         using System;
         public class C {
             void M(long count) {
@@ -39,7 +50,7 @@ public sealed partial class Al1216UseGuardPositiveTests : AnalyzerTest<Al1216Use
         """);
 
     [Fact]
-    public Task ShouldReportForDouble() => VerifyAsync("""
+    public Task ShouldReportForDouble() => Verify("""
         using System;
         public class C {
             void M(double value) {
@@ -49,7 +60,7 @@ public sealed partial class Al1216UseGuardPositiveTests : AnalyzerTest<Al1216Use
         """);
 
     [Fact]
-    public Task ShouldReportForDecimal() => VerifyAsync("""
+    public Task ShouldReportForDecimal() => Verify("""
         using System;
         public class C {
             void M(decimal amount) {
@@ -59,7 +70,7 @@ public sealed partial class Al1216UseGuardPositiveTests : AnalyzerTest<Al1216Use
         """);
 
     [Fact]
-    public Task ShouldReportForBlockBody() => VerifyAsync("""
+    public Task ShouldReportForBlockBody() => Verify("""
         using System;
         public class C {
             void M(int x) {
@@ -71,7 +82,7 @@ public sealed partial class Al1216UseGuardPositiveTests : AnalyzerTest<Al1216Use
         """);
 
     [Fact]
-    public Task ShouldNotReportForLessThanZero() => VerifyAsync("""
+    public Task ShouldNotReportForLessThanZero() => Verify("""
         using System;
         public class C {
             void M(int x) {
@@ -81,7 +92,7 @@ public sealed partial class Al1216UseGuardPositiveTests : AnalyzerTest<Al1216Use
         """);
 
     [Fact]
-    public Task ShouldNotReportForOtherExceptionTypes() => VerifyAsync("""
+    public Task ShouldNotReportForOtherExceptionTypes() => Verify("""
         using System;
         public class C {
             void M(int x) {
@@ -91,7 +102,7 @@ public sealed partial class Al1216UseGuardPositiveTests : AnalyzerTest<Al1216Use
         """);
 
     [Fact]
-    public Task ShouldNotReportForArgumentNullException() => VerifyAsync("""
+    public Task ShouldNotReportForArgumentNullException() => Verify("""
         using System;
         public class C {
             void M(int x) {
@@ -101,7 +112,7 @@ public sealed partial class Al1216UseGuardPositiveTests : AnalyzerTest<Al1216Use
         """);
 
     [Fact]
-    public Task ShouldNotReportForNonZeroComparison() => VerifyAsync("""
+    public Task ShouldNotReportForNonZeroComparison() => Verify("""
         using System;
         public class C {
             void M(int x) {
@@ -111,7 +122,7 @@ public sealed partial class Al1216UseGuardPositiveTests : AnalyzerTest<Al1216Use
         """);
 
     [Fact]
-    public Task ShouldNotReportForEqualsZero() => VerifyAsync("""
+    public Task ShouldNotReportForEqualsZero() => Verify("""
         using System;
         public class C {
             void M(int x) {
@@ -121,7 +132,7 @@ public sealed partial class Al1216UseGuardPositiveTests : AnalyzerTest<Al1216Use
         """);
 
     [Fact]
-    public Task ShouldNotReportForElseBranch() => VerifyAsync("""
+    public Task ShouldNotReportForElseBranch() => Verify("""
         using System;
         public class C {
             void M(int x) {
@@ -132,7 +143,7 @@ public sealed partial class Al1216UseGuardPositiveTests : AnalyzerTest<Al1216Use
         """);
 
     [Fact]
-    public Task ShouldReportForMemberAccess() => VerifyAsync("""
+    public Task ShouldReportForMemberAccess() => Verify("""
         using System;
         public class C {
             void M(Options opts) {
@@ -143,7 +154,7 @@ public sealed partial class Al1216UseGuardPositiveTests : AnalyzerTest<Al1216Use
         """);
 
     [Fact]
-    public Task ShouldReportForFloat() => VerifyAsync("""
+    public Task ShouldReportForFloat() => Verify("""
         using System;
         public class C {
             void M(float value) {
@@ -153,7 +164,7 @@ public sealed partial class Al1216UseGuardPositiveTests : AnalyzerTest<Al1216Use
         """);
 
     [Fact]
-    public Task ShouldReportForShort() => VerifyAsync("""
+    public Task ShouldReportForShort() => Verify("""
         using System;
         public class C {
             void M(short value) {
@@ -163,7 +174,7 @@ public sealed partial class Al1216UseGuardPositiveTests : AnalyzerTest<Al1216Use
         """);
 
     [Fact]
-    public Task ShouldReportWithMessage() => VerifyAsync("""
+    public Task ShouldReportWithMessage() => Verify("""
         using System;
         public class C {
             void M(int x) {
@@ -173,7 +184,7 @@ public sealed partial class Al1216UseGuardPositiveTests : AnalyzerTest<Al1216Use
         """);
 
     [Fact]
-    public Task ShouldNotReportForMultipleStatements() => VerifyAsync("""
+    public Task ShouldNotReportForMultipleStatements() => Verify("""
         using System;
         public class C {
             void M(int x) {
@@ -184,18 +195,38 @@ public sealed partial class Al1216UseGuardPositiveTests : AnalyzerTest<Al1216Use
             }
         }
         """);
+
+    // Gate regression: no Guard type in scope → no diagnostic.
+    [Fact]
+    public Task ShouldNotReportWhenGuardNotReferenced() =>
+        VerifyAsync("""
+                    using System;
+                    public class C {
+                        void M(int x) {
+                            if (x <= 0) throw new ArgumentOutOfRangeException(nameof(x));
+                        }
+                    }
+                    """);
 }
 
 public sealed partial class Al1216UseGuardPositiveCodeFixTests
     : CodeFixTest<Al1216UseGuardPositiveAnalyzer, Al1216UseGuardPositiveCodeFixProvider> {
-    [Fact]
-    public Task ShouldPreserveMemberAccessReceiver() =>
-        VerifyAsync(
-            """
-            using System;
+    // Polyfill in the real namespace so the analyzer gate opens and Guard.Positive() resolves.
+    private const string GuardPolyfill = """
+        using ANcpLua.Roslyn.Utilities;
+        namespace ANcpLua.Roslyn.Utilities {
             public static class Guard {
                 public static void Positive(int value) { }
             }
+        }
+        """;
+
+    [Fact]
+    public Task ShouldPreserveMemberAccessReceiver() =>
+        VerifyAsync(
+            $$"""
+            using System;
+            {{GuardPolyfill}}
             public class Options {
                 public int Count { get; set; }
             }
@@ -205,11 +236,9 @@ public sealed partial class Al1216UseGuardPositiveCodeFixTests
                 }
             }
             """,
-            """
+            $$"""
             using System;
-            public static class Guard {
-                public static void Positive(int value) { }
-            }
+            {{GuardPolyfill}}
             public class Options {
                 public int Count { get; set; }
             }

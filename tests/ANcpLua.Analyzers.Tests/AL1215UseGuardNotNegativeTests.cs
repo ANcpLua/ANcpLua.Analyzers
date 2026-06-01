@@ -7,8 +7,20 @@ namespace ANcpLua.Analyzers.Tests;
 ///     Tests for AL1215: Use Guard.NotNegative instead of if (x &lt; 0) throw new ArgumentOutOfRangeException.
 /// </summary>
 public sealed partial class Al1215UseGuardNotNegativeTests : AnalyzerTest<Al1215UseGuardNotNegativeAnalyzer> {
+    // AL1215 only fires when ANcpLua.Roslyn.Utilities.Guard is present and accessible.
+    // Each case appends this stub so the gate is open; the dedicated
+    // ShouldNotReportWhenGuardNotReferenced case omits it to assert the gate itself.
+    private const string Stub = """
+                                namespace ANcpLua.Roslyn.Utilities { internal static class Guard { } }
+                                """;
+
+    private static Task Verify(string body) => VerifyAsync($$"""
+                                                            {{body}}
+                                                            {{Stub}}
+                                                            """);
+
     [Fact]
-    public Task ShouldReportForIntLessThanZero() => VerifyAsync("""
+    public Task ShouldReportForIntLessThanZero() => Verify("""
         using System;
         public class C {
             void M(int x) {
@@ -18,7 +30,7 @@ public sealed partial class Al1215UseGuardNotNegativeTests : AnalyzerTest<Al1215
         """);
 
     [Fact]
-    public Task ShouldReportForZeroGreaterThanX() => VerifyAsync("""
+    public Task ShouldReportForZeroGreaterThanX() => Verify("""
         using System;
         public class C {
             void M(int x) {
@@ -28,7 +40,7 @@ public sealed partial class Al1215UseGuardNotNegativeTests : AnalyzerTest<Al1215
         """);
 
     [Fact]
-    public Task ShouldReportForLongType() => VerifyAsync("""
+    public Task ShouldReportForLongType() => Verify("""
         using System;
         public class C {
             void M(long value) {
@@ -38,7 +50,7 @@ public sealed partial class Al1215UseGuardNotNegativeTests : AnalyzerTest<Al1215
         """);
 
     [Fact]
-    public Task ShouldReportForDoubleType() => VerifyAsync("""
+    public Task ShouldReportForDoubleType() => Verify("""
         using System;
         public class C {
             void M(double value) {
@@ -48,7 +60,7 @@ public sealed partial class Al1215UseGuardNotNegativeTests : AnalyzerTest<Al1215
         """);
 
     [Fact]
-    public Task ShouldReportForDecimalType() => VerifyAsync("""
+    public Task ShouldReportForDecimalType() => Verify("""
         using System;
         public class C {
             void M(decimal value) {
@@ -58,7 +70,7 @@ public sealed partial class Al1215UseGuardNotNegativeTests : AnalyzerTest<Al1215
         """);
 
     [Fact]
-    public Task ShouldReportForThrowWithMessage() => VerifyAsync("""
+    public Task ShouldReportForThrowWithMessage() => Verify("""
         using System;
         public class C {
             void M(int x) {
@@ -68,7 +80,7 @@ public sealed partial class Al1215UseGuardNotNegativeTests : AnalyzerTest<Al1215
         """);
 
     [Fact]
-    public Task ShouldReportForBlockStatement() => VerifyAsync("""
+    public Task ShouldReportForBlockStatement() => Verify("""
         using System;
         public class C {
             void M(int x) {
@@ -80,7 +92,7 @@ public sealed partial class Al1215UseGuardNotNegativeTests : AnalyzerTest<Al1215
         """);
 
     [Fact]
-    public Task ShouldNotReportForBlockStatementWithExtraStatements() => VerifyAsync("""
+    public Task ShouldNotReportForBlockStatementWithExtraStatements() => Verify("""
         using System;
         public class C {
             void M(int x) {
@@ -93,7 +105,7 @@ public sealed partial class Al1215UseGuardNotNegativeTests : AnalyzerTest<Al1215
         """);
 
     [Fact]
-    public Task ShouldNotReportWhenElsePresent() => VerifyAsync("""
+    public Task ShouldNotReportWhenElsePresent() => Verify("""
         using System;
         public class C {
             void M(int x) {
@@ -107,7 +119,7 @@ public sealed partial class Al1215UseGuardNotNegativeTests : AnalyzerTest<Al1215
         """);
 
     [Fact]
-    public Task ShouldReportForParenthesizedCondition() => VerifyAsync("""
+    public Task ShouldReportForParenthesizedCondition() => Verify("""
         using System;
         public class C {
             void M(int x) {
@@ -117,7 +129,7 @@ public sealed partial class Al1215UseGuardNotNegativeTests : AnalyzerTest<Al1215
         """);
 
     [Fact]
-    public Task ShouldNotReportForLessThanOrEqual() => VerifyAsync("""
+    public Task ShouldNotReportForLessThanOrEqual() => Verify("""
         using System;
         public class C {
             void M(int x) {
@@ -127,7 +139,7 @@ public sealed partial class Al1215UseGuardNotNegativeTests : AnalyzerTest<Al1215
         """);
 
     [Fact]
-    public Task ShouldNotReportForOtherExceptionType() => VerifyAsync("""
+    public Task ShouldNotReportForOtherExceptionType() => Verify("""
         using System;
         public class C {
             void M(int x) {
@@ -137,7 +149,7 @@ public sealed partial class Al1215UseGuardNotNegativeTests : AnalyzerTest<Al1215
         """);
 
     [Fact]
-    public Task ShouldNotReportForArgumentException() => VerifyAsync("""
+    public Task ShouldNotReportForArgumentException() => Verify("""
         using System;
         public class C {
             void M(int x) {
@@ -147,7 +159,7 @@ public sealed partial class Al1215UseGuardNotNegativeTests : AnalyzerTest<Al1215
         """);
 
     [Fact]
-    public Task ShouldNotReportForNonZeroComparison() => VerifyAsync("""
+    public Task ShouldNotReportForNonZeroComparison() => Verify("""
         using System;
         public class C {
             void M(int x) {
@@ -157,7 +169,7 @@ public sealed partial class Al1215UseGuardNotNegativeTests : AnalyzerTest<Al1215
         """);
 
     [Fact]
-    public Task ShouldNotReportForTernaryExpression() => VerifyAsync("""
+    public Task ShouldNotReportForTernaryExpression() => Verify("""
         using System;
         public class C {
             int M(int x) => x < 0 ? throw new ArgumentOutOfRangeException(nameof(x)) : x;
@@ -165,7 +177,7 @@ public sealed partial class Al1215UseGuardNotNegativeTests : AnalyzerTest<Al1215
         """);
 
     [Fact]
-    public Task ShouldNotReportForEqualityComparison() => VerifyAsync("""
+    public Task ShouldNotReportForEqualityComparison() => Verify("""
         using System;
         public class C {
             void M(int x) {
@@ -175,7 +187,7 @@ public sealed partial class Al1215UseGuardNotNegativeTests : AnalyzerTest<Al1215
         """);
 
     [Fact]
-    public Task ShouldNotReportForGreaterThanZero() => VerifyAsync("""
+    public Task ShouldNotReportForGreaterThanZero() => Verify("""
         using System;
         public class C {
             void M(int x) {
@@ -183,4 +195,17 @@ public sealed partial class Al1215UseGuardNotNegativeTests : AnalyzerTest<Al1215
             }
         }
         """);
+
+    // The consumer scenario: a project that does not reference ANcpLua.Roslyn.Utilities has no
+    // Guard type, so AL1215 must stay silent on correct guard patterns.
+    [Fact]
+    public Task ShouldNotReportWhenGuardNotReferenced() =>
+        VerifyAsync("""
+                    using System;
+                    public class C {
+                        void M(int x) {
+                            if (x < 0) throw new ArgumentOutOfRangeException(nameof(x));
+                        }
+                    }
+                    """);
 }

@@ -16,6 +16,8 @@ public sealed partial class Al1209UseTryParseExtensionsAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL1209.</summary>
     public const string DiagnosticId = "AL1209";
 
+    private const string TryExtensionsMetadataName = "ANcpLua.Roslyn.Utilities.TryExtensions";
+
     private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.RoslynUtilities,
@@ -26,7 +28,22 @@ public sealed partial class Al1209UseTryParseExtensionsAnalyzer : AlAnalyzer {
 
     /// <summary>Registers syntax or operation actions for analysis.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
+        context.RegisterCompilationStartAction(OnCompilationStart);
+
+    private static void OnCompilationStart(CompilationStartAnalysisContext context) {
+        // TryParseInt32() and related methods live in ANcpLua.Roslyn.Utilities.TryExtensions. Only fire
+        // when that type is present and callable from this compilation; otherwise the suggestion/fix
+        // would reference a symbol the consumer cannot resolve.
+        if (context.Compilation.GetTypeByMetadataName(TryExtensionsMetadataName) is not { } gateType) {
+            return;
+        }
+
+        if (!context.Compilation.IsSymbolAccessibleWithin(gateType, context.Compilation.Assembly)) {
+            return;
+        }
+
         context.RegisterOperationAction(AnalyzeConditional, OperationKind.Conditional);
+    }
 
     private static void AnalyzeConditional(OperationAnalysisContext context) {
         if (context.Operation is not IConditionalOperation conditional) {
