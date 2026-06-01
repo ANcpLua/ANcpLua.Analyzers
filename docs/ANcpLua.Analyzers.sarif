@@ -576,7 +576,7 @@
                 "text": "Use StringComparison extension"
               },
               "fullDescription": {
-                "text": "Use StringComparison extensions (EqualsOrdinal, ContainsIgnoreCase, etc.) instead of methods with StringComparison enum parameter."
+                "text": "Use StringComparison extensions (EqualsOrdinal, ContainsIgnoreCase, etc.) from ANcpLua.Roslyn.Utilities instead of methods with a StringComparison enum parameter. Reported only when those extensions are referenced and accessible in the project, so projects that do not reference ANcpLua.Roslyn.Utilities are unaffected."
               },
               "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1210_UseStringComparisonExtensions.md",
               "defaultConfiguration": {

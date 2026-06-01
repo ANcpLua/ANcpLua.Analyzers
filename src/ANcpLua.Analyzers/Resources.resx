@@ -382,7 +382,7 @@
     <value>Use '{0}' for clearer intent</value>
   </data>
     <data name="AL1210AnalyzerDescription" xml:space="preserve">
-    <value>Use StringComparison extensions (EqualsOrdinal, ContainsIgnoreCase, etc.) instead of methods with StringComparison enum parameter.</value>
+    <value>Use StringComparison extensions (EqualsOrdinal, ContainsIgnoreCase, etc.) from ANcpLua.Roslyn.Utilities instead of methods with a StringComparison enum parameter. Reported only when those extensions are referenced and accessible in the project, so projects that do not reference ANcpLua.Roslyn.Utilities are unaffected.</value>
   </data>
     <!-- AL1211: Use attribute extensions -->
     <data name="AL1211AnalyzerTitle" xml:space="preserve">

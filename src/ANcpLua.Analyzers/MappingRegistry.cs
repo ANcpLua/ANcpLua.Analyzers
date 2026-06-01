@@ -59,15 +59,17 @@ internal static partial class MappingRegistry
     /// <summary>
     ///     Maps StringComparison enum values to extension method suffixes.
     /// </summary>
+    /// <remarks>
+    ///     Only Ordinal and OrdinalIgnoreCase have StringComparisonExtensions equivalents in
+    ///     ANcpLua.Roslyn.Utilities. Culture-aware comparisons have no extension method, so they are
+    ///     intentionally absent — suggesting e.g. <c>EqualsInvariantCulture</c> would name a method
+    ///     that does not exist.
+    /// </remarks>
     private static readonly Dictionary<string, string> s_stringComparisonSuffixes =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
             ["Ordinal"] = "Ordinal",
-            ["OrdinalIgnoreCase"] = "IgnoreCase",
-            ["CurrentCulture"] = "CurrentCulture",
-            ["CurrentCultureIgnoreCase"] = "CurrentCultureIgnoreCase",
-            ["InvariantCulture"] = "InvariantCulture",
-            ["InvariantCultureIgnoreCase"] = "InvariantCultureIgnoreCase"
+            ["OrdinalIgnoreCase"] = "IgnoreCase"
         };
 
     /// <summary>

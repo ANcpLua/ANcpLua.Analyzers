@@ -22,12 +22,33 @@ public sealed partial class Al1210UseStringComparisonExtensionsAnalyzer : AlAnal
         DiagnosticCategories.RoslynUtilities,
         DiagnosticSeverities.Suggestion);
 
+    private const string StringComparisonExtensionsMetadataName =
+        "ANcpLua.Roslyn.Utilities.StringComparisonExtensions";
+
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <summary>Registers syntax or operation actions for analysis.</summary>
     protected override void RegisterActions(AnalysisContext context) =>
+        context.RegisterCompilationStartAction(OnCompilationStart);
+
+    private static void OnCompilationStart(CompilationStartAnalysisContext context) {
+        // The suggested replacements (EqualsOrdinal, ContainsIgnoreCase, ...) live in
+        // ANcpLua.Roslyn.Utilities.StringComparisonExtensions. Only analyze when that type is
+        // present AND callable from this compilation; otherwise the code fix would rewrite a BCL
+        // StringComparison call into a symbol the consumer can never resolve. A project that merely
+        // pulls the analyzer package gets the helper DLL on the analyzer load path, not as a compile
+        // reference, so the type does not resolve there and the rule stays silent.
+        if (context.Compilation.GetTypeByMetadataName(StringComparisonExtensionsMetadataName) is not { } extensionsType) {
+            return;
+        }
+
+        if (!context.Compilation.IsSymbolAccessibleWithin(extensionsType, context.Compilation.Assembly)) {
+            return;
+        }
+
         context.RegisterOperationAction(AnalyzeInvocation, OperationKind.Invocation);
+    }
 
     private static void AnalyzeInvocation(OperationAnalysisContext context) {
         if (context.Operation is not IInvocationOperation invocation) {

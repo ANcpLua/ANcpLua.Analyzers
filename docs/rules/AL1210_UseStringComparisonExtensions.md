@@ -12,7 +12,7 @@
 
 ## Description
 
-Use StringComparison extensions (EqualsOrdinal, ContainsIgnoreCase, etc.) instead of methods with StringComparison enum parameter.
+Use StringComparison extensions (EqualsOrdinal, ContainsIgnoreCase, etc.) from ANcpLua.Roslyn.Utilities instead of methods with a StringComparison enum parameter. Reported only when those extensions are referenced and accessible in the project, so projects that do not reference ANcpLua.Roslyn.Utilities are unaffected.
 
 ## See also
 

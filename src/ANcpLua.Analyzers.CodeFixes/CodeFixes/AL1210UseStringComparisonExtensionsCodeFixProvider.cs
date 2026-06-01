@@ -12,19 +12,22 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 ///         <item><c>str.StartsWith(prefix, StringComparison.Ordinal)</c> → <c>str.StartsWithOrdinal(prefix)</c></item>
 ///         <item><c>str.Contains(sub, StringComparison.OrdinalIgnoreCase)</c> → <c>str.ContainsIgnoreCase(sub)</c></item>
 ///     </list>
+///     A <c>using ANcpLua.Roslyn.Utilities;</c> directive is added to the compilation unit when missing,
+///     so the rewritten call resolves to <c>StringComparisonExtensions</c>.
 /// </remarks>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(Al1210UseStringComparisonExtensionsCodeFixProvider))]
 [Shared]
 public sealed partial class Al1210UseStringComparisonExtensionsCodeFixProvider
     : AlCodeFixProvider<InvocationExpressionSyntax> {
-    // Mapping from StringComparison value to extension suffix
+    private const string ExtensionsNamespace = "ANcpLua.Roslyn.Utilities";
+
+    // Mapping from StringComparison value to extension suffix. Only Ordinal/OrdinalIgnoreCase have
+    // StringComparisonExtensions equivalents; culture-aware comparisons have no extension method.
+    // Kept in sync with MappingRegistry.s_stringComparisonSuffixes — the analyzer/code-fix assembly
+    // boundary (no InternalsVisibleTo) prevents sharing the analyzer's internal registry directly.
     private static readonly Dictionary<string, string> s_comparisonToSuffix = new(StringComparer.Ordinal) {
         ["Ordinal"] = "Ordinal",
-        ["OrdinalIgnoreCase"] = "IgnoreCase",
-        ["CurrentCulture"] = "CurrentCulture",
-        ["CurrentCultureIgnoreCase"] = "CurrentCultureIgnoreCase",
-        ["InvariantCulture"] = "InvariantCulture",
-        ["InvariantCultureIgnoreCase"] = "InvariantCultureIgnoreCase"
+        ["OrdinalIgnoreCase"] = "IgnoreCase"
     };
 
     /// <summary>Gets the diagnostic IDs this code fix can fix.</summary>
@@ -88,7 +91,35 @@ public sealed partial class Al1210UseStringComparisonExtensionsCodeFixProvider
             .WithTriviaFrom(invocation);
 
         var newRoot = root.ReplaceNode(invocation, newExpression);
+        newRoot = AddUsingIfMissing(newRoot, ExtensionsNamespace);
         return Task.FromResult(document.WithSyntaxRoot(newRoot));
+    }
+
+    private static SyntaxNode AddUsingIfMissing(SyntaxNode root, string namespaceName) {
+        if (root is not CompilationUnitSyntax compilationUnit) {
+            return root;
+        }
+
+        if (compilationUnit.Usings.Any(u => u.Name?.ToString() == namespaceName)) {
+            return root;
+        }
+
+        var newUsing = SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(namespaceName))
+            .WithTrailingTrivia(DetectEndOfLine(compilationUnit));
+
+        return compilationUnit.AddUsings(newUsing);
+    }
+
+    private static SyntaxTrivia DetectEndOfLine(CompilationUnitSyntax compilationUnit) {
+        // Preserve the file's CRLF/LF convention so the inserted using does not corrupt
+        // line endings; fall back to LineFeed only when the file has no end-of-line trivia.
+        foreach (var trivia in compilationUnit.DescendantTrivia()) {
+            if (trivia.IsKind(SyntaxKind.EndOfLineTrivia)) {
+                return trivia;
+            }
+        }
+
+        return SyntaxFactory.LineFeed;
     }
 
     private static bool IsStringComparisonArgument(ArgumentSyntax argument, out string? value) {
