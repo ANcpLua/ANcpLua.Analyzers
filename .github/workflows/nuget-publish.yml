@@ -40,8 +40,9 @@ jobs:
           fi
 
       - name: Restore
-        # Restore WITHOUT Version override - SDK injects published analyzer (1.10.7)
-        # The Version prop would cause SDK to inject 1.11.0 which doesn't exist yet
+        # Restore WITHOUT the Version override: ANcpLua.NET.Sdk self-injects the PUBLISHED analyzer
+        # version, so overriding Version to the not-yet-published release version breaks restore (that
+        # package isn't on NuGet yet). Build below applies -p:Version with --no-restore.
         run: dotnet restore ANcpLua.Analyzers.slnx
 
       - name: Build
