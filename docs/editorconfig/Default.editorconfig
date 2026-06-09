@@ -81,6 +81,7 @@ dotnet_diagnostic.AL1502.severity = warning
 dotnet_diagnostic.AL1503.severity = warning
 dotnet_diagnostic.AL1504.severity = error
 dotnet_diagnostic.AL1505.severity = warning
+dotnet_diagnostic.AL1506.severity = suggestion
 dotnet_diagnostic.AL1600.severity = warning
 dotnet_diagnostic.AL1601.severity = warning
 dotnet_diagnostic.AL1602.severity = warning

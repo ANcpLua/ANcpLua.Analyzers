@@ -81,6 +81,7 @@ dotnet_diagnostic.AL1502.severity = error
 dotnet_diagnostic.AL1503.severity = error
 dotnet_diagnostic.AL1504.severity = error
 dotnet_diagnostic.AL1505.severity = error
+dotnet_diagnostic.AL1506.severity = error
 dotnet_diagnostic.AL1600.severity = error
 dotnet_diagnostic.AL1601.severity = error
 dotnet_diagnostic.AL1602.severity = error

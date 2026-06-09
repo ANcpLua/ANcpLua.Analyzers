@@ -81,6 +81,7 @@ dotnet_diagnostic.AL1502.severity = none
 dotnet_diagnostic.AL1503.severity = none
 dotnet_diagnostic.AL1504.severity = none
 dotnet_diagnostic.AL1505.severity = none
+dotnet_diagnostic.AL1506.severity = none
 dotnet_diagnostic.AL1600.severity = none
 dotnet_diagnostic.AL1601.severity = none
 dotnet_diagnostic.AL1602.severity = none
