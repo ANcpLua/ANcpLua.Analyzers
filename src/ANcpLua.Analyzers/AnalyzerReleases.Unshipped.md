@@ -5,4 +5,4 @@
 
 Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
-AL1506 | Design | Info | Al1506ExcludeFromCodeCoverageHidesBranchesAnalyzer
+AL1506 | Design | Warning | Al1506ExcludeFromCodeCoverageHidesBranchesAnalyzer

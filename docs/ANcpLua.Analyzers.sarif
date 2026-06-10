@@ -1290,11 +1290,11 @@
                 "text": "Excluded code hides untested branches"
               },
               "fullDescription": {
-                "text": "[ExcludeFromCodeCoverage] removes a symbol from coverage reports entirely, so any if/switch/loop/?:/catch inside it counts as covered even though no test executed it \u2014 the classic source of a misleading 100%. When the exclusion is legitimate (platform-specific P/Invoke, generated code, unreachable defensive paths), record why in the attribute\u0027s Justification so the decision stays auditable. Otherwise the branching belongs under coverage: remove the attribute."
+                "text": "[ExcludeFromCodeCoverage] removes a symbol from coverage reports entirely, so any if/switch/loop/catch inside it counts as covered even though no test executed it \u2014 the classic source of a misleading 100%. When the exclusion is legitimate (platform-specific P/Invoke, generated code, unreachable defensive paths), record why in the attribute\u0027s Justification so the decision stays auditable. Otherwise the branching belongs under coverage: remove the attribute."
               },
               "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1506_ExcludeFromCodeCoverageHidesBranches.md",
               "defaultConfiguration": {
-                "level": "note"
+                "level": "warning"
               },
               "properties": {
                 "category": "Design"

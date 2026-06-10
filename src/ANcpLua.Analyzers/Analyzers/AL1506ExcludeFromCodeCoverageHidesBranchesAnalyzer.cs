@@ -7,7 +7,7 @@ namespace ANcpLua.Analyzers.Analyzers;
 /// <remarks>
 ///     <para>
 ///         <c>[ExcludeFromCodeCoverage]</c> removes a symbol from coverage reports entirely, so any
-///         <c>if</c>/<c>switch</c>/loop/<c>?:</c>/<c>catch</c> inside it counts as covered even though no
+///         <c>if</c>/<c>switch</c>/loop/<c>catch</c> inside it counts as covered even though no
 ///         test ever executed it. That is the classic source of a misleading 100% line/branch rate — the
 ///         number reads green while real control flow has never run.
 ///     </para>
@@ -35,7 +35,7 @@ public sealed partial class Al1506ExcludeFromCodeCoverageHidesBranchesAnalyzer :
     private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.Design,
-        DiagnosticSeverity.Info);
+        DiagnosticSeverity.Warning);
 
     /// <inheritdoc />
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
@@ -114,7 +114,6 @@ public sealed partial class Al1506ExcludeFromCodeCoverageHidesBranchesAnalyzer :
         SyntaxKind.IfStatement => true,
         SyntaxKind.SwitchStatement => true,
         SyntaxKind.SwitchExpression => true,
-        SyntaxKind.ConditionalExpression => true,
         SyntaxKind.ForStatement => true,
         SyntaxKind.ForEachStatement => true,
         SyntaxKind.ForEachVariableStatement => true,

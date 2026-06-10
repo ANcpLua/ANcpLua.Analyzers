@@ -91,7 +91,7 @@ Each ID links to a per-rule page under [`docs/rules/`](rules/) with severity, ca
 | [AL1503](rules/AL1503_NormalizeWhitespace.md) | Warning | Avoid NormalizeWhitespace in source generators | No |
 | [AL1504](rules/AL1504_DuckDbTableMustBePartial.md) | Error | [DuckDbTable] type must be partial | No |
 | [AL1505](rules/AL1505_DuckDbColumnConflictingOrdinal.md) | Warning | Conflicting [DuckDbColumn] ordinal values | No |
-| [AL1506](rules/AL1506_ExcludeFromCodeCoverageHidesBranches.md) | Info | Excluded code hides untested branches | No |
+| [AL1506](rules/AL1506_ExcludeFromCodeCoverageHidesBranches.md) | Warning | Excluded code hides untested branches | No |
 | [AL1600](rules/AL1600_HardcodedPackageVersion.md) | Warning | Hardcoded package version detected | No |
 | [AL1601](rules/AL1601_VersionPropsNotImported.md) | Warning | Version.props not imported | No |
 | [AL1602](rules/AL1602_UndefinedVersionVariable.md) | Warning | Undefined version variable | No |

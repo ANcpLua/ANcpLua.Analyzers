@@ -58,7 +58,7 @@ public sealed partial class Al1506ExcludeFromCodeCoverageHidesBranchesTests
                     """);
 
     [Fact]
-    public Task ShouldReportWhenExcludedPropertyHasConditional() =>
+    public Task ShouldReportWhenExcludedPropertyHasBranchingAccessor() =>
         VerifyAsync("""
                     using System.Diagnostics.CodeAnalysis;
 
@@ -66,7 +66,15 @@ public sealed partial class Al1506ExcludeFromCodeCoverageHidesBranchesTests
                         private int _x;
 
                         [{|AL1506:ExcludeFromCodeCoverage|}]
-                        public string Label => _x > 0 ? "pos" : "neg";
+                        public string Label {
+                            get {
+                                if (_x > 0) {
+                                    return "pos";
+                                }
+
+                                return "neg";
+                            }
+                        }
                     }
                     """);
 
@@ -77,7 +85,13 @@ public sealed partial class Al1506ExcludeFromCodeCoverageHidesBranchesTests
 
                     public class C {
                         [{|AL1506:ExcludeFromCodeCoverage(Justification = "   ")|}]
-                        public int M(int x) => x > 0 ? 1 : 0;
+                        public int M(int x) {
+                            if (x > 0) {
+                                return 1;
+                            }
+
+                            return 0;
+                        }
                     }
                     """);
 
@@ -118,6 +132,17 @@ public sealed partial class Al1506ExcludeFromCodeCoverageHidesBranchesTests
                     public class Dto {
                         public string Name { get; set; } = "";
                         public int Age { get; set; }
+                    }
+                    """);
+
+    [Fact]
+    public Task ShouldNotReportWhenOnlyBranchIsInlineSelection() =>
+        VerifyAsync("""
+                    using System.Diagnostics.CodeAnalysis;
+
+                    public class C {
+                        [ExcludeFromCodeCoverage]
+                        public int Pick(int x, int y) => x > 0 ? x : y;
                     }
                     """);
 

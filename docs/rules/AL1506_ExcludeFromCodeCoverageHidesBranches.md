@@ -4,7 +4,7 @@
 
 | Property | Value |
 | -- | -- |
-| Severity | Info |
+| Severity | Warning |
 | Category | `Design` |
 | Code fix | No |
 | Analyzer | `Al1506ExcludeFromCodeCoverageHidesBranchesAnalyzer` |
@@ -12,7 +12,7 @@
 
 ## Description
 
-[ExcludeFromCodeCoverage] removes a symbol from coverage reports entirely, so any if/switch/loop/?:/catch inside it counts as covered even though no test executed it — the classic source of a misleading 100%. When the exclusion is legitimate (platform-specific P/Invoke, generated code, unreachable defensive paths), record why in the attribute's Justification so the decision stays auditable. Otherwise the branching belongs under coverage: remove the attribute.
+[ExcludeFromCodeCoverage] removes a symbol from coverage reports entirely, so any if/switch/loop/catch inside it counts as covered even though no test executed it — the classic source of a misleading 100%. When the exclusion is legitimate (platform-specific P/Invoke, generated code, unreachable defensive paths), record why in the attribute's Justification so the decision stays auditable. Otherwise the branching belongs under coverage: remove the attribute.
 
 ## See also
 
