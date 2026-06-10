@@ -41,8 +41,12 @@ public sealed partial class Al1506ExcludeFromCodeCoverageHidesBranchesAnalyzer :
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
     /// <inheritdoc />
-    protected override void RegisterActions(AnalysisContext context) =>
+    protected override void RegisterActions(AnalysisContext context) {
+        // Generated code (source generators, designers) carries branches the consumer didn't write
+        // and can't test — never demand a Justification for an exclusion they don't own.
+        context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
         context.RegisterCompilationStartAction(OnCompilationStart);
+    }
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
         if (context.Compilation.GetTypeByMetadataName(ExcludeFromCodeCoverageMetadataName) is not { } attributeType) {
