@@ -73,7 +73,7 @@
          AL0xxx-ID analyzers; consumer Renovate-bump PRs hit build errors
          like AL0101 (renumbered to AL1408 in 2.0.0) because the OLD rule
          dll was being resolved here. -->
-    <ANcpLuaAnalyzersVersion>2.0.1</ANcpLuaAnalyzersVersion>
+    <ANcpLuaAnalyzersVersion>2.1.0</ANcpLuaAnalyzersVersion>
     <JonSkeetAnalyzersVersion>1.0.0-beta.6</JonSkeetAnalyzersVersion>
   </PropertyGroup>
 
