@@ -8,18 +8,12 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace ANcpLua.Analyzers.DocsGenerator;
 
-/// <summary>
-///   Walks every analyzer / code-fix source file under
-///   <c>src/ANcpLua.Analyzers/Analyzers/</c> and aligns class names, XML doc
-///   summaries, and <c>DiagnosticId</c>-const docs with the runtime
-///   <c>DiagnosticDescriptor.Id</c> each class registers. The runtime descriptor
-///   is the source of truth — RS2008 already locks the descriptor↔release-tracking
-///   contract, and this tool propagates that same authority into source.
-///
-///   Multi-id analyzers (e.g., <c>AL1003ToAL1004</c> documenting both IDs in the
-///   summary) are not "wrong" — each documented row matches one of the registered
-///   descriptors, and the rewriter consults <c>AllAnalyzerIds</c> to recognise that.
-/// </summary>
+// Aligns analyzer/code-fix source (class names, XML doc summaries, DiagnosticId-const docs)
+// with the runtime DiagnosticDescriptor.Id each class registers. The runtime descriptor is the
+// source of truth: RS2008 already locks the descriptor<->release-tracking contract, and this
+// propagates that same authority into source.
+// Multi-id analyzers (e.g. AL1003ToAL1004 documenting both IDs) are not "wrong" -- each row
+// matches a registered descriptor, which is why the rewriter consults AllAnalyzerIds.
 internal static class EnforceIdsRewriter
 {
     private static readonly Regex ClassPrefixRegex = new(@"^(?:Al|AL)(\d{4})(.+)$");

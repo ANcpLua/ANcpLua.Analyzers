@@ -7,22 +7,10 @@ using Microsoft.CodeAnalysis;
 
 namespace ANcpLua.Analyzers.DocsGenerator;
 
-/// <summary>
-///   Emits a SARIF v2.1.0 rule manifest describing every <see cref="DiagnosticDescriptor"/>
-///   this package ships. Each descriptor maps to one <c>reportingDescriptor</c> entry
-///   inside <c>runs[0].tool.driver.rules</c>. The file is run-results-free —
-///   <c>runs[0].results</c> is empty — because this is a <i>rule catalog</i> for tool
-///   interop (Sonar bridges, GitHub Advanced Security uploads, IDE rule catalogs),
-///   not an analyzer execution result. Indent + sort-by-id keeps the output
-///   deterministic for <c>--check</c> drift detection.
-///
-///   Spec: https://docs.oasis-open.org/sarif/sarif/v2.1.0/sarif-v2.1.0.html
-///
-///   Extension point: future machine-readable catalogs (CodeQL pack manifest, OWASP-ASVS
-///   mapping JSON) land as sibling classes next to this one with the same shape — accept
-///   <c>(descriptors, idToClass)</c>, return deterministic text, ship a <c>*Path</c>
-///   helper on <see cref="RepoLayout"/>.
-/// </summary>
+// SARIF v2.1.0 rule manifest. runs[0].results is intentionally empty: this is a rule catalog for
+// tool interop (Sonar bridges, GitHub Advanced Security, IDE rule catalogs), not an execution
+// result. Indent + sort-by-id keep the output deterministic for --check drift detection.
+// Spec: https://docs.oasis-open.org/sarif/sarif/v2.1.0/sarif-v2.1.0.html
 internal static class SarifRenderer
 {
     public static string Render(

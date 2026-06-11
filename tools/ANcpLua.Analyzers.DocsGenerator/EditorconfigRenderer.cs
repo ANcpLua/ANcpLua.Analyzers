@@ -6,15 +6,7 @@ using Microsoft.CodeAnalysis;
 
 namespace ANcpLua.Analyzers.DocsGenerator;
 
-/// <summary>
-///   Emits the three canonical editorconfig severity profiles consumers can drop into
-///   their repo to switch the whole AL band in one line. Mirrors the MS NetAnalyzers
-///   <c>rulesets/</c> + <c>editorconfig/</c> pattern at our scale.
-///
-///   Extension point: add a new profile by appending one <c>yield return</c>; the
-///   renderer is parameterised on a <c>severityFor</c> selector, so domain-specific
-///   profiles (per-band, per-severity floor) need no further code here.
-/// </summary>
+// Mirrors the MS NetAnalyzers rulesets/ + editorconfig/ pattern at our scale.
 internal static class EditorconfigRenderer
 {
     public static IEnumerable<(string AbsolutePath, string Content)> EnumerateProfiles(

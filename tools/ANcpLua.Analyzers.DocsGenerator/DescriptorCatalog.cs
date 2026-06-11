@@ -8,20 +8,10 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace ANcpLua.Analyzers.DocsGenerator;
 
-/// <summary>
-///   Reflects the analyzer assembly to enumerate everything the renderers + rewriters
-///   need: the <see cref="DiagnosticDescriptor"/> catalog, the set of fixable IDs, and
-///   the <c>Id → ClassName</c> map (covering multi-id analyzers by pointing every id
-///   at the same class). The runtime descriptor remains the source of truth; this is
-///   the only place that depends on <see cref="Activator.CreateInstance(Type)"/> over
-///   analyzer types — keeping that fragility contained.
-/// </summary>
+// Runtime descriptors are the source of truth. This is the only place that reflects over
+// analyzer types via Activator.CreateInstance, deliberately containing that fragility.
 internal static class DescriptorCatalog
 {
-    /// <summary>
-    ///   Returns every distinct <see cref="DiagnosticDescriptor"/> reported by the analyzer
-    ///   assembly, ordered by id for deterministic output.
-    /// </summary>
     public static IReadOnlyList<DiagnosticDescriptor> GetDescriptors()
     {
         var seen = new HashSet<string>(StringComparer.Ordinal);
@@ -45,11 +35,8 @@ internal static class DescriptorCatalog
         return descriptors.OrderBy(d => d.Id, StringComparer.Ordinal).ToArray();
     }
 
-    /// <summary>
-    ///   Returns the set of <c>AL*</c> diagnostic ids any <see cref="CodeFixProvider"/>
-    ///   advertises. Filters to the <c>AL</c> band so a code-fix that happens to advertise
-    ///   a non-package id doesn't leak into per-rule "Code fix: Yes" labels.
-    /// </summary>
+    // Filtered to the AL band so a code-fix advertising a non-package id can't leak into
+    // per-rule "Code fix: Yes" labels.
     public static HashSet<string> GetFixableDiagnosticIds()
     {
         var ids = new HashSet<string>(StringComparer.Ordinal);
@@ -70,11 +57,6 @@ internal static class DescriptorCatalog
         return ids;
     }
 
-    /// <summary>
-    ///   Walks every concrete <see cref="DiagnosticAnalyzer"/> in the analyzer assembly
-    ///   and builds <c>Id → ClassName</c>. Analyzers that register multiple ids point
-    ///   all of those ids at the same class.
-    /// </summary>
     public static Dictionary<string, string> BuildIdToClassMap()
     {
         var map = new Dictionary<string, string>(StringComparer.Ordinal);
@@ -95,15 +77,11 @@ internal static class DescriptorCatalog
         return map;
     }
 
-    /// <summary>
-    ///   Variant used by <see cref="EnforceIdsRewriter"/>. Returns three views:
-    ///   <list type="bullet">
-    ///     <item><c>AnalyzerIds</c> — the smallest descriptor id (ordinal-sorted) per analyzer class.</item>
-    ///     <item><c>CodeFixIds</c> — the smallest <c>FixableDiagnosticIds</c> entry per code-fix class.</item>
-    ///     <item><c>AllAnalyzerIds</c> — the full set of ids per multi-id analyzer class so the source rewriter
-    ///       can recognise existing valid id references (e.g., <c>AL1003ToAL1004</c> documenting both IDs).</item>
-    ///   </list>
-    /// </summary>
+    // Three views for EnforceIdsRewriter:
+    //   AnalyzerIds    -> smallest ordinal-sorted descriptor id per analyzer class.
+    //   CodeFixIds     -> smallest FixableDiagnosticIds entry per code-fix class.
+    //   AllAnalyzerIds -> full id set per multi-id analyzer class, so the rewriter recognises
+    //                     valid existing references (e.g. AL1003ToAL1004 documenting both IDs).
     public static (
         Dictionary<string, string> AnalyzerIds,
         Dictionary<string, string> CodeFixIds,

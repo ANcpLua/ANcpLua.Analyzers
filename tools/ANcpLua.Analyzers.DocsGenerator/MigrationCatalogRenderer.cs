@@ -5,16 +5,6 @@ using System.Text;
 
 namespace ANcpLua.Analyzers.DocsGenerator;
 
-/// <summary>
-///   Renders <c>docs/migration-catalog.md</c>: the AL0xxx → AL1xxx rename map
-///   from the 2.0.0 break. Consumer-facing answer to the question
-///   "I have <c>dotnet_diagnostic.AL0001.severity = error</c> in my
-///   editorconfig — what's it called now?".
-///
-///   Extension point: every section is a <c>void(StringBuilder, MigrationCatalogStats)</c>
-///   in the <c>sections</c> array. New views (per-band severity heat-map, codefix
-///   coverage column, etc.) plug in by appending to that array.
-/// </summary>
 internal static class MigrationCatalogRenderer
 {
     public static string Render(MigrationCatalogStats stats)
@@ -105,12 +95,8 @@ internal static class MigrationCatalogRenderer
     }
 }
 
-/// <summary>
-///   Computed view of <see cref="AlIdMigrationCatalog"/>. <see cref="Compute"/> also
-///   calls <see cref="AlIdMigrationCatalog.Validate"/> so any contract drift fails
-///   before we start writing files. Mirrors the QYL <c>CatalogStatistics</c> shape
-///   for cross-repo familiarity.
-/// </summary>
+// Compute() also calls AlIdMigrationCatalog.Validate(), so any contract drift fails before we
+// write files. Mirrors the QYL CatalogStatistics shape for cross-repo familiarity.
 internal sealed record MigrationCatalogStats(
     int RenameCount,
     int BandCount,

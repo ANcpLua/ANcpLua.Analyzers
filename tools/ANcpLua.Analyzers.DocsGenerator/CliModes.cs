@@ -3,15 +3,6 @@
 
 namespace ANcpLua.Analyzers.DocsGenerator;
 
-/// <summary>
-///   The generator's operating modes. <c>Generate</c> + <c>Check</c> own the produced
-///   artifacts (index, per-rule pages, editorconfig profiles, SARIF). <c>Audit</c> is a
-///   read-only stats print. <c>EnforceIdsCheck</c> + <c>EnforceIdsApply</c> reconcile
-///   analyzer source files against runtime descriptors.
-///
-///   Extension point: add a new mode by appending it here, wiring it in
-///   <see cref="CliModes.Parse"/>, and dispatching from <see cref="DocsGenerator.Run"/>.
-/// </summary>
 internal enum Mode
 {
     Generate,

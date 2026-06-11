@@ -3,12 +3,8 @@
 
 namespace ANcpLua.Analyzers.DocsGenerator;
 
-/// <summary>
-///   Markdown cell-escaping helper shared by every renderer. Centralised so that all
-///   tables emit the same escaping rules — descriptor titles/descriptions occasionally
-///   contain pipes or newlines, and inconsistent escaping has bitten <c>--check</c>
-///   drift in the past.
-/// </summary>
+// Shared cell-escaping so every renderer escapes identically. Descriptor titles/descriptions
+// occasionally contain pipes or newlines, and inconsistent escaping has bitten --check drift before.
 internal static class MarkdownFormatting
 {
     public static string Escape(string value) =>

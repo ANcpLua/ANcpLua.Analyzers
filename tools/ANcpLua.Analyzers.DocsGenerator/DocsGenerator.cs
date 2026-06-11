@@ -3,17 +3,6 @@
 
 namespace ANcpLua.Analyzers.DocsGenerator;
 
-/// <summary>
-///   Top-level orchestrator. Owns the mode dispatch (<see cref="CliModes.Parse"/>),
-///   the generated-artifact pipelines (<c>Generate</c> + <c>Check</c>), and the
-///   source-side <c>EnforceIds</c> rewriter. Every other class in this project is
-///   pure logic invoked from here.
-///
-///   Extension point: each generated artifact (index, per-rule pages, migration
-///   catalog, SARIF, editorconfig) is one numbered step in <see cref="Generate"/> +
-///   <see cref="Check"/>. Adding a new artifact means adding a focused renderer class
-///   and one numbered step in both methods.
-/// </summary>
 internal static class DocsGenerator
 {
     public static int Run(string[] args)
