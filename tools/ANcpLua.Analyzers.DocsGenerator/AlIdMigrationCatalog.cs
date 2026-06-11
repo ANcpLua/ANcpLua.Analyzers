@@ -6,25 +6,14 @@ using System.Text.RegularExpressions;
 
 namespace ANcpLua.Analyzers.DocsGenerator;
 
-/// <summary>
-///   AL0xxx → AL1xxx rename map from the 2.0.0 break. Documentation only — this
-///   catalog is consumed by the docs generator under <c>tools/</c> and does NOT
-///   ship in the runtime analyzer DLL. The 2.0.1 analyzer no longer emits
-///   AL0xxx, so no runtime code needs the old IDs; the catalog exists purely so
-///   the generated migration-catalog markdown can tell consumers "your
-///   editorconfig says AL0001 — that's now AL1000".
-///
-///   If a follow-up diagnostic ever warns consumers whose editorconfig still
-///   has stale <c>dotnet_diagnostic.AL0xxx.severity</c> entries, this catalog
-///   moves to <c>src/ANcpLua.Analyzers/</c> with it.
-///
-///   <see cref="Validate"/> runs structural invariant sweeps on every
-///   <see cref="MigrationCatalogStats.Compute"/> call and is also covered by a
-///   mandatory unit test in <c>AnalyzerConventionTests</c> — drift in the
-///   hand-transcription gets caught at CI, not at "Claude ran --check on a dev
-///   machine and forgot to commit the regenerated output".
-/// </summary>
-/// <summary>One row in the AL0xxx → AL1xxx rename map.</summary>
+// AL0xxx -> AL1xxx rename map from the 2.0.0 break. Documentation only: consumed by the docs
+// generator under tools/ and does NOT ship in the runtime analyzer DLL. The 2.0.1 analyzer no
+// longer emits AL0xxx, so no runtime code needs the old IDs; this exists purely so the generated
+// migration-catalog markdown can tell consumers "your editorconfig says AL0001 -- that's now AL1000".
+// If a follow-up diagnostic ever warns on stale dotnet_diagnostic.AL0xxx.severity entries, this
+// catalog moves to src/ANcpLua.Analyzers/ with it.
+// Validate() is covered by a mandatory AnalyzerConventionTests unit test, so hand-transcription
+// drift is caught at CI rather than only when --check happens to run on a dev machine.
 public sealed record AlIdRename(string OldId, string NewId, string Band, string Title);
 
 // Public (not internal) so the test project at tests/ANcpLua.Analyzers.Tests/ can
@@ -130,10 +119,8 @@ public static class AlIdMigrationCatalog
     private static readonly Regex NewIdRegex = new(@"^AL1[0-8]\d{2}$", RegexOptions.Compiled);
     private static readonly Regex OldIdRegex = new(@"^AL\d{4}$", RegexOptions.Compiled);
 
-    /// <summary>
-    ///   Structural invariants. No hardcoded ExpectedCount — count is a consequence
-    ///   of the actual safety properties below, not a property worth asserting.
-    /// </summary>
+    // Structural invariants. No hardcoded ExpectedCount: count is a consequence of the
+    // safety properties below, not a property worth asserting.
     public static void Validate()
     {
         if (Entries.IsDefaultOrEmpty)

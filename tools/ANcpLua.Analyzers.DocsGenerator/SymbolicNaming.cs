@@ -5,27 +5,18 @@ using System.Text.RegularExpressions;
 
 namespace ANcpLua.Analyzers.DocsGenerator;
 
-/// <summary>
-///   Class-name ↔ symbolic-name ↔ on-disk-filename transforms. Kept in one place because
-///   the per-rule docs filename (<c>docs/rules/{id}_{symbolic}.md</c>), the descriptor
-///   <c>HelpLinkUri</c> anchor, and the GitHub-case-sensitive source filename all have
-///   to agree byte-for-byte for <c>--check</c> drift detection to mean anything.
-/// </summary>
+// Class-name <-> symbolic-name <-> on-disk-filename transforms, kept in one place because the
+// per-rule docs filename (docs/rules/{id}_{symbolic}.md), the descriptor HelpLinkUri anchor, and
+// the GitHub-case-sensitive source filename must agree byte-for-byte or --check means nothing.
 internal static class SymbolicNaming
 {
     private static readonly Regex EmbeddedUpperAl = new(@"AL(\d{4})", RegexOptions.Compiled);
     private static readonly Regex SymbolicPrefix = new(@"^Al\d{4}", RegexOptions.Compiled);
     private static readonly Regex PascalAl = new(@"Al(\d{4})", RegexOptions.Compiled);
 
-    /// <summary>
-    ///   Strips the <c>Analyzer</c> suffix and any <c>Al\d{4}</c> prefix off the
-    ///   class name; the remainder is the symbolic part used in per-rule docs
-    ///   filenames <c>docs/rules/{id}_{symbolic}.md</c> and in the help-link URL.
-    ///   Normalizes embedded uppercase <c>AL\d{4}</c> to Pascal-case <c>Al\d{4}</c>
-    ///   first so the output matches <c>RuleDocs.SymbolicNameFromFile</c> on multi-id
-    ///   classes (e.g., <c>AL1003ToAL1004SpanComparison</c> in a file basename vs
-    ///   <c>Al1003ToAl1004SpanComparison</c> in a reflected class name).
-    /// </summary>
+    // Normalizes embedded uppercase AL\d{4} to Pascal-case Al\d{4} first so the result matches
+    // RuleDocs.SymbolicNameFromFile on multi-id classes (file basename AL1003ToAL1004SpanComparison
+    // vs reflected class name Al1003ToAl1004SpanComparison).
     public static string ToSymbolicName(string className)
     {
         var name = EmbeddedUpperAl.Replace(className, "Al$1");
@@ -37,14 +28,9 @@ internal static class SymbolicNaming
         return name;
     }
 
-    /// <summary>
-    ///   Maps a Pascal-case class name (e.g., <c>Al1003ToAl1004SpanComparisonAnalyzer</c>)
-    ///   to its on-disk source filename (<c>AL1003ToAL1004SpanComparisonAnalyzer.cs</c>).
-    ///   git tracks files with uppercase <c>AL</c> prefix; macOS's case-insensitive
-    ///   default masks this locally but GitHub's case-sensitive URL space does not.
-    ///   Replaces every <c>Al{4-digit}</c> occurrence with uppercase <c>AL{4-digit}</c>
-    ///   so multi-id classes (which carry two IDs in the name) lift both prefixes.
-    /// </summary>
+    // Pascal-case class name -> on-disk source filename (uppercases every Al{4-digit} to AL{4-digit},
+    // so multi-id classes lift both prefixes). git tracks the uppercase AL prefix; macOS's
+    // case-insensitive default masks this locally but GitHub's case-sensitive URL space does not.
     public static string FileBasenameForClass(string className) =>
         PascalAl.Replace(className, "AL$1");
 }

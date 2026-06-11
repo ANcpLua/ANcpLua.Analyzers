@@ -3,12 +3,6 @@
 
 namespace ANcpLua.Analyzers.DocsGenerator;
 
-/// <summary>
-///   Owns the package-identity constants and every path the generator reads or writes.
-///   Centralising path math here keeps the renderer/rewriter classes free of any
-///   filesystem layout knowledge — they ask <see cref="RepoLayout"/> for what they need
-///   and stay testable as pure functions of <see cref="DiagnosticDescriptor"/> input.
-/// </summary>
 internal static class RepoLayout
 {
     public const string PackageName = "ANcpLua.Analyzers";
@@ -41,12 +35,9 @@ internal static class RepoLayout
     public static string AnalyzersSourceDir(string repoRoot) =>
         Path.Combine(repoRoot, "src", PackageName, "Analyzers");
 
-    /// <summary>
-    ///   Walks up from the assembly directory looking for the solution file. The
-    ///   generator is invoked from the AfterBuild target on the analyzer csproj (CWD =
-    ///   repo root) and ad-hoc <c>dotnet run</c> (CWD = project dir), so anchoring on
-    ///   the solution file makes both shapes work.
-    /// </summary>
+    // Walks up from the assembly directory to the solution file. Invoked both from the analyzer
+    // csproj AfterBuild target (CWD = repo root) and ad-hoc `dotnet run` (CWD = project dir);
+    // anchoring on the solution file makes both shapes resolve correctly.
     public static string FindRepoRoot(string start)
     {
         for (var dir = new DirectoryInfo(start); dir is not null; dir = dir.Parent)

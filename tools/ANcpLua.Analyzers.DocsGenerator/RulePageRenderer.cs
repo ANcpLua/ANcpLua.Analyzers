@@ -6,15 +6,8 @@ using Microsoft.CodeAnalysis;
 
 namespace ANcpLua.Analyzers.DocsGenerator;
 
-/// <summary>
-///   Emits one markdown page per rule, keyed by id + symbolic name. Each page is
-///   small (header + property table + description + see-also) so IDE Quick-Fix
-///   "Show error help" links resolve onto a focused page rather than the
-///   multi-thousand-line aggregate.
-///
-///   Extension point: per-rule examples sourced from analyzer test fixtures can
-///   land here once a fixture-extraction helper exists.
-/// </summary>
+// One small markdown page per rule, so IDE Quick-Fix "Show error help" resolves onto a focused
+// page rather than a multi-thousand-line aggregate.
 internal static class RulePageRenderer
 {
     public static string Render(

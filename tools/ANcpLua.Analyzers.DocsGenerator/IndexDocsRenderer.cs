@@ -6,13 +6,8 @@ using Microsoft.CodeAnalysis;
 
 namespace ANcpLua.Analyzers.DocsGenerator;
 
-/// <summary>
-///   Renders the slim <c>docs/ANcpLua.Analyzers.md</c> index page. The page is
-///   intentionally an index, not an aggregate — each rule row links to its dedicated
-///   <c>docs/rules/{id}_{symbolic}.md</c> page (the descriptor's <c>HelpLinkUri</c>
-///   resolves to the same target). Sections compose by sequential <c>WriteX</c> calls
-///   in <see cref="Render"/> — adding a section means appending one method here.
-/// </summary>
+// Intentionally an index, not an aggregate: each rule row links to its dedicated
+// docs/rules/{id}_{symbolic}.md page, which is also where the descriptor's HelpLinkUri resolves.
 internal static class IndexDocsRenderer
 {
     public static string Render(
