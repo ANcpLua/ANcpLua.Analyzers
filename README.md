@@ -7,7 +7,7 @@
 
 # ANcpLua.Analyzers
 
-Roslyn diagnostic analyzers and code fixes for modern C# correctness, async and threading reliability, AOT and trim safety, ASP.NET Core / Aspire hosting, Roslyn-author hygiene, package/version management, agent-tool governance, and the ANcpLua Roslyn-utilities helper API — 89 rules across 9 domain bands.
+Roslyn diagnostic analyzers and code fixes for modern C# correctness, async and threading reliability, AOT and trim safety, ASP.NET Core / Aspire hosting, Roslyn-author hygiene, package/version management, agent-tool governance, and the ANcpLua Roslyn-utilities helper API — 90 rules across 9 domain bands.
 
 Targets: `netstandard2.0` (Roslyn host requirement)
 
@@ -29,7 +29,7 @@ Targets: `netstandard2.0` (Roslyn host requirement)
 | `AL1200..1299` | Roslyn Utilities helper API surface | 21 |
 | `AL1300..1399` | Async / threading / reliability | 15 |
 | `AL1400..1499` | AOT / trim safety | 10 |
-| `AL1500..1599` | Roslyn-author hygiene | 6 |
+| `AL1500..1599` | Roslyn-author hygiene | 7 |
 | `AL1600..1699` | Package / version management / doc alignment | 7 |
 | `AL1700..1799` | Style | 4 |
 | `AL1800..1899` | Agent / tool governance (Loom) | 3 |
@@ -132,7 +132,7 @@ Targets: `netstandard2.0` (Roslyn host requirement)
 | AL1408 | Warning | Activator.CreateInstance is not AOT-safe |
 | AL1409 | Warning | Type.GetType with dynamic name is not AOT-safe |
 
-### Roslyn-author hygiene (`AL1500..1505`)
+### Roslyn-author hygiene (`AL1500..1506`)
 
 | ID | Severity | Title |
 |---|---|---|
@@ -142,6 +142,7 @@ Targets: `netstandard2.0` (Roslyn host requirement)
 | AL1503 | Warning | Avoid NormalizeWhitespace in source generators |
 | AL1504 | Error | [DuckDbTable] type must be partial |
 | AL1505 | Warning | Conflicting [DuckDbColumn] ordinal values |
+| AL1506 | Warning | Excluded code hides untested branches |
 
 ### Package / version management (`AL1600..1606`)
 
@@ -176,7 +177,7 @@ Targets: `netstandard2.0` (Roslyn host requirement)
 
 ```xml
 <PackageReference Include="ANcpLua.Analyzers"
-                  Version="2.0.1"
+                  Version="2.1.0"
                   PrivateAssets="all"
                   IncludeAssets="analyzers; buildtransitive" />
 ```
