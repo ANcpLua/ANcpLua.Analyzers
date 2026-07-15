@@ -19,6 +19,20 @@
   </PropertyGroup>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
+       ROSLYN — local AHEAD override (SDK 3.4.42 ships 5.3.0)
+       Host SDK 10.0.30x bundles csc 5.6.0, so compiling against 5.6.0 stays
+       aligned with the running compiler (no CS9057). Delete this group once the
+       consumed ANcpLua.NET.Sdk ships 5.6.0 and the SDK value flows through.
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <PropertyGroup Label="Roslyn">
+    <RoslynVersion>5.6.0</RoslynVersion>
+    <!-- Directory.Build.props derives this eagerly from the SDK's RoslynVersion (5.3.0)
+         BEFORE this local override lands; re-derive it here so the SDK-injected
+         Microsoft.CodeAnalysis.CSharp matches the CPM CSharp.Workspaces (both 5.6.0). -->
+    <SourceGeneratorRoslynVersion>$(RoslynVersion)</SourceGeneratorRoslynVersion>
+  </PropertyGroup>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
        ROSLYN.UTILITIES (Runtime package)
        ═══════════════════════════════════════════════════════════════════════ -->
   <PropertyGroup Label="Roslyn.Utilities">
