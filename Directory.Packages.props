@@ -27,7 +27,7 @@
         <PackageVersion Include="Basic.Reference.Assemblies.NetStandard20" Version="$(BasicReferenceAssembliesVersion)"/>
     </ItemGroup>
 
-    <!-- Analyzer Testing (beta from dotnet-tools feed) -->
+    <!-- Analyzer Testing -->
     <ItemGroup Label="Analyzer Testing">
         <PackageVersion Include="Microsoft.CodeAnalysis.Analyzer.Testing" Version="$(AnalyzerTestingVersion)"/>
         <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing" Version="$(AnalyzerTestingVersion)"/>
@@ -50,6 +50,5 @@
         <PackageVersion Update="ANcpLua.Analyzers" Version="$(ANcpLuaAnalyzersVersion)"/>
         <PackageVersion Update="Microsoft.Sbom.Targets" Version="$(SbomTargetsVersion)"/>
         <PackageVersion Update="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="$(BannedApiAnalyzersVersion)"/>
-        <PackageVersion Update="JonSkeet.RoslynAnalyzers" Version="$(JonSkeetAnalyzersVersion)"/>
     </ItemGroup>
 </Project>

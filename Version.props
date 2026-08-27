@@ -2,92 +2,45 @@
   <!--
     LOCAL OVERRIDE — ANcpLua.Analyzers (NOT the SDK source-of-truth)
 
-    Imported by Directory.Packages.props AFTER the SDK-shipped Version.props,
-    so locals win. The SDK truth file lives inside the published nupkg at
-    ~/.nuget/packages/ancplua.net.sdk/<ver>/Build/Common/Version.props.
+    Directory.Packages.props imports this file AFTER ANcpLua.NET.Sdk's own
+    Build/Common/Version.props, so every property here wins over SDK truth.
 
-    INVARIANT: keep only entries AHEAD of the SDK. If an entry equals SDK or
-    has fallen BEHIND, delete it — the SDK value flows through. BEHIND drift =
-    silent regression, not a feature.
+    INVARIANT — an entry belongs here only if it is exactly one of:
+
+      [SDK-UNDEFINED]  the SDK ships no value at all, so this file is the sole
+                       source. Deleting the entry breaks restore or the build.
+      [AHEAD]          the SDK ships an OLDER value we deliberately outrun.
+                       Delete the entry the moment the SDK catches up.
+
+    Everything else is drift. An entry level with SDK truth is a duplicate; an
+    entry behind SDK truth is a silent regression wearing an override's clothes.
+    Both get deleted and the SDK value flows through untouched.
+
+    Every entry below states which case it is — and, for [AHEAD], the SDK value
+    it outruns — so auditing this file is a diff against
+    ~/.nuget/packages/ancplua.net.sdk/<ver>/Build/Common/Version.props rather
+    than an archaeology exercise. An [AHEAD] entry whose stated SDK value has
+    caught up is, by that fact alone, ready to delete.
   -->
-  <PropertyGroup Label="SDK Version (Auto-generated)">
-    <ANcpSdkPackageVersion>999.9.9</ANcpSdkPackageVersion>
-  </PropertyGroup>
 
-  <PropertyGroup Label=".NET SDK">
-    <DotNetSdkRollForward>latestFeature</DotNetSdkRollForward>
-  </PropertyGroup>
-
-  <!-- ═══════════════════════════════════════════════════════════════════════
-       ROSLYN.UTILITIES (Runtime package)
-       ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- [SDK-UNDEFINED] The SDK defines no ANcpLuaRoslynUtilities* property at all.
+       Consumed by Directory.Packages.props. global.json pins ANcpLua.Roslyn.Utilities
+       and .Testing as msbuild-sdks — those two must move in lockstep with these. -->
   <PropertyGroup Label="Roslyn.Utilities">
     <ANcpLuaRoslynUtilitiesVersion>2.2.44</ANcpLuaRoslynUtilitiesVersion>
-  </PropertyGroup>
-
-  <!-- ═══════════════════════════════════════════════════════════════════════
-       ROSLYN.UTILITIES.SOURCES (Source-only package for generators)
-       ═══════════════════════════════════════════════════════════════════════ -->
-  <PropertyGroup Label="Roslyn.Utilities.Sources">
-    <ANcpLuaRoslynUtilitiesSourcesVersion>2.2.44</ANcpLuaRoslynUtilitiesSourcesVersion>
-  </PropertyGroup>
-
-  <!-- ═══════════════════════════════════════════════════════════════════════
-       ROSLYN.UTILITIES.POLYFILLS (Source-only polyfills for netstandard2.0)
-       ═══════════════════════════════════════════════════════════════════════ -->
-  <PropertyGroup Label="Roslyn.Utilities.Polyfills">
     <ANcpLuaRoslynUtilitiesPolyfillsVersion>2.2.44</ANcpLuaRoslynUtilitiesPolyfillsVersion>
-  </PropertyGroup>
-
-  <!-- ═══════════════════════════════════════════════════════════════════════
-       ROSLYN.UTILITIES.TESTING (Analyzer/CodeFix/Generator test infrastructure)
-       ═══════════════════════════════════════════════════════════════════════ -->
-  <PropertyGroup Label="Roslyn.Utilities.Testing">
     <ANcpLuaRoslynUtilitiesTestingVersion>2.2.44</ANcpLuaRoslynUtilitiesTestingVersion>
   </PropertyGroup>
 
-  <!-- ═══════════════════════════════════════════════════════════════════════
-       MEZIANTOU PACKAGES
-       Used by: SDK, Roslyn.Utilities
-       ═══════════════════════════════════════════════════════════════════════ -->
-  <PropertyGroup Label="Meziantou">
-    <MeziantouAnalyzerVersion>3.0.44</MeziantouAnalyzerVersion>
-  </PropertyGroup>
-
-  <!-- ═══════════════════════════════════════════════════════════════════════
-       ANALYZERS (SDK-injected)
-       ═══════════════════════════════════════════════════════════════════════ -->
-  <PropertyGroup Label="Analyzers">
-    <!-- INVARIANT (see Directory.Build.props):
-         This is the LAST-PUBLISHED nuget.org version, used by the SDK's
-         GlobalPackageReference self-injection. Must always be a version
-         that already exists on nuget.org — otherwise restore fails NU1102.
-         After publishing N.M.P, bump to N.M.P. Before publishing N.M.P+1,
-         the value can stay at N.M.P; never set to N.M.P+1 before publish.
-
-         CR autofix conflated VersionPrefix with this value in commit 2fe348d
-         (2026-05-25) and broke CI; that incident triggered the CR uninstall.
-
-         Post-2.0.1-publish bump: now safe to track current.
-         Restore at 1.29.4 was forcing the AL repo's CI to dogfood OLD
-         AL0xxx-ID analyzers; consumer Renovate-bump PRs hit build errors
-         like AL0101 (renumbered to AL1408 in 2.0.0) because the OLD rule
-         dll was being resolved here.
-
-         2026-07-16: local entry deleted — SDK 3.4.44 ships 2.1.1 (published),
-         local 2.1.0 had fallen BEHIND; SDK value flows through per invariant. -->
-    <JonSkeetAnalyzersVersion>1.0.0-beta.6</JonSkeetAnalyzersVersion>
-  </PropertyGroup>
-
+  <!-- [SDK-UNDEFINED] Feeds the five Microsoft.CodeAnalysis.*.Testing package versions
+       in Directory.Packages.props. Deleting it silently drops the test project's
+       Microsoft.CodeAnalysis.Testing reference and fails the build with CS0234. -->
   <PropertyGroup Label="Analyzer Testing">
     <AnalyzerTestingVersion>1.1.4</AnalyzerTestingVersion>
   </PropertyGroup>
 
-  <!-- ═══════════════════════════════════════════════════════════════════════
-       LEGACY ALIASES (backward compatibility)
-       ═══════════════════════════════════════════════════════════════════════ -->
-  <PropertyGroup Label="Aliases">
-    <XunitMtpVersion>$(XunitV3Version)</XunitMtpVersion>
-    <MvcTestingVersion>$(AspNetCoreVersion)</MvcTestingVersion>
+  <!-- [AHEAD] SDK 3.4.46 ships 9.4.0. -->
+  <PropertyGroup Label="Testing">
+    <AwesomeAssertionsVersion>9.6.0</AwesomeAssertionsVersion>
   </PropertyGroup>
 </Project>
