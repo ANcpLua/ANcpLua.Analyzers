@@ -11,6 +11,8 @@ Roslyn diagnostic analyzers and code fixes for modern C# correctness, async and 
 
 Targets: `netstandard2.0` (Roslyn host requirement)
 
+Host floor: built against `Microsoft.CodeAnalysis` 5.9.0, so a Roslyn 5.9+ compiler host is required — the compiler bundled with .NET SDK 10.0.400 is Roslyn 5.9. An older host reports [CS9057](https://github.com/dotnet/roslyn/issues/64754) and skips every rule in this package rather than running a subset.
+
 ## Family
 
 | Package | Contents |
@@ -177,7 +179,7 @@ Targets: `netstandard2.0` (Roslyn host requirement)
 
 ```xml
 <PackageReference Include="ANcpLua.Analyzers"
-                  Version="2.1.0"
+                  Version="2.1.1"
                   PrivateAssets="all"
                   IncludeAssets="analyzers; buildtransitive" />
 ```
@@ -186,7 +188,7 @@ Targets: `netstandard2.0` (Roslyn host requirement)
 
 ## Consumer-side severity profile (`<AlAnalysisMode>`)
 
-Switch the whole `AL00xx`–`AL18xx` band in one csproj line instead of dropping editorconfig files:
+Switch the whole `AL10xx`–`AL18xx` band in one csproj line instead of dropping editorconfig files:
 
 ```xml
 <PropertyGroup>

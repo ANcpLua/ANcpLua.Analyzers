@@ -1675,14 +1675,6 @@ dotnet_naming_style.begins_with_i.required_prefix = I
 dotnet_naming_style.begins_with_i.capitalization = pascal_case
 
 # ═══════════════════════════════════════════════════════════════════════════
-# Disable the static_readonly_fields → PascalCase rule from the SDK 3.4.15
-# NamingConvention.editorconfig. dotnet/runtime style requires private/internal
-# static (incl. readonly) fields to use s_camelCase. The SDK fix is in flight
-# (PR #99); once a newer SDK ships with the fix, this override becomes a no-op.
-# ═══════════════════════════════════════════════════════════════════════════
-dotnet_naming_rule.static_readonly_fields_should_be_pascal_case.severity = none
-
-# ═══════════════════════════════════════════════════════════════════════════
 # Test Projects - Relaxed ANcpLua.Analyzers rules (warning instead of error)
 # Tests can be more lenient since they often contain intentional violations
 # for testing purposes

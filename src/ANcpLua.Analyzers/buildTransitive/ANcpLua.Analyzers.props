@@ -18,7 +18,7 @@
     severities apply.
 
     Naming is intentionally NOT bare <AnalysisMode> — that property is owned by
-    Microsoft.CodeAnalysis.NetAnalyzers. The Al* prefix matches the AL00xx-AL18xx
+    Microsoft.CodeAnalysis.NetAnalyzers. The Al* prefix matches the AL10xx-AL18xx
     diagnostic IDs this analyzer ships.
 
     The editorconfig profiles below are emitted by tools/ANcpLua.Analyzers.DocsGenerator
