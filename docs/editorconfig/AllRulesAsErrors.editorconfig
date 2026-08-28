@@ -3,9 +3,9 @@
 # after changing analyzer descriptors. See docs/ANcpLua.Analyzers.md for rule details.
 # Every AL rule promoted to error. Use for strict CI.
 
-root = false
+is_global = true
+global_level = 50
 
-[*.{cs,vb}]
 dotnet_diagnostic.AL1000.severity = error
 dotnet_diagnostic.AL1001.severity = error
 dotnet_diagnostic.AL1002.severity = error

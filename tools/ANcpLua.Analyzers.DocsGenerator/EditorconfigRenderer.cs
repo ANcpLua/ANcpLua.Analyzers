@@ -7,8 +7,19 @@ using Microsoft.CodeAnalysis;
 namespace ANcpLua.Analyzers.DocsGenerator;
 
 // Mirrors the MS NetAnalyzers rulesets/ + editorconfig/ pattern at our scale.
-internal static class EditorconfigRenderer
+/// <remarks>
+///     Public so <c>AnalyzerConventionTests</c> can assert the emitted profiles stay global
+///     AnalyzerConfigs via a plain ProjectReference, without InternalsVisibleTo — same pattern
+///     as <see cref="AlIdMigrationCatalog" />.
+/// </remarks>
+public static class EditorconfigRenderer
 {
+    /// <summary>
+    ///     global_level for the emitted profiles. Sits above ANcpLua.NET.Sdk's bundled AL config (13)
+    ///     and below the .globalconfig default (100). See the ladder comment in <see cref="Render" />.
+    /// </summary>
+    private const int GlobalLevel = 50;
+
     public static IEnumerable<(string AbsolutePath, string Content)> EnumerateProfiles(
         string repoRoot,
         IReadOnlyList<DiagnosticDescriptor> descriptors)
@@ -39,9 +50,21 @@ internal static class EditorconfigRenderer
         sb.AppendLine($"# after changing analyzer descriptors. See docs/{RepoLayout.PackageName}.md for rule details.");
         sb.AppendLine($"# {headerComment}");
         sb.AppendLine();
-        sb.AppendLine("root = false");
+        // These profiles ship inside the NuGet at buildTransitive/editorconfig/ and are appended to
+        // $(EditorConfigFiles) from the consumer's csproj via <AlAnalysisMode>. They MUST be global
+        // AnalyzerConfigs. A sectioned config (`root = false` + `[*.{cs,vb}]`) has its globs matched
+        // relative to the directory the config file itself lives in — here that is the NuGet package
+        // folder under ~/.nuget/packages/, which contains no consumer source, so every section matches
+        // nothing and the whole profile is silently inert. `is_global = true` makes the entries apply
+        // compilation-wide regardless of where the file sits.
+        sb.AppendLine("is_global = true");
+        // Precedence ladder (higher global_level wins):
+        //   13  ANcpLua.NET.Sdk's bundled Config/Analyzer.ANcpLua.Analyzers.editorconfig
+        //   50  this profile — <AlAnalysisMode> is an explicit opt-in, so it outranks SDK policy
+        //  100  a consumer's own .globalconfig (MSBuild's default level for that filename)
+        // so a repo's hand-written per-rule severities still beat the blanket profile.
+        sb.AppendLine($"global_level = {GlobalLevel}");
         sb.AppendLine();
-        sb.AppendLine("[*.{cs,vb}]");
         foreach (var d in descriptors)
             sb.AppendLine($"dotnet_diagnostic.{d.Id}.severity = {severityFor(d)}");
         return sb.ToString().ReplaceLineEndings("\n");

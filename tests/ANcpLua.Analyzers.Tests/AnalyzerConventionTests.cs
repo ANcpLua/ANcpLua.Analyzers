@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using ANcpLua.Analyzers.DocsGenerator;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace ANcpLua.Analyzers.Tests;
@@ -57,6 +58,35 @@ public sealed partial class AnalyzerConventionTests {
     [Fact]
     public void AlIdMigrationCatalog_StructuralInvariants_Hold() {
         AlIdMigrationCatalog.Validate();
+    }
+
+    /// <summary>
+    ///   The three <c>&lt;AlAnalysisMode&gt;</c> profiles ship inside the NuGet at
+    ///   <c>buildTransitive/editorconfig/</c> and are appended to <c>$(EditorConfigFiles)</c> from a
+    ///   consumer csproj. A sectioned config (<c>root = false</c> + <c>[*.{cs,vb}]</c>) has its globs
+    ///   matched relative to the config file's OWN directory — inside ~/.nuget/packages/, which holds
+    ///   no consumer source — so every section matches nothing and the profile is silently inert.
+    ///   Shipped 2.1.1 had exactly that bug: AlAnalysisMode=Disabled left rules at warning.
+    ///   Nothing else catches it: the file still reaches csc, and <c>--check</c> only compares the
+    ///   generator against its own output, so both sides would agree on a broken shape.
+    /// </summary>
+    [Fact]
+    public void EditorconfigProfiles_AreGlobalAnalyzerConfigs() {
+        var descriptor = new DiagnosticDescriptor(
+            "AL9999", "t", "m", "Usage", DiagnosticSeverity.Warning, true);
+
+        foreach (var (path, content) in EditorconfigRenderer.EnumerateProfiles(
+                     "/does-not-need-to-exist", [descriptor])) {
+            var name = Path.GetFileName(path);
+            content.Should().Contain("is_global = true",
+                $"{name} must apply compilation-wide, not relative to its own directory");
+            content.Should().MatchRegex(@"global_level = \d+",
+                $"{name} needs an explicit global_level to order against the SDK's bundled AL config");
+            content.Should().NotContain("root = false",
+                $"{name} must not be a sectioned config — that scopes it to the NuGet folder");
+            content.Should().NotContain("[*",
+                $"{name} must not carry a section header — globs would match nothing");
+        }
     }
 
     [Fact]
