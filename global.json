@@ -8,8 +8,8 @@
     "ANcpLua.NET.Sdk": "3.4.47",
     "ANcpLua.NET.Sdk.Web": "3.4.47",
     "ANcpLua.NET.Sdk.Test": "3.4.47",
-    "ANcpLua.Roslyn.Utilities.Testing": "2.2.46",
-    "ANcpLua.Roslyn.Utilities": "2.2.46"
+    "ANcpLua.Roslyn.Utilities.Testing": "2.2.47",
+    "ANcpLua.Roslyn.Utilities": "2.2.47"
   },
   "test": {
     "runner": "Microsoft.Testing.Platform"
