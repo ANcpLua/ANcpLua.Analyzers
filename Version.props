@@ -27,9 +27,9 @@
        Consumed by Directory.Packages.props. global.json pins ANcpLua.Roslyn.Utilities
        and .Testing as msbuild-sdks — those two must move in lockstep with these. -->
   <PropertyGroup Label="Roslyn.Utilities">
-    <ANcpLuaRoslynUtilitiesVersion>2.2.44</ANcpLuaRoslynUtilitiesVersion>
-    <ANcpLuaRoslynUtilitiesPolyfillsVersion>2.2.44</ANcpLuaRoslynUtilitiesPolyfillsVersion>
-    <ANcpLuaRoslynUtilitiesTestingVersion>2.2.44</ANcpLuaRoslynUtilitiesTestingVersion>
+    <ANcpLuaRoslynUtilitiesVersion>2.2.48</ANcpLuaRoslynUtilitiesVersion>
+    <ANcpLuaRoslynUtilitiesPolyfillsVersion>2.2.48</ANcpLuaRoslynUtilitiesPolyfillsVersion>
+    <ANcpLuaRoslynUtilitiesTestingVersion>2.2.48</ANcpLuaRoslynUtilitiesTestingVersion>
   </PropertyGroup>
 
   <!-- [SDK-UNDEFINED] Feeds the five Microsoft.CodeAnalysis.*.Testing package versions
