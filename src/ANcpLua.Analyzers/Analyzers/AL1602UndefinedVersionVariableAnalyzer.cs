@@ -23,10 +23,8 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///         Version attributes that isn't defined.
 ///     </para>
 ///     <para>
-///         The analyzer recognizes well-known SDK-provided variables that are commonly
-///         supplied by custom MSBuild SDKs (like ANcpLua.NET.Sdk). These variables are
-///         not flagged as undefined even if not present in the local Version.props,
-///         supporting the layering pattern where SDK provides base versions.
+///         Every Version.props passed as an additional file counts, so a variable defined by
+///         the MSBuild SDK's own Version.props (ANcpLua.NET.Sdk passes it) is not flagged.
 ///     </para>
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
@@ -58,79 +56,6 @@ public sealed partial class Al1602UndefinedVersionVariableAnalyzer : DiagnosticA
     /// <summary>Pattern to extract MSBuild property name from $(VariableName) syntax.</summary>
     private static readonly Regex s_msBuildPropertyPattern = MyRegex();
 
-    /// <summary>Well-known variables commonly provided by MSBuild SDKs (not flagged as undefined).</summary>
-    private static readonly HashSet<string> s_sdkProvidedVariables = new(StringComparer.OrdinalIgnoreCase) {
-        // Roslyn
-        "RoslynVersion",
-        "RoslynAnalyzersVersion",
-
-        // Testing - xUnit
-        "XunitV3Version",
-        "XunitMtpVersion",
-
-        // Testing - Assertions
-        "AwesomeAssertionsVersion",
-        "AwesomeAssertionsAnalyzersVersion",
-
-        // Testing - MTP Extensions
-        "MTPExtensionsVersion",
-        "CodeCoverageVersion",
-        "TestSdkVersion",
-        "DiagnosticsTestingVersion",
-        "GitHubActionsLoggerMTPVersion",
-        "GitHubActionsLoggerVSTestVersion",
-        "GitHubActionsTestLoggerVersion",
-
-        // Analyzer Testing
-        "AnalyzerTestingVersion",
-
-        // Reference Assemblies
-        "BasicReferenceAssembliesVersion",
-
-        // Meziantou
-        "MeziantouFrameworkVersion",
-        "MeziantouFullPathVersion",
-        "MeziantouTemporaryDirectoryVersion",
-        "MeziantouThreadingVersion",
-        "MeziantouDependencyScanningVersion",
-        "MeziantouAnalyzerVersion",
-        "MeziantouParallelTestFrameworkVersion",
-        "ParallelTestFrameworkVersion",
-
-        // Microsoft.Extensions
-        "MicrosoftExtensionsVersion",
-        "AspNetCoreVersion",
-        "MicrosoftBclAsyncInterfacesVersion",
-        "MvcTestingVersion",
-
-        // Legacy Polyfills
-        "BclAsyncInterfacesVersion",
-        "TasksExtensionsVersion",
-        "BclHashCodeVersion",
-
-        // OpenTelemetry
-        "OpenTelemetryVersion",
-
-        // Build Tools & Analyzers
-        "ANcpLuaAnalyzersVersion",
-        "ANcpLuaRoslynUtilitiesVersion",
-        "ANcpLuaRoslynUtilitiesSourcesVersion",
-        "ANcpLuaRoslynUtilitiesTestingVersion",
-        "ANcpLuaRoslynUtilitiesPolyfillsVersion",
-        "ANcpLuaRoslynUtilitiesTestingWorkflowsVersion",
-        "SbomTargetsVersion",
-        "BannedApiAnalyzersVersion",
-        "JonSkeetAnalyzersVersion",
-        "NuGetVersion",
-        "MSBuildStructuredLoggerVersion",
-        "MicrosoftSourceLinkVersion",
-        "MicrosoftDeploymentDotNetReleasesVersion",
-
-        // Other
-        "JetBrainsAnnotationsVersion",
-        "ANcpSdkPackageVersion"
-    };
-
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];
 
@@ -142,13 +67,11 @@ public sealed partial class Al1602UndefinedVersionVariableAnalyzer : DiagnosticA
     }
 
     private static void AnalyzeCompilation(CompilationAnalysisContext context) {
-        // Find Version.props to collect defined properties
-        var versionPropsFile = context.Options.AdditionalFiles
-            .FirstOrDefault(static f => f.Path.EndsWithIgnoreCase("Version.props"));
-
-        var definedProperties = versionPropsFile is not null
-            ? CollectDefinedProperties(versionPropsFile, context.CancellationToken)
-            : [];
+        // Every Version.props counts: the repository's own and the one its MSBuild SDK passes.
+        var definedProperties = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var versionPropsFile in context.Options.AdditionalFiles.Where(static f => f.Path.EndsWithIgnoreCase("Version.props"))) {
+            definedProperties.UnionWith(CollectDefinedProperties(versionPropsFile, context.CancellationToken));
+        }
 
         // Find Directory.Packages.props to check for undefined variables
         var packagesPropsFiles = context.Options.AdditionalFiles
@@ -224,14 +147,8 @@ public sealed partial class Al1602UndefinedVersionVariableAnalyzer : DiagnosticA
 
                 var variableName = match.Groups[1].Value;
 
-                // Skip if the variable is defined in local Version.props
+                // Skip if any Version.props defines the variable
                 if (definedProperties.Contains(variableName)) {
-                    continue;
-                }
-
-                // Skip if the variable is a well-known SDK-provided variable
-                // This supports the layering pattern where SDK provides base versions
-                if (s_sdkProvidedVariables.Contains(variableName)) {
                     continue;
                 }
 

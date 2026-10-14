@@ -2,6 +2,15 @@
 
 All notable changes to ANcpLua.Analyzers will be documented in this file.
 
+## [2.1.5] - 2026-10-14
+
+### Fixed
+
+- **AL1602** reads every `Version.props` passed as an additional file, so a variable the MSBuild SDK's own
+  Version.props defines (ANcpLua.NET.Sdk 3.4.49 passes it) is no longer reported as undefined. The hardcoded
+  list of "SDK-provided" variable names is gone: it fell behind each time the SDK added a variable
+  (`SystemSecurityCryptographyPkcsVersion`, `DotNetRuntimeVersion` in 3.4.48).
+
 ## [2.1.4] - 2026-10-14
 
 ### Fixed

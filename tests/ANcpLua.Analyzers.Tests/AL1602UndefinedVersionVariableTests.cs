@@ -66,6 +66,44 @@ public sealed partial class Al1602UndefinedVersionVariableTests : AnalyzerTestBa
     }
 
     [Fact]
+    public Task ShouldNotReportWhenTheSdkVersionPropsDefinesTheVariable() {
+        const string LocalVersionProps = """
+                                         <Project>
+                                             <PropertyGroup>
+                                                 <ContosoWidgetsVersion>1.2.3</ContosoWidgetsVersion>
+                                             </PropertyGroup>
+                                         </Project>
+                                         """;
+
+        const string SdkVersionProps = """
+                                       <Project>
+                                           <PropertyGroup>
+                                               <DotNetRuntimeVersion>10.0.13</DotNetRuntimeVersion>
+                                               <SystemSecurityCryptographyPkcsVersion>$(DotNetRuntimeVersion)</SystemSecurityCryptographyPkcsVersion>
+                                           </PropertyGroup>
+                                       </Project>
+                                       """;
+
+        const string DirectoryPackagesProps = """
+                                              <Project>
+                                                  <ItemGroup>
+                                                      <PackageVersion Include="Contoso.Widgets" Version="$(ContosoWidgetsVersion)" />
+                                                      <PackageVersion Include="System.Security.Cryptography.Pkcs" Version="$(SystemSecurityCryptographyPkcsVersion)" />
+                                                  </ItemGroup>
+                                              </Project>
+                                              """;
+
+        return VerifyAsync(
+            EmptyCode,
+            [
+                ("Version.props", LocalVersionProps),
+                ("sdk/Build/Common/Version.props", SdkVersionProps),
+                ("Directory.Packages.props", DirectoryPackagesProps)
+            ],
+            Array.Empty<DiagnosticResult>());
+    }
+
+    [Fact]
     public Task ShouldNotReportForHardcodedVersions() {
         const string VersionProps = """
                                     <Project>
