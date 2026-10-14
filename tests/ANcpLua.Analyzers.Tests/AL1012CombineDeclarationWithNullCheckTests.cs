@@ -70,6 +70,30 @@ public sealed partial class Al1012CombineDeclarationWithNullCheckTests : Analyze
                 {
                     public void TestMethod()
                     {
+                        using var x = M();
+                        if (x is null) return;
+                    }
+
+                    private System.IDisposable? M() => null;
+                }
+                """)]
+    [InlineData("""
+                public class TestClass
+                {
+                    public async System.Threading.Tasks.Task TestMethod()
+                    {
+                        await using var x = M();
+                        if (x is null) return;
+                    }
+
+                    private System.IAsyncDisposable? M() => null;
+                }
+                """)]
+    [InlineData("""
+                public class TestClass
+                {
+                    public void TestMethod()
+                    {
                         object? x = M(), y = N();
                         if (x is null) return;
                     }

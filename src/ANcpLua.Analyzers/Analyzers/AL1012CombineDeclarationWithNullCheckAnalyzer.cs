@@ -17,6 +17,8 @@ namespace ANcpLua.Analyzers.Analyzers;
 ///         an initializer, the next statement is an if-statement checking that variable
 ///         for null, the if-body is an early exit (return, throw, break, continue), and
 ///         the variable is not used within the if-body (except in <c>nameof</c> expressions).
+///         It never fires on <c>using</c> or <c>await using</c> declarations: merging those into the
+///         pattern would drop the dispose.
 ///     </para>
 ///     <para>
 ///         This rule requires C# 9 or later. It only applies to reference types since
@@ -52,6 +54,11 @@ public sealed partial class Al1012CombineDeclarationWithNullCheckAnalyzer : AlAn
         }
 
         var declaration = (LocalDeclarationStatementSyntax)context.Node;
+
+        // A using declaration disposes its local at scope end; the combined pattern drops the dispose.
+        if (declaration.UsingKeyword != default || declaration.IsConst) {
+            return;
+        }
 
         if (declaration.Declaration.Variables.Count != 1) {
             return;

@@ -2,6 +2,12 @@
 
 All notable changes to ANcpLua.Analyzers will be documented in this file.
 
+## [2.1.4] - 2026-10-14
+
+### Fixed
+
+- **AL1012** no longer fires on `using` or `await using` declarations. Its code fix merged `using var x = M(); if (x is null) return;` into `if (M() is not { } x) return;`, which drops the dispose (found in qyl's `WorkloadEmitter`, where the activity would never end).
+
 ## [2.0.0] - 2026-05-25
 
 ### Changed (BREAKING)
