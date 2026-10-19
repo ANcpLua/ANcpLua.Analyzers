@@ -47,10 +47,10 @@ public sealed partial class Al1210UseStringComparisonExtensionsAnalyzer : AlAnal
             return;
         }
 
-        context.RegisterOperationAction(AnalyzeInvocation, OperationKind.Invocation);
+        context.RegisterOperationAction(ctx => AnalyzeInvocation(ctx, extensionsType), OperationKind.Invocation);
     }
 
-    private static void AnalyzeInvocation(OperationAnalysisContext context) {
+    private static void AnalyzeInvocation(OperationAnalysisContext context, INamedTypeSymbol extensionsType) {
         if (context.Operation is not IInvocationOperation invocation) {
             return;
         }
@@ -84,13 +84,57 @@ public sealed partial class Al1210UseStringComparisonExtensionsAnalyzer : AlAnal
             return;
         }
 
-        var receiverName = invocation.Instance.GetOperandName("str");
         var extensionName = $"{method.Name}{suffix}";
+
+        // Suggest only an extension that really exists for these argument types:
+        // string.Contains(char, StringComparison) has no ContainsOrdinal(char) counterpart,
+        // while IndexOf(char, StringComparison) maps to IndexOfOrdinal(char).
+        if (!HasMatchingExtensionOverload(extensionsType, extensionName, invocation)) {
+            return;
+        }
+
+        var receiverName = invocation.Instance.GetOperandName("str");
         var argName = GetFirstStringArgument(invocation);
 
         context.ReportDiagnostic(s_rule, invocation.Syntax.GetLocation(),
             $"{receiverName}.{extensionName}({argName})");
     }
+
+    private static bool HasMatchingExtensionOverload(
+        INamedTypeSymbol extensionsType, string extensionName, IInvocationOperation invocation) {
+        foreach (var member in extensionsType.GetMembers(extensionName)) {
+            if (member is not IMethodSymbol { IsExtensionMethod: true } candidate) {
+                continue;
+            }
+
+            if (ParametersMatch(candidate, invocation)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool ParametersMatch(IMethodSymbol extension, IInvocationOperation invocation) {
+        var parameterIndex = 1; // parameter 0 is the `this string` receiver
+        foreach (var arg in invocation.Arguments) {
+            if (arg.Parameter?.Type is not { } argumentType || IsStringComparison(argumentType)) {
+                continue;
+            }
+
+            if (parameterIndex >= extension.Parameters.Length
+                || !extension.Parameters[parameterIndex].Type.IsEqualTo(argumentType)) {
+                return false;
+            }
+
+            parameterIndex++;
+        }
+
+        return parameterIndex == extension.Parameters.Length;
+    }
+
+    private static bool IsStringComparison(ITypeSymbol type) =>
+        type.ToDisplayString() is "System.StringComparison" or "StringComparison";
 
     private static int CountNonStringComparisonArgs(IInvocationOperation invocation) {
         var count = 0;

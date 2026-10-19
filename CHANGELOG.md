@@ -2,6 +2,22 @@
 
 All notable changes to ANcpLua.Analyzers will be documented in this file.
 
+## [2.1.8] - 2026-10-19
+
+### Fixed
+
+- **AL1210** reports only when `ANcpLua.Roslyn.Utilities.StringComparisonExtensions` has an overload for the
+  call's argument types. `s.Contains('_', StringComparison.Ordinal)` is no longer flagged (there is no
+  `ContainsOrdinal(char)`), while `s.IndexOf('x', StringComparison.Ordinal)` still maps to `IndexOfOrdinal(char)`.
+
+### Changed (repository only)
+
+- The publish workflow runs the analyzer tests before packing.
+- The AR0001 `#pragma warning disable AL1210` (and its incorrect comment) is gone.
+- The `[tests/**/*.cs]` editorconfig block that "relaxed" rules to warning is gone: under
+  `TreatWarningsAsErrors` it relaxed nothing and tightened the Info rules. AL1408 stays off in tests, with
+  its reason. The test project's `NoWarn` for AL1210 is gone; the build stays at zero warnings.
+
 ## [2.1.7] - 2026-10-19
 
 ### Fixed

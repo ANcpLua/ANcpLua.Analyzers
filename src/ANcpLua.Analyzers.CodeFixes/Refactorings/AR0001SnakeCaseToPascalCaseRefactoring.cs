@@ -72,9 +72,7 @@ public sealed partial class Ar0001SnakeCaseToPascalCaseRefactoring : CodeRefacto
     }
 
     private static bool IsScreamingSnakeCase(string identifier) =>
-#pragma warning disable AL1210 // CodeFixes project doesn't reference ANcpLua.Roslyn.Utilities
         s_screamingSnakeCasePattern.IsMatch(identifier) && identifier.Contains('_', StringComparison.Ordinal);
-#pragma warning restore AL1210
 
     private static string ToPascalCase(string screamingSnake) =>
         string.Concat(screamingSnake

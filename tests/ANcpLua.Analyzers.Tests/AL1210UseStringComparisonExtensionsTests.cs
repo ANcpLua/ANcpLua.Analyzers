@@ -9,13 +9,28 @@ namespace ANcpLua.Analyzers.Tests;
 /// </summary>
 public sealed partial class Al1210UseStringComparisonExtensionsTests : AnalyzerTest<Al1210UseStringComparisonExtensionsAnalyzer> {
     // AL1210 only fires when ANcpLua.Roslyn.Utilities.StringComparisonExtensions is present and
-    // accessible. Each positive/negative case is wrapped with this stub so the gate is open and the
-    // test exercises the analyzer's matching logic rather than the gate. The dedicated
-    // ShouldNotReportWhenExtensionsNotReferenced case omits the stub to assert the gate itself.
+    // accessible, and only for an extension overload that exists for the call's argument types.
+    // The stub mirrors the ANcpLua.Roslyn.Utilities 3.0.0 signatures of the mapped methods (only
+    // IndexOfOrdinal has a char overload). ShouldNotReportWhenExtensionsNotReferenced omits the stub
+    // to assert the gate itself.
     private const string Stub = """
         using System;
         namespace ANcpLua.Roslyn.Utilities {
-            internal static class StringComparisonExtensions { }
+            internal static class StringComparisonExtensions {
+                public static bool EqualsOrdinal(this string? value, string? other) => true;
+                public static bool EqualsIgnoreCase(this string? value, string? other) => true;
+                public static bool ContainsOrdinal(this string? value, string? substring) => true;
+                public static bool ContainsIgnoreCase(this string? value, string? substring) => true;
+                public static bool StartsWithOrdinal(this string? value, string prefix) => true;
+                public static bool StartsWithIgnoreCase(this string? value, string prefix) => true;
+                public static bool EndsWithOrdinal(this string? value, string suffix) => true;
+                public static bool EndsWithIgnoreCase(this string? value, string suffix) => true;
+                public static int IndexOfOrdinal(this string? value, string substring) => 0;
+                public static int IndexOfOrdinal(this string? value, char character) => 0;
+                public static int IndexOfIgnoreCase(this string? value, string substring) => 0;
+                public static string? ReplaceOrdinal(this string? value, string oldValue, string newValue) => value;
+                public static string? ReplaceIgnoreCase(this string? value, string oldValue, string newValue) => value;
+            }
         }
         """;
 
@@ -67,6 +82,20 @@ public sealed partial class Al1210UseStringComparisonExtensionsTests : AnalyzerT
     [Fact]
     public Task ShouldNotReportForReplaceWithoutComparison() =>
         Verify("""public class C { string M(string s) => s.Replace("old", "new"); }""");
+
+    // string.Contains(char, StringComparison) has no ContainsOrdinal(char) overload; suggesting it
+    // would name a method that doesn't exist (AR0001's identifier.Contains('_', Ordinal) hit this).
+    [Fact]
+    public Task ShouldNotReportForContainsCharWithoutCharExtension() =>
+        Verify("public class C { bool M(string s) => s.Contains('_', StringComparison.Ordinal); }");
+
+    [Fact]
+    public Task ShouldNotReportForIndexOfCharIgnoreCaseWithoutCharExtension() =>
+        Verify("public class C { int M(string s) => s.IndexOf('x', StringComparison.OrdinalIgnoreCase); }");
+
+    [Fact]
+    public Task ShouldReportForIndexOfCharWhenCharExtensionExists() =>
+        Verify("public class C { int M(string s) => [|s.IndexOf('x', StringComparison.Ordinal)|]; }");
 
     // Culture-aware comparisons have no StringComparisonExtensions equivalent, so they must not be
     // flagged even when the extensions are referenced — otherwise the fix would name a method that
