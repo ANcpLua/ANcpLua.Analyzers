@@ -489,7 +489,7 @@ Useful variable names:
 | AwesomeAssertions | `$(AwesomeAssertionsVersion)` |
 
 As of the current local `Version.props`, the Roslyn.Utilities chain is on the
-`2.2.x` line. Do not downgrade below the line that contains the AL1010
+`3.0.x` line. Do not downgrade below the line that contains the AL1010
 `IsConstantZero` regression fix.
 
 ## Cross-Repo Bootstrap
