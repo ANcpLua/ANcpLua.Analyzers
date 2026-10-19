@@ -8,9 +8,9 @@
         <!-- Version: CI stamps via -p:Version=$VERSION at pack time from the v* tag (a global
              property, beats anything set here). Locally we compose a placeholder so packs
              still produce a valid .nupkg; matches the Roslyn.Utilities / Agents convention.
-             The self-referenced last-PUBLISHED $(ANcpLuaAnalyzersVersion) lives in Version.props
-             (imported via Directory.Packages.props, which loads AFTER this file) and is what
-             restore-time PackageReferences resolve against — keep it separate from this dev pin. -->
+             The self-referenced last-PUBLISHED $(ANcpLuaAnalyzersVersion) comes from
+             ANcpLua.NET.Sdk's Version.props and is what the SDK-injected analyzer resolves
+             against at restore time; keep it separate from this dev pin. -->
         <VersionPrefix Condition="'$(VersionPrefix)' == ''">2.0.1</VersionPrefix>
         <VersionSuffix Condition="'$(VersionSuffix)' == ''">local</VersionSuffix>
         <Version Condition="'$(VersionSuffix)' != ''">$(VersionPrefix)-$(VersionSuffix)</Version>

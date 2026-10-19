@@ -64,8 +64,6 @@
 
     <ItemGroup>
         <None Include="../../README.md" Pack="true" PackagePath="/"/>
-        <!-- Include build props for analyzer configuration (exposes MSBuild properties to analyzers) -->
-        <None Include="build/ANcpLua.Analyzers.props" Pack="true" PackagePath="build/"/>
     </ItemGroup>
 
     <!-- AnalyzerReleases files are auto-added as AdditionalFiles by Microsoft.CodeAnalysis.Analyzers

@@ -26,6 +26,21 @@
     `dotnet run -project tools/ANcpLua.Analyzers.DocsGenerator`.
   -->
 
+  <!--
+    MSBuild properties the analyzers read through AnalyzerConfigOptions (build_property.*).
+    NuGet imports only buildTransitive/ when a package has it, so these items live here;
+    a build/ copy would never reach a consumer.
+  -->
+  <ItemGroup>
+    <!-- AL1601: detects Central Package Management without an AdditionalFiles probe -->
+    <CompilerVisibleProperty Include="ManagePackageVersionsCentrally" />
+    <!-- AL1406/AL1407: scope the AOT-only rules to AOT-targeting projects -->
+    <CompilerVisibleProperty Include="PublishAot" />
+    <CompilerVisibleProperty Include="IsAotCompatible" />
+    <!-- AL1011: multi-target projects keep the polyfill-free null-guard form -->
+    <CompilerVisibleProperty Include="TargetFrameworks" />
+  </ItemGroup>
+
   <ItemGroup Condition=" '$(AlAnalysisMode)' == 'Default' ">
     <EditorConfigFiles Include="$(MSBuildThisFileDirectory)editorconfig/Default.editorconfig" />
   </ItemGroup>

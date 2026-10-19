@@ -2,6 +2,30 @@
 
 All notable changes to ANcpLua.Analyzers will be documented in this file.
 
+## [2.1.7] - 2026-10-19
+
+### Fixed
+
+- **Consumers now pass the MSBuild properties the analyzers read.** The `CompilerVisibleProperty` items sat in
+  `build/ANcpLua.Analyzers.props`, which NuGet never imports because the package also has `buildTransitive/`.
+  They now live in `buildTransitive/ANcpLua.Analyzers.props`, and the `build/` copy is gone. Effects in consumer
+  builds:
+  - **AL1406/AL1407** see `PublishAot`/`IsAotCompatible` and report in AOT-targeting projects (previously they
+    never fired unless another package exposed those properties).
+  - **AL1601** recognizes Central Package Management through `ManagePackageVersionsCentrally`.
+  - **AL1011** sees `TargetFrameworks` (newly exposed) and treats multi-target projects as multi-target.
+  - `EventSourceSupport` is no longer exposed; no rule reads it.
+- A convention test fails when an analyzer reads a `build_property.*` key that the `buildTransitive` props
+  doesn't expose.
+
+### Changed (repository only)
+
+- `.editorconfig`: AL1600/AL1601/AL1602 lines under `[*.cs]` sections are gone. Those rules report on
+  `Directory.Packages.props`/`Version.props`, which only global configs reach.
+- `Directory.Packages.props`: eight `PackageVersion Update` items that matched nothing or re-set the same
+  value are gone (evaluated package items are identical).
+- `global.json`: unused `ANcpLua.NET.Sdk.Web`/`.Test` pins removed.
+
 ## [2.1.6] - 2026-10-19
 
 ### Changed

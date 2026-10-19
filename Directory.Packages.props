@@ -1,5 +1,5 @@
 <Project>
-    <!-- Local Version.props mirrors SDK Build/Common/Version.props; dogfooded AL1602 inspects only the local file -->
+    <!-- Local overrides of SDK Build/Common/Version.props (see the invariant at the top of Version.props) -->
     <Import Project="$(MSBuildThisFileDirectory)Version.props"/>
 
     <PropertyGroup>
@@ -34,21 +34,5 @@
         <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing" Version="$(AnalyzerTestingVersion)"/>
         <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.CodeRefactoring.Testing" Version="$(AnalyzerTestingVersion)"/>
         <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing" Version="$(AnalyzerTestingVersion)"/>
-    </ItemGroup>
-
-    <!-- Testing (MTP v2): Use Update for SDK-injected packages -->
-    <ItemGroup Label="Testing">
-        <PackageVersion Update="AwesomeAssertions" Version="$(AwesomeAssertionsVersion)"/>
-        <PackageVersion Update="xunit.v3" Version="$(XunitV3Version)"/>
-        <PackageVersion Update="xunit.v3.mtp-v2" Version="$(XunitV3Version)"/>
-        <PackageVersion Update="Microsoft.Testing.Platform" Version="$(MTPExtensionsVersion)"/>
-        <PackageVersion Update="Microsoft.Testing.Platform.MSBuild" Version="$(MTPExtensionsVersion)"/>
-    </ItemGroup>
-
-    <!-- SDK-injected analyzers: Use Update (not Include) to override SDK-provided versions -->
-    <ItemGroup Label="SDK Analyzers">
-        <PackageVersion Update="ANcpLua.Analyzers" Version="$(ANcpLuaAnalyzersVersion)"/>
-        <PackageVersion Update="Microsoft.Sbom.Targets" Version="$(SbomTargetsVersion)"/>
-        <PackageVersion Update="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="$(BannedApiAnalyzersVersion)"/>
     </ItemGroup>
 </Project>

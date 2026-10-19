@@ -68,8 +68,7 @@ src/ANcpLua.Analyzers/
   AnalyzerReleases.Shipped.md
   AnalyzerReleases.Unshipped.md
   Analyzers/AL1XXX*.cs                            # one analyzer, grouped analyzer, or helper
-  build/ANcpLua.Analyzers.props                   # CompilerVisibleProperty surface
-  buildTransitive/ANcpLua.Analyzers.props         # AlAnalysisMode profile hook
+  buildTransitive/ANcpLua.Analyzers.props         # CompilerVisibleProperty surface + AlAnalysisMode profile hook
 src/ANcpLua.Analyzers.CodeFixes/
   CodeFixes/AL1XXX*.cs
   Refactorings/AR0XXX*.cs
@@ -438,7 +437,6 @@ pattern without revalidating the tool bootstrap.
 ANcpLua.Analyzers.dll            -> analyzers/dotnet/cs/
 ANcpLua.Analyzers.CodeFixes.dll  -> analyzers/dotnet/cs/
 ANcpLua.Roslyn.Utilities.dll     -> analyzers/dotnet/cs/
-build/ANcpLua.Analyzers.props    -> build/
 buildTransitive/ANcpLua.Analyzers.props
 docs/editorconfig/*.editorconfig -> buildTransitive/editorconfig/
 ```

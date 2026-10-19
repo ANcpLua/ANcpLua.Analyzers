@@ -1,5 +1,7 @@
 ﻿using System.Reflection;
+using System.Text.RegularExpressions;
 using ANcpLua.Analyzers.DocsGenerator;
+using ANcpLua.Roslyn.Utilities.Testing.MSBuild;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
@@ -88,6 +90,38 @@ public sealed partial class AnalyzerConventionTests {
                 $"{name} must not carry a section header — globs would match nothing");
         }
     }
+
+    /// <summary>
+    ///   An analyzer sees an MSBuild property only when a <c>CompilerVisibleProperty</c> item names it,
+    ///   and NuGet imports only <c>buildTransitive/</c> from a package that has that folder. Up to 2.1.6
+    ///   the items sat in a never-imported <c>build/</c> copy, so AL1011, AL1406/AL1407 and AL1601 read
+    ///   empty values in every consumer while tests that inject the keys through editorconfig passed.
+    /// </summary>
+    [Fact]
+#pragma warning disable RS1035 // test code reading the repository, not analyzer code running in the compiler
+    public void EveryBuildPropertyReadByAnAnalyzer_IsCompilerVisibleInBuildTransitiveProps() {
+        string root = RepositoryRoot.Locate("ANcpLua.Analyzers.slnx");
+        var analyzerSource = Path.Combine(root, "src", "ANcpLua.Analyzers");
+        var props = File.ReadAllText(Path.Combine(analyzerSource, "buildTransitive", "ANcpLua.Analyzers.props"));
+
+        var readProperties = Directory.EnumerateFiles(analyzerSource, "*.cs", SearchOption.AllDirectories)
+            .SelectMany(static file => BuildPropertyKey().Matches(File.ReadAllText(file)))
+            .Select(static match => match.Groups[1].Value)
+            .ToHashSet(StringComparer.Ordinal);
+
+        readProperties.Should().NotBeEmpty();
+        foreach (var property in readProperties) {
+            props.Should().Contain($"<CompilerVisibleProperty Include=\"{property}\"",
+                $"an analyzer reads build_property.{property}");
+        }
+
+        Directory.Exists(Path.Combine(analyzerSource, "build")).Should().BeFalse(
+            "NuGet ignores build/ when buildTransitive/ exists; keep consumer props in buildTransitive/ only");
+    }
+#pragma warning restore RS1035
+
+    [GeneratedRegex("\"build_property\\.([A-Za-z]+)\"")]
+    private static partial Regex BuildPropertyKey();
 
     [Fact]
     public void AllAnalyzersDeclareDiagnosticIdConsts() {

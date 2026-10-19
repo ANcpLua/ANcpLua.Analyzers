@@ -1054,9 +1054,6 @@ dotnet_diagnostic.AL1011.severity = error
 # AL1012: Combine declaration with subsequent null-check
 dotnet_diagnostic.AL1012.severity = error
 
-# AL1600: Hardcoded package version in Directory.Packages.props
-dotnet_diagnostic.AL1600.severity = error
-
 # AL1100: IFormCollection requires explicit [FromForm]
 dotnet_diagnostic.AL1100.severity = error
 
@@ -1696,9 +1693,6 @@ dotnet_diagnostic.AL1009.severity = warning
 dotnet_diagnostic.AL1010.severity = warning
 dotnet_diagnostic.AL1011.severity = warning
 dotnet_diagnostic.AL1012.severity = warning
-dotnet_diagnostic.AL1600.severity = warning
-dotnet_diagnostic.AL1601.severity = warning
-dotnet_diagnostic.AL1602.severity = warning
 dotnet_diagnostic.AL1100.severity = warning
 dotnet_diagnostic.AL1101.severity = warning
 dotnet_diagnostic.AL1102.severity = warning

@@ -5,8 +5,8 @@ Unit tests for all analyzers and code fixes.
 ## Target
 
 - **Framework:** net10.0
-- **Test Framework:** xunit.v3.mtp-v2 ($(XunitV3Version) = 3.2.2)
-- **Assertions:** AwesomeAssertions ($(AwesomeAssertionsVersion) = 9.4.0)
+- **Test Framework:** xunit.v3.mtp-v2 (`$(XunitV3Version)`, injected by ANcpLua.NET.Sdk)
+- **Assertions:** AwesomeAssertions (`$(AwesomeAssertionsVersion)`, injected by ANcpLua.NET.Sdk)
 - **Test Infrastructure:** ANcpLua.Roslyn.Utilities.Testing ($(ANcpLuaRoslynUtilitiesTestingVersion))
 
 ## Running Tests
