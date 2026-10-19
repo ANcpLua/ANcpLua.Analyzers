@@ -24,23 +24,22 @@
   -->
 
   <!-- [SDK-UNDEFINED] The SDK defines no ANcpLuaRoslynUtilities* property at all.
-       Consumed by Directory.Packages.props. global.json pins ANcpLua.Roslyn.Utilities
-       and .Testing as msbuild-sdks — those two must move in lockstep with these. -->
+       Consumed by Directory.Packages.props. The renovate comments make each property
+       an updatable dependency (custom manager in ANcpLua/github-settings-automation). -->
   <PropertyGroup Label="Roslyn.Utilities">
-    <ANcpLuaRoslynUtilitiesVersion>2.2.48</ANcpLuaRoslynUtilitiesVersion>
-    <ANcpLuaRoslynUtilitiesPolyfillsVersion>2.2.48</ANcpLuaRoslynUtilitiesPolyfillsVersion>
-    <ANcpLuaRoslynUtilitiesTestingVersion>2.2.48</ANcpLuaRoslynUtilitiesTestingVersion>
+    <!-- renovate: datasource=nuget depName=ANcpLua.Roslyn.Utilities -->
+    <ANcpLuaRoslynUtilitiesVersion>3.0.0</ANcpLuaRoslynUtilitiesVersion>
+    <!-- renovate: datasource=nuget depName=ANcpLua.Roslyn.Utilities.Polyfills -->
+    <ANcpLuaRoslynUtilitiesPolyfillsVersion>3.0.0</ANcpLuaRoslynUtilitiesPolyfillsVersion>
+    <!-- renovate: datasource=nuget depName=ANcpLua.Roslyn.Utilities.Testing -->
+    <ANcpLuaRoslynUtilitiesTestingVersion>3.0.0</ANcpLuaRoslynUtilitiesTestingVersion>
   </PropertyGroup>
 
   <!-- [SDK-UNDEFINED] Feeds the five Microsoft.CodeAnalysis.*.Testing package versions
        in Directory.Packages.props. Deleting it silently drops the test project's
        Microsoft.CodeAnalysis.Testing reference and fails the build with CS0234. -->
   <PropertyGroup Label="Analyzer Testing">
+    <!-- renovate: datasource=nuget depName=Microsoft.CodeAnalysis.CSharp.Analyzer.Testing -->
     <AnalyzerTestingVersion>1.1.4</AnalyzerTestingVersion>
-  </PropertyGroup>
-
-  <!-- [AHEAD] SDK 3.4.46 ships 9.4.0. -->
-  <PropertyGroup Label="Testing">
-    <AwesomeAssertionsVersion>9.6.0</AwesomeAssertionsVersion>
   </PropertyGroup>
 </Project>

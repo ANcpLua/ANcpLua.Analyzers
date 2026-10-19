@@ -2,6 +2,17 @@
 
 All notable changes to ANcpLua.Analyzers will be documented in this file.
 
+## [2.1.6] - 2026-10-19
+
+### Changed
+
+- Bundles **ANcpLua.Roslyn.Utilities 3.0.0** (was 2.2.48). No diagnostic, severity or code-fix change.
+- Repository: `Version.props` carries Renovate annotations for the Roslyn.Utilities and analyzer-testing
+  versions, and the two `ANcpLua.Roslyn.Utilities*` entries are gone from `global.json` `msbuild-sdks`
+  (they are plain library packages, not MSBuild SDKs; Renovate bumped only them in #212 and left the
+  versions the build actually restores on 2.2.48). The stale `AwesomeAssertionsVersion` override equal to
+  ANcpLua.NET.Sdk 3.4.49 is removed.
+
 ## [2.1.5] - 2026-10-14
 
 ### Fixed
