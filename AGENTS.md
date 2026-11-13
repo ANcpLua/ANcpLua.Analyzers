@@ -1,5 +1,7 @@
 # ANcpLua.Analyzers - Agent Contract
 
+@claude check if claude.md can be removed
+
 Canonical instruction surface for Codex and Claude. Keep the repo-root `CLAUDE.md`
 symlinked to this file; edit this file for repo-wide agent rules. Nested
 `CLAUDE.md` files are project-local notes and are not the root contract.
