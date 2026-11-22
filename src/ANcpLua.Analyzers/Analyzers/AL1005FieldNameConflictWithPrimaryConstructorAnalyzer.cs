@@ -47,9 +47,10 @@ public sealed partial class Al1005FieldNameConflictWithPrimaryConstructorAnalyze
             return;
         }
 
-        var parameterNames = new HashSet<string>(
-            parameterList.Parameters.Select(static p => p.Identifier.ValueText),
-            StringComparer.Ordinal);
+        var parameterNames = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var parameter in parameterList.Parameters) {
+            parameterNames.Add(parameter.Identifier.ValueText);
+        }
 
         foreach (var variable in member.Declaration.Variables) {
             var identifier = variable.Identifier;

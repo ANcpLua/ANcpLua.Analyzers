@@ -80,12 +80,21 @@ public sealed partial class Al1000ProhibitPrimaryConstructorParameterReassignmen
             return;
         }
 
-        if (!ctor.DeclaringSyntaxReferences.Any(sr =>
-                sr.GetSyntax(context.CancellationToken) is ClassDeclarationSyntax or StructDeclarationSyntax
-                    or RecordDeclarationSyntax)) {
+        if (!IsPrimaryConstructor(ctor, context.CancellationToken)) {
             return;
         }
 
         context.ReportDiagnostic(s_rule, target.Syntax.GetLocation(), parameterRef.Parameter.Name);
+    }
+
+    private static bool IsPrimaryConstructor(IMethodSymbol ctor, CancellationToken cancellationToken) {
+        foreach (var reference in ctor.DeclaringSyntaxReferences) {
+            if (reference.GetSyntax(cancellationToken) is ClassDeclarationSyntax or StructDeclarationSyntax
+                or RecordDeclarationSyntax) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
