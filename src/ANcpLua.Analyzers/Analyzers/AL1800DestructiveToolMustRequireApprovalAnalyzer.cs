@@ -25,7 +25,6 @@ public sealed partial class Al1800DestructiveToolMustRequireApprovalAnalyzer : A
     /// <summary>The diagnostic identifier for AL1800.</summary>
     private const string DiagnosticId = "AL1800";
 
-    private const string LoomToolAttributeName = "LoomTool";
     private const string ToolSideEffectAttributeName = "ToolSideEffect";
     private const string RequiresApprovalAttributeName = "RequiresApproval";
 
@@ -54,11 +53,11 @@ public sealed partial class Al1800DestructiveToolMustRequireApprovalAnalyzer : A
     private static void AnalyzeMethod(SymbolAnalysisContext context) {
         var method = (IMethodSymbol)context.Symbol;
 
-        if (!method.HasAttributeByShortName(LoomToolAttributeName)) {
+        if (!Al1800ToAl1802LoomToolAttributes.IsLoomTool(method)) {
             return;
         }
 
-        if (HasAttributeOnMethodOrType(method, RequiresApprovalAttributeName)) {
+        if (Al1800ToAl1802LoomToolAttributes.HasAttributeOnMethodOrType(method, RequiresApprovalAttributeName)) {
             return;
         }
 
@@ -66,11 +65,11 @@ public sealed partial class Al1800DestructiveToolMustRequireApprovalAnalyzer : A
             return;
         }
 
-        context.ReportDiagnostic(Diagnostic.Create(
+        context.ReportDiagnostic(
             s_rule,
             method.Locations.FirstOrDefault() ?? Location.None,
             method.Name,
-            destructiveSideEffect));
+            destructiveSideEffect);
     }
 
     private static string? GetDestructiveSideEffectName(IMethodSymbol method) {
@@ -99,8 +98,4 @@ public sealed partial class Al1800DestructiveToolMustRequireApprovalAnalyzer : A
 
         return null;
     }
-
-    private static bool HasAttributeOnMethodOrType(IMethodSymbol method, string attributeName) =>
-        method.HasAttributeByShortName(attributeName) ||
-        method.ContainingType?.HasAttributeByShortName(attributeName) is true;
 }

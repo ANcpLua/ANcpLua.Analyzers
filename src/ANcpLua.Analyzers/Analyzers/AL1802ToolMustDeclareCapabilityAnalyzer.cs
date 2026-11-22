@@ -25,7 +25,6 @@ public sealed partial class Al1802ToolMustDeclareCapabilityAnalyzer : AlAnalyzer
     /// <summary>The diagnostic identifier for AL1802.</summary>
     private const string DiagnosticId = "AL1802";
 
-    private const string LoomToolAttributeName = "LoomTool";
     private const string RequiresCapabilityAttributeName = "RequiresCapability";
 
     private static readonly DiagnosticDescriptor s_rule = CreateRule(
@@ -43,21 +42,17 @@ public sealed partial class Al1802ToolMustDeclareCapabilityAnalyzer : AlAnalyzer
     private static void AnalyzeMethod(SymbolAnalysisContext context) {
         var method = (IMethodSymbol)context.Symbol;
 
-        if (!method.HasAttributeByShortName(LoomToolAttributeName)) {
+        if (!Al1800ToAl1802LoomToolAttributes.IsLoomTool(method)) {
             return;
         }
 
-        if (HasAttributeOnMethodOrType(method, RequiresCapabilityAttributeName)) {
+        if (Al1800ToAl1802LoomToolAttributes.HasAttributeOnMethodOrType(method, RequiresCapabilityAttributeName)) {
             return;
         }
 
-        context.ReportDiagnostic(Diagnostic.Create(
+        context.ReportDiagnostic(
             s_rule,
             method.Locations.FirstOrDefault() ?? Location.None,
-            method.Name));
+            method.Name);
     }
-
-    private static bool HasAttributeOnMethodOrType(IMethodSymbol method, string attributeName) =>
-        method.HasAttributeByShortName(attributeName) ||
-        method.ContainingType?.HasAttributeByShortName(attributeName) is true;
 }
