@@ -34,7 +34,8 @@ public sealed partial class Al1012CombineDeclarationWithNullCheckAnalyzer : AlAn
     private static readonly DiagnosticDescriptor s_rule = new(
         DiagnosticId,
         "Combine declaration with subsequent null-check",
-        "Combine declaration of '{0}' with subsequent null-check",
+        "Declaration of '{0}' is followed by a null-check that exits early; merge both statements into " +
+        "'if (<initializer> is not {{ }} {0}) <early exit>;'",
         DiagnosticCategories.Style,
         DiagnosticSeverity.Info,
         true,
