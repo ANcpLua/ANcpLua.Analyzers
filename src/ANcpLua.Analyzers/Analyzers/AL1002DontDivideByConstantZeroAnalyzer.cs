@@ -68,7 +68,7 @@ public sealed partial class Al1002DontDivideByConstantZeroAnalyzer : AlAnalyzer 
         // For Int128/UInt128, Roslyn may not provide a ConstantValue on the conversion
         // operation. Check if it's a conversion from a zero literal.
         if (operation is IConversionOperation conversion &&
-            conversion.Type is { } conversionType && IsInt128OrUInt128(conversionType)) {
+            conversion.Type?.ToDisplayString() is "System.Int128" or "System.UInt128") {
             var operand = conversion.Operand.UnwrapAllConversions();
             return operand.ConstantValue.HasValue && IsZero(operand.ConstantValue.Value);
         }
@@ -87,19 +87,9 @@ public sealed partial class Al1002DontDivideByConstantZeroAnalyzer : AlAnalyzer 
             return true;
         }
 
-        return IsInt128OrUInt128(typeSymbol);
+        var fullName = typeSymbol.ToDisplayString();
+        return fullName is "System.Int128" or "System.UInt128";
     }
-
-    // Matches exactly the types whose ToDisplayString() is "System.Int128" or "System.UInt128":
-    // non-generic, top-level, directly in the System namespace. Avoids formatting a display
-    // string for every non-special operand type (double, float, user types) on the hot path.
-    private static bool IsInt128OrUInt128(ITypeSymbol typeSymbol) =>
-        typeSymbol is INamedTypeSymbol {
-            Name: "Int128" or "UInt128",
-            Arity: 0,
-            ContainingType: null,
-            ContainingNamespace: { Name: "System", ContainingNamespace.IsGlobalNamespace: true }
-        };
 
     private static bool IsZero(object? value) =>
         value switch {
