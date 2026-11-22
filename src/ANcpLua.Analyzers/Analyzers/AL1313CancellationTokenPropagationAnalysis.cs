@@ -259,12 +259,7 @@ public static partial class Al1313CancellationTokenPropagationAnalysis {
 
     private static bool IsObsolete(ISymbol symbol) {
         foreach (var attribute in symbol.GetAttributes()) {
-            if (attribute.AttributeClass is {
-                    Name: "ObsoleteAttribute",
-                    Arity: 0,
-                    ContainingType: null,
-                    ContainingNamespace: { Name: "System", ContainingNamespace.IsGlobalNamespace: true }
-                }) {
+            if (attribute.AttributeClass?.ToDisplayString() == "System.ObsoleteAttribute") {
                 return true;
             }
         }
