@@ -82,8 +82,8 @@ public sealed partial class Al1207UseToDisplayStringExtensionsAnalyzer : AlAnaly
         }
 
         var receiverName = GetReceiverDisplayName(invocation);
-        context.ReportDiagnostic(Diagnostic.Create(s_rule, invocation.Syntax.GetLocation(),
-            $"{receiverName}.{suggestion}", $"ToDisplayString({formatName})"));
+        context.ReportDiagnostic(s_rule, invocation.Syntax.GetLocation(),
+            $"{receiverName}.{suggestion}", $"ToDisplayString({formatName})");
     }
 
     private static ITypeSymbol? GetReceiverType(IInvocationOperation invocation) {

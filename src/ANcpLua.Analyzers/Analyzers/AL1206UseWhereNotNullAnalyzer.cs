@@ -81,8 +81,8 @@ public sealed partial class Al1206UseWhereNotNullAnalyzer : AlAnalyzer {
         }
 
         if (predicateValue is IAnonymousFunctionOperation lambda && IsNullCheckLambda(lambda)) {
-            context.ReportDiagnostic(Diagnostic.Create(s_rule, invocation.Syntax.GetLocation(),
-                ".WhereNotNull()", ".Where(x => x != null)"));
+            context.ReportDiagnostic(s_rule, invocation.Syntax.GetLocation(),
+                ".WhereNotNull()", ".Where(x => x != null)");
         }
     }
 

@@ -50,11 +50,11 @@ public sealed partial class Al1203UseOperationExtensionsAnalyzer : AlAnalyzer {
         }
 
         if (binary.OperatorKind == BinaryOperatorKind.ConditionalAnd && IsConstantValueHasValueCheck(binary)) {
-            context.ReportDiagnostic(Diagnostic.Create(
+            context.ReportDiagnostic(
                 s_rule,
                 binary.Syntax.GetLocation(),
                 "operation.TryGetConstantValue<T>(out value)",
-                "ConstantValue.HasValue check"));
+                "ConstantValue.HasValue check");
         }
     }
 
