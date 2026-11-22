@@ -46,10 +46,7 @@ public sealed partial class Al1314UseExplicitMidpointRoundingAnalyzer : AlAnalyz
 
         var fullName = $"{method.ContainingType.Name}.{method.Name}";
 
-        context.ReportDiagnostic(Diagnostic.Create(
-            s_rule,
-            context.Operation.Syntax.GetLocation(),
-            fullName));
+        context.ReportDiagnostic(s_rule, context.Operation.Syntax.GetLocation(), fullName);
     }
 
     private static bool IsRoundWithoutMidpointRounding(IMethodSymbol method) {
