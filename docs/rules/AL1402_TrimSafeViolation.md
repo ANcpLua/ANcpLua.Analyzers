@@ -12,7 +12,7 @@
 
 ## Description
 
-Code marked with [TrimSafe] guarantees it will work correctly in trimmed applications. Calling methods with [RequiresUnreferencedCode] violates this guarantee because those methods may fail at runtime when types are trimmed.
+Code marked with [TrimSafe] guarantees it will work correctly in trimmed applications. Calling methods with [RequiresUnreferencedCode] violates this guarantee because those methods may fail at runtime when types are trimmed. Replace the call with a trim-compatible API, or remove [TrimSafe] from the calling method.
 
 ## See also
 

@@ -12,7 +12,7 @@
 
 ## Description
 
-Primary constructor parameters should not be reassigned as this can lead to confusion and bugs.
+Primary constructor parameters should not be reassigned as this can lead to confusion and bugs. Copy the parameter into a local variable or a field and assign to that copy instead.
 
 ## See also
 

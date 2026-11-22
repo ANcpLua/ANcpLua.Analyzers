@@ -72,7 +72,7 @@
     <value>Primary constructor parameter '{0}' is reassigned; copy it into a local or field first (for example 'var {0}Value = {0};') and assign to that copy instead</value>
   </data>
     <data name="AL1000AnalyzerDescription" xml:space="preserve">
-    <value>Primary constructor parameters should not be reassigned as this can lead to confusion and bugs.</value>
+    <value>Primary constructor parameters should not be reassigned as this can lead to confusion and bugs. Copy the parameter into a local variable or a field and assign to that copy instead.</value>
   </data>
     <!-- AL1001: Don't repeat negated patterns -->
     <data name="AL1001AnalyzerTitle" xml:space="preserve">
@@ -82,7 +82,7 @@
     <value>Pattern repeats 'not'; 'not not X' means 'X', so delete every pair of 'not' and keep a single 'not' only when the count is odd</value>
   </data>
     <data name="AL1001AnalyzerDescription" xml:space="preserve">
-    <value>The negated pattern should not be repeated multiple times.</value>
+    <value>The negated pattern should not be repeated multiple times. Two consecutive 'not' cancel out: write 'x is null' instead of 'x is not not null', and 'x is not null' instead of 'x is not not not null'.</value>
   </data>
     <!-- AL1002: Don't divide by constant zero -->
     <data name="AL1002AnalyzerTitle" xml:space="preserve">
@@ -122,7 +122,7 @@
     <value>Field '{0}' has the same name as a primary constructor parameter and hides it; rename the field (for example '_{0}') or delete the field and use the parameter directly</value>
   </data>
     <data name="AL1005AnalyzerDescription" xml:space="preserve">
-    <value>Field names should not conflict with primary constructor parameters to avoid shadowing and confusion.</value>
+    <value>Field names should not conflict with primary constructor parameters to avoid shadowing and confusion. Rename the field (for example with a leading underscore), or remove the field and use the parameter directly.</value>
   </data>
     <!-- AL1006: GetSchema should be explicitly implemented -->
     <data name="AL1006AnalyzerTitle" xml:space="preserve">
@@ -132,7 +132,7 @@
     <value>IXmlSerializable.GetSchema is implemented as a public method; implement it explicitly instead by writing 'XmlSchema? IXmlSerializable.GetSchema() =&gt; null;'</value>
   </data>
     <data name="AL1006AnalyzerDescription" xml:space="preserve">
-    <value>Implement IXmlSerializable.GetSchema explicitly to avoid exposing it as part of the public API.</value>
+    <value>Implement IXmlSerializable.GetSchema explicitly to avoid exposing it as part of the public API. Write 'XmlSchema? IXmlSerializable.GetSchema() =&gt; null;' instead of a public GetSchema method.</value>
   </data>
     <!-- AL1007: GetSchema must return null -->
     <data name="AL1007AnalyzerTitle" xml:space="preserve">
@@ -142,7 +142,7 @@
     <value>IXmlSerializable.GetSchema must return null and must not be abstract; write 'XmlSchema? IXmlSerializable.GetSchema() =&gt; null;'</value>
   </data>
     <data name="AL1007AnalyzerDescription" xml:space="preserve">
-    <value>GetSchema should return null according to IXmlSerializable guidance and should not be abstract.</value>
+    <value>GetSchema should return null according to IXmlSerializable guidance and should not be abstract. Write 'XmlSchema? IXmlSerializable.GetSchema() =&gt; null;'.</value>
   </data>
     <!-- AL1008: Don't call GetSchema -->
     <data name="AL1008AnalyzerTitle" xml:space="preserve">
@@ -152,7 +152,7 @@
     <value>Do not call IXmlSerializable.GetSchema because it always returns null; delete this call and, when a schema is needed, put [XmlSchemaProvider("MethodName")] on the type and call that static method</value>
   </data>
     <data name="AL1008AnalyzerDescription" xml:space="preserve">
-    <value>Calling GetSchema is not supported; it should always return null and isn't intended to be invoked.</value>
+    <value>Calling GetSchema is not supported; it should always return null and isn't intended to be invoked. Remove the call; to publish a schema, apply XmlSchemaProviderAttribute to the type and call the static method it names.</value>
   </data>
     <!-- AL1009: Avoid lock keyword on non-Lock types -->
     <data name="AL1009AnalyzerTitle" xml:space="preserve">
@@ -422,7 +422,7 @@
     <value>Method '{0}' is marked [TrimSafe] but calls '{1}' which has [RequiresUnreferencedCode]; replace the call with a trim-compatible API or remove [TrimSafe] from '{0}'</value>
   </data>
     <data name="AL1402AnalyzerDescription" xml:space="preserve">
-    <value>Code marked with [TrimSafe] guarantees it will work correctly in trimmed applications. Calling methods with [RequiresUnreferencedCode] violates this guarantee because those methods may fail at runtime when types are trimmed.</value>
+    <value>Code marked with [TrimSafe] guarantees it will work correctly in trimmed applications. Calling methods with [RequiresUnreferencedCode] violates this guarantee because those methods may fail at runtime when types are trimmed. Replace the call with a trim-compatible API, or remove [TrimSafe] from the calling method.</value>
   </data>
     <!-- AL1403: AotSafe violation -->
     <data name="AL1403AnalyzerTitle" xml:space="preserve">
@@ -432,7 +432,7 @@
     <value>Method '{0}' is marked [AotSafe] but calls '{1}' which has [RequiresDynamicCode]; replace the call with an AOT-compatible API or remove [AotSafe] from '{0}'</value>
   </data>
     <data name="AL1403AnalyzerDescription" xml:space="preserve">
-    <value>Code marked with [AotSafe] guarantees it will work correctly in AOT-compiled applications. Calling methods with [RequiresDynamicCode] violates this guarantee because those methods rely on runtime code generation which is not available in AOT scenarios.</value>
+    <value>Code marked with [AotSafe] guarantees it will work correctly in AOT-compiled applications. Calling methods with [RequiresDynamicCode] violates this guarantee because those methods rely on runtime code generation which is not available in AOT scenarios. Replace the call with an AOT-compatible API, or remove [AotSafe] from the calling method.</value>
   </data>
     <!-- AL1212: Use Guard.NotNullOrEmpty -->
     <data name="AL1212AnalyzerTitle" xml:space="preserve">
@@ -512,7 +512,7 @@
     <value>Method '{0}' is marked [AotSafe] but calls '{1}' which is marked [AotUnsafe]; replace the call with an AOT-compatible API or remove [AotSafe] from '{0}'</value>
   </data>
     <data name="AL1404AnalyzerDescription" xml:space="preserve">
-    <value>Code marked with [AotSafe] guarantees it will work correctly in AOT-compiled applications. Calling methods marked with [AotUnsafe] violates this guarantee because [AotUnsafe] code explicitly declares it requires JIT compilation.</value>
+    <value>Code marked with [AotSafe] guarantees it will work correctly in AOT-compiled applications. Calling methods marked with [AotUnsafe] violates this guarantee because [AotUnsafe] code explicitly declares it requires JIT compilation. Replace the call with an AOT-compatible API, or remove [AotSafe] from the calling method.</value>
   </data>
     <!-- AL1405: Unnecessary AotUnsafe -->
     <data name="AL1405AnalyzerTitle" xml:space="preserve">

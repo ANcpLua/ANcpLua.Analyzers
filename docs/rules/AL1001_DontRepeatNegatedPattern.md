@@ -12,7 +12,7 @@
 
 ## Description
 
-The negated pattern should not be repeated multiple times.
+The negated pattern should not be repeated multiple times. Two consecutive 'not' cancel out: write 'x is null' instead of 'x is not not null', and 'x is not null' instead of 'x is not not not null'.
 
 ## See also
 

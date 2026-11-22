@@ -15,7 +15,7 @@
                 "text": "Prohibit reassignment of primary constructor parameters"
               },
               "fullDescription": {
-                "text": "Primary constructor parameters should not be reassigned as this can lead to confusion and bugs."
+                "text": "Primary constructor parameters should not be reassigned as this can lead to confusion and bugs. Copy the parameter into a local variable or a field and assign to that copy instead."
               },
               "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1000_ProhibitPrimaryConstructorParameterReassignment.md",
               "defaultConfiguration": {
@@ -32,7 +32,7 @@
                 "text": "Don\u0027t repeat negated patterns"
               },
               "fullDescription": {
-                "text": "The negated pattern should not be repeated multiple times."
+                "text": "The negated pattern should not be repeated multiple times. Two consecutive \u0027not\u0027 cancel out: write \u0027x is null\u0027 instead of \u0027x is not not null\u0027, and \u0027x is not null\u0027 instead of \u0027x is not not not null\u0027."
               },
               "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1001_DontRepeatNegatedPattern.md",
               "defaultConfiguration": {
@@ -100,7 +100,7 @@
                 "text": "Field name conflicts with primary constructor parameter"
               },
               "fullDescription": {
-                "text": "Field names should not conflict with primary constructor parameters to avoid shadowing and confusion."
+                "text": "Field names should not conflict with primary constructor parameters to avoid shadowing and confusion. Rename the field (for example with a leading underscore), or remove the field and use the parameter directly."
               },
               "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1005_FieldNameConflictWithPrimaryConstructor.md",
               "defaultConfiguration": {
@@ -117,7 +117,7 @@
                 "text": "GetSchema should be explicitly implemented"
               },
               "fullDescription": {
-                "text": "Implement IXmlSerializable.GetSchema explicitly to avoid exposing it as part of the public API."
+                "text": "Implement IXmlSerializable.GetSchema explicitly to avoid exposing it as part of the public API. Write \u0027XmlSchema? IXmlSerializable.GetSchema() =\u003E null;\u0027 instead of a public GetSchema method."
               },
               "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1006_ToAl1008IXmlSerializable.md",
               "defaultConfiguration": {
@@ -134,7 +134,7 @@
                 "text": "GetSchema must return null and not be abstract"
               },
               "fullDescription": {
-                "text": "GetSchema should return null according to IXmlSerializable guidance and should not be abstract."
+                "text": "GetSchema should return null according to IXmlSerializable guidance and should not be abstract. Write \u0027XmlSchema? IXmlSerializable.GetSchema() =\u003E null;\u0027."
               },
               "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1007_ToAl1008IXmlSerializable.md",
               "defaultConfiguration": {
@@ -151,7 +151,7 @@
                 "text": "Don\u0027t call IXmlSerializable.GetSchema"
               },
               "fullDescription": {
-                "text": "Calling GetSchema is not supported; it should always return null and isn\u0027t intended to be invoked."
+                "text": "Calling GetSchema is not supported; it should always return null and isn\u0027t intended to be invoked. Remove the call; to publish a schema, apply XmlSchemaProviderAttribute to the type and call the static method it names."
               },
               "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1008_ToAl1008IXmlSerializable.md",
               "defaultConfiguration": {
@@ -1052,7 +1052,7 @@
                 "text": "[TrimSafe] code must not call methods with [RequiresUnreferencedCode]"
               },
               "fullDescription": {
-                "text": "Code marked with [TrimSafe] guarantees it will work correctly in trimmed applications. Calling methods with [RequiresUnreferencedCode] violates this guarantee because those methods may fail at runtime when types are trimmed."
+                "text": "Code marked with [TrimSafe] guarantees it will work correctly in trimmed applications. Calling methods with [RequiresUnreferencedCode] violates this guarantee because those methods may fail at runtime when types are trimmed. Replace the call with a trim-compatible API, or remove [TrimSafe] from the calling method."
               },
               "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1402_TrimSafeViolation.md",
               "defaultConfiguration": {
@@ -1069,7 +1069,7 @@
                 "text": "[AotSafe] code must not call methods with [RequiresDynamicCode]"
               },
               "fullDescription": {
-                "text": "Code marked with [AotSafe] guarantees it will work correctly in AOT-compiled applications. Calling methods with [RequiresDynamicCode] violates this guarantee because those methods rely on runtime code generation which is not available in AOT scenarios."
+                "text": "Code marked with [AotSafe] guarantees it will work correctly in AOT-compiled applications. Calling methods with [RequiresDynamicCode] violates this guarantee because those methods rely on runtime code generation which is not available in AOT scenarios. Replace the call with an AOT-compatible API, or remove [AotSafe] from the calling method."
               },
               "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1403_AotSafeViolation.md",
               "defaultConfiguration": {
@@ -1086,7 +1086,7 @@
                 "text": "[AotSafe] code must not call [AotUnsafe] code"
               },
               "fullDescription": {
-                "text": "Code marked with [AotSafe] guarantees it will work correctly in AOT-compiled applications. Calling methods marked with [AotUnsafe] violates this guarantee because [AotUnsafe] code explicitly declares it requires JIT compilation."
+                "text": "Code marked with [AotSafe] guarantees it will work correctly in AOT-compiled applications. Calling methods marked with [AotUnsafe] violates this guarantee because [AotUnsafe] code explicitly declares it requires JIT compilation. Replace the call with an AOT-compatible API, or remove [AotSafe] from the calling method."
               },
               "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1404_AotSafeCallsAotUnsafe.md",
               "defaultConfiguration": {

@@ -12,7 +12,7 @@
 
 ## Description
 
-Field names should not conflict with primary constructor parameters to avoid shadowing and confusion.
+Field names should not conflict with primary constructor parameters to avoid shadowing and confusion. Rename the field (for example with a leading underscore), or remove the field and use the parameter directly.
 
 ## See also
 
