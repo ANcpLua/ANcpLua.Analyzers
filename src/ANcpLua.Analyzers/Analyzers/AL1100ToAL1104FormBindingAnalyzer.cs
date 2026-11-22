@@ -181,15 +181,7 @@ public sealed partial class Al1100ToAl1104FormBindingAnalyzer : AlAnalyzer {
         FromBodyAttribute,
         IFormFile,
         IFormFileCollection,
-        IFormCollection,
-        SystemGuid,
-        TimeSpan,
-        DateTimeOffset,
-        DateOnly,
-        TimeOnly,
-        Uri,
-        AttributeData,
-        TypedConstant
+        IFormCollection
     }
 
     private static partial class WellKnownTypeNames {
@@ -198,15 +190,7 @@ public sealed partial class Al1100ToAl1104FormBindingAnalyzer : AlAnalyzer {
             "Microsoft.AspNetCore.Mvc.FromBodyAttribute",
             "Microsoft.AspNetCore.Http.IFormFile",
             "Microsoft.AspNetCore.Http.IFormFileCollection",
-            "Microsoft.AspNetCore.Http.IFormCollection",
-            "System.Guid",
-            "System.TimeSpan",
-            "System.DateTimeOffset",
-            "System.DateOnly",
-            "System.TimeOnly",
-            "System.Uri",
-            "Microsoft.CodeAnalysis.AttributeData",
-            "Microsoft.CodeAnalysis.TypedConstant"
+            "Microsoft.AspNetCore.Http.IFormCollection"
         ];
 
         public static string GetName(WellKnownType type) => s_names[(int)type];
