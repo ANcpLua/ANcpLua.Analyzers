@@ -44,23 +44,24 @@ public sealed partial class Al1106MissingHealthChecksAnalyzer : AlAnalyzer {
             return;
         }
 
-        if (invocation.Ancestors().OfType<MethodDeclarationSyntax>().FirstOrDefault() is not { } containingMethod) {
-            if (invocation.Ancestors().OfType<CompilationUnitSyntax>().FirstOrDefault() is { } compilationUnit
+        if (invocation.FirstAncestorOrSelf<MethodDeclarationSyntax>() is not { } containingMethod) {
+            if (invocation.FirstAncestorOrSelf<CompilationUnitSyntax>() is { } compilationUnit
                 && !HasHealthChecksConfigured(compilationUnit)) {
-                context.ReportDiagnostic(Diagnostic.Create(s_rule, invocation.GetLocation()));
+                context.ReportDiagnostic(s_rule, invocation.GetLocation());
             }
 
             return;
         }
 
         if (!HasHealthChecksConfigured(containingMethod)) {
-            context.ReportDiagnostic(Diagnostic.Create(s_rule, invocation.GetLocation()));
+            context.ReportDiagnostic(s_rule, invocation.GetLocation());
         }
     }
 
     private static bool HasHealthChecksConfigured(SyntaxNode scope) {
-        foreach (var inv in scope.DescendantNodes().OfType<InvocationExpressionSyntax>()) {
-            if (GetMethodName(inv) is { } name
+        foreach (var node in scope.DescendantNodes()) {
+            if (node is InvocationExpressionSyntax inv
+                && GetMethodName(inv) is { } name
                 && (name is "AddHealthChecks" || IsServiceDefaultsWrapper(name))) {
                 return true;
             }
