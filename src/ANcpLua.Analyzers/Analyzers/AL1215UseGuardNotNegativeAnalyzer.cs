@@ -18,8 +18,6 @@ public sealed partial class Al1215UseGuardNotNegativeAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL1215.</summary>
     public const string DiagnosticId = "AL1215";
 
-    private const string GuardMetadataName = "ANcpLua.Roslyn.Utilities.Guard";
-
     private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.RoslynUtilities,
@@ -33,14 +31,7 @@ public sealed partial class Al1215UseGuardNotNegativeAnalyzer : AlAnalyzer {
         context.RegisterCompilationStartAction(OnCompilationStart);
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
-        // Guard.* lives in ANcpLua.Roslyn.Utilities.Guard. Only fire when that type is present and
-        // callable from this compilation; otherwise the code fix would rewrite to a symbol the
-        // consumer cannot resolve. Projects that do not reference ANcpLua.Roslyn.Utilities are unaffected.
-        if (context.Compilation.GetTypeByMetadataName(GuardMetadataName) is not { } guardType) {
-            return;
-        }
-
-        if (!context.Compilation.IsSymbolAccessibleWithin(guardType, context.Compilation.Assembly)) {
+        if (!GuardPatterns.IsGuardAccessible(context.Compilation)) {
             return;
         }
 
@@ -95,26 +86,6 @@ public sealed partial class Al1215UseGuardNotNegativeAnalyzer : AlAnalyzer {
         operation is ILiteralOperation { ConstantValue: { HasValue: true, Value: 0 or 0L or 0.0 or 0.0f or 0m } };
 
     private static bool HasSingleArgumentOutOfRangeExceptionThrow(IOperation? operation) =>
-        operation switch {
-            null => false,
-            IBlockOperation block => block.Operations.Length == 1 && IsArgumentOutOfRangeExceptionThrow(block.Operations[0]),
-            _ => IsArgumentOutOfRangeExceptionThrow(operation)
-        };
-
-    private static bool IsArgumentOutOfRangeExceptionThrow(IOperation? operation) {
-        if (operation is IExpressionStatementOperation exprStmt) {
-            operation = exprStmt.Operation;
-        }
-
-        if (operation is not IThrowOperation { Exception: { } exception }) {
-            return false;
-        }
-
-        if (exception.UnwrapAllConversions() is not IObjectCreationOperation { Type: { } exceptionType }) {
-            return false;
-        }
-
-        return exceptionType.ToDisplayString()
+        GuardPatterns.GetSingleThrownCreationType(operation)?.ToDisplayString()
             is "System.ArgumentOutOfRangeException" or "ArgumentOutOfRangeException";
-    }
 }
