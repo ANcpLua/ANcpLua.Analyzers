@@ -75,11 +75,12 @@ public sealed partial class Al1308PreferTryParseAnalyzer : AlAnalyzer {
             SpecialType.System_Single or
             SpecialType.System_Double or
             SpecialType.System_Decimal
-        || type.ToDisplayString() is
-            "System.DateTime" or
-            "System.DateTimeOffset" or
-            "System.Guid" or
-            "System.Enum";
+        || type is {
+            Name: "DateTime" or "DateTimeOffset" or "Guid" or "Enum",
+            Arity: 0,
+            ContainingType: null,
+            ContainingNamespace: { Name: "System", ContainingNamespace.IsGlobalNamespace: true }
+        };
 
     private static bool IsInsideTryCatchForFormatException(
         SemanticModel semanticModel,
