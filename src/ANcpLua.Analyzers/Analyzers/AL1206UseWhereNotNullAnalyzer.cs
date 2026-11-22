@@ -60,9 +60,7 @@ public sealed partial class Al1206UseWhereNotNullAnalyzer : AlAnalyzer {
             return;
         }
 
-        var fullTypeName = containingType.ToDisplayString();
-        if (!fullTypeName.ContainsOrdinal("System.Linq.Enumerable") &&
-            !fullTypeName.ContainsOrdinal("Enumerable")) {
+        if (!containingType.ToDisplayString().ContainsOrdinal("Enumerable")) {
             return;
         }
 
@@ -70,11 +68,7 @@ public sealed partial class Al1206UseWhereNotNullAnalyzer : AlAnalyzer {
             return;
         }
 
-        var predicateValue = predicateArg.Value;
-
-        while (predicateValue is IConversionOperation conversion) {
-            predicateValue = conversion.Operand;
-        }
+        var predicateValue = predicateArg.Value.UnwrapAllConversions();
 
         if (predicateValue is IDelegateCreationOperation delegateCreation) {
             predicateValue = delegateCreation.Target;
@@ -117,9 +111,7 @@ public sealed partial class Al1206UseWhereNotNullAnalyzer : AlAnalyzer {
             return false;
         }
 
-        while (operation is IConversionOperation conversion) {
-            operation = conversion.Operand;
-        }
+        operation = operation.UnwrapAllConversions();
 
         return operation switch {
             IBinaryOperation {
@@ -139,18 +131,14 @@ public sealed partial class Al1206UseWhereNotNullAnalyzer : AlAnalyzer {
     private static bool IsParameterAndNull(IOperation left, IOperation right, IParameterSymbol parameter) => IsParameterReference(left, parameter) && IsNullLiteral(right);
 
     private static bool IsParameterReference(IOperation? operation, IParameterSymbol parameter) {
-        while (operation is IConversionOperation conversion) {
-            operation = conversion.Operand;
-        }
+        operation = operation?.UnwrapAllConversions();
 
         return operation is IParameterReferenceOperation paramRef &&
                paramRef.Parameter.IsEqualTo(parameter);
     }
 
     private static bool IsNullLiteral(IOperation? operation) {
-        while (operation is IConversionOperation conversion) {
-            operation = conversion.Operand;
-        }
+        operation = operation?.UnwrapAllConversions();
 
         return operation is ILiteralOperation { ConstantValue: { HasValue: true, Value: null } };
     }

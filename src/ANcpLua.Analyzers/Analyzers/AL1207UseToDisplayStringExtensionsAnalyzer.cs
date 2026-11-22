@@ -127,10 +127,7 @@ public sealed partial class Al1207UseToDisplayStringExtensionsAnalyzer : AlAnaly
     private static (string? formatName, string? suggestion) DetectFormatAndSuggestion(
         IOperation formatArg,
         INamedTypeSymbol symbolDisplayFormat) {
-        // Unwrap conversions
-        while (formatArg is IConversionOperation conversion) {
-            formatArg = conversion.Operand;
-        }
+        formatArg = formatArg.UnwrapAllConversions();
 
         return formatArg switch {
             // Check for SymbolDisplayFormat.FullyQualifiedFormat or CSharpErrorMessageFormat
@@ -165,10 +162,7 @@ public sealed partial class Al1207UseToDisplayStringExtensionsAnalyzer : AlAnaly
             return "type";
         }
 
-        // Unwrap conversions
-        while (receiver is IConversionOperation conversion) {
-            receiver = conversion.Operand;
-        }
+        receiver = receiver.UnwrapAllConversions();
 
         return receiver switch {
             ILocalReferenceOperation local => local.Local.Name,
