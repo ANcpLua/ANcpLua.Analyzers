@@ -56,6 +56,6 @@ public sealed partial class Al1406AvoidDynamicKeywordAnalyzer : AlAnalyzer {
             _ => "dynamic"
         };
 
-        context.ReportDiagnostic(Diagnostic.Create(s_rule, context.Operation.Syntax.GetLocation(), description));
+        context.ReportDiagnostic(s_rule, context.Operation.Syntax.GetLocation(), description);
     }
 }

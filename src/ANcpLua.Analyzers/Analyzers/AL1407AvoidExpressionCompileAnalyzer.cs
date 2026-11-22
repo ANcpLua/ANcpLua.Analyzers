@@ -59,7 +59,6 @@ public sealed partial class Al1407AvoidExpressionCompileAnalyzer : AlAnalyzer {
             return;
         }
 
-        context.ReportDiagnostic(Diagnostic.Create(
-            s_rule, invocation.Syntax.GetLocation(), $"{containingType.Name}.{targetMethod.Name}()"));
+        context.ReportDiagnostic(s_rule, invocation.Syntax.GetLocation(), $"{containingType.Name}.{targetMethod.Name}()");
     }
 }
