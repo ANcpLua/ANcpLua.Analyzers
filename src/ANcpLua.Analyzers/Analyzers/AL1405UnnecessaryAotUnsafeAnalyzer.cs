@@ -96,7 +96,7 @@ public sealed partial class Al1405UnnecessaryAotUnsafeAnalyzer : AlAnalyzer {
             var targetMethod = ((IInvocationOperation)ctx.Operation).TargetMethod;
 
             if (targetMethod.HasAttributeByShortName(RequiresDynamicCodeAttributeName) ||
-                IsAotUnsafe(targetMethod) ||
+                Al14xxAotAttributeLookup.HasAttributeOnMethodOrContainingTypes(targetMethod, AotUnsafeAttributeName) ||
                 IsKnownReflectionApi(targetMethod)) {
                 methodUnsafePatterns[method] = true;
             } else {
@@ -161,20 +161,6 @@ public sealed partial class Al1405UnnecessaryAotUnsafeAnalyzer : AlAnalyzer {
 
         method = m;
         return true;
-    }
-
-    private static bool IsAotUnsafe(IMethodSymbol method) {
-        if (method.HasAttributeByShortName(AotUnsafeAttributeName)) {
-            return true;
-        }
-
-        for (var type = method.ContainingType; type is not null; type = type.ContainingType) {
-            if (type.HasAttributeByShortName(AotUnsafeAttributeName)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private static bool IsKnownReflectionApi(IMethodSymbol method) {
