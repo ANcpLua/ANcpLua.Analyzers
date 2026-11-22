@@ -112,7 +112,6 @@ public sealed partial class Al1500ClosedTypeHierarchySwitchTests
 
                     public static class C {
                         public static int M(Shape shape) => shape switch {
-                            Circle => 1,
                             _ => 0
                         };
                     }
