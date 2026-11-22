@@ -12,7 +12,7 @@
 
 ## Description
 
-Code marked with [AotSafe] guarantees it will work correctly in AOT-compiled applications. Calling methods marked with [AotUnsafe] violates this guarantee because [AotUnsafe] code explicitly declares it requires JIT compilation.
+Code marked with [AotSafe] guarantees it will work correctly in AOT-compiled applications. Calling methods marked with [AotUnsafe] violates this guarantee because [AotUnsafe] code explicitly declares it requires JIT compilation. Replace the call with an AOT-compatible API, or remove [AotSafe] from the calling method.
 
 ## See also
 

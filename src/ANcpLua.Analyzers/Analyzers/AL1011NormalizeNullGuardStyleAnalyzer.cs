@@ -21,7 +21,7 @@ public sealed partial class Al1011NormalizeNullGuardStyleAnalyzer : AlAnalyzer {
     private static readonly DiagnosticDescriptor s_rule = new(
         DiagnosticId,
         "Normalize null-guard style",
-        "Normalize null-guard to '{0}' style",
+        "Replace this if/throw null-guard with '{1}' (null-guard style '{0}')",
         DiagnosticCategories.Style,
         DiagnosticSeverity.Info,
         true,
@@ -90,8 +90,15 @@ public sealed partial class Al1011NormalizeNullGuardStyleAnalyzer : AlAnalyzer {
             return;
         }
 
+        var identifier = identifierNode.Identifier.Text;
+        var replacement = targetStyle switch {
+            "throw" => $"Throw.IfNull({identifier});",
+            "bcl" => $"{typeName}.ThrowIfNull({identifier});",
+            _ => $"{identifier} = {identifier} ?? throw new {typeName}(nameof({identifier}));"
+        };
+
         var properties = ImmutableDictionary.CreateBuilder<string, string?>();
-        properties.Add(PropertyIdentifier, identifierNode.Identifier.Text);
+        properties.Add(PropertyIdentifier, identifier);
         properties.Add(PropertyTypeName, typeName);
         properties.Add(PropertyStyle, targetStyle);
 
@@ -99,7 +106,8 @@ public sealed partial class Al1011NormalizeNullGuardStyleAnalyzer : AlAnalyzer {
             s_rule,
             ifStatement.IfKeyword.GetLocation(),
             properties.ToImmutable(),
-            targetStyle));
+            targetStyle,
+            replacement));
     }
 
     private static string ComputeTargetStyle(

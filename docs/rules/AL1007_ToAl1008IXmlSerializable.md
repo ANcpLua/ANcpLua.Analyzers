@@ -12,7 +12,7 @@
 
 ## Description
 
-GetSchema should return null according to IXmlSerializable guidance and should not be abstract.
+GetSchema should return null according to IXmlSerializable guidance and should not be abstract. Write 'XmlSchema? IXmlSerializable.GetSchema() => null;'.
 
 ## See also
 

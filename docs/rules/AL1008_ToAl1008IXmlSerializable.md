@@ -12,7 +12,7 @@
 
 ## Description
 
-Calling GetSchema is not supported; it should always return null and isn't intended to be invoked.
+Calling GetSchema is not supported; it should always return null and isn't intended to be invoked. Remove the call; to publish a schema, apply XmlSchemaProviderAttribute to the type and call the static method it names.
 
 ## See also
 

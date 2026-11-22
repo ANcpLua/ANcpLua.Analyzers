@@ -2,6 +2,32 @@
 
 All notable changes to ANcpLua.Analyzers will be documented in this file.
 
+## [Unreleased]
+
+### Changed
+
+- **Messages now carry the fix.** Agents read diagnostics from build output and never run a code fix, so the
+  messages of 32 rules were rewritten to say what to write instead (AL1000-AL1008, AL1011, AL1012, AL1109,
+  AL1208, AL1301-AL1303, AL1313, AL1400, AL1402-AL1406, AL1500-AL1502, AL1504, AL1505, AL1601, AL1606, AL1700,
+  AL1703). IDs, severities, categories and titles are unchanged.
+- **Help pages name the fix** for AL1000, AL1001, AL1005-AL1008 and AL1402-AL1404: their descriptions (and with
+  them `docs/rules/*.md` and the SARIF manifest) end with what to write instead.
+- **AL1011** names the exact replacement statement, for example `ArgumentNullException.ThrowIfNull(value);`,
+  instead of only the style keyword.
+
+### Fixed
+
+- **AL1208** printed the operand where the replacement belongs (`Use 'value' instead of null-coalescing throw`).
+  It now prints `Use 'Guard.NotNull(value)' instead of 'value ?? throw new ArgumentNullException(nameof(value))'`.
+- **AL1500** no longer lists the leaves below an intermediate type as missing when the switch has an arm for
+  that intermediate type (`GateMoving => ...` covers `GateOpening` and `GateClosing`), which matches how the
+  compiler counts arms over C# 15 `closed` hierarchies. A discard or an arm for the root type still does not count.
+
+### Added (repository only)
+
+- Tests that run every analyzer over C# 15 `union` declarations and `closed` hierarchies and fail on an
+  analyzer crash (AD0001) or on any report against code the compiler accepts.
+
 ## [2.1.8] - 2026-10-19
 
 ### Fixed

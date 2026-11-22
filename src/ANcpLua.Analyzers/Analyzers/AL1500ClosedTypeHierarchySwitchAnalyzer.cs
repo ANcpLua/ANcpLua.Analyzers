@@ -26,7 +26,8 @@ public sealed partial class Al1500ClosedTypeHierarchySwitchAnalyzer : AlAnalyzer
     static readonly DiagnosticDescriptor s_rule = new(
         DiagnosticId,
         "Closed hierarchy match is not exhaustive",
-        "Closed hierarchy '{0}' does not handle: {1}",
+        "Closed hierarchy '{0}' does not handle: {1}; add one switch arm, case label or Match handler for each listed type " +
+        "(a discard '_' or a '{0}' arm does not count)",
         DiagnosticCategories.Design,
         DiagnosticSeverity.Warning,
         true,
@@ -117,7 +118,7 @@ public sealed partial class Al1500ClosedTypeHierarchySwitchAnalyzer : AlAnalyzer
         ImmutableArray<INamedTypeSymbol> requiredTypes,
         IReadOnlyCollection<INamedTypeSymbol> handledTypes) {
         var missing = requiredTypes
-            .Where(required => !ContainsType(handledTypes, required))
+            .Where(required => !IsCovered(handledTypes, required, rootType))
             .ToImmutableArray();
 
         if (missing.IsEmpty) {
@@ -398,6 +399,31 @@ public sealed partial class Al1500ClosedTypeHierarchySwitchAnalyzer : AlAnalyzer
     static bool ContainsType(IEnumerable<INamedTypeSymbol> types, ISymbol expected) {
         foreach (var type in types) {
             if (AreEquivalentForCoverage(type, expected)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    ///     A leaf is covered by an arm for the leaf itself or for an intermediate type between the
+    ///     hierarchy root and the leaf: such an arm matches every type below it, which is also how the
+    ///     compiler counts arms over C# 15 <c>closed</c> hierarchies. An arm for the root itself (or for
+    ///     a type above it) is a catch-all and still does not count.
+    /// </summary>
+    static bool IsCovered(
+        IReadOnlyCollection<INamedTypeSymbol> handledTypes,
+        INamedTypeSymbol required,
+        INamedTypeSymbol rootType) {
+        foreach (var handledType in handledTypes) {
+            if (AreEquivalentForCoverage(handledType, required)) {
+                return true;
+            }
+
+            if (!handledType.IsEqualTo(rootType) &&
+                handledType.InheritsFrom(rootType) &&
+                required.InheritsFrom(handledType)) {
                 return true;
             }
         }

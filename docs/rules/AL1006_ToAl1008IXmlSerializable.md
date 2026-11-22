@@ -12,7 +12,7 @@
 
 ## Description
 
-Implement IXmlSerializable.GetSchema explicitly to avoid exposing it as part of the public API.
+Implement IXmlSerializable.GetSchema explicitly to avoid exposing it as part of the public API. Write 'XmlSchema? IXmlSerializable.GetSchema() => null;' instead of a public GetSchema method.
 
 ## See also
 

@@ -12,7 +12,7 @@
 
 ## Description
 
-Code marked with [AotSafe] guarantees it will work correctly in AOT-compiled applications. Calling methods with [RequiresDynamicCode] violates this guarantee because those methods rely on runtime code generation which is not available in AOT scenarios.
+Code marked with [AotSafe] guarantees it will work correctly in AOT-compiled applications. Calling methods with [RequiresDynamicCode] violates this guarantee because those methods rely on runtime code generation which is not available in AOT scenarios. Replace the call with an AOT-compatible API, or remove [AotSafe] from the calling method.
 
 ## See also
 
