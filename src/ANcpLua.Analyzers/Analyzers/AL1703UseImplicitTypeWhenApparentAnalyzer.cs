@@ -56,9 +56,7 @@ public sealed partial class Al1703UseImplicitTypeWhenApparentAnalyzer : AlAnalyz
         out EqualsValueClauseSyntax initializer) {
         initializer = null!;
 
-        if (declaration.DescendantNodesAndTokensAndSelf()
-            .Any(static nodeOrToken => nodeOrToken.GetDiagnostics()
-                .Any(static diagnostic => diagnostic.Severity == DiagnosticSeverity.Error))) {
+        if (HasSyntaxError(declaration)) {
             return false;
         }
 
@@ -81,6 +79,23 @@ public sealed partial class Al1703UseImplicitTypeWhenApparentAnalyzer : AlAnalyz
 
         initializer = declaratorInitializer;
         return true;
+    }
+
+    private static bool HasSyntaxError(SyntaxNode declaration) {
+        // Green-node flag: no node or token below carries a diagnostic, so skip the walk
+        if (!declaration.ContainsDiagnostics) {
+            return false;
+        }
+
+        foreach (var nodeOrToken in declaration.DescendantNodesAndTokensAndSelf()) {
+            foreach (var diagnostic in nodeOrToken.GetDiagnostics()) {
+                if (diagnostic.Severity == DiagnosticSeverity.Error) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private static bool ShouldUseImplicitType(
