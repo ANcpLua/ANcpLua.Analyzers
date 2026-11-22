@@ -24,7 +24,6 @@ public sealed partial class Al1801ToolMustDeclareSideEffectAnalyzer : AlAnalyzer
     /// <summary>The diagnostic identifier for AL1801.</summary>
     private const string DiagnosticId = "AL1801";
 
-    private const string LoomToolAttributeName = "LoomTool";
     private const string ToolSideEffectAttributeName = "ToolSideEffect";
 
     private static readonly DiagnosticDescriptor s_rule = CreateRule(
@@ -42,11 +41,11 @@ public sealed partial class Al1801ToolMustDeclareSideEffectAnalyzer : AlAnalyzer
     private static void AnalyzeMethod(SymbolAnalysisContext context) {
         var method = (IMethodSymbol)context.Symbol;
 
-        if (!method.HasAttributeByShortName(LoomToolAttributeName)) {
+        if (!Al1800ToAl1802LoomToolAttributes.IsLoomTool(method)) {
             return;
         }
 
-        if (HasAttributeOnMethodOrType(method, ToolSideEffectAttributeName)) {
+        if (Al1800ToAl1802LoomToolAttributes.HasAttributeOnMethodOrType(method, ToolSideEffectAttributeName)) {
             return;
         }
 
@@ -55,8 +54,4 @@ public sealed partial class Al1801ToolMustDeclareSideEffectAnalyzer : AlAnalyzer
             method.Locations.FirstOrDefault() ?? Location.None,
             method.Name));
     }
-
-    private static bool HasAttributeOnMethodOrType(IMethodSymbol method, string attributeName) =>
-        method.HasAttributeByShortName(attributeName) ||
-        method.ContainingType?.HasAttributeByShortName(attributeName) is true;
 }
