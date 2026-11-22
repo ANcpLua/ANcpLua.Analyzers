@@ -35,7 +35,6 @@ public sealed partial class Al1107ConsiderConnectionStringAnalyzer : AlAnalyzer 
         "MongoClient",
         "ConnectionMultiplexer",
         "IConnectionMultiplexer",
-        "RabbitMQ.Client.ConnectionFactory",
         "ConnectionFactory",
         "DbConnection",
         "SqliteConnection",
@@ -91,11 +90,6 @@ public sealed partial class Al1107ConsiderConnectionStringAnalyzer : AlAnalyzer 
         var typeName = type.Name;
         foreach (var clientType in s_connectionClientTypes) {
             if (typeName.EqualsOrdinal(clientType)) {
-                return true;
-            }
-
-            // Fully-qualified match (e.g., Npgsql.NpgsqlConnection)
-            if (clientType.ContainsOrdinal(".") && type.ToDisplayString().EndsWithOrdinal(clientType)) {
                 return true;
             }
         }
