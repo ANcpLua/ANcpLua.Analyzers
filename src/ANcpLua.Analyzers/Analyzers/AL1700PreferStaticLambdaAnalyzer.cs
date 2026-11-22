@@ -35,7 +35,7 @@ public sealed partial class Al1700PreferStaticLambdaAnalyzer : AlAnalyzer {
         }
 
         // Report diagnostic on the entire lambda for proper Fix All support
-        context.ReportDiagnostic(Diagnostic.Create(s_rule, lambda.GetLocation()));
+        context.ReportDiagnostic(s_rule, lambda.GetLocation());
     }
 
     /// <summary>

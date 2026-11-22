@@ -47,7 +47,7 @@ public sealed partial class Al1703UseImplicitTypeWhenApparentAnalyzer : AlAnalyz
             context.SemanticModel);
 
         if (shouldUseImplicitType) {
-            context.ReportDiagnostic(Diagnostic.Create(s_rule, declaration.Type.GetLocation()));
+            context.ReportDiagnostic(s_rule, declaration.Type.GetLocation());
         }
     }
 
