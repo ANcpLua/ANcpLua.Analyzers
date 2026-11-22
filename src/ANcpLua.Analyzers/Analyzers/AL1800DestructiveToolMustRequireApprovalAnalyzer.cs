@@ -65,11 +65,11 @@ public sealed partial class Al1800DestructiveToolMustRequireApprovalAnalyzer : A
             return;
         }
 
-        context.ReportDiagnostic(Diagnostic.Create(
+        context.ReportDiagnostic(
             s_rule,
             method.Locations.FirstOrDefault() ?? Location.None,
             method.Name,
-            destructiveSideEffect));
+            destructiveSideEffect);
     }
 
     private static string? GetDestructiveSideEffectName(IMethodSymbol method) {

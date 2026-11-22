@@ -49,9 +49,9 @@ public sealed partial class Al1801ToolMustDeclareSideEffectAnalyzer : AlAnalyzer
             return;
         }
 
-        context.ReportDiagnostic(Diagnostic.Create(
+        context.ReportDiagnostic(
             s_rule,
             method.Locations.FirstOrDefault() ?? Location.None,
-            method.Name));
+            method.Name);
     }
 }
