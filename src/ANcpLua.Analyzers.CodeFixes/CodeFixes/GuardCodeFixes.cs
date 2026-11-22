@@ -15,7 +15,7 @@ internal static partial class GuardCodeFixes {
             return root;
         }
 
-        if (compilationUnit.Usings.Any(u => u.Name?.ToString() == GuardNamespace)) {
+        if (compilationUnit.Usings.Any(static u => u.Name?.ToString() == GuardNamespace)) {
             return root;
         }
 
