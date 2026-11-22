@@ -15,8 +15,6 @@ public sealed partial class Al1208UseGuardNotNullAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL1208.</summary>
     public const string DiagnosticId = "AL1208";
 
-    private const string GuardMetadataName = "ANcpLua.Roslyn.Utilities.Guard";
-
     private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.RoslynUtilities,
@@ -30,14 +28,7 @@ public sealed partial class Al1208UseGuardNotNullAnalyzer : AlAnalyzer {
         context.RegisterCompilationStartAction(OnCompilationStart);
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
-        // Guard.* lives in ANcpLua.Roslyn.Utilities.Guard. Only fire when that type is present and
-        // callable from this compilation; otherwise the code fix would rewrite to a symbol the
-        // consumer cannot resolve. Projects that do not reference ANcpLua.Roslyn.Utilities are unaffected.
-        if (context.Compilation.GetTypeByMetadataName(GuardMetadataName) is not { } guardType) {
-            return;
-        }
-
-        if (!context.Compilation.IsSymbolAccessibleWithin(guardType, context.Compilation.Assembly)) {
+        if (!GuardPatterns.IsGuardAccessible(context.Compilation)) {
             return;
         }
 

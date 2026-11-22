@@ -21,8 +21,6 @@ public sealed partial class Al1212UseGuardNotNullOrEmptyAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL1212.</summary>
     public const string DiagnosticId = "AL1212";
 
-    private const string GuardMetadataName = "ANcpLua.Roslyn.Utilities.Guard";
-
     private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.RoslynUtilities,
@@ -36,14 +34,7 @@ public sealed partial class Al1212UseGuardNotNullOrEmptyAnalyzer : AlAnalyzer {
         context.RegisterCompilationStartAction(OnCompilationStart);
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
-        // Guard.* lives in ANcpLua.Roslyn.Utilities.Guard. Only fire when that type is present and
-        // callable from this compilation; otherwise the code fix would rewrite to a symbol the
-        // consumer cannot resolve. Projects that do not reference ANcpLua.Roslyn.Utilities are unaffected.
-        if (context.Compilation.GetTypeByMetadataName(GuardMetadataName) is not { } guardType) {
-            return;
-        }
-
-        if (!context.Compilation.IsSymbolAccessibleWithin(guardType, context.Compilation.Assembly)) {
+        if (!GuardPatterns.IsGuardAccessible(context.Compilation)) {
             return;
         }
 
@@ -90,16 +81,12 @@ public sealed partial class Al1212UseGuardNotNullOrEmptyAnalyzer : AlAnalyzer {
             return false;
         }
 
-        argumentName = GetExpressionName(arg);
+        argumentName = GuardPatterns.GetExpressionName(arg);
         return true;
     }
 
     private static bool IsArgumentExceptionThrow(StatementSyntax statement) {
-        if (statement is BlockSyntax { Statements: [var single] }) {
-            statement = single;
-        }
-
-        if (statement is not ThrowStatementSyntax { Expression: ObjectCreationExpressionSyntax objectCreation }) {
+        if (GuardPatterns.TryGetSingleThrowStatement(statement) is not { Expression: ObjectCreationExpressionSyntax objectCreation }) {
             return false;
         }
 
@@ -113,12 +100,5 @@ public sealed partial class Al1212UseGuardNotNullOrEmptyAnalyzer : AlAnalyzer {
             IdentifierNameSyntax identifier => identifier.Identifier.Text,
             QualifiedNameSyntax qualified => $"{GetTypeName(qualified.Left)}.{qualified.Right.Identifier.Text}",
             _ => string.Empty
-        };
-
-    private static string GetExpressionName(ExpressionSyntax expression) =>
-        expression switch {
-            IdentifierNameSyntax identifier => identifier.Identifier.Text,
-            MemberAccessExpressionSyntax memberAccess => memberAccess.Name.Identifier.Text,
-            _ => "value"
         };
 }

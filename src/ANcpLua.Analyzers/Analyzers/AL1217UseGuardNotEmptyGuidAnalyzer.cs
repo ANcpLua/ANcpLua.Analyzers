@@ -15,8 +15,6 @@ public sealed partial class Al1217UseGuardNotEmptyGuidAnalyzer : AlAnalyzer {
     /// <summary>The diagnostic identifier for AL1217.</summary>
     public const string DiagnosticId = "AL1217";
 
-    private const string GuardMetadataName = "ANcpLua.Roslyn.Utilities.Guard";
-
     private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.RoslynUtilities,
@@ -33,14 +31,7 @@ public sealed partial class Al1217UseGuardNotEmptyGuidAnalyzer : AlAnalyzer {
         context.RegisterCompilationStartAction(OnCompilationStart);
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
-        // Guard.* lives in ANcpLua.Roslyn.Utilities.Guard. Only fire when that type is present and
-        // callable from this compilation; otherwise the code fix would rewrite to a symbol the
-        // consumer cannot resolve. Projects that do not reference ANcpLua.Roslyn.Utilities are unaffected.
-        if (context.Compilation.GetTypeByMetadataName(GuardMetadataName) is not { } guardType) {
-            return;
-        }
-
-        if (!context.Compilation.IsSymbolAccessibleWithin(guardType, context.Compilation.Assembly)) {
+        if (!GuardPatterns.IsGuardAccessible(context.Compilation)) {
             return;
         }
 
@@ -52,7 +43,7 @@ public sealed partial class Al1217UseGuardNotEmptyGuidAnalyzer : AlAnalyzer {
 
         if (ifStatement.Else is not null ||
             !TryParseGuidEmptyCheck(ifStatement.Condition, context.SemanticModel, out var identifier) ||
-            TryGetThrowStatement(ifStatement.Statement) is not { } throwStmt ||
+            GuardPatterns.TryGetSingleThrowStatement(ifStatement.Statement) is not { } throwStmt ||
             !IsArgumentExceptionThrow(throwStmt, context.SemanticModel)) {
             return;
         }
@@ -104,13 +95,6 @@ public sealed partial class Al1217UseGuardNotEmptyGuidAnalyzer : AlAnalyzer {
 
         return !string.IsNullOrEmpty(identifier);
     }
-
-    private static ThrowStatementSyntax? TryGetThrowStatement(StatementSyntax statement) =>
-        statement switch {
-            ThrowStatementSyntax t => t,
-            BlockSyntax { Statements: [ThrowStatementSyntax t] } => t,
-            _ => null
-        };
 
     private static bool IsArgumentExceptionThrow(ThrowStatementSyntax throwStmt, SemanticModel model) {
         if (throwStmt.Expression is not ObjectCreationExpressionSyntax creation) {

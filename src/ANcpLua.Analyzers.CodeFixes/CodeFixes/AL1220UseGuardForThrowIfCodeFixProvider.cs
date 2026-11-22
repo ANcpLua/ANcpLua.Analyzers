@@ -19,8 +19,6 @@ namespace ANcpLua.Analyzers.CodeFixes.CodeFixes;
 [Shared]
 public sealed partial class Al1220UseGuardForThrowIfCodeFixProvider
     : AlCodeFixProvider<InvocationExpressionSyntax> {
-    private const string GuardNamespace = "ANcpLua.Roslyn.Utilities";
-
     /// <summary>Gets the diagnostic IDs this code fix can fix.</summary>
     public override ImmutableArray<string> FixableDiagnosticIds => [Al1220UseGuardForThrowIfAnalyzer.DiagnosticId];
 
@@ -55,35 +53,8 @@ public sealed partial class Al1220UseGuardForThrowIfCodeFixProvider
             .WithTriviaFrom(invocation);
 
         var newRoot = root.ReplaceNode(invocation, newInvocation);
-        newRoot = AddUsingIfMissing(newRoot, GuardNamespace);
+        newRoot = GuardCodeFixes.AddGuardUsingIfMissing(newRoot);
 
         return Task.FromResult(document.WithSyntaxRoot(newRoot));
-    }
-
-    private static SyntaxNode AddUsingIfMissing(SyntaxNode root, string namespaceName) {
-        if (root is not CompilationUnitSyntax compilationUnit) {
-            return root;
-        }
-
-        if (compilationUnit.Usings.Any(u => u.Name?.ToString() == namespaceName)) {
-            return root;
-        }
-
-        var newUsing = SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(namespaceName))
-            .WithTrailingTrivia(DetectEndOfLine(compilationUnit));
-
-        return compilationUnit.AddUsings(newUsing);
-    }
-
-    private static SyntaxTrivia DetectEndOfLine(CompilationUnitSyntax compilationUnit) {
-        // Walk the actual file trivia first so the inserted using preserves the file's CRLF/LF
-        // convention. Falling back to LineFeed corrupts Windows-CRLF files; falling back to
-        // CarriageReturnLineFeed corrupts LF-normalized files. Pick what the file already uses.
-        foreach (var trivia in compilationUnit.DescendantTrivia()) {
-            if (trivia.IsKind(SyntaxKind.EndOfLineTrivia)) {
-                return trivia;
-            }
-        }
-        return SyntaxFactory.LineFeed;
     }
 }

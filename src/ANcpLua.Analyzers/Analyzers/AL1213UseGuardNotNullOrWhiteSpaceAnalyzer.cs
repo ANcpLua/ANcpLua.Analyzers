@@ -15,8 +15,6 @@ public sealed partial class Al1213UseGuardNotNullOrWhiteSpaceAnalyzer : AlAnalyz
     /// <summary>The diagnostic identifier for AL1213.</summary>
     public const string DiagnosticId = "AL1213";
 
-    private const string GuardMetadataName = "ANcpLua.Roslyn.Utilities.Guard";
-
     private static readonly DiagnosticDescriptor s_rule = CreateRule(
         DiagnosticId,
         DiagnosticCategories.RoslynUtilities,
@@ -30,14 +28,7 @@ public sealed partial class Al1213UseGuardNotNullOrWhiteSpaceAnalyzer : AlAnalyz
         context.RegisterCompilationStartAction(OnCompilationStart);
 
     private static void OnCompilationStart(CompilationStartAnalysisContext context) {
-        // Guard.* lives in ANcpLua.Roslyn.Utilities.Guard. Only fire when that type is present and
-        // callable from this compilation; otherwise the code fix would rewrite to a symbol the
-        // consumer cannot resolve. Projects that do not reference ANcpLua.Roslyn.Utilities are unaffected.
-        if (context.Compilation.GetTypeByMetadataName(GuardMetadataName) is not { } guardType) {
-            return;
-        }
-
-        if (!context.Compilation.IsSymbolAccessibleWithin(guardType, context.Compilation.Assembly)) {
+        if (!GuardPatterns.IsGuardAccessible(context.Compilation)) {
             return;
         }
 
@@ -49,7 +40,7 @@ public sealed partial class Al1213UseGuardNotNullOrWhiteSpaceAnalyzer : AlAnalyz
 
         if (ifStatement.Else is not null ||
             !TryParseIsNullOrWhiteSpaceCheck(ifStatement.Condition, out var parameterName) ||
-            !IsArgumentNullOrArgumentExceptionThrow(TryGetThrowStatement(ifStatement.Statement), context.SemanticModel)) {
+            !IsArgumentNullOrArgumentExceptionThrow(GuardPatterns.TryGetSingleThrowStatement(ifStatement.Statement), context.SemanticModel)) {
             return;
         }
 
@@ -67,26 +58,12 @@ public sealed partial class Al1213UseGuardNotNullOrWhiteSpaceAnalyzer : AlAnalyz
             },
             ArgumentList.Arguments.Count: 1
         } invocation) {
-            parameterName = GetExpressionName(invocation.ArgumentList.Arguments[0].Expression);
+            parameterName = GuardPatterns.GetExpressionName(invocation.ArgumentList.Arguments[0].Expression);
             return !string.IsNullOrEmpty(parameterName);
         }
 
         return false;
     }
-
-    private static string GetExpressionName(ExpressionSyntax expression) =>
-        expression switch {
-            IdentifierNameSyntax identifier => identifier.Identifier.Text,
-            MemberAccessExpressionSyntax memberAccess => memberAccess.Name.Identifier.Text,
-            _ => "value"
-        };
-
-    private static ThrowStatementSyntax? TryGetThrowStatement(StatementSyntax statement) =>
-        statement switch {
-            ThrowStatementSyntax t => t,
-            BlockSyntax { Statements: [ThrowStatementSyntax t] } => t,
-            _ => null
-        };
 
     private static bool IsArgumentNullOrArgumentExceptionThrow(
         ThrowStatementSyntax? throwStmt,
