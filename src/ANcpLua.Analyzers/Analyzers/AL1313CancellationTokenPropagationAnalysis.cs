@@ -430,16 +430,25 @@ public static partial class Al1313CancellationTokenPropagationAnalysis {
             return false;
         }
 
-        var hasCurrent = testContextType.GetMembers("Current")
-            .OfType<IPropertySymbol>()
-            .Any(property => property.IsStatic && property.Type.IsEqualTo(testContextType));
+        var hasCurrent = false;
+        foreach (var member in testContextType.GetMembers("Current")) {
+            if (member is IPropertySymbol { IsStatic: true } property && property.Type.IsEqualTo(testContextType)) {
+                hasCurrent = true;
+                break;
+            }
+        }
+
         if (!hasCurrent) {
             return false;
         }
 
-        return testContextType.GetMembers("CancellationToken")
-            .OfType<IPropertySymbol>()
-            .Any(property => property.GetMethod is not null && property.Type.IsEqualTo(cancellationTokenType));
+        foreach (var member in testContextType.GetMembers("CancellationToken")) {
+            if (member is IPropertySymbol { GetMethod: not null } property && property.Type.IsEqualTo(cancellationTokenType)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static bool IsConditionalAccessInvocation(IInvocationOperation invocation) {

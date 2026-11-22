@@ -118,7 +118,7 @@ public sealed partial class Al1308PreferTryParseAnalyzer : AlAnalyzer {
         }
 
         for (var type = caughtType; type is not null; type = type.BaseType) {
-            if (SymbolEqualityComparer.Default.Equals(type, knownType)) {
+            if (type.IsEqualTo(knownType)) {
                 return true;
             }
         }

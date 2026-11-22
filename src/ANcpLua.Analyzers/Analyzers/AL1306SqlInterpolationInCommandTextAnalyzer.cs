@@ -39,7 +39,7 @@ public sealed partial class Al1306SqlInterpolationInCommandTextAnalyzer : AlAnal
 
         // Left side must be a member access ending in CommandText
         if (assignment.Left is not MemberAccessExpressionSyntax memberAccess ||
-            !string.Equals(memberAccess.Name.Identifier.Text, "CommandText", StringComparison.Ordinal)) {
+            !memberAccess.Name.Identifier.Text.EqualsOrdinal("CommandText")) {
             return;
         }
 

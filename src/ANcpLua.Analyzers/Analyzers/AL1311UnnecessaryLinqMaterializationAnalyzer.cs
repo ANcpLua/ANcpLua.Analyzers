@@ -134,7 +134,7 @@ public sealed partial class Al1311UnnecessaryLinqMaterializationAnalyzer : AlAna
 
         // Report on the materialization method name location
         var location = GetMethodNameLocation(invocation);
-        context.ReportDiagnostic(Diagnostic.Create(s_rule, location, method.Name, sourceMethod.TargetMethod.Name));
+        context.ReportDiagnostic(s_rule, location, method.Name, sourceMethod.TargetMethod.Name);
     }
 
     private static bool IsBoxedToObject(IInvocationOperation materialization) {
@@ -206,7 +206,7 @@ public sealed partial class Al1311UnnecessaryLinqMaterializationAnalyzer : AlAna
         ILocalReferenceOperation? singleRead = null;
         foreach (var descendant in MsOperationExtensions.DescendantsAndSelf(root)) {
             if (descendant is ILocalReferenceOperation localRef
-                && SymbolEqualityComparer.Default.Equals(localRef.Local, local)) {
+                && localRef.Local.IsEqualTo(local)) {
                 if (singleRead is not null) {
                     return false; // more than one read — handled by CountLocalReads >= 2
                 }
@@ -306,7 +306,7 @@ public sealed partial class Al1311UnnecessaryLinqMaterializationAnalyzer : AlAna
         var read = (SyntaxNode?)null;
         foreach (var desc in MsOperationExtensions.DescendantsAndSelf(root)) {
             if (desc is ILocalReferenceOperation localRef
-                && SymbolEqualityComparer.Default.Equals(localRef.Local, local)) {
+                && localRef.Local.IsEqualTo(local)) {
                 read = localRef.Syntax;
                 break;
             }
@@ -325,17 +325,17 @@ public sealed partial class Al1311UnnecessaryLinqMaterializationAnalyzer : AlAna
         }
 
         return invocation.Instance switch {
-            ILocalReferenceOperation { Local: { } local } when SymbolEqualityComparer.Default.Equals(local, sourceSymbol) =>
+            ILocalReferenceOperation { Local: { } local } when local.IsEqualTo(sourceSymbol) =>
                 invocation.Syntax.SpanStart,
             IParameterReferenceOperation { Parameter: { } parameter }
-                when SymbolEqualityComparer.Default.Equals(parameter, sourceSymbol) =>
+                when parameter.IsEqualTo(sourceSymbol) =>
                 invocation.Syntax.Span.Start,
             IConversionOperation { Operand: ILocalReferenceOperation { Local: { } local } }
                 when invocation.TargetMethod.IsExtensionMethod is false
-                     && SymbolEqualityComparer.Default.Equals(local, sourceSymbol)
+                     && local.IsEqualTo(sourceSymbol)
                 => invocation.Syntax.Span.Start,
             IConversionOperation { Operand: IParameterReferenceOperation { Parameter: { } parameter } }
-                when SymbolEqualityComparer.Default.Equals(parameter, sourceSymbol)
+                when parameter.IsEqualTo(sourceSymbol)
                 => invocation.Syntax.Span.Start,
             _ => null,
         };
@@ -347,12 +347,12 @@ public sealed partial class Al1311UnnecessaryLinqMaterializationAnalyzer : AlAna
         }
 
         if (assignment.Target is ILocalReferenceOperation { Local: { } local }
-            && SymbolEqualityComparer.Default.Equals(local, sourceSymbol)) {
+            && local.IsEqualTo(sourceSymbol)) {
             return assignment.Syntax.Span.Start;
         }
 
         if (assignment.Target is IParameterReferenceOperation { Parameter: { } parameter }
-            && SymbolEqualityComparer.Default.Equals(parameter, sourceSymbol)) {
+            && parameter.IsEqualTo(sourceSymbol)) {
             return assignment.Syntax.Span.Start;
         }
 
@@ -369,7 +369,7 @@ public sealed partial class Al1311UnnecessaryLinqMaterializationAnalyzer : AlAna
         var count = 0;
         foreach (var descendant in MsOperationExtensions.DescendantsAndSelf(root)) {
             if (descendant is ILocalReferenceOperation localRef
-                && SymbolEqualityComparer.Default.Equals(localRef.Local, local)) {
+                && localRef.Local.IsEqualTo(local)) {
                 count++;
             }
         }
@@ -406,7 +406,7 @@ public sealed partial class Al1311UnnecessaryLinqMaterializationAnalyzer : AlAna
 
         var definition = named.OriginalDefinition;
         foreach (var strict in strictCollectionTypes) {
-            if (SymbolEqualityComparer.Default.Equals(definition, strict)) {
+            if (definition.IsEqualTo(strict)) {
                 return true;
             }
         }
