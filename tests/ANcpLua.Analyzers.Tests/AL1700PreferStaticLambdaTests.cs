@@ -59,6 +59,37 @@ public sealed partial class Al1700PreferStaticLambdaTests : AnalyzerTest<Al1700P
                     }
                     """);
 
+    [Theory]
+    [InlineData("Expression<Func<int, int>> e = x => x * 2;")]
+    [InlineData("list.AsQueryable().Where(x => x > 0);")]
+    public Task ShouldNotReportLambdaConvertedToExpressionTree(string statement) =>
+        VerifyAsync($$"""
+                      using System;
+                      using System.Linq;
+                      using System.Linq.Expressions;
+                      public class C {
+                          void M() {
+                              var list = new[] { 1, 2, 3 };
+                              {{statement}}
+                          }
+                      }
+                      """);
+
+    [Fact]
+    public Task ShouldReportLambdaUsingOnlyStaticMembers() =>
+        VerifyAsync("""
+                    using System;
+                    using System.Linq;
+                    public class C {
+                        private static int s_field = 10;
+                        private static bool IsPositive(int x) => x > 0;
+                        void M() {
+                            var list = new[] { 1, 2, 3 };
+                            list.Where({|AL1700:x => x > s_field && IsPositive(x)|});
+                        }
+                    }
+                    """);
+
     [Fact]
     public Task ShouldNotReportLambdaUsingThis() =>
         VerifyAsync("""

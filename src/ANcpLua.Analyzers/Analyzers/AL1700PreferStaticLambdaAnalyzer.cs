@@ -35,7 +35,7 @@ public sealed partial class Al1700PreferStaticLambdaAnalyzer : AlAnalyzer {
         }
 
         // Report diagnostic on the entire lambda for proper Fix All support
-        context.ReportDiagnostic(Diagnostic.Create(s_rule, lambda.GetLocation()));
+        context.ReportDiagnostic(s_rule, lambda.GetLocation());
     }
 
     /// <summary>
@@ -72,9 +72,16 @@ public sealed partial class Al1700PreferStaticLambdaAnalyzer : AlAnalyzer {
     private static bool IsInExpressionTree(AnonymousFunctionExpressionSyntax lambda, SemanticModel semanticModel) {
         var converted = semanticModel.GetTypeInfo(lambda).ConvertedType;
         while (converted is not null) {
-            if (converted is INamedTypeSymbol named
-                && named.ContainingNamespace?.ToDisplayString() == "System.Linq.Expressions"
-                && named.Name == "Expression") {
+            if (converted is INamedTypeSymbol {
+                    Name: "Expression",
+                    ContainingNamespace: {
+                        Name: "Expressions",
+                        ContainingNamespace: {
+                            Name: "Linq",
+                            ContainingNamespace: { Name: "System", ContainingNamespace.IsGlobalNamespace: true }
+                        }
+                    }
+                }) {
                 return true;
             }
             converted = converted.BaseType;
@@ -91,24 +98,20 @@ public sealed partial class Al1700PreferStaticLambdaAnalyzer : AlAnalyzer {
         };
 
     private static bool ReferencesThis(SyntaxNode lambda, SemanticModel semanticModel) {
-        // Check for explicit 'this' usage
-        if (lambda.DescendantNodes().OfType<ThisExpressionSyntax>().Any()) {
-            return true;
-        }
+        // Implicit 'this' is only possible inside a containing type
+        var lambdaContainingType = semanticModel.GetEnclosingSymbol(lambda.SpanStart)?.ContainingType;
 
-        // Get the containing type of the lambda
-        if (semanticModel.GetEnclosingSymbol(lambda.SpanStart)?.ContainingType is not { } lambdaContainingType) {
-            return false;
-        }
-
-        // Check for implicit 'this' through instance member access
-        foreach (var identifier in lambda.DescendantNodes().OfType<IdentifierNameSyntax>()) {
-            if (ModelExtensions.GetSymbolInfo(semanticModel, identifier).Symbol is not { } symbol) {
-                continue;
+        foreach (var node in lambda.DescendantNodes()) {
+            // Explicit 'this' usage
+            if (node is ThisExpressionSyntax) {
+                return true;
             }
 
-            // Check if it's an instance member from the containing type
-            if (IsInstanceMemberOfType(symbol, lambdaContainingType)) {
+            // Implicit 'this' through instance member access
+            if (lambdaContainingType is not null &&
+                node is IdentifierNameSyntax identifier &&
+                ModelExtensions.GetSymbolInfo(semanticModel, identifier).Symbol is { } symbol &&
+                IsInstanceMemberOfType(symbol, lambdaContainingType)) {
                 return true;
             }
         }
