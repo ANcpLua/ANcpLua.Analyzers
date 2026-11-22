@@ -58,10 +58,7 @@ public sealed partial class Al1408AvoidActivatorCreateInstanceAnalyzer : AlAnaly
             return;
         }
 
-        context.ReportDiagnostic(Diagnostic.Create(
-            s_rule,
-            invocation.Syntax.GetLocation(),
-            GetTargetTypeName(invocation)));
+        context.ReportDiagnostic(s_rule, invocation.Syntax.GetLocation(), GetTargetTypeName(invocation));
     }
 
     private static string GetTargetTypeName(IInvocationOperation invocation) {

@@ -43,29 +43,13 @@ public sealed partial class Al1404AotSafeCallsAotUnsafeAnalyzer : AlAnalyzer {
         var invocation = (IInvocationOperation)context.Operation;
 
         if (context.ContainingSymbol is not IMethodSymbol callingMethod ||
-            !HasAttribute(callingMethod, AotSafeAttributeName) ||
-            !HasAttribute(invocation.TargetMethod, AotUnsafeAttributeName)) {
+            !Al14xxAotAttributeLookup.HasAttributeOnMethodOrContainingTypes(callingMethod, AotSafeAttributeName) ||
+            !Al14xxAotAttributeLookup.HasAttributeOnMethodOrContainingTypes(invocation.TargetMethod, AotUnsafeAttributeName)) {
             return;
         }
 
-        context.ReportDiagnostic(Diagnostic.Create(
-            s_rule,
-            invocation.Syntax.GetLocation(),
+        context.ReportDiagnostic(s_rule, invocation.Syntax.GetLocation(),
             callingMethod.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat),
-            invocation.TargetMethod.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)));
-    }
-
-    private static bool HasAttribute(IMethodSymbol method, string attributeName) {
-        if (method.HasAttributeByShortName(attributeName)) {
-            return true;
-        }
-
-        for (var type = method.ContainingType; type is not null; type = type.ContainingType) {
-            if (type.HasAttributeByShortName(attributeName)) {
-                return true;
-            }
-        }
-
-        return false;
+            invocation.TargetMethod.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat));
     }
 }

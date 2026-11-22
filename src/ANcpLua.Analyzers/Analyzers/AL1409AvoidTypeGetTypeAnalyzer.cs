@@ -61,10 +61,10 @@ public sealed partial class Al1409AvoidTypeGetTypeAnalyzer : AlAnalyzer {
         var ignoreCaseArgument = GetArgumentValue(invocation, "ignoreCase");
 
         if (!isLiteralTypeName) {
-            context.ReportDiagnostic(Diagnostic.Create(s_rule, invocation.Syntax.GetLocation(), "a dynamic type name"));
+            context.ReportDiagnostic(s_rule, invocation.Syntax.GetLocation(), "a dynamic type name");
         }
         else if (ignoreCaseArgument is not null && IsPotentiallyTrue(ignoreCaseArgument)) {
-            context.ReportDiagnostic(Diagnostic.Create(s_rule, invocation.Syntax.GetLocation(), "case-insensitive search"));
+            context.ReportDiagnostic(s_rule, invocation.Syntax.GetLocation(), "case-insensitive search");
         }
     }
 
