@@ -84,7 +84,7 @@ public sealed partial class Al1211UseAttributeExtensionsAnalyzer : AlAnalyzer {
         var attrName = arrayProp.Instance.GetOperandName("attr");
         var suggestion = $"{attrName}.GetConstructorArgument<T>({indexStr})";
 
-        context.ReportDiagnostic(Diagnostic.Create(s_rule, valueAccess.Syntax.GetLocation(), suggestion));
+        context.ReportDiagnostic(s_rule, valueAccess.Syntax.GetLocation(), suggestion);
     }
 
     private static void AnalyzeConstructorArgumentsIndexerAccess(
@@ -103,7 +103,7 @@ public sealed partial class Al1211UseAttributeExtensionsAnalyzer : AlAnalyzer {
         var attrName = arrayProp.Instance.GetOperandName("attr");
         var suggestion = $"{attrName}.GetConstructorArgument<T>({indexStr})";
 
-        context.ReportDiagnostic(Diagnostic.Create(s_rule, valueAccess.Syntax.GetLocation(), suggestion));
+        context.ReportDiagnostic(s_rule, valueAccess.Syntax.GetLocation(), suggestion);
     }
 
     private static bool IsTypedConstantType(ITypeSymbol? type) {

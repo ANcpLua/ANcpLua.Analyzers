@@ -66,8 +66,8 @@ public sealed partial class Al1204UseOrEmptyAnalyzer : AlAnalyzer {
         }
 
         var leftName = GetOperandDisplayName(coalesce.Value);
-        context.ReportDiagnostic(Diagnostic.Create(s_rule, coalesce.Syntax.GetLocation(),
-            $"{leftName}.OrEmpty()", "null-coalescing with empty collection"));
+        context.ReportDiagnostic(s_rule, coalesce.Syntax.GetLocation(),
+            $"{leftName}.OrEmpty()", "null-coalescing with empty collection");
     }
 
     private static bool IsEmptyCollectionExpression(IOperation? operation) {

@@ -84,8 +84,8 @@ public sealed partial class Al1209UseTryParseExtensionsAnalyzer : AlAnalyzer {
         }
 
         var stringArg = GetStringArgumentName(invocation);
-        context.ReportDiagnostic(Diagnostic.Create(s_rule, conditional.Syntax.GetLocation(),
-            $"{stringArg}.{extensionName}()"));
+        context.ReportDiagnostic(s_rule, conditional.Syntax.GetLocation(),
+            $"{stringArg}.{extensionName}()");
     }
 
     private static bool IsTryParseResultPattern(IConditionalOperation conditional, IInvocationOperation tryParse, string outVarName) {

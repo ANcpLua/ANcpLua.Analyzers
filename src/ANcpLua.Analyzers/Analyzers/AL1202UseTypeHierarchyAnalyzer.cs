@@ -277,9 +277,17 @@ public sealed partial class Al1202UseTypeHierarchyAnalyzer : AlAnalyzer {
             return false;
         }
 
-        return block.Statements[index - 1] is LocalDeclarationStatementSyntax localDeclaration &&
-               localDeclaration.Declaration.Variables.Any(static v =>
-                   v.Initializer?.Value is MemberAccessExpressionSyntax { Name.Identifier.Text: "BaseType" });
+        if (block.Statements[index - 1] is not LocalDeclarationStatementSyntax localDeclaration) {
+            return false;
+        }
+
+        foreach (var variable in localDeclaration.Declaration.Variables) {
+            if (variable.Initializer?.Value is MemberAccessExpressionSyntax { Name.Identifier.Text: "BaseType" }) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static bool IsSymbolEqualityComparerEquals(IInvocationOperation invocation, TypeCache<KnownType> cache) {

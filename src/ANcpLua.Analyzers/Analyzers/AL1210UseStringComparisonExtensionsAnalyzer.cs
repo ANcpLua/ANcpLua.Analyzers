@@ -170,11 +170,7 @@ public sealed partial class Al1210UseStringComparisonExtensionsAnalyzer : AlAnal
     }
 
     private static string? GetStringComparisonValue(IArgumentOperation argument) {
-        var value = argument.Value;
-
-        while (value is IConversionOperation conversion) {
-            value = conversion.Operand;
-        }
+        var value = argument.Value.UnwrapAllConversions();
 
         return value is IFieldReferenceOperation fieldRef ? fieldRef.Field.Name : null;
     }

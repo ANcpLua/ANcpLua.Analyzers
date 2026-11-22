@@ -55,8 +55,8 @@ public sealed partial class Al1205UseToImmutableArrayOrEmptyAnalyzer : AlAnalyze
             return;
         }
 
-        context.ReportDiagnostic(Diagnostic.Create(s_rule, coalesce.Syntax.GetLocation(),
-            $"{sourceName}.ToImmutableArrayOrEmpty()", "?.ToImmutableArray() ?? ImmutableArray.Empty"));
+        context.ReportDiagnostic(s_rule, coalesce.Syntax.GetLocation(),
+            $"{sourceName}.ToImmutableArrayOrEmpty()", "?.ToImmutableArray() ?? ImmutableArray.Empty");
     }
 
     private static bool IsImmutableArrayEmpty(IOperation? operation) {
