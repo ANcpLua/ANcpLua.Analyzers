@@ -52,11 +52,11 @@ public sealed partial class Al1501SymbolStoredInModelAnalyzer : AlAnalyzer {
             var memberType = member is IFieldSymbol field ? field.Type : ((IPropertySymbol)member).Type;
 
             if (IsOrContainsSymbolType(memberType, iSymbolType)) {
-                context.ReportDiagnostic(Diagnostic.Create(
+                context.ReportDiagnostic(
                     s_rule,
                     member.Locations.FirstOrDefault() ?? Location.None,
                     member.Name,
-                    memberType.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)));
+                    memberType.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat));
             }
         }
     }
@@ -84,6 +84,17 @@ public sealed partial class Al1501SymbolStoredInModelAnalyzer : AlAnalyzer {
         return false;
     }
 
-    private static bool IsSymbolType(ITypeSymbol type, INamedTypeSymbol iSymbolType) =>
-        type.IsEqualTo(iSymbolType) || type.AllInterfaces.Any(i => i.IsEqualTo(iSymbolType));
+    private static bool IsSymbolType(ITypeSymbol type, INamedTypeSymbol iSymbolType) {
+        if (type.IsEqualTo(iSymbolType)) {
+            return true;
+        }
+
+        foreach (var implemented in type.AllInterfaces) {
+            if (implemented.IsEqualTo(iSymbolType)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

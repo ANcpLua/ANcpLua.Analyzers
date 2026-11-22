@@ -47,9 +47,9 @@ public sealed partial class Al1502UseIncrementalGeneratorAnalyzer : AlAnalyzer {
             return;
         }
 
-        context.ReportDiagnostic(Diagnostic.Create(
+        context.ReportDiagnostic(
             s_rule,
             namedType.Locations.FirstOrDefault() ?? Location.None,
-            namedType.Name));
+            namedType.Name);
     }
 }
