@@ -247,11 +247,13 @@ public sealed partial class CSharp15UnionAndClosedTypeTests {
     }
 
     [Fact]
-    public async Task ClosedHierarchyMissingOneLeaf_ShouldNotCrashOrReportOtherRules() {
+    public async Task ClosedHierarchyMissingOneLeaf_ShouldReportOnlyThatLeaf() {
         var diagnostics = await AnalyzeAsync(RuntimeSupport + ClosedGateHierarchy + SwitchMissingOneLeaf).ConfigureAwait(true);
 
-        // The compiler already reports CS8509 here; AL1500 may add its own report, nothing else may.
-        diagnostics.Where(static d => d.Id != ClosedHierarchyRuleId).Select(Describe).Should().BeEmpty();
+        // A closed type is implicitly abstract, so AL1500 sees the hierarchy like an abstract one and
+        // reports next to the compiler's own CS8509. No other rule may report.
+        diagnostics.Select(Describe).Should().ContainSingle()
+            .Which.Should().StartWith(ClosedHierarchyRuleId).And.Contain("GateClosing").And.NotContain("GateOpening");
     }
 
     private static async Task AssertNoDiagnosticsAsync(string source) {

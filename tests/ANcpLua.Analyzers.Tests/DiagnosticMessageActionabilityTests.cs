@@ -1,4 +1,9 @@
+using System.Collections.Immutable;
 using System.Globalization;
+using ANcpLua.Analyzers.Analyzers;
+using Basic.Reference.Assemblies;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace ANcpLua.Analyzers.Tests;
@@ -43,6 +48,61 @@ public sealed partial class DiagnosticMessageActionabilityTests {
     [InlineData("AL1703", "with 'var'")]
     public void MessageFormat_ShouldSayWhatToWrite(string diagnosticId, string expectedFragment) =>
         GetMessageFormat(diagnosticId).Should().Contain(expectedFragment);
+
+    [Fact]
+    public async Task AL1011_ShouldPrintTheReplacementStatement() {
+        var messages = await GetMessagesAsync(
+            new Al1011NormalizeNullGuardStyleAnalyzer(),
+            "using System; public class C { void M(string? x) { if (x is null) throw new ArgumentNullException(nameof(x)); } }")
+            .ConfigureAwait(true);
+
+        messages.Should().Equal(
+            "Replace this if/throw null-guard with 'ArgumentNullException.ThrowIfNull(x);' (null-guard style 'bcl')");
+    }
+
+    [Fact]
+    public async Task AL1208_ShouldPrintTheGuardCallNotTheOperand() {
+        var messages = await GetMessagesAsync(
+            new Al1208UseGuardNotNullAnalyzer(),
+            """
+            using System;
+            public class C {
+                string M(string? x) => x ?? throw new ArgumentNullException(nameof(x));
+            }
+            namespace ANcpLua.Roslyn.Utilities { internal static class Guard { } }
+            """)
+            .ConfigureAwait(true);
+
+        messages.Should().Equal(
+            "Use 'Guard.NotNull(x)' instead of 'x ?? throw new ArgumentNullException(nameof(x))'");
+    }
+
+    private static async Task<ImmutableArray<string>> GetMessagesAsync(DiagnosticAnalyzer analyzer, string source) {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        var tree = CSharpSyntaxTree.ParseText(
+            source,
+            new CSharpParseOptions(LanguageVersion.Preview),
+            "MessageSample.cs",
+            cancellationToken: cancellationToken);
+        var compilation = CSharpCompilation.Create(
+            "MessageSample",
+            [tree],
+            Net100.References.All,
+            new CSharpCompilationOptions(
+                OutputKind.DynamicallyLinkedLibrary,
+                nullableContextOptions: NullableContextOptions.Enable));
+        var withAnalyzers = new CompilationWithAnalyzers(
+            compilation,
+            [analyzer],
+            new CompilationWithAnalyzersOptions(
+                new AnalyzerOptions([]),
+                onAnalyzerException: null,
+                concurrentAnalysis: true,
+                logAnalyzerExecutionTime: false));
+        var diagnostics = await withAnalyzers.GetAnalyzerDiagnosticsAsync(cancellationToken).ConfigureAwait(true);
+
+        return [.. diagnostics.Select(static d => d.GetMessage(CultureInfo.InvariantCulture))];
+    }
 
     private static string GetMessageFormat(string diagnosticId) =>
         typeof(AlAnalyzer).Assembly.GetTypes()
