@@ -105,7 +105,7 @@ public sealed partial class Al1012CombineDeclarationWithNullCheckAnalyzer : AlAn
             return;
         }
 
-        context.ReportDiagnostic(Diagnostic.Create(s_rule, declaration.GetLocation(), variableName));
+        context.ReportDiagnostic(s_rule, declaration.GetLocation(), variableName);
     }
 
     private static bool IsNullCheck(ExpressionSyntax condition, string name, SemanticModel semanticModel) {

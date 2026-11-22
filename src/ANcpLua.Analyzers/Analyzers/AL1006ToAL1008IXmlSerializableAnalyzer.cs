@@ -125,8 +125,7 @@ public sealed partial class Al1006ToAl1008IXmlSerializableAnalyzer : AlAnalyzer 
             return;
         }
 
-        if (!methodSymbol.ExplicitInterfaceImplementations.Any(i =>
-                i.IsEqualTo(interfaceGetSchema))) {
+        if (!ExplicitlyImplements(methodSymbol, interfaceGetSchema)) {
             context.ReportDiagnostic(s_ruleAl1006, methodSymbol.Locations[0]);
         }
 
@@ -159,13 +158,12 @@ public sealed partial class Al1006ToAl1008IXmlSerializableAnalyzer : AlAnalyzer 
         IMethodSymbol method,
         INamedTypeSymbol ixmlSerializable,
         IMethodSymbol interfaceGetSchema) {
-        if (method.ExplicitInterfaceImplementations.Any(interfaceMethod =>
-                interfaceMethod.IsEqualTo(interfaceGetSchema))) {
+        if (ExplicitlyImplements(method, interfaceGetSchema)) {
             return true;
         }
 
         if (method.ContainingType is not INamedTypeSymbol containingType ||
-            !containingType.AllInterfaces.Contains(ixmlSerializable, SymbolEqualityComparer.Default)) {
+            !containingType.Implements(ixmlSerializable)) {
             return false;
         }
 
@@ -175,6 +173,16 @@ public sealed partial class Al1006ToAl1008IXmlSerializableAnalyzer : AlAnalyzer 
 
         return containingType.FindImplementationForInterfaceMember(interfaceGetSchema) is { } implementation &&
                implementation.IsEqualTo(method);
+    }
+
+    private static bool ExplicitlyImplements(IMethodSymbol method, IMethodSymbol interfaceMethod) {
+        foreach (var implemented in method.ExplicitInterfaceImplementations) {
+            if (implemented.IsEqualTo(interfaceMethod)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static bool IsGetSchemaSignature(IMethodSymbol method, IMethodSymbol interfaceGetSchema) =>
