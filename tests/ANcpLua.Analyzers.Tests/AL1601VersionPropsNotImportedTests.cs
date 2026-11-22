@@ -65,6 +65,79 @@ public sealed partial class Al1601VersionPropsNotImportedTests : AnalyzerTestBas
     }
 
     [Fact]
+    public Task ShouldNotReportWhenDirectoryPackagesPropsImportsVersionProps() {
+        const string DirectoryBuildProps = """
+                                           <Project>
+                                               <PropertyGroup>
+                                                   <SomeProperty>Value</SomeProperty>
+                                               </PropertyGroup>
+                                           </Project>
+                                           """;
+
+        const string DirectoryPackagesProps = """
+                                              <Project>
+                                                  <Import Project="Version.props" />
+                                              </Project>
+                                              """;
+
+        return VerifyAsync(
+            EmptyCode,
+            [("Directory.Build.props", DirectoryBuildProps), ("Directory.Packages.props", DirectoryPackagesProps)],
+            Array.Empty<DiagnosticResult>());
+    }
+
+    [Fact]
+    public Task ShouldReportWhenDirectoryPackagesPropsHasNoImport() {
+        const string DirectoryBuildProps = """
+                                           <Project>
+                                               <PropertyGroup>
+                                                   <SomeProperty>Value</SomeProperty>
+                                               </PropertyGroup>
+                                           </Project>
+                                           """;
+
+        const string DirectoryPackagesProps = """
+                                              <Project>
+                                                  <ItemGroup>
+                                                      <PackageVersion Include="SomePackage" Version="$(SomePackageVersion)" />
+                                                  </ItemGroup>
+                                              </Project>
+                                              """;
+
+        var expected = new DiagnosticResult("AL1601", DiagnosticSeverity.Warning)
+            .WithLocation("Directory.Build.props", 1, 1);
+
+        return VerifyAsync(
+            EmptyCode,
+            [("Directory.Build.props", DirectoryBuildProps), ("Directory.Packages.props", DirectoryPackagesProps)],
+            [expected]);
+    }
+
+    [Fact]
+    public Task ShouldNotReportInCpmNativeMode() {
+        const string DirectoryBuildProps = """
+                                           <Project>
+                                               <PropertyGroup>
+                                                   <SomeProperty>Value</SomeProperty>
+                                               </PropertyGroup>
+                                           </Project>
+                                           """;
+
+        const string DirectoryPackagesProps = """
+                                              <Project>
+                                                  <PropertyGroup>
+                                                      <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+                                                  </PropertyGroup>
+                                              </Project>
+                                              """;
+
+        return VerifyAsync(
+            EmptyCode,
+            [("Directory.Build.props", DirectoryBuildProps), ("Directory.Packages.props", DirectoryPackagesProps)],
+            Array.Empty<DiagnosticResult>());
+    }
+
+    [Fact]
     public Task ShouldNotReportForOtherPropsFiles() {
         const string OtherPropsFile = """
                                       <Project>
