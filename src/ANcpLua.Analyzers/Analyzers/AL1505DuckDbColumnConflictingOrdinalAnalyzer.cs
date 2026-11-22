@@ -66,13 +66,13 @@ public sealed partial class Al1505DuckDbColumnConflictingOrdinalAnalyzer : AlAna
                     var location = property.Locations.FirstOrDefault() ?? Location.None;
 
                     if (ordinalMap.TryGetValue(ordinal, out var existing)) {
-                        context.ReportDiagnostic(Diagnostic.Create(
+                        context.ReportDiagnostic(
                             s_rule,
                             location,
                             existing.Name,
                             property.Name,
                             namedType.Name,
-                            ordinal));
+                            ordinal);
                     } else {
                         ordinalMap[ordinal] = (property.Name, location);
                     }

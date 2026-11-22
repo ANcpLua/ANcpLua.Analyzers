@@ -52,11 +52,11 @@ public sealed partial class Al1501SymbolStoredInModelAnalyzer : AlAnalyzer {
             var memberType = member is IFieldSymbol field ? field.Type : ((IPropertySymbol)member).Type;
 
             if (IsOrContainsSymbolType(memberType, iSymbolType)) {
-                context.ReportDiagnostic(Diagnostic.Create(
+                context.ReportDiagnostic(
                     s_rule,
                     member.Locations.FirstOrDefault() ?? Location.None,
                     member.Name,
-                    memberType.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)));
+                    memberType.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat));
             }
         }
     }

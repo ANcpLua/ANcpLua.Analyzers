@@ -54,8 +54,7 @@ public sealed partial class Al1503NormalizeWhitespaceAnalyzer : AlAnalyzer {
         // Narrow the span to just NormalizeWhitespace() rather than the full receiver chain
         if (invocation.Syntax is InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax memberAccess } invocationSyntax) {
             var span = Microsoft.CodeAnalysis.Text.TextSpan.FromBounds(memberAccess.Name.SpanStart, invocationSyntax.Span.End);
-            context.ReportDiagnostic(Diagnostic.Create(s_rule,
-                Location.Create(invocationSyntax.SyntaxTree, span)));
+            context.ReportDiagnostic(s_rule, Location.Create(invocationSyntax.SyntaxTree, span));
         } else {
             context.ReportDiagnostic(s_rule, invocation.Syntax.GetLocation());
         }

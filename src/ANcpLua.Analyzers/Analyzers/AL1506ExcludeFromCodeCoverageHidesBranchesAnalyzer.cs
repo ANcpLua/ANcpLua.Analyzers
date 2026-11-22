@@ -74,10 +74,10 @@ public sealed partial class Al1506ExcludeFromCodeCoverageHidesBranchesAnalyzer :
             return;
         }
 
-        context.ReportDiagnostic(Diagnostic.Create(
+        context.ReportDiagnostic(
             s_rule,
             syntaxReference.GetSyntax().GetLocation(),
-            symbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)));
+            symbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat));
     }
 
     private static AttributeData? FindExclusionAttribute(ISymbol symbol, INamedTypeSymbol attributeType) {
