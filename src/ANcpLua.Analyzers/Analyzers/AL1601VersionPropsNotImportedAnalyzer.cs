@@ -82,7 +82,7 @@ public sealed partial class Al1601VersionPropsNotImportedAnalyzer : DiagnosticAn
 
         // Skip if using CPM native mode (ManagePackageVersionsCentrally=true)
         // In CPM native mode, Version.props is not needed - versions are defined directly in Directory.Packages.props
-        if (directoryPackagesPropsFiles.Any(f => IsCpmNativeMode(f, context.CancellationToken))) {
+        if (directoryPackagesPropsFiles.Any(f => Al16xxMsBuildPropsHelper.IsCpmNativeMode(f, context.CancellationToken))) {
             return;
         }
 
@@ -113,28 +113,6 @@ public sealed partial class Al1601VersionPropsNotImportedAnalyzer : DiagnosticAn
     }
 
     /// <summary>
-    ///     Checks if the props file uses CPM native mode (ManagePackageVersionsCentrally=true).
-    ///     When CPM native mode is active, Version.props import is not required.
-    /// </summary>
-    private static bool IsCpmNativeMode(AdditionalText propsFile, CancellationToken cancellationToken) {
-        if (propsFile.GetText(cancellationToken) is not { } sourceText) {
-            return false;
-        }
-
-        try {
-            var doc = XDocument.Parse(sourceText.ToString());
-
-            // Check for <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-            return doc.Descendants()
-                .Any(static e =>
-                    e.Name.LocalName == "ManagePackageVersionsCentrally" &&
-                    string.Equals(e.Value.Trim(), "true", StringComparison.OrdinalIgnoreCase));
-        } catch (Exception) {
-            return false;
-        }
-    }
-
-    /// <summary>
     ///     Checks if a props file imports Version.props.
     /// </summary>
     private static bool HasVersionPropsImport(AdditionalText propsFile, CancellationToken cancellationToken) {
@@ -143,17 +121,21 @@ public sealed partial class Al1601VersionPropsNotImportedAnalyzer : DiagnosticAn
         }
 
         try {
-            var doc = XDocument.Parse(sourceText.ToString());
-
-            return doc.Descendants()
-                .Where(static e => e.Name.LocalName == "Import")
-                .Any(static import =>
-                    import.Attribute("Project") is { Value: { } projectValue } &&
-                    projectValue.ContainsIgnoreCase(VersionPropsFileName));
+            return ImportsVersionProps(XDocument.Parse(sourceText.ToString()));
         } catch (Exception) {
             return false;
         }
     }
+
+    /// <summary>
+    ///     Checks if a parsed props document has an <c>Import</c> whose <c>Project</c> mentions Version.props.
+    /// </summary>
+    private static bool ImportsVersionProps(XDocument doc) =>
+        doc.Descendants()
+            .Where(static e => e.Name.LocalName == "Import")
+            .Any(static import =>
+                import.Attribute("Project") is { Value: { } projectValue } &&
+                projectValue.ContainsIgnoreCase(VersionPropsFileName));
 
     private static void AnalyzePropsFile(CompilationAnalysisContext context, AdditionalText propsFile, bool hasImportInPackagesProps) {
         // If Version.props is already imported in Directory.Packages.props, don't flag
@@ -170,14 +152,7 @@ public sealed partial class Al1601VersionPropsNotImportedAnalyzer : DiagnosticAn
         try {
             var doc = XDocument.Parse(content);
 
-            // Look for Import elements that reference Version.props
-            var hasVersionPropsImport = doc.Descendants()
-                .Where(static e => e.Name.LocalName == "Import")
-                .Any(static import =>
-                    import.Attribute("Project") is { Value: { } projectValue } &&
-                    projectValue.ContainsIgnoreCase(VersionPropsFileName));
-
-            if (!hasVersionPropsImport) {
+            if (!ImportsVersionProps(doc)) {
                 // Report diagnostic at the start of the file
                 var location = Location.Create(propsFile.Path, sourceText.Lines[0].Span,
                     new LinePositionSpan(

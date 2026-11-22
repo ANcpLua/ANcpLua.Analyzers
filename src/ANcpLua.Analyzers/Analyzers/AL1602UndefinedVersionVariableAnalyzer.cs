@@ -1,6 +1,4 @@
-using Microsoft.CodeAnalysis.Text;
 using System.Text.RegularExpressions;
-using System.Xml;
 using System.Xml.Linq;
 
 namespace ANcpLua.Analyzers.Analyzers;
@@ -153,7 +151,7 @@ public sealed partial class Al1602UndefinedVersionVariableAnalyzer : DiagnosticA
                 }
 
                 // This is an undefined variable - report diagnostic
-                var location = CreateLocation(propsFile, sourceText, versionAttr);
+                var location = Al16xxMsBuildPropsHelper.CreateAttributeLocation(propsFile, sourceText, versionAttr);
 
                 var properties = ImmutableDictionary.CreateBuilder<string, string?>();
                 properties.Add(VariableNameKey, variableName);
@@ -171,18 +169,6 @@ public sealed partial class Al1602UndefinedVersionVariableAnalyzer : DiagnosticA
         } catch (Exception) {
             return;
         }
-    }
-
-    private static Location CreateLocation(AdditionalText propsFile, SourceText sourceText, XAttribute attribute) {
-        IXmlLineInfo lineInfo = attribute;
-        if (lineInfo.HasLineInfo()) {
-            var linePosition = new LinePosition(lineInfo.LineNumber - 1, lineInfo.LinePosition - 1);
-            var textSpan = sourceText.Lines[lineInfo.LineNumber - 1].Span;
-            return Location.Create(propsFile.Path, textSpan,
-                new LinePositionSpan(linePosition, linePosition));
-        }
-
-        return Location.None;
     }
 
 #if NET7_0_OR_GREATER

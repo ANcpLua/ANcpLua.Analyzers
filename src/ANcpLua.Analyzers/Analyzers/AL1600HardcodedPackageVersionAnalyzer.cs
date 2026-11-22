@@ -1,6 +1,4 @@
-using Microsoft.CodeAnalysis.Text;
 using System.Text.RegularExpressions;
-using System.Xml;
 using System.Xml.Linq;
 
 namespace ANcpLua.Analyzers.Analyzers;
@@ -148,28 +146,11 @@ public sealed partial class Al1600HardcodedPackageVersionAnalyzer : DiagnosticAn
             .ToList();
 
         foreach (var propsFile in propsFiles) {
-            if (IsCpmNativeMode(propsFile, context.CancellationToken)) {
+            if (Al16xxMsBuildPropsHelper.IsCpmNativeMode(propsFile, context.CancellationToken)) {
                 continue;
             }
 
             AnalyzePropsFile(context, propsFile);
-        }
-    }
-
-    private static bool IsCpmNativeMode(AdditionalText propsFile, CancellationToken cancellationToken) {
-        if (propsFile.GetText(cancellationToken) is not { } sourceText) {
-            return false;
-        }
-
-        try {
-            var doc = XDocument.Parse(sourceText.ToString());
-
-            return doc.Descendants()
-                .Any(static e =>
-                    e.Name.LocalName == "ManagePackageVersionsCentrally" &&
-                    string.Equals(e.Value.Trim(), "true", StringComparison.OrdinalIgnoreCase));
-        } catch (Exception) {
-            return false;
         }
     }
 
@@ -202,15 +183,7 @@ public sealed partial class Al1600HardcodedPackageVersionAnalyzer : DiagnosticAn
 
                 var suggestedVariable = GetSuggestedVariableName(packageName);
 
-                IXmlLineInfo lineInfo = versionAttr;
-                var location = Location.None;
-
-                if (lineInfo.HasLineInfo()) {
-                    var linePosition = new LinePosition(lineInfo.LineNumber - 1, lineInfo.LinePosition - 1);
-                    var textSpan = sourceText.Lines[lineInfo.LineNumber - 1].Span;
-                    location = Location.Create(propsFile.Path, textSpan,
-                        new LinePositionSpan(linePosition, linePosition));
-                }
+                var location = Al16xxMsBuildPropsHelper.CreateAttributeLocation(propsFile, sourceText, versionAttr);
 
                 var properties = ImmutableDictionary.CreateBuilder<string, string?>();
                 properties.Add(SuggestedVariableKey, suggestedVariable);
