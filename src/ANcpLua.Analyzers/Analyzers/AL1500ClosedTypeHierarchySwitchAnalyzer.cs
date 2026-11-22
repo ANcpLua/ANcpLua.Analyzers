@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using ANcpLua.Roslyn.Utilities.Matching;
 
 namespace ANcpLua.Analyzers.Analyzers;
@@ -116,11 +115,14 @@ public sealed partial class Al1500ClosedTypeHierarchySwitchAnalyzer : AlAnalyzer
         INamedTypeSymbol rootType,
         ImmutableArray<INamedTypeSymbol> requiredTypes,
         IReadOnlyCollection<INamedTypeSymbol> handledTypes) {
-        var missing = requiredTypes
-            .Where(required => !ContainsType(handledTypes, required))
-            .ToImmutableArray();
+        var missing = new List<INamedTypeSymbol>(requiredTypes.Length);
+        foreach (var required in requiredTypes) {
+            if (!ContainsType(handledTypes, required)) {
+                missing.Add(required);
+            }
+        }
 
-        if (missing.IsEmpty) {
+        if (missing.Count is 0) {
             return;
         }
 
@@ -157,13 +159,23 @@ public sealed partial class Al1500ClosedTypeHierarchySwitchAnalyzer : AlAnalyzer
     }
 
     static bool IsSupportedHierarchyRoot(INamedTypeSymbol type) =>
-        type.Locations.Any(static location => location.IsInSource) &&
         type is {
             TypeKind: TypeKind.Class,
             IsAbstract: true,
             IsSealed: false,
             IsGenericType: false
-        };
+        } &&
+        IsDeclaredInSource(type);
+
+    static bool IsDeclaredInSource(ISymbol type) {
+        foreach (var location in type.Locations) {
+            if (location.IsInSource) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     static INamedTypeSymbol? GetSwitchedType(IOperation operation) {
         var type = operation switch {

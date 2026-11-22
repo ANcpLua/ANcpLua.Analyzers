@@ -84,6 +84,17 @@ public sealed partial class Al1501SymbolStoredInModelAnalyzer : AlAnalyzer {
         return false;
     }
 
-    private static bool IsSymbolType(ITypeSymbol type, INamedTypeSymbol iSymbolType) =>
-        type.IsEqualTo(iSymbolType) || type.AllInterfaces.Any(i => i.IsEqualTo(iSymbolType));
+    private static bool IsSymbolType(ITypeSymbol type, INamedTypeSymbol iSymbolType) {
+        if (type.IsEqualTo(iSymbolType)) {
+            return true;
+        }
+
+        foreach (var implemented in type.AllInterfaces) {
+            if (implemented.IsEqualTo(iSymbolType)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

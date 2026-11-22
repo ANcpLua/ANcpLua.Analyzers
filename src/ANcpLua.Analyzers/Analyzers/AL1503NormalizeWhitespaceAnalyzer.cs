@@ -93,6 +93,5 @@ public sealed partial class Al1503NormalizeWhitespaceAnalyzer : AlAnalyzer {
     }
 
     private static bool IsTextOutputMethod(string methodName) =>
-        string.Equals(methodName, "ToFullString", StringComparison.Ordinal) ||
-        string.Equals(methodName, "ToString", StringComparison.Ordinal);
+        methodName.EqualsOrdinal("ToFullString") || methodName.EqualsOrdinal("ToString");
 }
