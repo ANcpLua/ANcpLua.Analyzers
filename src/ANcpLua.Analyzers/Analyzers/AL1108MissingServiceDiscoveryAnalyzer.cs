@@ -174,15 +174,32 @@ public sealed partial class Al1108MissingServiceDiscoveryAnalyzer : AlAnalyzer {
         }
 
         var hostParts = host.Split('.');
-        if (hostParts.Length is 4 && hostParts.All(static p => byte.TryParse(p, out _))) {
+        if (hostParts.Length is 4 && AllPartsAreBytes(hostParts)) {
             return true;
         }
 
         return !uri.IsDefaultPort || host.ContainsOrdinal(".");
     }
 
-    private static bool IsWellKnownExternalApi(string host) =>
-        s_wellKnownExternalApis.Any(host.EqualsIgnoreCase);
+    private static bool AllPartsAreBytes(string[] parts) {
+        foreach (var part in parts) {
+            if (!byte.TryParse(part, out _)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static bool IsWellKnownExternalApi(string host) {
+        foreach (var api in s_wellKnownExternalApis) {
+            if (host.EqualsIgnoreCase(api)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     private static bool IsServiceDiscoveryUrl(Uri uri) {
         var scheme = uri.Scheme;
@@ -196,9 +213,21 @@ public sealed partial class Al1108MissingServiceDiscoveryAnalyzer : AlAnalyzer {
                uri.IsDefaultPort;
     }
 
-    private static bool IsReservedDomain(string host) =>
-        s_reservedTlds.Any(host.EndsWithIgnoreCase) ||
-        s_reservedDomains.Any(d => host.EqualsIgnoreCase(d) || host.EndsWithIgnoreCase("." + d));
+    private static bool IsReservedDomain(string host) {
+        foreach (var tld in s_reservedTlds) {
+            if (host.EndsWithIgnoreCase(tld)) {
+                return true;
+            }
+        }
+
+        foreach (var domain in s_reservedDomains) {
+            if (host.EqualsIgnoreCase(domain) || host.EndsWithIgnoreCase("." + domain)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     private static bool IsLocalhost(string host) =>
         host.EqualsIgnoreCase("localhost") ||
