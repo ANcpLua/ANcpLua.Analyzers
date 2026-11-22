@@ -47,10 +47,7 @@ public sealed partial class Al1105MissingResilienceConfigurationAnalyzer : AlAna
             return;
         }
 
-        context.ReportDiagnostic(Diagnostic.Create(
-            s_rule,
-            invocation.Syntax.GetLocation(),
-            GetHttpClientName(invocation)));
+        context.ReportDiagnostic(s_rule, invocation.Syntax.GetLocation(), GetHttpClientName(invocation));
     }
 
     private static bool IsAddHttpClientCall(IInvocationOperation invocation) =>

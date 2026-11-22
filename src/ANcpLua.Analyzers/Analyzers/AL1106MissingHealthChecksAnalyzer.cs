@@ -47,14 +47,14 @@ public sealed partial class Al1106MissingHealthChecksAnalyzer : AlAnalyzer {
         if (invocation.Ancestors().OfType<MethodDeclarationSyntax>().FirstOrDefault() is not { } containingMethod) {
             if (invocation.Ancestors().OfType<CompilationUnitSyntax>().FirstOrDefault() is { } compilationUnit
                 && !HasHealthChecksConfigured(compilationUnit)) {
-                context.ReportDiagnostic(Diagnostic.Create(s_rule, invocation.GetLocation()));
+                context.ReportDiagnostic(s_rule, invocation.GetLocation());
             }
 
             return;
         }
 
         if (!HasHealthChecksConfigured(containingMethod)) {
-            context.ReportDiagnostic(Diagnostic.Create(s_rule, invocation.GetLocation()));
+            context.ReportDiagnostic(s_rule, invocation.GetLocation());
         }
     }
 

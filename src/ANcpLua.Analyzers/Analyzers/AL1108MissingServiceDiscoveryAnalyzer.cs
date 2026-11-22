@@ -76,7 +76,7 @@ public sealed partial class Al1108MissingServiceDiscoveryAnalyzer : AlAnalyzer {
         }
 
         if (IsHardcodedUrl(url) && !IsServiceDiscoveryUrl(url)) {
-            context.ReportDiagnostic(Diagnostic.Create(s_rule, assignment.Syntax.GetLocation(), url.OriginalString));
+            context.ReportDiagnostic(s_rule, assignment.Syntax.GetLocation(), url.OriginalString);
         }
     }
 
@@ -105,7 +105,7 @@ public sealed partial class Al1108MissingServiceDiscoveryAnalyzer : AlAnalyzer {
         }
 
         if (IsHardcodedUrl(url) && !IsServiceDiscoveryUrl(url)) {
-            context.ReportDiagnostic(Diagnostic.Create(s_rule, creation.Syntax.GetLocation(), url.OriginalString));
+            context.ReportDiagnostic(s_rule, creation.Syntax.GetLocation(), url.OriginalString);
         }
     }
 
