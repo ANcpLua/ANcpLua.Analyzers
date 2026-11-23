@@ -23,11 +23,10 @@ ANcpLua.Roslyn.Utilities -> ANcpLua.NET.Sdk -> ANcpLua.Analyzers -> consumers
 `ANcpLua.Roslyn.Utilities` owns reusable Roslyn helpers. This repo owns concrete
 diagnostics, code fixes, docs generation, packaging, and tests. OTel semantic
 convention diagnostics moved out of this repo; do not reintroduce them here
-unless explicitly requested. Agent/tool-governance analyzers such as
-`AL1800`-`AL1802` may remain here because they are not OTel semantic-convention
-rules.
+unless explicitly requested. The Loom agent/tool-governance rules
+`AL1800`-`AL1802` were removed; don't bring them back.
 
-Current active rule IDs live in the `AL1000..AL1899` domain bands. `AL0xxx` is
+Current active rule IDs live in the `AL1000..AL1799` domain bands. `AL0xxx` is
 reserved for sibling analyzer packages and migration mapping only. Rule counts
 drift; trust `src/ANcpLua.Analyzers/AnalyzerReleases.*.md`, analyzer classes,
 and the docs generator output over prose.

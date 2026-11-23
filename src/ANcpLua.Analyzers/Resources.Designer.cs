@@ -1275,50 +1275,5 @@ internal static string AL1210AnalyzerDescription {
                 return ResourceManager.GetString("AL1606AnalyzerTitle", resourceCulture);
             }
         }
-        internal static string AL1800AnalyzerDescription {
-            get {
-                return ResourceManager.GetString("AL1800AnalyzerDescription", resourceCulture);
-            }
-        }
-        internal static string AL1800AnalyzerMessageFormat {
-            get {
-                return ResourceManager.GetString("AL1800AnalyzerMessageFormat", resourceCulture);
-            }
-        }
-        internal static string AL1800AnalyzerTitle {
-            get {
-                return ResourceManager.GetString("AL1800AnalyzerTitle", resourceCulture);
-            }
-        }
-        internal static string AL1801AnalyzerDescription {
-            get {
-                return ResourceManager.GetString("AL1801AnalyzerDescription", resourceCulture);
-            }
-        }
-        internal static string AL1801AnalyzerMessageFormat {
-            get {
-                return ResourceManager.GetString("AL1801AnalyzerMessageFormat", resourceCulture);
-            }
-        }
-        internal static string AL1801AnalyzerTitle {
-            get {
-                return ResourceManager.GetString("AL1801AnalyzerTitle", resourceCulture);
-            }
-        }
-        internal static string AL1802AnalyzerDescription {
-            get {
-                return ResourceManager.GetString("AL1802AnalyzerDescription", resourceCulture);
-            }
-        }
-        internal static string AL1802AnalyzerMessageFormat {
-            get {
-                return ResourceManager.GetString("AL1802AnalyzerMessageFormat", resourceCulture);
-            }
-        }
-        internal static string AL1802AnalyzerTitle {
-            get {
-                return ResourceManager.GetString("AL1802AnalyzerTitle", resourceCulture);
-            }
-        }
     }
 }

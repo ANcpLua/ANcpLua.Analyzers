@@ -854,36 +854,6 @@
     <data name="AL1606AnalyzerDescription" xml:space="preserve">
         <value>Detects outdated Microsoft Agent Framework and related package versions. Update to the minimum required version to ensure compatibility with GA APIs and AIFunctionFactoryOptions.</value>
     </data>
-    <!-- AL1800: Destructive Loom tool must require approval -->
-    <data name="AL1800AnalyzerTitle" xml:space="preserve">
-        <value>Destructive Loom tool must require approval</value>
-    </data>
-    <data name="AL1800AnalyzerMessageFormat" xml:space="preserve">
-        <value>Loom tool '{0}' has destructive side effect '{1}' but does not require approval. Add [RequiresApproval] to ensure governance.</value>
-    </data>
-    <data name="AL1800AnalyzerDescription" xml:space="preserve">
-        <value>Loom tools with destructive side effects (WritesExternalState, MutatesCode, Deploys, ClosesIssue) must declare [RequiresApproval] to ensure governance gates are in place before execution.</value>
-    </data>
-    <!-- AL1801: Loom tool must declare side effect -->
-    <data name="AL1801AnalyzerTitle" xml:space="preserve">
-        <value>Loom tool should declare its side effect</value>
-    </data>
-    <data name="AL1801AnalyzerMessageFormat" xml:space="preserve">
-        <value>Loom tool '{0}' does not declare its side effect. Add [ToolSideEffect] to make governance explicit.</value>
-    </data>
-    <data name="AL1801AnalyzerDescription" xml:space="preserve">
-        <value>Every Loom tool should declare its side effect via [ToolSideEffect] on the method or containing type so that governance policies can be enforced automatically.</value>
-    </data>
-    <!-- AL1802: Loom tool must declare capability -->
-    <data name="AL1802AnalyzerTitle" xml:space="preserve">
-        <value>Loom tool should declare required capabilities</value>
-    </data>
-    <data name="AL1802AnalyzerMessageFormat" xml:space="preserve">
-        <value>Loom tool '{0}' does not declare any required capabilities. Add [RequiresCapability] to enable fine-grained access control.</value>
-    </data>
-    <data name="AL1802AnalyzerDescription" xml:space="preserve">
-        <value>Every Loom tool should declare its required capabilities via [RequiresCapability] on the method or containing type to enable fine-grained access control.</value>
-    </data>
     <!-- AL1220: Use Guard.* helpers instead of BCL ThrowIf* helpers -->
     <data name="AL1220AnalyzerTitle" xml:space="preserve">
         <value>Use Guard.* helpers instead of throw helpers</value>

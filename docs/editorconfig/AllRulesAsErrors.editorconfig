@@ -93,6 +93,3 @@ dotnet_diagnostic.AL1700.severity = error
 dotnet_diagnostic.AL1701.severity = error
 dotnet_diagnostic.AL1702.severity = error
 dotnet_diagnostic.AL1703.severity = error
-dotnet_diagnostic.AL1800.severity = error
-dotnet_diagnostic.AL1801.severity = error
-dotnet_diagnostic.AL1802.severity = error

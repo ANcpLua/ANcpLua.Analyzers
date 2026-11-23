@@ -6,7 +6,7 @@ AL0xxx → AL1xxx rename map from the ANcpLua.Analyzers 2.0.0 break. The 2.0.1 a
 
 ## Summary
 
-`89` renames across `9` 100-wide domain bands. The `AL0xxx` range is reserved for sibling packages (`ANcpLua.AotReflection`, `ANcpLua.ExtensibleEnumMirror`, `ANcpLua.DiscriminatedUnion`) and is not reissued by this analyzer.
+`86` renames across `8` 100-wide domain bands. The `AL0xxx` range is reserved for sibling packages (`ANcpLua.AotReflection`, `ANcpLua.ExtensibleEnumMirror`, `ANcpLua.DiscriminatedUnion`) and is not reissued by this analyzer.
 
 ## Completion audit
 
@@ -31,7 +31,6 @@ No hardcoded `ExpectedCount` constant — count is a consequence of the invarian
 | AL1500..AL1599 Roslyn-author hygiene | 6 |
 | AL1600..AL1699 Package / version | 7 |
 | AL1700..AL1799 Style | 4 |
-| AL1800..AL1899 Agent governance | 3 |
 
 ## Old → New mapping
 
@@ -125,9 +124,6 @@ Sorted by `NewId` — scan to find your current ID's predecessor.
 | `AL0026` | `AL1701` | Avoid DateTime/DateTimeOffset time accessors |
 | `AL0027` | `AL1702` | Avoid legacy JSON library |
 | `AL0139` | `AL1703` | Use implicit type when type is apparent |
-| `AL0128` | `AL1800` | Destructive Loom tool must require approval |
-| `AL0129` | `AL1801` | Loom tool should declare its side effect |
-| `AL0130` | `AL1802` | Loom tool should declare required capabilities |
 
 ## Generated file
 

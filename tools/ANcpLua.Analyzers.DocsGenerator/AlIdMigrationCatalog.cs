@@ -111,9 +111,6 @@ public static class AlIdMigrationCatalog
         new("AL0026", "AL1701", "AL1700..AL1799 Style", "Avoid DateTime/DateTimeOffset time accessors"),
         new("AL0027", "AL1702", "AL1700..AL1799 Style", "Avoid legacy JSON library"),
         new("AL0139", "AL1703", "AL1700..AL1799 Style", "Use implicit type when type is apparent"),
-        new("AL0128", "AL1800", "AL1800..AL1899 Agent governance", "Destructive Loom tool must require approval"),
-        new("AL0129", "AL1801", "AL1800..AL1899 Agent governance", "Loom tool should declare its side effect"),
-        new("AL0130", "AL1802", "AL1800..AL1899 Agent governance", "Loom tool should declare required capabilities"),
     ];
 
     private static readonly Regex NewIdRegex = new(@"^AL1[0-8]\d{2}$", RegexOptions.Compiled);

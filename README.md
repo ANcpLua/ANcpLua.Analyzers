@@ -1,13 +1,12 @@
 [![NuGet ANcpLua.Analyzers](https://img.shields.io/nuget/v/ANcpLua.Analyzers?label=ANcpLua.Analyzers&color=0891B2)](https://www.nuget.org/packages/ANcpLua.Analyzers/)
 [![NuGet ANcpLua.NET.Sdk](https://img.shields.io/nuget/v/ANcpLua.NET.Sdk?label=.NET.Sdk&color=0891B2)](https://www.nuget.org/packages/ANcpLua.NET.Sdk/)
 [![NuGet ANcpLua.Roslyn.Utilities](https://img.shields.io/nuget/v/ANcpLua.Roslyn.Utilities?label=.Roslyn.Utilities&color=0891B2)](https://www.nuget.org/packages/ANcpLua.Roslyn.Utilities/)
-[![NuGet ANcpLua.Agents](https://img.shields.io/nuget/v/ANcpLua.Agents?label=.Agents&color=0891B2)](https://www.nuget.org/packages/ANcpLua.Agents/)
 [![.NET](https://img.shields.io/badge/.NET-netstandard2.0-512BD4)](https://dotnet.microsoft.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 # ANcpLua.Analyzers
 
-Roslyn diagnostic analyzers and code fixes for modern C# correctness, async and threading reliability, AOT and trim safety, ASP.NET Core / Aspire hosting, Roslyn-author hygiene, package/version management, agent-tool governance, and the ANcpLua Roslyn-utilities helper API — 90 rules across 9 domain bands.
+Roslyn diagnostic analyzers and code fixes for modern C# correctness, async and threading reliability, AOT and trim safety, ASP.NET Core / Aspire hosting, Roslyn-author hygiene, package/version management, and the ANcpLua Roslyn-utilities helper API — 87 rules across 8 domain bands.
 
 Targets: `netstandard2.0` (Roslyn host requirement)
 
@@ -20,7 +19,6 @@ Host floor: built against `Microsoft.CodeAnalysis` 5.12.0, so a Roslyn 5.12+ com
 | [`ANcpLua.Analyzers`](https://www.nuget.org/packages/ANcpLua.Analyzers/) | Roslyn diagnostic analyzers + code fixes (this package) |
 | [`ANcpLua.NET.Sdk`](https://www.nuget.org/packages/ANcpLua.NET.Sdk/) | MSBuild SDK that auto-injects this analyzer package and shared `.editorconfig` defaults |
 | [`ANcpLua.Roslyn.Utilities`](https://www.nuget.org/packages/ANcpLua.Roslyn.Utilities/) | Shared Roslyn helpers, extensions, and `Guard.*` API the `AL12xx` band promotes |
-| [`ANcpLua.Agents`](https://www.nuget.org/packages/ANcpLua.Agents/) | Microsoft Agent Framework consumer toolkit; the `AL18xx` agent-governance band targets its `[LoomTool]` attributes |
 
 ## Domain bands
 
@@ -34,9 +32,8 @@ Host floor: built against `Microsoft.CodeAnalysis` 5.12.0, so a Roslyn 5.12+ com
 | `AL1500..1599` | Roslyn-author hygiene | 7 |
 | `AL1600..1699` | Package / version management / doc alignment | 7 |
 | `AL1700..1799` | Style | 4 |
-| `AL1800..1899` | Agent / tool governance (Loom) | 3 |
 
-`AL0xxx` is reserved for sibling packages in the ANcpLua family that ship their own AL-prefixed analyzers. `AL1900..AL9999` is reserved for future bands.
+`AL0xxx` is reserved for sibling packages in the ANcpLua family that ship their own AL-prefixed analyzers. `AL1800..AL9999` is reserved for future bands.
 
 ## Rules
 
@@ -167,13 +164,6 @@ Host floor: built against `Microsoft.CodeAnalysis` 5.12.0, so a Roslyn 5.12+ com
 | AL1702 | Warning | Avoid legacy JSON library |
 | AL1703 | Warning | Use implicit type when type is apparent |
 
-### Agent / tool governance (`AL1800..1802`)
-
-| ID | Severity | Title |
-|---|---|---|
-| AL1800 | Warning | Destructive Loom tool must require approval |
-| AL1801 | Info | Loom tool should declare its side effect |
-| AL1802 | Info | Loom tool should declare required capabilities |
 
 ## Usage
 
@@ -188,7 +178,7 @@ Host floor: built against `Microsoft.CodeAnalysis` 5.12.0, so a Roslyn 5.12+ com
 
 ## Consumer-side severity profile (`<AlAnalysisMode>`)
 
-Switch the whole `AL10xx`–`AL18xx` band in one csproj line instead of dropping editorconfig files:
+Switch the whole `AL10xx`–`AL17xx` band in one csproj line instead of dropping editorconfig files:
 
 ```xml
 <PropertyGroup>
@@ -212,4 +202,4 @@ The knob is exposed via `buildTransitive/ANcpLua.Analyzers.props` in the NuGet, 
 - **[`docs/ANcpLua.Analyzers.sarif`](docs/ANcpLua.Analyzers.sarif)** — SARIF v2.1.0 rule manifest for tool interop (Sonar bridges, GitHub Advanced Security uploads, IDE rule-catalog importers).
 - **[`docs/editorconfig/`](docs/editorconfig/)** — three drop-in severity profiles: `Default`, `AllRulesAsErrors`, `AllRulesDisabled`. Same content ships inside the NuGet under `buildTransitive/editorconfig/` so `<AlAnalysisMode>` can pick them up.
 
-Siblings: [ANcpLua.Roslyn.Utilities](https://github.com/ANcpLua/ANcpLua.Roslyn.Utilities) · [ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk) · [ANcpLua.Agents](https://github.com/ANcpLua/ANcpLua.Agents) · [Qyl.Opentelemetry.SemanticConventions](https://github.com/ANcpLua/Qyl.Opentelemetry.SemanticConventions)
+Siblings: [ANcpLua.Roslyn.Utilities](https://github.com/ANcpLua/ANcpLua.Roslyn.Utilities) · [ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk) · [Qyl.Opentelemetry.SemanticConventions](https://github.com/ANcpLua/Qyl.Opentelemetry.SemanticConventions)

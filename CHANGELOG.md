@@ -4,6 +4,11 @@ All notable changes to ANcpLua.Analyzers will be documented in this file.
 
 ## [Unreleased]
 
+### Removed
+
+- **AL1800–AL1802** (Loom agent/tool governance) and their `AL18xx` band. Loom is no longer used;
+  the rules targeted `[LoomTool]` attributes that nothing ships anymore.
+
 ### Changed
 
 - Bundles ANcpLua.Roslyn.Utilities 5.0.1 (built for .NET 11 and Roslyn 5.12) instead of 3.0.0.

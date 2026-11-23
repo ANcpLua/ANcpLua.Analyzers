@@ -103,9 +103,6 @@ Each ID links to a per-rule page under [`docs/rules/`](rules/) with severity, ca
 | [AL1701](rules/AL1701_AvoidDateTimeNow.md) | Warning | Avoid DateTime/DateTimeOffset time accessors | No |
 | [AL1702](rules/AL1702_AvoidNewtonsoftJson.md) | Warning | Avoid legacy JSON library | No |
 | [AL1703](rules/AL1703_UseImplicitTypeWhenApparent.md) | Warning | Use implicit type when type is apparent | No |
-| [AL1800](rules/AL1800_DestructiveToolMustRequireApproval.md) | Warning | Destructive Loom tool must require approval | No |
-| [AL1801](rules/AL1801_ToolMustDeclareSideEffect.md) | Info | Loom tool should declare its side effect | No |
-| [AL1802](rules/AL1802_ToolMustDeclareCapability.md) | Info | Loom tool should declare required capabilities | No |
 
 ## Consumer-side severity profile (`AlAnalysisMode`)
 

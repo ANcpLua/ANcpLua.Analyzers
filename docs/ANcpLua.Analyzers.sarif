@@ -1486,57 +1486,6 @@
               "properties": {
                 "category": "Style"
               }
-            },
-            {
-              "id": "AL1800",
-              "name": "DestructiveToolMustRequireApproval",
-              "shortDescription": {
-                "text": "Destructive Loom tool must require approval"
-              },
-              "fullDescription": {
-                "text": "Loom tools with destructive side effects (WritesExternalState, MutatesCode, Deploys, ClosesIssue) must declare [RequiresApproval] to ensure governance gates are in place before execution."
-              },
-              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1800_DestructiveToolMustRequireApproval.md",
-              "defaultConfiguration": {
-                "level": "warning"
-              },
-              "properties": {
-                "category": "GenAI"
-              }
-            },
-            {
-              "id": "AL1801",
-              "name": "ToolMustDeclareSideEffect",
-              "shortDescription": {
-                "text": "Loom tool should declare its side effect"
-              },
-              "fullDescription": {
-                "text": "Every Loom tool should declare its side effect via [ToolSideEffect] on the method or containing type so that governance policies can be enforced automatically."
-              },
-              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1801_ToolMustDeclareSideEffect.md",
-              "defaultConfiguration": {
-                "level": "note"
-              },
-              "properties": {
-                "category": "GenAI"
-              }
-            },
-            {
-              "id": "AL1802",
-              "name": "ToolMustDeclareCapability",
-              "shortDescription": {
-                "text": "Loom tool should declare required capabilities"
-              },
-              "fullDescription": {
-                "text": "Every Loom tool should declare its required capabilities via [RequiresCapability] on the method or containing type to enable fine-grained access control."
-              },
-              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1802_ToolMustDeclareCapability.md",
-              "defaultConfiguration": {
-                "level": "note"
-              },
-              "properties": {
-                "category": "GenAI"
-              }
             }
           ]
         }
