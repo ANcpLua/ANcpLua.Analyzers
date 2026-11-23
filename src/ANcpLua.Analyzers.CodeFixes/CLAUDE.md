@@ -83,7 +83,7 @@ public sealed class Ar0001MyRefactoring : CodeRefactoringProvider {
 
 ## Available Code Fixes
 
-The authoritative list is the `CodeFixes/AL*.cs` files in this directory. Do not duplicate it here or in the README — past attempts drifted within weeks (e.g., listed AL0010/AL0012 fixes that don't exist, missed AL1212–AL1218 / AL1500 / AL1503 / AL1504 / AL1313 / AL1220 / AL1314 / AL1703 that do).
+The authoritative list is the `CodeFixes/AL*.cs` files in this directory. Do not duplicate it here or in the README — past attempts drifted within weeks (e.g., listed AL0010/AL0012 fixes that don't exist, missed AL1212–AL1218 / AL1500 / AL1503 / AL1313 / AL1220 / AL1314 / AL1703 that do).
 
 ## Available Refactorings
 

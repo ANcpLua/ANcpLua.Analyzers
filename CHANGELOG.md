@@ -8,6 +8,9 @@ All notable changes to ANcpLua.Analyzers will be documented in this file.
 
 - **AL1800–AL1802** (Loom agent/tool governance) and their `AL18xx` band. Loom is no longer used;
   the rules targeted `[LoomTool]` attributes that nothing ships anymore.
+- **AL1504** (`[DuckDbTable]` type must be partial, with its code fix) and **AL1505** (conflicting
+  `[DuckDbColumn]` ordinals). Both checked only qyl's `Qyl.Collector.Storage` attributes; qyl is no
+  longer maintained.
 
 ### Changed
 

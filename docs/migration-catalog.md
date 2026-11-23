@@ -6,7 +6,7 @@ AL0xxx → AL1xxx rename map from the ANcpLua.Analyzers 2.0.0 break. The 2.0.1 a
 
 ## Summary
 
-`86` renames across `8` 100-wide domain bands. The `AL0xxx` range is reserved for sibling packages (`ANcpLua.AotReflection`, `ANcpLua.ExtensibleEnumMirror`, `ANcpLua.DiscriminatedUnion`) and is not reissued by this analyzer.
+`84` renames across `8` 100-wide domain bands. The `AL0xxx` range is reserved for sibling packages (`ANcpLua.AotReflection`, `ANcpLua.ExtensibleEnumMirror`, `ANcpLua.DiscriminatedUnion`) and is not reissued by this analyzer.
 
 ## Completion audit
 
@@ -28,7 +28,7 @@ No hardcoded `ExpectedCount` constant — count is a consequence of the invarian
 | AL1200..AL1299 Roslyn Utilities | 21 |
 | AL1300..AL1399 Async / reliability | 15 |
 | AL1400..AL1499 AOT / trim | 10 |
-| AL1500..AL1599 Roslyn-author hygiene | 6 |
+| AL1500..AL1599 Roslyn-author hygiene | 4 |
 | AL1600..AL1699 Package / version | 7 |
 | AL1700..AL1799 Style | 4 |
 
@@ -111,8 +111,6 @@ Sorted by `NewId` — scan to find your current ID's predecessor.
 | `AL0119` | `AL1501` | Avoid storing ISymbol in source generator models |
 | `AL0120` | `AL1502` | Use IIncrementalGenerator instead of ISourceGenerator |
 | `AL0121` | `AL1503` | Avoid NormalizeWhitespace in source generators |
-| `AL0122` | `AL1504` | [DuckDbTable] type must be partial |
-| `AL0123` | `AL1505` | Conflicting [DuckDbColumn] ordinal values |
 | `AL0017` | `AL1600` | Hardcoded package version detected |
 | `AL0018` | `AL1601` | Version.props not imported |
 | `AL0019` | `AL1602` | Undefined version variable |

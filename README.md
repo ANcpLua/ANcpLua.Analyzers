@@ -6,7 +6,7 @@
 
 # ANcpLua.Analyzers
 
-Roslyn diagnostic analyzers and code fixes for modern C# correctness, async and threading reliability, AOT and trim safety, ASP.NET Core / Aspire hosting, Roslyn-author hygiene, package/version management, and the ANcpLua Roslyn-utilities helper API — 87 rules across 8 domain bands.
+Roslyn diagnostic analyzers and code fixes for modern C# correctness, async and threading reliability, AOT and trim safety, ASP.NET Core / Aspire hosting, Roslyn-author hygiene, package/version management, and the ANcpLua Roslyn-utilities helper API — 85 rules across 8 domain bands.
 
 Targets: `netstandard2.0` (Roslyn host requirement)
 
@@ -29,7 +29,7 @@ Host floor: built against `Microsoft.CodeAnalysis` 5.12.0, so a Roslyn 5.12+ com
 | `AL1200..1299` | Roslyn Utilities helper API surface | 21 |
 | `AL1300..1399` | Async / threading / reliability | 15 |
 | `AL1400..1499` | AOT / trim safety | 10 |
-| `AL1500..1599` | Roslyn-author hygiene | 7 |
+| `AL1500..1599` | Roslyn-author hygiene | 5 |
 | `AL1600..1699` | Package / version management / doc alignment | 7 |
 | `AL1700..1799` | Style | 4 |
 
@@ -139,8 +139,6 @@ Host floor: built against `Microsoft.CodeAnalysis` 5.12.0, so a Roslyn 5.12+ com
 | AL1501 | Warning | Avoid storing ISymbol in source generator models |
 | AL1502 | Warning | Use IIncrementalGenerator instead of ISourceGenerator |
 | AL1503 | Warning | Avoid NormalizeWhitespace in source generators |
-| AL1504 | Error | [DuckDbTable] type must be partial |
-| AL1505 | Warning | Conflicting [DuckDbColumn] ordinal values |
 | AL1506 | Warning | Excluded code hides untested branches |
 
 ### Package / version management (`AL1600..1606`)
@@ -202,4 +200,4 @@ The knob is exposed via `buildTransitive/ANcpLua.Analyzers.props` in the NuGet, 
 - **[`docs/ANcpLua.Analyzers.sarif`](docs/ANcpLua.Analyzers.sarif)** — SARIF v2.1.0 rule manifest for tool interop (Sonar bridges, GitHub Advanced Security uploads, IDE rule-catalog importers).
 - **[`docs/editorconfig/`](docs/editorconfig/)** — three drop-in severity profiles: `Default`, `AllRulesAsErrors`, `AllRulesDisabled`. Same content ships inside the NuGet under `buildTransitive/editorconfig/` so `<AlAnalysisMode>` can pick them up.
 
-Siblings: [ANcpLua.Roslyn.Utilities](https://github.com/ANcpLua/ANcpLua.Roslyn.Utilities) · [ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk) · [Qyl.Opentelemetry.SemanticConventions](https://github.com/ANcpLua/Qyl.Opentelemetry.SemanticConventions)
+Siblings: [ANcpLua.Roslyn.Utilities](https://github.com/ANcpLua/ANcpLua.Roslyn.Utilities) · [ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk)

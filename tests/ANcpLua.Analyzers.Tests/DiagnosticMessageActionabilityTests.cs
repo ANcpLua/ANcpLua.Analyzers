@@ -40,8 +40,6 @@ public sealed partial class DiagnosticMessageActionabilityTests {
     [InlineData("AL1500", "add one switch arm, case label or Match handler for each listed type")]
     [InlineData("AL1501", "'symbol.ToDisplayString()'")]
     [InlineData("AL1502", "'public void Initialize(IncrementalGeneratorInitializationContext context)'")]
-    [InlineData("AL1504", "add the 'partial' modifier")]
-    [InlineData("AL1505", "a different Ordinal")]
     [InlineData("AL1601", "'<Import Project=\"$(MSBuildThisFileDirectory)Version.props\" />'")]
     [InlineData("AL1606", "change its version to '{2}' or newer")]
     [InlineData("AL1700", "add the 'static' modifier")]

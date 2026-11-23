@@ -98,8 +98,6 @@ public static class AlIdMigrationCatalog
         new("AL0119", "AL1501", "AL1500..AL1599 Roslyn-author hygiene", "Avoid storing ISymbol in source generator models"),
         new("AL0120", "AL1502", "AL1500..AL1599 Roslyn-author hygiene", "Use IIncrementalGenerator instead of ISourceGenerator"),
         new("AL0121", "AL1503", "AL1500..AL1599 Roslyn-author hygiene", "Avoid NormalizeWhitespace in source generators"),
-        new("AL0122", "AL1504", "AL1500..AL1599 Roslyn-author hygiene", "[DuckDbTable] type must be partial"),
-        new("AL0123", "AL1505", "AL1500..AL1599 Roslyn-author hygiene", "Conflicting [DuckDbColumn] ordinal values"),
         new("AL0017", "AL1600", "AL1600..AL1699 Package / version", "Hardcoded package version detected"),
         new("AL0018", "AL1601", "AL1600..AL1699 Package / version", "Version.props not imported"),
         new("AL0019", "AL1602", "AL1600..AL1699 Package / version", "Undefined version variable"),

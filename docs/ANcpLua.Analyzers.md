@@ -89,8 +89,6 @@ Each ID links to a per-rule page under [`docs/rules/`](rules/) with severity, ca
 | [AL1501](rules/AL1501_SymbolStoredInModel.md) | Warning | Avoid storing ISymbol in source generator models | No |
 | [AL1502](rules/AL1502_UseIncrementalGenerator.md) | Warning | Use IIncrementalGenerator instead of ISourceGenerator | No |
 | [AL1503](rules/AL1503_NormalizeWhitespace.md) | Warning | Avoid NormalizeWhitespace in source generators | No |
-| [AL1504](rules/AL1504_DuckDbTableMustBePartial.md) | Error | [DuckDbTable] type must be partial | No |
-| [AL1505](rules/AL1505_DuckDbColumnConflictingOrdinal.md) | Warning | Conflicting [DuckDbColumn] ordinal values | No |
 | [AL1506](rules/AL1506_ExcludeFromCodeCoverageHidesBranches.md) | Warning | Excluded code hides untested branches | No |
 | [AL1600](rules/AL1600_HardcodedPackageVersion.md) | Warning | Hardcoded package version detected | No |
 | [AL1601](rules/AL1601_VersionPropsNotImported.md) | Warning | Version.props not imported | No |

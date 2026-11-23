@@ -167,12 +167,9 @@
     <data name="AL1500CodeFixTitle" xml:space="preserve">
         <value>Add missing cases</value>
     </data>
-    <!-- AL1503/AL1504/AL1313 Code Fix Titles -->
+    <!-- AL1503/AL1313 Code Fix Titles -->
     <data name="AL1503CodeFixTitle" xml:space="preserve">
         <value>Remove NormalizeWhitespace call</value>
-    </data>
-    <data name="AL1504CodeFixTitle" xml:space="preserve">
-        <value>Make type partial</value>
     </data>
     <data name="AL1313CodeFixTitle" xml:space="preserve">
         <value>Forward CancellationToken</value>

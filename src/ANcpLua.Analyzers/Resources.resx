@@ -804,26 +804,6 @@
     <data name="AL1503AnalyzerDescription" xml:space="preserve">
         <value>SyntaxFactory.NormalizeWhitespace() traverses the entire syntax tree to rewrite whitespace, which is expensive in source generators that run frequently. Use raw string literals or manual formatting instead.</value>
     </data>
-    <!-- AL1504: DuckDbTable type must be partial -->
-    <data name="AL1504AnalyzerTitle" xml:space="preserve">
-        <value>[DuckDbTable] type must be partial</value>
-    </data>
-    <data name="AL1504AnalyzerMessageFormat" xml:space="preserve">
-        <value>Type '{0}' has [DuckDbTable] but is not partial, so the source generator cannot extend it; add the 'partial' modifier to the declaration of '{0}'</value>
-    </data>
-    <data name="AL1504AnalyzerDescription" xml:space="preserve">
-        <value>The DuckDbInsertGenerator source generator creates additional methods (AddParameters, MapFromReader, BuildMultiRowInsertSql) on types marked with [DuckDbTable]. The type must be partial so the generator can add these members.</value>
-    </data>
-    <!-- AL1505: Conflicting DuckDbColumn ordinals -->
-    <data name="AL1505AnalyzerTitle" xml:space="preserve">
-        <value>Conflicting [DuckDbColumn] ordinal values</value>
-    </data>
-    <data name="AL1505AnalyzerMessageFormat" xml:space="preserve">
-        <value>Properties '{0}' and '{1}' on type '{2}' both specify Ordinal = {3}; give every [DuckDbColumn] on '{2}' a different Ordinal</value>
-    </data>
-    <data name="AL1505AnalyzerDescription" xml:space="preserve">
-        <value>Multiple properties in a [DuckDbTable] type have the same Ordinal value in their [DuckDbColumn] attribute. Each column must have a unique ordinal to ensure deterministic column ordering in generated SQL.</value>
-    </data>
     <!-- AL1219: Use *Any* string comparison extensions -->
     <data name="AL1219AnalyzerTitle" xml:space="preserve">
         <value>Use *Any* string comparison extension</value>

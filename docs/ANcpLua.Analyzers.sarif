@@ -1250,40 +1250,6 @@
               }
             },
             {
-              "id": "AL1504",
-              "name": "DuckDbTableMustBePartial",
-              "shortDescription": {
-                "text": "[DuckDbTable] type must be partial"
-              },
-              "fullDescription": {
-                "text": "The DuckDbInsertGenerator source generator creates additional methods (AddParameters, MapFromReader, BuildMultiRowInsertSql) on types marked with [DuckDbTable]. The type must be partial so the generator can add these members."
-              },
-              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1504_DuckDbTableMustBePartial.md",
-              "defaultConfiguration": {
-                "level": "error"
-              },
-              "properties": {
-                "category": "Design"
-              }
-            },
-            {
-              "id": "AL1505",
-              "name": "DuckDbColumnConflictingOrdinal",
-              "shortDescription": {
-                "text": "Conflicting [DuckDbColumn] ordinal values"
-              },
-              "fullDescription": {
-                "text": "Multiple properties in a [DuckDbTable] type have the same Ordinal value in their [DuckDbColumn] attribute. Each column must have a unique ordinal to ensure deterministic column ordering in generated SQL."
-              },
-              "helpUri": "https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/docs/rules/AL1505_DuckDbColumnConflictingOrdinal.md",
-              "defaultConfiguration": {
-                "level": "warning"
-              },
-              "properties": {
-                "category": "Design"
-              }
-            },
-            {
               "id": "AL1506",
               "name": "ExcludeFromCodeCoverageHidesBranches",
               "shortDescription": {
