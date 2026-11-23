@@ -46,15 +46,15 @@ internal static partial class MappingRegistry
     ///     Replace is included — ReplaceOrdinal and ReplaceIgnoreCase exist.
     /// </remarks>
     private static readonly HashSet<string> s_stringComparisonMethods =
-        new(StringComparer.Ordinal)
-        {
+        [
+            with(StringComparer.Ordinal),
             "Equals",
             "StartsWith",
             "EndsWith",
             "Contains",
             "IndexOf",
             "Replace"
-        };
+        ];
 
     /// <summary>
     ///     Maps StringComparison enum values to extension method suffixes.

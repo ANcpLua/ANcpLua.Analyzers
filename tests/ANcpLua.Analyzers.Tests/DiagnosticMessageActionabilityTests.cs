@@ -1,10 +1,10 @@
-using System.Collections.Immutable;
-using System.Globalization;
 using ANcpLua.Analyzers.Analyzers;
 using Basic.Reference.Assemblies;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
+using System.Collections.Immutable;
+using System.Globalization;
 
 namespace ANcpLua.Analyzers.Tests;
 
@@ -81,13 +81,13 @@ public sealed partial class DiagnosticMessageActionabilityTests {
         var cancellationToken = TestContext.Current.CancellationToken;
         var tree = CSharpSyntaxTree.ParseText(
             source,
-            new CSharpParseOptions(LanguageVersion.Preview),
+            new CSharpParseOptions(LanguageVersion.CSharp15),
             "MessageSample.cs",
             cancellationToken: cancellationToken);
         var compilation = CSharpCompilation.Create(
             "MessageSample",
             [tree],
-            Net100.References.All,
+            Net110.References.All,
             new CSharpCompilationOptions(
                 OutputKind.DynamicallyLinkedLibrary,
                 nullableContextOptions: NullableContextOptions.Enable));

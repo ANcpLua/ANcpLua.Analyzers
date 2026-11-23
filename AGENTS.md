@@ -1,7 +1,5 @@
 # ANcpLua.Analyzers - Agent Contract
 
-@claude check if claude.md can be removed
-
 Canonical instruction surface for Codex and Claude. Keep the repo-root `CLAUDE.md`
 symlinked to this file; edit this file for repo-wide agent rules. Nested
 `CLAUDE.md` files are project-local notes and are not the root contract.
@@ -432,6 +430,15 @@ The tools docs-generator project intentionally uses plain `Microsoft.NET.Sdk`
 and pins its Roslyn package inline because CPM evaluation from `tools/` does not
 pick up the repo version variables. Do not "fix" that into the normal SDK
 pattern without revalidating the tool bootstrap.
+
+## Toolchain
+
+.NET SDK 11.0.100 (`global.json`), `net11.0` plus `netstandard2.0` for the shipped
+assemblies, Roslyn `Microsoft.CodeAnalysis` 5.12.0. Compiling against 5.12.0 sets
+the consumer floor: a compiler older than 5.12 (every .NET 10 SDK) reports CS9057
+and runs none of the rules. The C# 15 APIs `ITypeSymbol.IsUnion`, `IsClosed`,
+`GetClosedDerivedTypeInfo` and `UnionCaseTypes` are stable in 5.12.0 and need no
+`RSEXPERIMENTAL006` suppression; the memory-safety APIs are still experimental.
 
 ## Package Shape
 

@@ -1,6 +1,6 @@
 <Project Sdk="ANcpLua.NET.Sdk">
     <PropertyGroup>
-        <TargetFrameworks>net10.0;netstandard2.0</TargetFrameworks>
+        <TargetFrameworks>net11.0;netstandard2.0</TargetFrameworks>
 
         <!-- REQUIRED: Break circular dependency (SDK auto-injects this analyzer) -->
         <PackageId>Dummy</PackageId>
@@ -85,7 +85,7 @@
           analyzer csproj. Without the sentinel, AfterBuild fires inside the
           nested build and detonates into hundreds of duplicated errors.
         * TargetFramework == netstandard2.0: this project multi-targets
-          (net10.0;netstandard2.0). MSBuild fires AfterBuild once per TFM, in
+          (net11.0;netstandard2.0). MSBuild fires AfterBuild once per TFM, in
           parallel under -m:N. On Windows that races on the obj/DocsGenerator.dll
           write lock (CS2012). Pin to the netstandard2.0 inner build so the
           drift check runs exactly once per outer `dotnet build`.

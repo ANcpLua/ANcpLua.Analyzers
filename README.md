@@ -11,7 +11,7 @@ Roslyn diagnostic analyzers and code fixes for modern C# correctness, async and 
 
 Targets: `netstandard2.0` (Roslyn host requirement)
 
-Host floor: built against `Microsoft.CodeAnalysis` 5.9.0, so a Roslyn 5.9+ compiler host is required — the compiler bundled with .NET SDK 10.0.400 is Roslyn 5.9. An older host reports [CS9057](https://github.com/dotnet/roslyn/issues/64754) and skips every rule in this package rather than running a subset.
+Host floor: built against `Microsoft.CodeAnalysis` 5.12.0, so a Roslyn 5.12+ compiler host is required — .NET SDK 11.0.100 bundles Roslyn 5.12. An older host, such as any .NET 10 SDK, reports [CS9057](https://github.com/dotnet/roslyn/issues/64754) and skips every rule in this package rather than running a subset.
 
 ## Family
 

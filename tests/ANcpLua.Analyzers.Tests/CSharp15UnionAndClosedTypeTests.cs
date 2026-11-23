@@ -1,9 +1,9 @@
-using System.Collections.Immutable;
-using System.Globalization;
 using Basic.Reference.Assemblies;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
+using System.Collections.Immutable;
+using System.Globalization;
 
 namespace ANcpLua.Analyzers.Tests;
 
@@ -12,35 +12,13 @@ namespace ANcpLua.Analyzers.Tests;
 ///     hierarchies) and checks that no analyzer crashes (AD0001) or reports on code the compiler accepts.
 /// </summary>
 /// <remarks>
-///     The test project compiles against net10.0 reference assemblies, which lack the runtime support
-///     types for unions and closed types, so each sample declares them itself. The sample must compile
-///     without errors; otherwise the analyzers would only have seen broken syntax.
+///     The samples compile against the .NET 11 reference assemblies, which carry the runtime support
+///     types for unions and closed types. Each sample must compile without errors; otherwise the
+///     analyzers would only have seen broken syntax.
 /// </remarks>
 public sealed partial class CSharp15UnionAndClosedTypeTests {
     private const string AnalyzerCrashId = "AD0001";
     private const string ClosedHierarchyRuleId = "AL1500";
-
-    private const string RuntimeSupport = """
-        namespace System.Runtime.CompilerServices
-        {
-            [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct, AllowMultiple = false, Inherited = false)]
-            internal sealed class UnionAttribute : System.Attribute
-            {
-            }
-
-            internal interface IUnion
-            {
-                object? Value { get; }
-            }
-
-            [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-            internal sealed class IsClosedTypeAttribute : System.Attribute
-            {
-                public System.Type[] DerivedTypes { get; set; } = System.Array.Empty<System.Type>();
-            }
-        }
-
-        """;
 
     private const string Unions = """
         namespace Sample
@@ -222,15 +200,15 @@ public sealed partial class CSharp15UnionAndClosedTypeTests {
 
     [Fact]
     public Task UnionDeclarationsAndExhaustiveMatches_ShouldNotCrashOrReport() =>
-        AssertNoDiagnosticsAsync(RuntimeSupport + Unions);
+        AssertNoDiagnosticsAsync(Unions);
 
     [Fact]
     public Task ClosedHierarchyWithEveryLeafHandled_ShouldNotCrashOrReport() =>
-        AssertNoDiagnosticsAsync(RuntimeSupport + ClosedGateHierarchy + SwitchStatementOverShapes + SwitchOverEveryLeaf);
+        AssertNoDiagnosticsAsync(ClosedGateHierarchy + SwitchStatementOverShapes + SwitchOverEveryLeaf);
 
     [Fact]
     public Task ClosedHierarchyWithIntermediateTypeArm_ShouldNotReportItsLeavesAsMissing() =>
-        AssertNoDiagnosticsAsync(RuntimeSupport + ClosedGateHierarchy + SwitchOverIntermediateType);
+        AssertNoDiagnosticsAsync(ClosedGateHierarchy + SwitchOverIntermediateType);
 
     [Fact]
     public Task AbstractHierarchyWithIntermediateTypeArm_ShouldNotReportItsLeavesAsMissing() =>
@@ -248,7 +226,7 @@ public sealed partial class CSharp15UnionAndClosedTypeTests {
 
     [Fact]
     public async Task ClosedHierarchyMissingOneLeaf_ShouldReportOnlyThatLeaf() {
-        var diagnostics = await AnalyzeAsync(RuntimeSupport + ClosedGateHierarchy + SwitchMissingOneLeaf).ConfigureAwait(true);
+        var diagnostics = await AnalyzeAsync(ClosedGateHierarchy + SwitchMissingOneLeaf).ConfigureAwait(true);
 
         // A closed type is implicitly abstract, so AL1500 sees the hierarchy like an abstract one and
         // reports next to the compiler's own CS8509. No other rule may report.
@@ -263,20 +241,20 @@ public sealed partial class CSharp15UnionAndClosedTypeTests {
     }
 
     /// <summary>
-    ///     Compiles <paramref name="source"/> as C# preview (the language version that carries C# 15 in
-    ///     the pinned Roslyn package), then returns analyzer crashes plus every diagnostic located in source.
+    ///     Compiles <paramref name="source"/> as C# 15 against the .NET 11 reference assemblies, then returns
+    ///     analyzer crashes plus every diagnostic located in source.
     /// </summary>
     private static async Task<ImmutableArray<Diagnostic>> AnalyzeAsync(string source) {
         var cancellationToken = TestContext.Current.CancellationToken;
         var tree = CSharpSyntaxTree.ParseText(
             source,
-            new CSharpParseOptions(LanguageVersion.Preview),
+            new CSharpParseOptions(LanguageVersion.CSharp15),
             "CSharp15Sample.cs",
             cancellationToken: cancellationToken);
         var compilation = CSharpCompilation.Create(
             "CSharp15Sample",
             [tree],
-            Net100.References.All,
+            Net110.References.All,
             new CSharpCompilationOptions(
                 OutputKind.DynamicallyLinkedLibrary,
                 nullableContextOptions: NullableContextOptions.Enable));

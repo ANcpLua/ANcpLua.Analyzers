@@ -3,6 +3,10 @@
     <Import Project="$(MSBuildThisFileDirectory)Version.props"/>
 
     <PropertyGroup>
+        <!-- Keep the SDK-injected Microsoft.CodeAnalysis.CSharp on the same version as Workspaces.
+             Set here, after the Version.props import, so a local RoslynVersion override applies;
+             unconditional because the SDK sets a default before this file runs. -->
+        <SourceGeneratorRoslynVersion>$(RoslynVersion)</SourceGeneratorRoslynVersion>
         <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
         <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
     </PropertyGroup>
@@ -23,6 +27,7 @@
 
     <!-- Reference Assemblies -->
     <ItemGroup Label="Reference Assemblies">
+        <PackageVersion Include="Basic.Reference.Assemblies.Net110" Version="$(BasicReferenceAssembliesVersion)"/>
         <PackageVersion Include="Basic.Reference.Assemblies.Net100" Version="$(BasicReferenceAssembliesVersion)"/>
         <PackageVersion Include="Basic.Reference.Assemblies.NetStandard20" Version="$(BasicReferenceAssembliesVersion)"/>
     </ItemGroup>

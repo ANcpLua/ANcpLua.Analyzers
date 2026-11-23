@@ -1,7 +1,7 @@
-using System.Reflection;
 using ANcpLua.Analyzers.Analyzers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Testing;
+using System.Reflection;
 using AnalyzerTestBase = ANcpLua.Roslyn.Utilities.Testing.AnalyzerTest<ANcpLua.Analyzers.Analyzers.Al1606OutdatedMafPackageVersionAnalyzer>;
 
 namespace ANcpLua.Analyzers.Tests;

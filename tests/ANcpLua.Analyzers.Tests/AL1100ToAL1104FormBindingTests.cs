@@ -31,10 +31,10 @@ public sealed partial class Al1100ToAl1104FormBindingTests {
     private static Task VerifyAsync(string source) {
         var test = new CSharpAnalyzerTest<Al1100ToAl1104FormBindingAnalyzer, DefaultVerifier> {
             TestCode = (Stubs + "\n" + source).ReplaceLineEndings(),
-            ReferenceAssemblies = new ReferenceAssemblies("net10.0"),
+            ReferenceAssemblies = new ReferenceAssemblies("net11.0"),
             MarkupOptions = MarkupOptions.UseFirstDescriptor
         };
-        test.TestState.AdditionalReferences.AddRange(Net100.References.All);
+        test.TestState.AdditionalReferences.AddRange(Net110.References.All);
         return test.RunAsync();
     }
 

@@ -1,6 +1,6 @@
 <Project Sdk="ANcpLua.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
+        <TargetFramework>net11.0</TargetFramework>
         <OutputType>Exe</OutputType>
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
@@ -13,6 +13,8 @@
         <!-- AwesomeAssertions and xunit.v3.mtp-v2 are auto-injected by SDK for IsTestProject -->
         <PackageReference Include="ANcpLua.Roslyn.Utilities.Testing"/>
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces"/>
+        <!-- .NET 11 reference assemblies for test compilations: they carry the C# 15 union and closed-type support types -->
+        <PackageReference Include="Basic.Reference.Assemblies.Net110"/>
     </ItemGroup>
 
     <ItemGroup>

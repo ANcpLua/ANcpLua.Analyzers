@@ -35,6 +35,24 @@
     <ANcpLuaRoslynUtilitiesTestingVersion>3.0.0</ANcpLuaRoslynUtilitiesTestingVersion>
   </PropertyGroup>
 
+  <!-- [AHEAD] SDK 3.4.51 ships RoslynVersion and RoslynAnalyzersVersion 5.9.0. The analyzers
+       compile against Roslyn 5.12.0, so consumers need a 5.12 compiler (SDK 11.0.100 or later);
+       an older compiler reports CS9057 and does not run them. Delete both entries once the SDK
+       ships 5.12.0. -->
+  <PropertyGroup Label="Roslyn">
+    <!-- renovate: datasource=nuget depName=Microsoft.CodeAnalysis.CSharp.Workspaces -->
+    <RoslynVersion>5.12.0</RoslynVersion>
+    <!-- renovate: datasource=nuget depName=Microsoft.CodeAnalysis.Analyzers -->
+    <RoslynAnalyzersVersion>5.12.0</RoslynAnalyzersVersion>
+  </PropertyGroup>
+
+  <!-- [AHEAD] SDK 3.4.51 ships 1.8.11, whose Net110 assemblies are a .NET 11 preview. 1.8.15 carries
+       the .NET 11 GA reference assemblies the tests compile against. -->
+  <PropertyGroup Label="Reference Assemblies">
+    <!-- renovate: datasource=nuget depName=Basic.Reference.Assemblies.Net110 -->
+    <BasicReferenceAssembliesVersion>1.8.15</BasicReferenceAssembliesVersion>
+  </PropertyGroup>
+
   <!-- [SDK-UNDEFINED] Feeds the five Microsoft.CodeAnalysis.*.Testing package versions
        in Directory.Packages.props. Deleting it silently drops the test project's
        Microsoft.CodeAnalysis.Testing reference and fails the build with CS0234. -->

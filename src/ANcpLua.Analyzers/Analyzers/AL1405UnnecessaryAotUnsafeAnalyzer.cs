@@ -35,7 +35,8 @@ public sealed partial class Al1405UnnecessaryAotUnsafeAnalyzer : AlAnalyzer {
         DiagnosticCategories.AotTesting,
         DiagnosticSeverities.Suggestion);
 
-    private static readonly HashSet<string> s_unsafeReflectionMethods = new(StringComparer.Ordinal) {
+    private static readonly HashSet<string> s_unsafeReflectionMethods = [
+        with(StringComparer.Ordinal),
         "GetMethod",
         "GetMethods",
         "GetProperty",
@@ -55,9 +56,10 @@ public sealed partial class Al1405UnnecessaryAotUnsafeAnalyzer : AlAnalyzer {
         "Compile", // Expression.Compile
         "CompileToMethod",
         "CreateDelegate",
-    };
+    ];
 
-    private static readonly HashSet<string> s_unsafeReflectionTypes = new(StringComparer.Ordinal) {
+    private static readonly HashSet<string> s_unsafeReflectionTypes = [
+        with(StringComparer.Ordinal),
         "System.Type",
         "System.Reflection.MethodInfo",
         "System.Reflection.MethodBase",
@@ -69,7 +71,7 @@ public sealed partial class Al1405UnnecessaryAotUnsafeAnalyzer : AlAnalyzer {
         "System.Linq.Expressions.Expression",
         "System.Linq.Expressions.LambdaExpression",
         "System.Delegate",
-    };
+    ];
 
     /// <summary>Gets the diagnostic descriptors for the supported diagnostics.</summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [s_rule];

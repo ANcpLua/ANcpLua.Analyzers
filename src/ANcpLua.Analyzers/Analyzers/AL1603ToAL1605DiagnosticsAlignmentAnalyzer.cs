@@ -115,7 +115,7 @@ public sealed partial class Al1603ToAl1605DiagnosticsAlignmentAnalyzer : Diagnos
 
         var docs = docsFile is not null
             ? ParseDocs(docsFile, context.CancellationToken)
-            : new Dictionary<string, DocInfo>(StringComparer.Ordinal);
+            : [with(StringComparer.Ordinal)];
 
         var releases = ParseReleases(shippedFile, unshippedFile, context.CancellationToken);
 

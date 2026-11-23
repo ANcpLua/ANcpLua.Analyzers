@@ -108,7 +108,7 @@ public sealed partial class Al1606OutdatedMafPackageVersionAnalyzer : Diagnostic
 
         var propertyValues = versionPropsFile is not null
             ? CollectPropertyValues(versionPropsFile, context.CancellationToken)
-            : new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            : [with(StringComparer.OrdinalIgnoreCase)];
 
         var packagesPropsFiles = context.Options.AdditionalFiles
             .Where(static f => f.Path.EndsWithIgnoreCase("Directory.Packages.props"))

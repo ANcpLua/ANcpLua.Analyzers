@@ -4,7 +4,7 @@ Unit tests for all analyzers and code fixes.
 
 ## Target
 
-- **Framework:** net10.0
+- **Framework:** net11.0
 - **Test Framework:** xunit.v3.mtp-v2 (`$(XunitV3Version)`, injected by ANcpLua.NET.Sdk)
 - **Assertions:** AwesomeAssertions (`$(AwesomeAssertionsVersion)`, injected by ANcpLua.NET.Sdk)
 - **Test Infrastructure:** ANcpLua.Roslyn.Utilities.Testing ($(ANcpLuaRoslynUtilitiesTestingVersion))
@@ -96,4 +96,4 @@ public Task Test(string p, string s) => VerifyAsync($"class C({p}) {{ void M() {
 - `ANcpLua.Roslyn.Utilities.Testing` - Test base classes (AnalyzerTest, CodeFixTest)
 - `xunit.v3.mtp-v2` - Test framework with MTP protocol
 - `AwesomeAssertions` - Fluent assertions (replaces FluentAssertions)
-- `Basic.Reference.Assemblies.Net100` - Reference assemblies for compilation
+- `Basic.Reference.Assemblies.Net110` - .NET 11 reference assemblies for compilation

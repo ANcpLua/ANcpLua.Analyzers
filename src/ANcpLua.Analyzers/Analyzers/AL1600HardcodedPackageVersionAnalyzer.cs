@@ -105,6 +105,7 @@ public sealed partial class Al1600HardcodedPackageVersionAnalyzer : DiagnosticAn
         ["OpenTelemetry.Instrumentation.SqlClient"] = "OpenTelemetryVersion",
 
         // Build Tools & SDK Analyzers
+        ["Basic.Reference.Assemblies.Net110"] = "BasicReferenceAssembliesVersion",
         ["Basic.Reference.Assemblies.Net100"] = "BasicReferenceAssembliesVersion",
         ["Basic.Reference.Assemblies.Net90"] = "BasicReferenceAssembliesVersion",
         ["Basic.Reference.Assemblies.Net80"] = "BasicReferenceAssembliesVersion",

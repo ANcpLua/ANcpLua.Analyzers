@@ -4,7 +4,20 @@ All notable changes to ANcpLua.Analyzers will be documented in this file.
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-11-23
+
+### Breaking
+
+- **Requires a Roslyn 5.12 compiler (.NET SDK 11.0.100 or later).** The analyzers and code fixes now compile
+  against `Microsoft.CodeAnalysis` 5.12.0 instead of 5.9.0. A .NET 10 SDK, or an IDE whose compiler is older
+  than 5.12, reports CS9057 and runs none of the rules. Move the consuming repository to SDK 11 first.
+
 ### Changed
+
+- The repository builds with .NET SDK 11.0.100 and targets `net11.0` (plus `netstandard2.0` for the shipped
+  assemblies), with C# 15 collection expression arguments (`[with(StringComparer.Ordinal), ...]`) in place of
+  collection initializers.
+- **AL1600** maps `Basic.Reference.Assemblies.Net110` to `BasicReferenceAssembliesVersion`.
 
 - **Messages now carry the fix.** Agents read diagnostics from build output and never run a code fix, so the
   messages of 32 rules were rewritten to say what to write instead (AL1000-AL1008, AL1011, AL1012, AL1109,

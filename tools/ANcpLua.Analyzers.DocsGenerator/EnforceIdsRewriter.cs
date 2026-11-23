@@ -1,10 +1,10 @@
 // Copyright (c) Alexander Nachtmann
 // SPDX-License-Identifier: Apache-2.0
 
-using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Text.RegularExpressions;
 
 namespace ANcpLua.Analyzers.DocsGenerator;
 
@@ -68,7 +68,7 @@ internal static class EnforceIdsRewriter
             //     not "wrong" — each row is the doc for one of the registered descriptors.
             var validIdsForClass = isAnalyzer && allAnalyzerIds.TryGetValue(className, out var idSet)
                 ? idSet
-                : new HashSet<string>(StringComparer.Ordinal) { realId };
+                : [with(StringComparer.Ordinal), realId];
             var classTrivia = classNode.GetLeadingTrivia().ToFullString();
             var fixedClassTrivia = XmlDocIdRegex.Replace(
                 classTrivia,

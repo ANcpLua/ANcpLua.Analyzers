@@ -1,9 +1,9 @@
 // Copyright (c) Alexander Nachtmann
 // SPDX-License-Identifier: Apache-2.0
 
+using Microsoft.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Microsoft.CodeAnalysis;
 
 namespace ANcpLua.Analyzers.DocsGenerator;
 

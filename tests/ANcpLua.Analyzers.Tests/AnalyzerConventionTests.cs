@@ -1,9 +1,9 @@
-﻿using System.Reflection;
-using System.Text.RegularExpressions;
-using ANcpLua.Analyzers.DocsGenerator;
+﻿using ANcpLua.Analyzers.DocsGenerator;
 using ANcpLua.Roslyn.Utilities.Testing.MSBuild;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
+using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace ANcpLua.Analyzers.Tests;
 
