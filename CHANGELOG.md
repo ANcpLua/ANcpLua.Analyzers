@@ -4,6 +4,15 @@ All notable changes to ANcpLua.Analyzers will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- Bundles ANcpLua.Roslyn.Utilities 5.0.1 (built for .NET 11 and Roslyn 5.12) instead of 3.0.0.
+
+### Repository
+
+- Builds with ANcpLua.NET.Sdk 4.0.1, which ships Roslyn 5.12.0 and Basic.Reference.Assemblies 1.8.15;
+  the local `[AHEAD]` overrides for them are gone.
+
 ## [3.0.0] - 2026-11-23
 
 ### Breaking

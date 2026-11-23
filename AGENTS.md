@@ -482,6 +482,16 @@ Rules before touching versions:
   commit, use the next patch version rather than force-moving remote tags.
 - Verify package versions through the NuGet flat-container API before bumping.
 
+Releasing: `CHANGELOG.md` `[Unreleased]` lists what `main` has that NuGet does
+not (for example a newer bundled `ANcpLua.Roslyn.Utilities.dll`). To ship it:
+
+1. Rename `[Unreleased]` to the new version, then tag and push it:
+   `git tag -a vX.Y.Z -m "..." && git push origin main vX.Y.Z`.
+2. Once the flat-container index lists X.Y.Z, set `ANcpLuaAnalyzersVersion` to it
+   in `ANcpLua.NET.Sdk/src/Build/Common/Version.props` and push that repo's
+   `main`; the SDK publishes on push, and consumers get the new analyzers with
+   the next SDK version.
+
 Useful variable names:
 
 | Package | Variable |
@@ -496,8 +506,8 @@ Useful variable names:
 | AwesomeAssertions | `$(AwesomeAssertionsVersion)` |
 
 As of the current local `Version.props`, the Roslyn.Utilities chain is on the
-`3.0.x` line. Do not downgrade below the line that contains the AL1010
-`IsConstantZero` regression fix.
+`5.0.x` line (built for .NET 11 and Roslyn 5.12). Do not downgrade below the line
+that contains the AL1010 `IsConstantZero` regression fix.
 
 ## Cross-Repo Bootstrap
 
